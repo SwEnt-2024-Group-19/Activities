@@ -33,8 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
-import com.github.se.bootcamp.ui.navigation.NavigationActions
-import com.github.se.bootcamp.ui.navigation.Screen
+import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
