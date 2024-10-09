@@ -1,6 +1,5 @@
 package com.android.sample.ui.authentification
 
-import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,12 +37,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
-
+import android.content.Context
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-
 import com.github.se.bootcamp.ui.navigation.NavigationActions
 import com.github.se.bootcamp.ui.navigation.Screen
 
@@ -53,6 +50,8 @@ fun SignInScreen(navigationActions: NavigationActions) {
     val context = LocalContext.current
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
+    val passwordErrorState =
+        remember { mutableStateOf<String?>(null) } // State for password validation error
     val launcher = rememberFirebaseAuthLauncher(onAuthComplete = { result ->
         Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
         Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
@@ -78,7 +77,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                 contentDescription = "App Logo", modifier = Modifier.size(110.dp)
             )
             Spacer(modifier = Modifier.height(48.dp))
-// Email and Password fields
+            // Email and Password fields
             OutlinedTextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
@@ -90,26 +89,42 @@ fun SignInScreen(navigationActions: NavigationActions) {
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
                 label = { Text("Password") },
+                isError = passwordErrorState.value != null, // Highlight the text field in red if there's an error
                 modifier = Modifier.fillMaxWidth(0.8f)
             )
+            // Display password error message below the password field
+            if (passwordErrorState.value != null) {
+                Text(
+                    text = passwordErrorState.value ?: "",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 40.dp, top = 4.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
-
             // Sign In with Email/Password Button
             Button(
                 onClick = {
-
-                    signInWithEmailAndPassword(
-                        emailState.value, passwordState.value, context
-                    )
-
-
+                    when {
+                        passwordState.value.isEmpty() -> {
+                            passwordErrorState.value =
+                                "Password cannot be empty" // Set the error message if password is empty
+                        }
+                        else -> {
+                            signInWithEmailAndPassword(
+                                emailState.value, passwordState.value, context
+                            )
+                        }
+                    }
                 }, modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .height(48.dp)
             ) {
                 Text("Sign in with Email", fontSize = 16.sp)
             }
-
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Authenticate With Google Button
             GoogleSignInButton(onSignInClick = {
@@ -145,6 +160,19 @@ fun SignInScreen(navigationActions: NavigationActions) {
     })
 }
 
+fun signInWithEmailAndPassword(email: String, password: String, context: Context) {
+    val auth = Firebase.auth
+    auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            Log.d("SignInScreen", "signInWithEmail:success")
+            Toast.makeText(context, "Email login successful!", Toast.LENGTH_LONG).show()
+            // Navigate to the next screen upon successful login
+        } else {
+            Log.w("SignInScreen", "signInWithEmail:failure", task.exception)
+            Toast.makeText(context, "Email login failed!", Toast.LENGTH_LONG).show()
+        }
+    }
+}
 
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
@@ -198,19 +226,6 @@ fun rememberFirebaseAuthLauncher(
             }
         } catch (e: ApiException) {
             onAuthError(e)
-        }
-    }
-}
-fun signInWithEmailAndPassword(email: String, password: String, context: Context) {
-    val auth = Firebase.auth
-    auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            Log.d("SignInScreen", "signInWithEmail:success")
-            Toast.makeText(context, "Email login successful!", Toast.LENGTH_LONG).show()
-            // Navigate to the next screen upon successful login
-        } else {
-            Log.w("SignInScreen", "signInWithEmail:failure", task.exception)
-            Toast.makeText(context, "Email login failed!", Toast.LENGTH_LONG).show()
         }
     }
 }
