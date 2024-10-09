@@ -72,15 +72,19 @@ fun ActivitiesApp(name: String, modifier: Modifier = Modifier) {
             route = Route.OVERVIEW,
         ) {
             composable(Screen.OVERVIEW) { BlankScreen() }
-            composable(Screen.ADD_ACTIVITY) {
-                BlankScreen()
-            }
             composable(Screen.EDIT_ACTIVITY) {
                 BlankScreen()
             }
             composable(Screen.ACTIVITY_DETAILS) {
                 BlankScreen()
             }
+        }
+
+        navigation(
+            startDestination = Screen.ADD_ACTIVITY,
+            route = Route.ADD_ACTIVITY
+        ) {
+            composable(Screen.ADD_ACTIVITY) { BlankScreen() }
         }
 
         navigation(

@@ -10,6 +10,7 @@ object Route {
     const val AUTH = "Auth"
     const val OVERVIEW = "Overview"
     const val PROFILE = "Profile"
+    const val ADD_ACTIVITY = "AddActivity"
 }
 
 object Screen {
@@ -28,9 +29,13 @@ data class TopLevelDestination(val route: String, val icon: ImageVector, val tex
 object TopLevelDestinations {
     val OVERVIEW =
         TopLevelDestination(route = Route.OVERVIEW, icon = Icons.Outlined.Menu, textId = "Overview")
+    val PROFILE =
+        TopLevelDestination(route = Route.PROFILE, icon = Icons.Outlined.Menu, textId = "Profile")
+    val ADD_ACTIVITY =
+        TopLevelDestination(route = Route.ADD_ACTIVITY, icon = Icons.Outlined.Menu, textId = "Add Activity")
 }
 
-val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.OVERVIEW)
+val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.OVERVIEW, TopLevelDestinations.PROFILE, TopLevelDestinations.ADD_ACTIVITY)
 
 open class NavigationActions(
     private val navController: NavHostController,
