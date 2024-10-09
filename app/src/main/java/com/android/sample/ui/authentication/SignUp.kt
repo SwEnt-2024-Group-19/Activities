@@ -1,4 +1,4 @@
-package com.android.sample.ui.authentification
+package com.android.sample.ui.authentication
 
 import android.content.Context
 import android.util.Log
@@ -110,7 +110,10 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 text = passwordErrorState.value ?: "",
                 color = Color.Red,
                 fontSize = 12.sp,
-                modifier = Modifier.align(Alignment.Start).padding(start = 40.dp, top = 4.dp))
+                modifier =
+                    Modifier.align(Alignment.Start)
+                        .padding(start = 40.dp, top = 4.dp)
+                        .testTag("PasswordErrorText"))
           }
 
           Spacer(modifier = Modifier.height(16.dp))

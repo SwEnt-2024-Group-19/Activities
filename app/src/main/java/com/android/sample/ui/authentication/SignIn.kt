@@ -1,4 +1,4 @@
-package com.android.sample.ui.authentification
+package com.android.sample.ui.authentication
 
 import android.content.Context
 import android.content.Intent
