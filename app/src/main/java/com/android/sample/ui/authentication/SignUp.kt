@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,7 +77,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
               isError =
                   emailErrorState.value !=
                       null, // Highlight the text field in red if there's an error
-              modifier = Modifier.fillMaxWidth(0.8f))
+              modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
 
           // Display email error message below the email field
           if (emailErrorState.value != null) {
@@ -84,7 +85,10 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 text = emailErrorState.value ?: "",
                 color = Color.Red,
                 fontSize = 12.sp,
-                modifier = Modifier.align(Alignment.Start).padding(start = 40.dp, top = 4.dp))
+                modifier =
+                    Modifier.align(Alignment.Start)
+                        .padding(start = 40.dp, top = 4.dp)
+                        .testTag("EmailErrorText"))
           }
 
           Spacer(modifier = Modifier.height(16.dp))
@@ -99,7 +103,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
               isError =
                   passwordErrorState.value !=
                       null, // Highlight the text field in red if there's an error
-              modifier = Modifier.fillMaxWidth(0.8f))
+              modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"))
           // Display password error message below the password field
           if (passwordErrorState.value != null) {
             Text(
@@ -138,7 +142,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                   }
                 }
               },
-              modifier = Modifier.fillMaxWidth(0.8f).height(48.dp)) {
+              modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignUpButton")) {
                 Text("Sign up with Email", fontSize = 16.sp)
               }
           Spacer(modifier = Modifier.height(16.dp))
@@ -146,7 +150,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
           // If user already has an account, navigate to the sign in screen
           TextButton(
               onClick = { navigationActions.navigateTo(Screen.AUTH) },
-              modifier = Modifier.fillMaxWidth(0.8f).height(36.dp)) {
+              modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignInButton")) {
                 Text("Already an account?", fontSize = 16.sp)
               }
         }

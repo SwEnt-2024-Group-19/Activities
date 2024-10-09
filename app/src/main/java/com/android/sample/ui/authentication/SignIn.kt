@@ -79,14 +79,15 @@ fun SignInScreen(navigationActions: NavigationActions) {
           Image(
               painter = painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
               contentDescription = "App Logo",
-              modifier = Modifier.size(110.dp))
+              modifier = Modifier.size(110.dp).testTag("AppLogo"))
           Spacer(modifier = Modifier.height(48.dp))
+
           // Email and Password fields
           OutlinedTextField(
               value = emailState.value,
               onValueChange = { emailState.value = it },
               label = { Text("Email") },
-              modifier = Modifier.fillMaxWidth(0.8f))
+              modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
           Spacer(modifier = Modifier.height(16.dp))
           OutlinedTextField(
               value = passwordState.value,
@@ -95,7 +96,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
               isError =
                   passwordErrorState.value !=
                       null, // Highlight the text field in red if there's an error
-              modifier = Modifier.fillMaxWidth(0.8f))
+              modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"))
           // Display password error message below the password field
           if (passwordErrorState.value != null) {
             Text(
@@ -105,6 +106,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                 modifier = Modifier.align(Alignment.Start).padding(start = 40.dp, top = 4.dp))
           }
           Spacer(modifier = Modifier.height(16.dp))
+
           // Sign In with Email/Password Button
           Button(
               onClick = {
@@ -118,7 +120,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
                   }
                 }
               },
-              modifier = Modifier.fillMaxWidth(0.8f).height(48.dp)) {
+              modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignInButton")) {
                 Text("Sign in with Email", fontSize = 16.sp)
               }
           Spacer(modifier = Modifier.height(16.dp))
@@ -138,14 +140,15 @@ fun SignInScreen(navigationActions: NavigationActions) {
           // If user already has an account, navigate to the sign in screen
           TextButton(
               onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-              modifier = Modifier.fillMaxWidth(0.8f).height(36.dp)) {
+              modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignUpButton")) {
                 Text("No account yet?", fontSize = 16.sp)
               }
 
           // Continue as a guest button
           TextButton(
               onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
-              modifier = Modifier.fillMaxWidth(0.8f).height(36.dp)) {
+              modifier =
+                  Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("ContinueAsGuestButton")) {
                 Text("Continue as a guest", fontSize = 16.sp)
               }
         }
@@ -176,7 +179,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       modifier =
           Modifier.padding(8.dp)
               .height(48.dp) // Adjust height as needed
-              .testTag("loginButton")) {
+              .testTag("GoogleSignInButton")) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
