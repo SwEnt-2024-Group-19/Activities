@@ -26,86 +26,67 @@ import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var auth: FirebaseAuth
+  private lateinit var auth: FirebaseAuth
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
 
-        auth = FirebaseAuth.getInstance()
+    auth = FirebaseAuth.getInstance()
 
-        setContent {
-            SampleAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .semantics { testTag = C.Tag.main_screen_container },
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    ActivitiesApp("Android")
-                }
+    setContent {
+      SampleAppTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
+            color = MaterialTheme.colorScheme.background) {
+              ActivitiesApp("Android")
             }
-        }
+      }
     }
+  }
 }
 
 @Composable
 fun ActivitiesApp(name: String, modifier: Modifier = Modifier) {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
 
-    val listToDosViewModel: ListActivitiesViewModel =
-        viewModel(factory = ListActivitiesViewModel.Factory)
-    val locationViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
+  val listToDosViewModel: ListActivitiesViewModel =
+      viewModel(factory = ListActivitiesViewModel.Factory)
+  val locationViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
 
-    NavHost(navController = navController, startDestination = Route.AUTH) {
-        navigation(
-            startDestination = Screen.AUTH,
-            route = Route.AUTH,
-        ) {
-            composable(Screen.AUTH) { BlankScreen() }
-            composable(Screen.SIGN_UP) { BlankScreen() }
-        }
-
-        navigation(
-            startDestination = Screen.OVERVIEW,
-            route = Route.OVERVIEW,
-        ) {
-            composable(Screen.OVERVIEW) { BlankScreen() }
-            composable(Screen.EDIT_ACTIVITY) {
-                BlankScreen()
-            }
-            composable(Screen.ACTIVITY_DETAILS) {
-                BlankScreen()
-            }
-        }
-
-        navigation(
-            startDestination = Screen.ADD_ACTIVITY,
-            route = Route.ADD_ACTIVITY
-        ) {
-            composable(Screen.ADD_ACTIVITY) { BlankScreen() }
-        }
-
-        navigation(
-            startDestination = Screen.PROFILE,
-            route = Route.PROFILE
-        ) {
-            composable(Screen.PROFILE) { BlankScreen() }
-            composable(Screen.EDIT_PROFILE) { BlankScreen() }
-        }
-
+  NavHost(navController = navController, startDestination = Route.AUTH) {
+    navigation(
+        startDestination = Screen.AUTH,
+        route = Route.AUTH,
+    ) {
+      composable(Screen.AUTH) { BlankScreen() }
+      composable(Screen.SIGN_UP) { BlankScreen() }
     }
 
+    navigation(
+        startDestination = Screen.OVERVIEW,
+        route = Route.OVERVIEW,
+    ) {
+      composable(Screen.OVERVIEW) { BlankScreen() }
+      composable(Screen.EDIT_ACTIVITY) { BlankScreen() }
+      composable(Screen.ACTIVITY_DETAILS) { BlankScreen() }
+    }
+
+    navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
+      composable(Screen.ADD_ACTIVITY) { BlankScreen() }
+    }
+
+    navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
+      composable(Screen.PROFILE) { BlankScreen() }
+      composable(Screen.EDIT_PROFILE) { BlankScreen() }
+    }
+  }
 }
 
 @Composable
 fun BlankScreen() {
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .semantics { testTag = C.Tag.blank_screen },
-        color = MaterialTheme.colorScheme.background
-    ) {
-    }
+  Surface(
+      modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.blank_screen },
+      color = MaterialTheme.colorScheme.background) {}
 }
