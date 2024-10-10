@@ -16,12 +16,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,12 +47,15 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityRepositoryFirestore
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivityViewModel
+import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateActivityScreen(
-    lAV: ListActivityViewModel,
-    aRF: ActivityRepositoryFirestore,
+    listActivityViewModel: ListActivityViewModel,
+    activityRepositoryFirestore: ActivityRepositoryFirestore,
+    navigationActions: NavigationActions,
 ) {
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
@@ -60,19 +64,18 @@ fun CreateActivityScreen(
   var price by remember { mutableStateOf("") }
   var placesLeft by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
-  val context = LocalContext.current
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = { Text("Create a new activity") },
             navigationIcon = {
-              Icon(
-                  Icons.AutoMirrored.Filled.ArrowBack,
-                  contentDescription = "", // Add a valid content description
-              )
-            },
-            modifier = Modifier.fillMaxWidth().background(Color(0xFFF0F0F0)))
+              IconButton(onClick = { navigationActions.goBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                    contentDescription = "Back")
+              }
+            })
       },
       content = { paddingValues ->
         Column(
@@ -135,7 +138,7 @@ fun CreateActivityScreen(
               onClick = {
                 val activity =
                     Activity(
-                        uid = aRF.getNewUid(),
+                        uid = activityRepositoryFirestore.getNewUid(),
                         title = title,
                         description = description,
                         date = dueDate,
@@ -147,7 +150,8 @@ fun CreateActivityScreen(
                         location = location,
                         images = listOf(),
                     )
-                lAV.addActivity(activity)
+                listActivityViewModel.addActivity(activity)
+                navigationActions.navigateTo(Screen.OVERVIEW)
               },
               modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
           ) {
