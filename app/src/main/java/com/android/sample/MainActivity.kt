@@ -9,8 +9,6 @@ import com.android.sample.model.UserProfileViewModel
 import com.android.sample.ui.profile.ProfileScreen
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.initialize
-
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,15 +18,13 @@ class MainActivity : ComponentActivity() {
     val db = FirebaseFirestore.getInstance()
     val repository = ProfilesRepositoryFirestore(db)
 
-   // Log.e("Not an error "," just after repository creation")
+    // Log.e("Not an error "," just after repository creation")
     val userId = "jp3oRcsfzjcIL7QkiEm7"
 
     val viewModel: UserProfileViewModel by viewModels {
       UserProfileViewModel.provideFactory(repository, userId)
     }
 
-    setContent {
-      ProfileScreen(viewModel)
-      }
-    }
+    setContent { ProfileScreen(viewModel) }
   }
+}
