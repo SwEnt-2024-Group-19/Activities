@@ -30,8 +30,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
-import com.github.se.bootcamp.ui.navigation.NavigationActions
-import com.github.se.bootcamp.ui.navigation.Screen
+import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
