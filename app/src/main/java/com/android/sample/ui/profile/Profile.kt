@@ -1,6 +1,9 @@
 package com.android.sample.ui.profile
 
 
+import android.content.Context
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,26 +20,45 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
+import com.android.sample.model.Activity
+import com.android.sample.model.User
+import com.android.sample.model.UserProfileViewModel
+import coil.compose.rememberImagePainter
+
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(userProfileViewModel: UserProfileViewModel) {
 
-    var name by remember { mutableStateOf("") }
+    userProfileViewModel.userState.let { it.value?.let { it1 -> Log.e("not an error",
+        "name" + it1.name ) } }
+    val profileState = userProfileViewModel.userState.collectAsState()
 
+    Log.e("not an error ", "interests are " + profileState.value?.interests.toString())
+    when (val profile = profileState.value) {
+        null -> LoadingScreen()  // Show a loading indicator or a retry button
+        else -> ProfileContent(user = profile)  // Proceed with showing profile content
+    }
+}
+
+@Composable
+fun LoadingScreen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text("Loading profile...", color = Color.Gray)
+    }
+}
+
+@Composable
+fun ProfileContent(user: User) {
     Scaffold(
-       // bottomBar = {}
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         Column(
@@ -45,6 +67,7 @@ fun ProfileScreen() {
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(Modifier.height(16.dp))
             Text(
                 text = "Profile",
                 fontSize = 30.sp,
@@ -52,22 +75,25 @@ fun ProfileScreen() {
             )
 
             // Profile Picture
-            Box(
-                modifier = Modifier
-                    .size(100.dp) // Size of the circle
-                    .clip(CircleShape)
-                    .background(Color.Gray) // Placeholder color
-                    .padding(16.dp), // Padding inside the circle
-                contentAlignment = Alignment.Center
-            ) {
-                // Replace with an Image when available
-                // Image(painter = painterResource(R.drawable.profile_pic), contentDescription = null)
-            }
 
-            // Name
+            ProfileImage(
+                url = user.photo,
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+            )
+
+            // User Name and Surname
             Text(
-                text = name,
+                text = "${user.name} ${user.surname}",
                 fontSize = 20.sp,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            // Interests
+            Text(
+                text = "Interests: ${user.interests?.joinToString(", ")}",
+                fontSize = 18.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
@@ -80,24 +106,22 @@ fun ProfileScreen() {
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp)
             )
 
-            // Scrollable Lazy Column for activities
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp)
             ) {
-                items(10) { index -> // Replace 10 with your activities list size
-                    ActivityBox(index + 1)
+                user.activities?.let { activities ->
+                    items(activities.size) { index ->
+                        ActivityBox(activity = activities[index])
+                    }
                 }
             }
         }
+    }
+}
 
-
-            }
-
-
-        }
 @Composable
-fun ActivityBox(activityNumber: Int) {
+fun ActivityBox(activity: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,6 +131,27 @@ fun ActivityBox(activityNumber: Int) {
             .background(Color.LightGray), // Box background color
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Activity $activityNumber", fontSize = 18.sp)
+        Text(text = "Activity $activity.name", fontSize = 18.sp)
     }
+
+
+}
+
+@Composable
+fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
+    val painter = rememberImagePainter(
+        data = url, // URL of the image
+        builder = {
+            crossfade(true) // Optional: enable crossfade animation
+             // Optional: placeholder image
+            // Optional: error image if the URL load fails
+        }
+    )
+
+    Image(
+        painter = painter,
+        contentDescription = "Profile Image",
+        modifier = modifier,
+        contentScale = ContentScale.Crop // Adjust the scaling to suit your layout needs
+    )
 }

@@ -1,41 +1,34 @@
 package com.android.sample
 
 import android.os.Bundle
-import android.provider.ContactsContract.Profile
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.tooling.preview.Preview
-import com.android.sample.resources.C
-import com.android.sample.ui.theme.SampleAppTheme
+import androidx.activity.viewModels
+import com.android.sample.model.ProfilesRepositoryFirestore
+import com.android.sample.model.UserProfileViewModel
 import com.android.sample.ui.profile.ProfileScreen
-
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.initialize
 
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    FirebaseApp.initializeApp(this)
+
+    val db = FirebaseFirestore.getInstance()
+    val repository = ProfilesRepositoryFirestore(db)
+
+   // Log.e("Not an error "," just after repository creation")
+    val userId = "jp3oRcsfzjcIL7QkiEm7"
+
+    val viewModel: UserProfileViewModel by viewModels {
+      UserProfileViewModel.provideFactory(repository, userId)
+    }
+
     setContent {
-      ProfileScreen()
+      ProfileScreen(viewModel)
       }
     }
   }
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-  Text(text = "Hello $name!", modifier = modifier.semantics { testTag = C.Tag.greeting })
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-  SampleAppTheme { Greeting("Android") }
-}
