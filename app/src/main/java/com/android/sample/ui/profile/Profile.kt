@@ -2,6 +2,7 @@ package com.android.sample.ui.profile
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,14 +28,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 
 @Composable
 fun ProfileScreen() {
 
     var name by remember { mutableStateOf("") }
+    var newInterest by remember { mutableStateOf("") }
+    var interests by remember { mutableStateOf(listOf<String>()) }
 
     Scaffold(
        // bottomBar = {}
@@ -73,6 +78,56 @@ fun ProfileScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Interests Section
+            Text(
+                text = "Interests",
+                fontSize = 24.sp,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+            )
+
+            // Input field to add interests
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                TextField(
+                    value = newInterest,
+                    onValueChange = { newInterest = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text(text = "Add interest") }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .background(Color.Blue)
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Add",
+                        color = Color.White,
+                        modifier = Modifier.clickable {
+                            if (newInterest.isNotBlank()) {
+                                interests = interests + newInterest
+                                newInterest = ""
+                            }
+                        }
+                    )
+                }
+            }
+
+            // List of interests
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                contentPadding = PaddingValues(vertical = 8.dp)
+            ) {
+                items(interests.size) { index ->
+                    InterestItem(interests[index])
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Activities Section
             Text(
                 text = "Activities Created",
@@ -96,6 +151,8 @@ fun ProfileScreen() {
 
 
         }
+//how do I get access to the activity views ?
+
 @Composable
 fun ActivityBox(activityNumber: Int) {
     Box(
@@ -108,5 +165,20 @@ fun ActivityBox(activityNumber: Int) {
         contentAlignment = Alignment.Center
     ) {
         Text(text = "Activity $activityNumber", fontSize = 18.sp)
+    }
+}
+
+@Composable
+fun InterestItem(interest: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.LightGray)
+            .padding(16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(text = interest, fontSize = 18.sp)
     }
 }
