@@ -49,65 +49,58 @@ import com.android.sample.ui.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
-    listActivityViewModel: ListActivityViewModel = viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivityViewModel =
+        viewModel(factory = ListActivitiesViewModel.Factory),
     activityRepositoryFirestore: ActivityRepositoryFirestore,
     navigationActions: NavigationActions
 ) {
-    val activity = listActivityViewModel.selectedActivity.collectAsState().value
+  val activity = listActivityViewModel.selectedActivity.collectAsState().value
   var activityTitle by remember { mutableStateOf(activity?.title) }
   var description by remember { mutableStateOf(activity?.description) }
   var price by remember { mutableStateOf(activity?.price) }
   var schedule by remember { mutableStateOf(activity?.date) }
-    var location by remember { mutableStateOf(activity?.location) }
-    var placesLeft by remember { mutableStateOf(activity?.placesLeft) }
-    var maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
-    var creator by remember { mutableStateOf(activity?.creator) }
-    var status by remember { mutableStateOf(activity?.status) }
+  var location by remember { mutableStateOf(activity?.location) }
+  var placesLeft by remember { mutableStateOf(activity?.placesLeft) }
+  var maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
+  var creator by remember { mutableStateOf(activity?.creator) }
+  var status by remember { mutableStateOf(activity?.status) }
 
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-
-    Scaffold(
+  Scaffold(
       topBar = {
-          TopAppBar(
-              title = { Text("Title", modifier = Modifier.testTag("editTodoTitle")) },
-              navigationIcon = {
-                  IconButton(
-                      modifier = Modifier.testTag("goBackButton"),
-                      onClick = { navigationActions.goBack() }) {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                          contentDescription = "Back")
+        TopAppBar(
+            title = { Text("Title", modifier = Modifier.testTag("editTodoTitle")) },
+            navigationIcon = {
+              IconButton(
+                  modifier = Modifier.testTag("goBackButton"),
+                  onClick = { navigationActions.goBack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back")
                   }
-              })
+            })
       }) { padding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .padding(16.dp)) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
           // Image section
           Imagery()
 
           Spacer(modifier = Modifier.height(16.dp))
 
           // Title and description
-          Text(text = activityTitle?:"", style = MaterialTheme.typography.titleMedium)
+          Text(text = activityTitle ?: "", style = MaterialTheme.typography.titleMedium)
           Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Description:",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = description?:"",
-                style = MaterialTheme.typography.bodyMedium
-            )
+          Text(
+              text = "Description:",
+              style = MaterialTheme.typography.bodyMedium,
+          )
+          Spacer(modifier = Modifier.height(4.dp))
+          Text(text = description ?: "", style = MaterialTheme.typography.bodyMedium)
 
           Spacer(modifier = Modifier.height(16.dp))
 
-
-            //  price and schedule
+          //  price and schedule
           Spacer(modifier = Modifier.height(8.dp))
           Row(
               verticalAlignment = Alignment.CenterVertically,
@@ -123,61 +116,56 @@ fun ActivityDetailsScreen(
           Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.DateRange, contentDescription = "Schedule")
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = schedule?:"not defined yet")
+            Text(text = schedule ?: "not defined yet")
           }
 
           Spacer(modifier = Modifier.height(32.dp))
 
           // Enroll button
-          Button(onClick = {
-              if((placesLeft ?: 0) > 0) {
+          Button(
+              onClick = {
+                if ((placesLeft ?: 0) > 0) {
                   val theActivity =
                       Activity(
                           uid = activityRepositoryFirestore.getNewUid(),
-                          title = activityTitle?:"",
-                          description = description?:"",
-                          date = schedule?:"",
-                          price = price?: 0.0,
+                          title = activityTitle ?: "",
+                          description = description ?: "",
+                          date = schedule ?: "",
+                          price = price ?: 0.0,
                           placesLeft = (placesLeft ?: 0).let { if (it > 0) it - 1 else 0 },
-                          maxPlaces = maxPlaces?: 0,
-                          creator = creator?:"",
-                          status = status?: ActivityStatus.ACTIVE,
-                          location = location?:"",
+                          maxPlaces = maxPlaces ?: 0,
+                          creator = creator ?: "",
+                          status = status ?: ActivityStatus.ACTIVE,
+                          location = location ?: "",
                           images = listOf(),
                       )
                   listActivityViewModel.addActivity(theActivity)
-                  Toast.makeText(
-                      context, "Enroll Successful", Toast.LENGTH_SHORT)
-                      .show()
+                  Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
                   navigationActions.navigateTo(Screen.OVERVIEW)
-              }
-              else {
+                } else {
                   Toast.makeText(
-                      context, "Enroll failed, limit of places reached", Toast.LENGTH_SHORT)
+                          context, "Enroll failed, limit of places reached", Toast.LENGTH_SHORT)
                       .show()
-              } }
-              , modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(horizontal = 24.dp)) {
-            Text(text = "Enroll")
-          }
+                }
+              },
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+                Text(text = "Enroll")
+              }
         }
       }
 }
+
 @Composable
 fun Imagery() {
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .padding(3.dp),
-        ) {
-            items(com.android.sample.ui.activity.items.size) { index ->
-                Image(
-                    painter = painterResource(id = com.android.sample.ui.activity.items[index].imageResId),
-                    contentDescription = com.android.sample.ui.activity.items[index].contentDescription,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.padding(8.dp))
-            }
-        }
+  LazyRow(
+      modifier = Modifier.fillMaxWidth().height(200.dp).padding(3.dp),
+  ) {
+    items(com.android.sample.ui.activity.items.size) { index ->
+      Image(
+          painter = painterResource(id = com.android.sample.ui.activity.items[index].imageResId),
+          contentDescription = com.android.sample.ui.activity.items[index].contentDescription,
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.padding(8.dp))
+    }
+  }
 }
