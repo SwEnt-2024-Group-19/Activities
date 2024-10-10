@@ -17,14 +17,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 
-
 data class Activity(
-    val uid : String,
+    val uid: String,
     var title: String,
     var description: String,
     var date: String,
-    //var category: Category,
-    var price : Double,
+    // var category: Category,
+    var price: Double,
     var location: String,
     var creator: String,
     var images: List<Image>,
@@ -34,81 +33,74 @@ data class Activity(
 )
 
 enum class ActivityStatus {
-    ACTIVE,
-    FINISHED,
+  ACTIVE,
+  FINISHED,
 }
 
 enum class Category {
-    WORKSHOP,
-    TALK,
-    KEYNOTE,
-    BREAK,
-    LUNCH,
-    NETWORKING,
-    SOCIAL,
-    OTHER,
+  WORKSHOP,
+  TALK,
+  KEYNOTE,
+  BREAK,
+  LUNCH,
+  NETWORKING,
+  SOCIAL,
+  OTHER,
 }
 
-val categories= listOf(
-    Category.WORKSHOP,
-    Category.TALK,
-    Category.KEYNOTE,
-    Category.BREAK,
-    Category.LUNCH,
-    Category.NETWORKING,
-    Category.SOCIAL,
-    Category.OTHER,
-)
+val categories =
+    listOf(
+        Category.WORKSHOP,
+        Category.TALK,
+        Category.KEYNOTE,
+        Category.BREAK,
+        Category.LUNCH,
+        Category.NETWORKING,
+        Category.SOCIAL,
+        Category.OTHER,
+    )
+
 @Composable
 fun CategoryDropdown() {
-    var   selectedCategory= remember { mutableStateOf<Category?>(null) }
-    var open = remember { mutableStateOf(false) }
-    Column {
-        OutlinedTextField(
-            value = CategoryToString(selectedCategory),
-            onValueChange = {
-                open.value = true
-            },
-            label = { Text("Enter Location") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("inputTodoLocation")
-                .padding(16.dp),
-        )
+  var selectedCategory = remember { mutableStateOf<Category?>(null) }
+  var open = remember { mutableStateOf(false) }
+  Column {
+    OutlinedTextField(
+        value = CategoryToString(selectedCategory),
+        onValueChange = { open.value = true },
+        label = { Text("Enter Location") },
+        modifier = Modifier.fillMaxWidth().testTag("inputTodoLocation").padding(16.dp),
+    )
 
-        DropdownMenu(
-            expanded = open.value ,
-            properties = PopupProperties(focusable = false),
-            onDismissRequest = { open.value = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)) {
-            categories.forEach { cat ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedCategory=mutableStateOf<Category?>(cat)
-                        open.value = false
-
-                    },
-                    text = { Text("") },
-                    )
-            }
+    DropdownMenu(
+        expanded = open.value,
+        properties = PopupProperties(focusable = false),
+        onDismissRequest = { open.value = false },
+        modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+          categories.forEach { cat ->
+            DropdownMenuItem(
+                onClick = {
+                  selectedCategory = mutableStateOf<Category?>(cat)
+                  open.value = false
+                },
+                text = { Text("") },
+            )
+          }
         }
-    }
+  }
 }
 
 fun CategoryToString(category: MutableState<Category?>): String {
 
-        return when (category.value) {
-            Category.WORKSHOP -> "Workshop"
-            Category.TALK -> "Talk"
-            Category.KEYNOTE -> "Keynote"
-            Category.BREAK -> "Break"
-            Category.LUNCH -> "Lunch"
-            Category.NETWORKING -> "Networking"
-            Category.SOCIAL -> "Social"
-            Category.OTHER -> "Other"
-            null -> ""
-        }
-
+  return when (category.value) {
+    Category.WORKSHOP -> "Workshop"
+    Category.TALK -> "Talk"
+    Category.KEYNOTE -> "Keynote"
+    Category.BREAK -> "Break"
+    Category.LUNCH -> "Lunch"
+    Category.NETWORKING -> "Networking"
+    Category.SOCIAL -> "Social"
+    Category.OTHER -> "Other"
+    null -> ""
+  }
 }
