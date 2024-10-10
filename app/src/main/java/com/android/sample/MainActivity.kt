@@ -18,6 +18,7 @@ import androidx.navigation.navigation
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
+import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
 import com.android.sample.ui.navigation.NavigationActions
@@ -36,7 +37,10 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              ActivitiesApp("Android")
+              ActivityDetailsScreen(    // Change 1
+                  listToDosViewModel = viewModel(factory = ListActivitiesViewModel.Factory),
+                  navigationActions = NavigationActions(rememberNavController())
+              )
             }
       }
     }
