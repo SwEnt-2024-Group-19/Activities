@@ -5,27 +5,36 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -58,8 +67,12 @@ fun LoadingScreen() {
 
 @Composable
 fun ProfileContent(user: User) {
+
+    var newInterest by remember { mutableStateOf("") }
+    var interests by remember { mutableStateOf(listOf<String>()) }
+
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().testTag("profileScreen")
     ) { innerPadding ->
         Column(
             Modifier
@@ -80,22 +93,58 @@ fun ProfileContent(user: User) {
                 url = user.photo,
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(CircleShape)
+                    .clip(CircleShape).testTag("profilePicture")
             )
+
+
 
             // User Name and Surname
             Text(
                 text = "${user.name} ${user.surname}",
                 fontSize = 20.sp,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp).testTag("userName")
             )
 
             // Interests
             Text(
                 text = "Interests: ${user.interests?.joinToString(", ")}",
                 fontSize = 18.sp,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp).testTag("interestsSection")
             )
+/*
+            // Input field to add interests
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                TextField(
+                    value = newInterest,
+                    onValueChange = { newInterest = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text(text = "Add interest") }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .background(Color.Blue)
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Add",
+                        color = Color.White,
+                        modifier = Modifier.clickable {
+                            if (newInterest.isNotBlank()) {
+                                interests = interests + newInterest
+                                newInterest = ""
+                            }
+                        }
+                    )
+                }
+            }
+
+ */
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -103,11 +152,11 @@ fun ProfileContent(user: User) {
             Text(
                 text = "Activities Created",
                 fontSize = 24.sp,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp).testTag("activitiesSection")
             )
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().testTag("activitiesList"),
                 contentPadding = PaddingValues(16.dp)
             ) {
                 user.activities?.let { activities ->
@@ -148,10 +197,15 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
         }
     )
 
+
+
     Image(
         painter = painter,
         contentDescription = "Profile Image",
         modifier = modifier,
         contentScale = ContentScale.Crop // Adjust the scaling to suit your layout needs
     )
+
+
 }
+

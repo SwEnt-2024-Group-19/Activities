@@ -187,7 +187,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.inline)
+    testImplementation("org.mockito:mockito-inline:4.10.0")
+    testImplementation("org.mockito:mockito-core:4.10.0")
+
+    //testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
@@ -279,3 +282,4 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
 }
+
