@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class UserProfileViewModel(private val repository: ProfilesRepository, userId: String) : ViewModel() {
+open class UserProfileViewModel(private val repository: ProfilesRepository, userId: String) : ViewModel() {
     private var userState_ = MutableStateFlow<User?>(null)
-    val userState : StateFlow<User?> = userState_.asStateFlow()
+    open val userState : StateFlow<User?> = userState_.asStateFlow()
 
     init {
         fetchUserData(userId)
