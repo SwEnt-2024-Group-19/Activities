@@ -1,18 +1,17 @@
 package com.android.sample.ui.activitydetails
 
-import androidx.compose.foundation.background
+import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachMoney
@@ -33,26 +32,37 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ActivityRepositoryFirestore
+import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.ListActivityViewModel
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
-    listToDosViewModel: ListActivitiesViewModel = viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivityViewModel = viewModel(factory = ListActivitiesViewModel.Factory),
+    activityRepositoryFirestore: ActivityRepositoryFirestore,
     navigationActions: NavigationActions
 ) {
-    val activity = listToDosViewModel.selectedActivity.collectAsState().value
+    val activity = listActivityViewModel.selectedActivity.collectAsState().value
   var activityTitle by remember { mutableStateOf(activity?.title) }
   var description by remember { mutableStateOf(activity?.description) }
   var price by remember { mutableStateOf(activity?.price) }
   var schedule by remember { mutableStateOf(activity?.date) }
+    var location by remember { mutableStateOf(activity?.location) }
+    var placesLeft by remember { mutableStateOf(activity?.placesLeft) }
+    var maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
+    var creator by remember { mutableStateOf(activity?.creator) }
+    var status by remember { mutableStateOf(activity?.status) }
 
     val context = LocalContext.current
 
@@ -71,20 +81,12 @@ fun ActivityDetailsScreen(
                   }
               })
       }) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(16.dp)) {
           // Image section
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .aspectRatio(16 / 9f)
-                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                      .clip(RoundedCornerShape(8.dp))) {
-                // Placeholder for the image
-                Text(
-                    text = "Activity Image",
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color.White)
-              }
+          Imagery()
 
           Spacer(modifier = Modifier.height(16.dp))
 
@@ -127,9 +129,55 @@ fun ActivityDetailsScreen(
           Spacer(modifier = Modifier.height(32.dp))
 
           // Enroll button
-          Button(onClick = {}, modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+          Button(onClick = {
+              if((placesLeft ?: 0) > 0) {
+                  val theActivity =
+                      Activity(
+                          uid = activityRepositoryFirestore.getNewUid(),
+                          title = activityTitle?:"",
+                          description = description?:"",
+                          date = schedule?:"",
+                          price = price?: 0.0,
+                          placesLeft = (placesLeft ?: 0).let { if (it > 0) it - 1 else 0 },
+                          maxPlaces = maxPlaces?: 0,
+                          creator = creator?:"",
+                          status = status?: ActivityStatus.ACTIVE,
+                          location = location?:"",
+                          images = listOf(),
+                      )
+                  listActivityViewModel.addActivity(theActivity)
+                  Toast.makeText(
+                      context, "Enroll Successful", Toast.LENGTH_SHORT)
+                      .show()
+                  navigationActions.navigateTo(Screen.OVERVIEW)
+              }
+              else {
+                  Toast.makeText(
+                      context, "Enroll failed, limit of places reached", Toast.LENGTH_SHORT)
+                      .show()
+              } }
+              , modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 24.dp)) {
             Text(text = "Enroll")
           }
         }
       }
+}
+@Composable
+fun Imagery() {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(3.dp),
+        ) {
+            items(com.android.sample.ui.activity.items.size) { index ->
+                Image(
+                    painter = painterResource(id = com.android.sample.ui.activity.items[index].imageResId),
+                    contentDescription = com.android.sample.ui.activity.items[index].contentDescription,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.padding(8.dp))
+            }
+        }
 }
