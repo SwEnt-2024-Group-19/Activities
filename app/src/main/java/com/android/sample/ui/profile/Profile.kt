@@ -27,16 +27,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 import com.android.sample.model.User
 import com.android.sample.model.UserProfileViewModel
-import coil.compose.rememberImagePainter
 
 
 @Composable
 fun ProfileScreen(userProfileViewModel: UserProfileViewModel) {
 
-    userProfileViewModel.userState.let { it.value?.let { it1 -> Log.e("not an error",
-        "name" + it1.name ) } }
+    userProfileViewModel.userState.let {
+        it.value?.let { it1 ->
+            Log.e(
+                "not an error",
+                "name" + it1.name
+            )
+        }
+    }
     val profileState = userProfileViewModel.userState.collectAsState()
 
     Log.e("not an error ", "interests are " + profileState.value?.interests.toString())
@@ -57,7 +63,9 @@ fun LoadingScreen() {
 fun ProfileContent(user: User) {
 
     Scaffold(
-        modifier = Modifier.fillMaxSize().testTag("profileScreen")
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("profileScreen")
     ) { innerPadding ->
         Column(
             Modifier
@@ -78,23 +86,27 @@ fun ProfileContent(user: User) {
                 url = user.photo,
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(CircleShape).testTag("profilePicture")
+                    .clip(CircleShape)
+                    .testTag("profilePicture")
             )
-
 
 
             // User Name and Surname
             Text(
                 text = "${user.name} ${user.surname}",
                 fontSize = 20.sp,
-                modifier = Modifier.padding(top = 8.dp).testTag("userName")
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .testTag("userName")
             )
 
             // Interests
             Text(
                 text = "Interests: ${user.interests?.joinToString(", ")}",
                 fontSize = 18.sp,
-                modifier = Modifier.padding(top = 8.dp).testTag("interestsSection")
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .testTag("interestsSection")
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -103,11 +115,15 @@ fun ProfileContent(user: User) {
             Text(
                 text = "Activities Created",
                 fontSize = 24.sp,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp).testTag("activitiesSection")
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 16.dp)
+                    .testTag("activitiesSection")
             )
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize().testTag("activitiesList"),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("activitiesList"),
                 contentPadding = PaddingValues(16.dp)
             ) {
                 user.activities?.let { activities ->
@@ -141,7 +157,7 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
         data = url, // URL of the image
         builder = {
             crossfade(true) // Optional: enable crossfade animation
-             // Optional: placeholder image
+            // Optional: placeholder image
             // Optional: error image if the URL load fails
         }
     )
