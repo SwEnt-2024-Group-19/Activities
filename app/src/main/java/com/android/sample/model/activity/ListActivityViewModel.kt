@@ -10,11 +10,10 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class ListActivityViewModel(private val repository: ActivityRepository): ViewModel() {
     private val activities_ = MutableStateFlow<List<Activity>>(emptyList())
-    val todos: StateFlow<List<Activity>> = activities_.asStateFlow()
+    val activities: StateFlow<List<Activity>> = activities_.asStateFlow()
 
-    // Selected todo, i.e the todo for the detail view
     private val selectedActivity_ = MutableStateFlow<Activity?>(null)
-    open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
+     val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
     init {
         repository.init { getActivities() }
