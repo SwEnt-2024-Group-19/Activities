@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -162,7 +164,6 @@ dependencies {
     implementation(libs.maps.compose.utils)
     implementation(libs.play.services.auth)
 
-
     // Firebase
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
@@ -228,7 +229,6 @@ dependencies {
     // UI Tests
     globalTestImplementation(libs.compose.test.junit)
     debugImplementation(libs.compose.test.manifest)
-
 
     // ------------- Coil ------------------
     implementation(libs.coil.compose)
