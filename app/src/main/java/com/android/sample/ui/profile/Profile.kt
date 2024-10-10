@@ -24,149 +24,121 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.android.sample.model.User
 import com.android.sample.model.UserProfileViewModel
-
 
 @Composable
 fun ProfileScreen(userProfileViewModel: UserProfileViewModel) {
 
-    userProfileViewModel.userState.let {
-        it.value?.let { it1 ->
-            Log.e(
-                "not an error",
-                "name" + it1.name
-            )
-        }
-    }
-    val profileState = userProfileViewModel.userState.collectAsState()
+  userProfileViewModel.userState.let {
+    it.value?.let { it1 -> Log.e("not an error", "name" + it1.name) }
+  }
+  val profileState = userProfileViewModel.userState.collectAsState()
 
-    Log.e("not an error ", "interests are " + profileState.value?.interests.toString())
-    when (val profile = profileState.value) {
-        null -> LoadingScreen()  // Show a loading indicator or a retry button
-        else -> ProfileContent(user = profile)  // Proceed with showing profile content
-    }
+  Log.e("not an error ", "interests are " + profileState.value?.interests.toString())
+  when (val profile = profileState.value) {
+    null -> LoadingScreen() // Show a loading indicator or a retry button
+    else -> ProfileContent(user = profile) // Proceed with showing profile content
+  }
 }
 
 @Composable
 fun LoadingScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Loading profile...", color = Color.Gray)
-    }
+  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Text("Loading profile...", color = Color.Gray)
+  }
 }
 
 @Composable
 fun ProfileContent(user: User) {
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag("profileScreen")
-    ) { innerPadding ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = "Profile",
-                fontSize = 30.sp,
-                modifier = Modifier.padding(top = 16.dp)
-            )
+  Scaffold(modifier = Modifier.fillMaxSize().testTag("profileScreen")) { innerPadding ->
+    Column(
+        Modifier.fillMaxSize().padding(innerPadding),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+          Spacer(Modifier.height(16.dp))
+          Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
 
-            // Profile Picture
+          // Profile Picture
 
-            ProfileImage(
-                url = user.photo,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .testTag("profilePicture")
-            )
+          ProfileImage(
+              url = user.photo,
+              modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
+          // User Name and Surname
+          Text(
+              text = "${user.name} ${user.surname}",
+              fontSize = 20.sp,
+              modifier = Modifier.padding(top = 8.dp).testTag("userName"))
 
-            // User Name and Surname
-            Text(
-                text = "${user.name} ${user.surname}",
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .testTag("userName")
-            )
+          // Interests
+          Text(
+              text = "Interests: ${user.interests?.joinToString(", ")}",
+              fontSize = 18.sp,
+              modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
 
-            // Interests
-            Text(
-                text = "Interests: ${user.interests?.joinToString(", ")}",
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .testTag("interestsSection")
-            )
+          Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+          // Activities Section
+          Text(
+              text = "Activities Created",
+              fontSize = 24.sp,
+              modifier = Modifier.padding(start = 16.dp, top = 16.dp).testTag("activitiesSection"))
 
-            // Activities Section
-            Text(
-                text = "Activities Created",
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 16.dp)
-                    .testTag("activitiesSection")
-            )
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .testTag("activitiesList"),
-                contentPadding = PaddingValues(16.dp)
-            ) {
+          LazyColumn(
+              modifier = Modifier.fillMaxSize().testTag("activitiesList"),
+              contentPadding = PaddingValues(16.dp)) {
                 user.activities?.let { activities ->
-                    items(activities.size) { index ->
-                        ActivityBox(activity = activities[index])
-                    }
+                  items(activities.size) { index -> ActivityBox(activity = activities[index]) }
                 }
-            }
+              }
         }
-    }
+  }
 }
 
 @Composable
 fun ActivityBox(activity: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .height(60.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray), // Box background color
-        contentAlignment = Alignment.Center
-    ) {
+  Box(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(vertical = 8.dp)
+              .height(60.dp)
+              .clip(RoundedCornerShape(8.dp))
+              .background(Color.LightGray), // Box background color
+      contentAlignment = Alignment.Center) {
         Text(text = "Activity $activity.name", fontSize = 18.sp)
-    }
+      }
 }
 
 @Composable
 fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
-    val painter = rememberImagePainter(
-        data = url, // URL of the image
-        builder = {
-            crossfade(true) // Optional: enable crossfade animation
-            // Optional: placeholder image
-            // Optional: error image if the URL load fails
-        }
-    )
+  val painter = // Optional: enable crossfade animation
+      // Optional: placeholder image
+      // Optional: error image if the URL load fails
+      rememberAsyncImagePainter(
+          ImageRequest.Builder(LocalContext.current)
+              .data(
+                  data = url // URL of the image
+                  )
+              .apply(
+                  block =
+                      fun ImageRequest.Builder.() {
+                        crossfade(true) // Optional: enable crossfade animation
+                        // Optional: placeholder image
+                        // Optional: error image if the URL load fails
+                      })
+              .build())
 
-    Image(
-        painter = painter,
-        contentDescription = "Profile Image",
-        modifier = modifier,
-        contentScale = ContentScale.Crop // Adjust the scaling to suit your layout needs
-    )
+  Image(
+      painter = painter,
+      contentDescription = "Profile Image",
+      modifier = modifier,
+      contentScale = ContentScale.Crop // Adjust the scaling to suit your layout needs
+      )
 }
-
