@@ -13,7 +13,7 @@ class ActivityRepositoryFirestore(private val db: FirebaseFirestore) : ActivityR
   }
 
   override fun init(onSuccess: () -> Unit) {
-      onSuccess()
+    onSuccess()
   }
 
   override fun getActivities(onSuccess: (List<Activity>) -> Unit, onFailure: (Exception) -> Unit) {
