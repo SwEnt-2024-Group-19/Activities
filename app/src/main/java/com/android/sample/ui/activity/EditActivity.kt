@@ -12,10 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,22 +34,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityRepositoryFirestore
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivityViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivityScreen(
-    lAV: ListActivityViewModel,
-    aRF: ActivityRepositoryFirestore,
+    listActivityViewModel: ListActivityViewModel,
+    activityRepositoryFirestore: ActivityRepositoryFirestore,
+    navigationActions: NavigationActions,
 ) {
-  val t_activity = lAV.selectedActivity.collectAsState().value
+  val t_activity = listActivityViewModel.selectedActivity.collectAsState().value
   var title by remember { mutableStateOf(t_activity?.title) }
   var description by remember { mutableStateOf(t_activity?.description) }
   var creator by remember { mutableStateOf(t_activity?.creator) }
@@ -58,14 +62,14 @@ fun EditActivityScreen(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
-            title = { Text("Create a new activity") },
+            title = { Text("Edit the activity") },
             navigationIcon = {
-              Icon(
-                  Icons.AutoMirrored.Filled.ArrowBack,
-                  contentDescription = "", // Add a valid content description
-              )
-            },
-            modifier = Modifier.fillMaxWidth().background(Color(0xFFF0F0F0)))
+              IconButton(onClick = { navigationActions.goBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                    contentDescription = "Back")
+              }
+            })
       },
       content = { paddingValues ->
         Column(
@@ -128,7 +132,7 @@ fun EditActivityScreen(
               onClick = {
                 val activity =
                     Activity(
-                        uid = aRF.getNewUid(),
+                        uid = t_activity?.uid ?: "",
                         title = title ?: "",
                         description = description ?: "",
                         date = dueDate ?: "",
@@ -140,7 +144,8 @@ fun EditActivityScreen(
                         location = location ?: "",
                         images = listOf(),
                     )
-                lAV.addActivity(activity)
+                listActivityViewModel.updateActivity(activity)
+                navigationActions.navigateTo(Screen.OVERVIEW)
               },
               modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
           ) {
@@ -152,18 +157,37 @@ fun EditActivityScreen(
                   Icons.Default.Done,
                   contentDescription = "add a new activity",
               )
+              Text("Delete", color = Color.Red)
+            }
+          }
+          Spacer(modifier = Modifier.height(16.dp))
+          Button(
+              colors =
+                  ButtonColors(
+                      containerColor = Color.Transparent,
+                      contentColor = Color.Red,
+                      disabledContentColor = Color.Red,
+                      disabledContainerColor = Color.Transparent,
+                  ),
+              onClick = {
+                listActivityViewModel.deleteActivityById(t_activity?.uid ?: "")
+                navigationActions.navigateTo(Screen.OVERVIEW)
+              },
+              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
+          ) {
+            Row(
+                Modifier.background(Color.Transparent),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Icon(
+                  Icons.Outlined.Delete,
+                  contentDescription = "add a new activity",
+              )
               Text("Create")
             }
           }
         }
       },
   )
-}
-
-@Preview
-@Composable
-fun PreviewEditActivityScreen() {
-  EditActivityScreen(
-      lAV = ListActivityViewModel(ActivityRepositoryFirestore(Firebase.firestore)),
-      aRF = ActivityRepositoryFirestore(Firebase.firestore))
 }
