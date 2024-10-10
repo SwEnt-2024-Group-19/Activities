@@ -179,7 +179,8 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
-
+    testImplementation(libs.jetbrains.kotlinx.coroutines.test)
+    testImplementation(libs.kotlinx.coroutines.test.v164)
     // Test UI
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
