@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
-              ActivitiesApp("Android", auth.currentUser?.uid ?: "")
+              ActivitiesApp(auth.currentUser?.uid ?: "")
             }
       }
     }
@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ActivitiesApp(name: String, uid: String, modifier: Modifier = Modifier) {
+fun ActivitiesApp(uid: String) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
