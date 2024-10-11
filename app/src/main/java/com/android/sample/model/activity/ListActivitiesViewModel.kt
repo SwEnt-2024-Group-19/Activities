@@ -1,8 +1,5 @@
 package com.android.sample.model.activity
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -11,12 +8,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ListActivitiesViewModel(private val repository: ActivitiesRepository) : ViewModel() {
+  
+  private val activity_ = MutableStateFlow<List<Activity>>(emptyList())
+  val activity: StateFlow<List<Activity>> = activity_.asStateFlow()
 
-  val selectedActivity = mutableStateOf<Activity?>(null)
-
-  fun selectActivity(activity: Activity) {
-    selectedActivity.value = activity // Update the internal state
-  }
+  // Selected todo, i.e the todo for the detail view
+  private val selectedActivity_ = MutableStateFlow<Activity?>(null)
+  open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
   val uiState: StateFlow<ActivitiesUiState> = _uiState
