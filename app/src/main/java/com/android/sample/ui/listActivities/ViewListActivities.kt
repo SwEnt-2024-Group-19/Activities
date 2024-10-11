@@ -54,44 +54,46 @@ fun ListActivitiesScreen(
 ) {
   val uiState by viewModel.uiState.collectAsState()
 
-  Scaffold (
+  Scaffold(
       modifier = modifier,
       bottomBar = {
-          BottomNavigationMenu(
-              onTabSelect = { route -> navigationActions.navigateTo(route) },
-              tabList = LIST_TOP_LEVEL_DESTINATION,
-              selectedItem = navigationActions.currentRoute())
-      }
-  ){ paddingValues ->
-    Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
-      when (uiState) {
-        is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-          val activities = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-          if (activities.isEmpty()) {
-            Text(
-                text = "There is no activity yet.",
-                modifier =
-                    Modifier.padding(8.dp).align(Alignment.Center).testTag("emptyActivityPrompt"),
-                color = MaterialTheme.colorScheme.onSurface)
-          } else {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      }) { paddingValues ->
+        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
+          when (uiState) {
+            is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+              val activities =
+                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+              if (activities.isEmpty()) {
+                Text(
+                    text = "There is no activity yet.",
+                    modifier =
+                        Modifier.padding(8.dp)
+                            .align(Alignment.Center)
+                            .testTag("emptyActivityPrompt"),
+                    color = MaterialTheme.colorScheme.onSurface)
+              } else {
 
-            LazyColumn(
-                modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                  // Use LazyColumn to efficiently display the list of activities
-                  items(activities) { activity ->
-                    ActivityCard(activity = activity, navigationActions)
-                  }
-                }
+                LazyColumn(
+                    modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                      // Use LazyColumn to efficiently display the list of activities
+                      items(activities) { activity ->
+                        ActivityCard(activity = activity, navigationActions)
+                      }
+                    }
+              }
+            }
+            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+              Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
+            }
           }
         }
-        is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-          val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-          Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
-        }
       }
-    }
-  }
 }
 
 @Composable

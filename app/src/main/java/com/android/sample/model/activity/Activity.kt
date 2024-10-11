@@ -1,6 +1,5 @@
 package com.android.sample.model.activity
 
-import com.google.firebase.Timestamp
 import android.media.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import com.google.firebase.Timestamp
 
 data class Activity(
     val uid: String,

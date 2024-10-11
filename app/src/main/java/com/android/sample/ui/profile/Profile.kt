@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.android.sample.model.profile.User
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
 
 @Composable
 fun ProfileScreen(userProfileViewModel: ProfileViewModel) {

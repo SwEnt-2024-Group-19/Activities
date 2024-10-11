@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ListActivitiesViewModel(private val repository: ActivitiesRepository) : ViewModel() {
-  
+
   private val activity_ = MutableStateFlow<List<Activity>>(emptyList())
   val activity: StateFlow<List<Activity>> = activity_.asStateFlow()
 

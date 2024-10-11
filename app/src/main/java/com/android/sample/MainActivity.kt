@@ -59,7 +59,8 @@ fun ActivitiesApp(name: String, uid: String, modifier: Modifier = Modifier) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  val listActivitiesViewModel: ListActivitiesViewModel = viewModel(factory = ListActivitiesViewModel.Factory)
+  val listActivitiesViewModel: ListActivitiesViewModel =
+      viewModel(factory = ListActivitiesViewModel.Factory)
   val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(uid))
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
@@ -75,13 +76,21 @@ fun ActivitiesApp(name: String, uid: String, modifier: Modifier = Modifier) {
         startDestination = Screen.OVERVIEW,
         route = Route.OVERVIEW,
     ) {
-      composable(Screen.OVERVIEW) { ListActivitiesScreen(listActivitiesViewModel, navigationActions) }
-      composable(Screen.EDIT_ACTIVITY) { EditActivityScreen(listActivitiesViewModel, navigationActions) }
-      composable(Screen.ACTIVITY_DETAILS) { ActivityDetailsScreen(listActivitiesViewModel, navigationActions) }
+      composable(Screen.OVERVIEW) {
+        ListActivitiesScreen(listActivitiesViewModel, navigationActions)
+      }
+      composable(Screen.EDIT_ACTIVITY) {
+        EditActivityScreen(listActivitiesViewModel, navigationActions)
+      }
+      composable(Screen.ACTIVITY_DETAILS) {
+        ActivityDetailsScreen(listActivitiesViewModel, navigationActions)
+      }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
-      composable(Screen.ADD_ACTIVITY) { CreateActivityScreen(listActivitiesViewModel, navigationActions) }
+      composable(Screen.ADD_ACTIVITY) {
+        CreateActivityScreen(listActivitiesViewModel, navigationActions)
+      }
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
@@ -96,6 +105,6 @@ fun BlankScreen() {
   Surface(
       modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.blank_screen },
       color = MaterialTheme.colorScheme.background) {
-    Text(text = "Blank Screen")
-  }
+        Text(text = "Blank Screen")
+      }
 }
