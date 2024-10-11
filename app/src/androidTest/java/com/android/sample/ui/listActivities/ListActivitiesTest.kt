@@ -3,9 +3,9 @@ package com.android.sample.ui.listActivities
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.android.sample.R
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
@@ -52,14 +52,16 @@ class OverviewScreenTest {
           listOf(
               Activity(
                   uid = "3",
-                  name = "Fun Farm",
+                  title = "Fun Farm",
                   description = "Come discover the new farm and enjoy with your family!",
                   date = Timestamp.now(),
                   location = "Lausanne",
-                  organizerName = "Rola",
-                  image = R.drawable.farm.toLong(),
-                  20,
-                  22)))
+                  creator = "Rola",
+                  images = listOf(),
+                  price = 20.toDouble(),
+                  status = ActivityStatus.ACTIVE,
+                  placesLeft = 10,
+                  maxPlaces = 20)))
     }
     listActivitiesViewModel.getActivities()
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
