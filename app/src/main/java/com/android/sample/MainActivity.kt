@@ -20,15 +20,21 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
+import com.android.sample.ui.listActivities.ListActivitiesScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.android.sample.ui.theme.SampleAppTheme
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
+  private lateinit var auth: FirebaseAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    auth = FirebaseAuth.getInstance()
+    auth.currentUser?.let { auth.signOut() }
 
     setContent {
       SampleAppTheme {
@@ -65,7 +71,7 @@ fun ActivitiesApp(name: String, modifier: Modifier = Modifier) {
         startDestination = Screen.OVERVIEW,
         route = Route.OVERVIEW,
     ) {
-      composable(Screen.OVERVIEW) { BlankScreen() }
+      composable(Screen.OVERVIEW) { ListActivitiesScreen(listToDosViewModel, navigationActions) }
       composable(Screen.EDIT_ACTIVITY) { BlankScreen() }
       composable(Screen.ACTIVITY_DETAILS) { BlankScreen() }
     }

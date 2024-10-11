@@ -1,5 +1,6 @@
 package com.android.sample.model.activity
 
+import com.google.firebase.Timestamp
 import android.media.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,14 +22,14 @@ data class Activity(
     val uid: String,
     var title: String,
     var description: String,
-    var date: String,
+    var date: Timestamp,
     // var category: Category,
     var price: Double,
     var location: String,
     var creator: String,
     var images: List<Image>,
-    var placesLeft: Int,
-    var maxPlaces: Int,
+    var placesLeft: Long,
+    var maxPlaces: Long,
     var status: ActivityStatus
 )
 
