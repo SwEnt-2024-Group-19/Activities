@@ -59,6 +59,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             // Navigate to OverviewScreen upon successful login
+            navigationActions.navigateTo(Screen.OVERVIEW)
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
@@ -116,7 +117,8 @@ fun SignInScreen(navigationActions: NavigationActions) {
                         "Password cannot be empty" // Set the error message if password is empty
                   }
                   else -> {
-                    signInWithEmailAndPassword(emailState.value, passwordState.value, context)
+                    signInWithEmailAndPassword(
+                        emailState.value, passwordState.value, context, navigationActions)
                   }
                 }
               },
@@ -155,13 +157,19 @@ fun SignInScreen(navigationActions: NavigationActions) {
       })
 }
 
-fun signInWithEmailAndPassword(email: String, password: String, context: Context) {
+fun signInWithEmailAndPassword(
+    email: String,
+    password: String,
+    context: Context,
+    navigationActions: NavigationActions
+) {
   val auth = Firebase.auth
   auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
     if (task.isSuccessful) {
       Log.d("SignInScreen", "signInWithEmail:success")
       Toast.makeText(context, "Email login successful!", Toast.LENGTH_LONG).show()
       // Navigate to the next screen upon successful login
+      navigationActions.navigateTo(Screen.OVERVIEW)
     } else {
       Log.w("SignInScreen", "signInWithEmail:failure", task.exception)
       Toast.makeText(context, "Email login failed!", Toast.LENGTH_LONG).show()
