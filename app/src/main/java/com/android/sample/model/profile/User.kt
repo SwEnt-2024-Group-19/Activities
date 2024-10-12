@@ -1,4 +1,4 @@
-package com.android.sample.model
+package com.android.sample.model.profile
 
 data class User(
     val id: String,

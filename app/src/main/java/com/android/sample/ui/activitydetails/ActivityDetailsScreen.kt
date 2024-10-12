@@ -39,31 +39,44 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityRepositoryFirestore
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.activity.ListActivityViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import java.util.Calendar
+import java.util.GregorianCalendar
+import kotlin.math.max
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
-    listActivityViewModel: ListActivityViewModel =
+    listActivityViewModel: ListActivitiesViewModel =
         viewModel(factory = ListActivitiesViewModel.Factory),
-    activityRepositoryFirestore: ActivityRepositoryFirestore,
     navigationActions: NavigationActions
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
-  var activityTitle by remember { mutableStateOf(activity?.title) }
-  var description by remember { mutableStateOf(activity?.description) }
-  var price by remember { mutableStateOf(activity?.price) }
-  var schedule by remember { mutableStateOf(activity?.date) }
-  var location by remember { mutableStateOf(activity?.location) }
-  var placesLeft by remember { mutableStateOf(activity?.placesLeft) }
-  var maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
-  var creator by remember { mutableStateOf(activity?.creator) }
-  var status by remember { mutableStateOf(activity?.status) }
+  val activityTitle by remember { mutableStateOf(activity?.title) }
+  val description by remember { mutableStateOf(activity?.description) }
+  val price by remember { mutableStateOf(activity?.price) }
+  val dueDate by remember {
+    mutableStateOf(
+        activity?.date.let {
+          val calendar = GregorianCalendar()
+          if (activity != null) {
+            calendar.time = activity.date.toDate()
+          }
+          return@let "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
+                    calendar.get(
+                        Calendar.YEAR
+                    )
+                }"
+        })
+  }
+  val location by remember { mutableStateOf(activity?.location) }
+  val placesLeft by remember { mutableStateOf(activity?.placesLeft) }
+  val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
+  val creator by remember { mutableStateOf(activity?.creator) }
+  val status by remember { mutableStateOf(activity?.status) }
 
   val context = LocalContext.current
 
@@ -116,7 +129,7 @@ fun ActivityDetailsScreen(
           Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.DateRange, contentDescription = "Schedule")
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = schedule ?: "not defined yet")
+            Text(text = dueDate ?: "not defined yet")
           }
 
           Spacer(modifier = Modifier.height(32.dp))
@@ -126,20 +139,24 @@ fun ActivityDetailsScreen(
               onClick = {
                 if ((placesLeft ?: 0) > 0) {
                   val theActivity =
-                      Activity(
-                          uid = activityRepositoryFirestore.getNewUid(),
-                          title = activityTitle ?: "",
-                          description = description ?: "",
-                          date = schedule ?: "",
-                          price = price ?: 0.0,
-                          placesLeft = (placesLeft ?: 0).let { if (it > 0) it - 1 else 0 },
-                          maxPlaces = maxPlaces ?: 0,
-                          creator = creator ?: "",
-                          status = status ?: ActivityStatus.ACTIVE,
-                          location = location ?: "",
-                          images = listOf(),
-                      )
-                  listActivityViewModel.addActivity(theActivity)
+                      activity?.let { activity ->
+                        Activity(
+                            uid = listActivityViewModel.getNewUid(),
+                            title = activityTitle ?: "",
+                            description = description ?: "",
+                            date = activity.date,
+                            price = price ?: 0.0,
+                            placesLeft = max((placesLeft ?: 0) - 1, 0),
+                            maxPlaces = maxPlaces ?: 0,
+                            creator = creator ?: "",
+                            status = status ?: ActivityStatus.ACTIVE,
+                            location = location ?: "",
+                            images = listOf(),
+                        )
+                      }
+                  if (theActivity != null) {
+                    listActivityViewModel.updateActivity(theActivity)
+                  }
                   Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
                   navigationActions.navigateTo(Screen.OVERVIEW)
                 } else {

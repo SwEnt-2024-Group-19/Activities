@@ -30,11 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.android.sample.model.User
-import com.android.sample.model.UserProfileViewModel
+import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
 
 @Composable
-fun ProfileScreen(userProfileViewModel: UserProfileViewModel) {
+fun ProfileScreen(userProfileViewModel: ProfileViewModel) {
 
   userProfileViewModel.userState.let {
     it.value?.let { it1 -> Log.e("not an error", "name" + it1.name) }

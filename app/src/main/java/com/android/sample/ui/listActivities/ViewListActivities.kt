@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.ui.navigation.BottomNavigationMenu
+import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import java.text.SimpleDateFormat
@@ -52,36 +54,46 @@ fun ListActivitiesScreen(
 ) {
   val uiState by viewModel.uiState.collectAsState()
 
-  Scaffold { paddingValues ->
-    Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
-      when (uiState) {
-        is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-          val activities = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-          if (activities.isEmpty()) {
-            Text(
-                text = "There is no activity yet.",
-                modifier =
-                    Modifier.padding(8.dp).align(Alignment.Center).testTag("emptyActivityPrompt"),
-                color = MaterialTheme.colorScheme.onSurface)
-          } else {
+  Scaffold(
+      modifier = modifier,
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      }) { paddingValues ->
+        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
+          when (uiState) {
+            is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+              val activities =
+                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+              if (activities.isEmpty()) {
+                Text(
+                    text = "There is no activity yet.",
+                    modifier =
+                        Modifier.padding(8.dp)
+                            .align(Alignment.Center)
+                            .testTag("emptyActivityPrompt"),
+                    color = MaterialTheme.colorScheme.onSurface)
+              } else {
 
-            LazyColumn(
-                modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                  // Use LazyColumn to efficiently display the list of activities
-                  items(activities) { activity ->
-                    ActivityCard(activity = activity, navigationActions)
-                  }
-                }
+                LazyColumn(
+                    modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                      // Use LazyColumn to efficiently display the list of activities
+                      items(activities) { activity ->
+                        ActivityCard(activity = activity, navigationActions)
+                      }
+                    }
+              }
+            }
+            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+              Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
+            }
           }
         }
-        is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-          val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-          Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
-        }
       }
-    }
-  }
 }
 
 @Composable
@@ -101,13 +113,13 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
             // Display the activity image
             Image(
                 painter = painterResource(R.drawable.foot),
-                contentDescription = activity.name,
+                contentDescription = activity.title,
                 modifier = Modifier.fillMaxWidth().height(180.dp),
                 contentScale = ContentScale.Crop)
 
             // Display the activity name on top of the image
             Text(
-                text = activity.name,
+                text = activity.title,
                 style =
                     MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,

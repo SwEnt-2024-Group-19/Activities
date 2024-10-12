@@ -1,6 +1,8 @@
 package com.android.sample.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -30,17 +32,20 @@ object TopLevelDestinations {
   val OVERVIEW =
       TopLevelDestination(route = Route.OVERVIEW, icon = Icons.Outlined.Menu, textId = "Overview")
   val PROFILE =
-      TopLevelDestination(route = Route.PROFILE, icon = Icons.Outlined.Menu, textId = "Profile")
+      TopLevelDestination(
+          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
   val ADD_ACTIVITY =
       TopLevelDestination(
-          route = Route.ADD_ACTIVITY, icon = Icons.Outlined.Menu, textId = "Add Activity")
+          route = Route.ADD_ACTIVITY,
+          icon = Icons.Outlined.AddCircleOutline,
+          textId = "Add Activity")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(
         TopLevelDestinations.OVERVIEW,
-        TopLevelDestinations.PROFILE,
-        TopLevelDestinations.ADD_ACTIVITY)
+        TopLevelDestinations.ADD_ACTIVITY,
+        TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
