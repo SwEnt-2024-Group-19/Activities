@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -19,7 +18,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-import org.mockito.kotlin.argThat
 
 class ProfileCreationTest {
 
@@ -45,12 +43,11 @@ class ProfileCreationTest {
     `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
     `when`(mockFirebaseUser.uid).thenReturn("testUser123")
 
-
     profileViewModel = ProfileViewModel(repository = mockProfilesRepository, userId = testUserId)
 
     `when`(mockProfilesRepository.getUser(any(), any(), any())).thenAnswer { invocation ->
       val onSuccess = invocation.getArgument<(User?) -> Unit>(1)
-      onSuccess.invoke(null)  // Simulate no existing user found
+      onSuccess.invoke(null) // Simulate no existing user found
       null
     }
 
@@ -107,9 +104,4 @@ class ProfileCreationTest {
     // Check if the error message is displayed
     composeTestRule.onNodeWithTag("errorMessage").assertIsDisplayed()
   }
-
-
-  }
-
-
-
+}
