@@ -15,7 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.ListActivityViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
 import com.android.sample.ui.authentication.SignInScreen
@@ -48,8 +48,7 @@ fun ActivitiesApp(name: String, modifier: Modifier = Modifier) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  val listToDosViewModel: ListActivitiesViewModel =
-      viewModel(factory = ListActivitiesViewModel.Factory)
+  val listToDosViewModel: ListActivityViewModel = viewModel(factory = ListActivityViewModel.Factory)
   val locationViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
 
   NavHost(navController = navController, startDestination = Route.AUTH) {

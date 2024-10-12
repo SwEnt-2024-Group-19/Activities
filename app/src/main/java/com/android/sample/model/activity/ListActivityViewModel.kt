@@ -1,6 +1,9 @@
 package com.android.sample.model.activity
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,5 +37,15 @@ class ListActivityViewModel(private val repository: ActivityRepository) : ViewMo
 
   fun selectActivity(activity: Activity) {
     selectedActivity_.value = activity
+  }
+
+  companion object {
+    val Factory: ViewModelProvider.Factory =
+        object : ViewModelProvider.Factory {
+          @Suppress("UNCHECKED_CAST")
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ListActivityViewModel(ActivityRepositoryFirestore(Firebase.firestore)) as T
+          }
+        }
   }
 }
