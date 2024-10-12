@@ -34,7 +34,9 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 
 @Composable
-fun ProfileScreen(userProfileViewModel: ProfileViewModel) {
+fun ProfileScreen(
+    userProfileViewModel: ProfileViewModel,
+) {
 
   userProfileViewModel.userState.let {
     it.value?.let { it1 -> Log.e("not an error", "name" + it1.name) }

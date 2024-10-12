@@ -28,6 +28,7 @@ import com.android.sample.ui.listActivities.ListActivitiesScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.profile.ProfileCreationScreen
 import com.android.sample.ui.profile.ProfileScreen
 import com.android.sample.ui.theme.SampleAppTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -70,6 +71,9 @@ fun ActivitiesApp(uid: String) {
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
       composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
+      composable(Screen.CREATE_PROFILE) {
+        ProfileCreationScreen(profileViewModel, navigationActions)
+      }
     }
 
     navigation(

@@ -58,4 +58,16 @@ class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesR
       null
     }
   }
+
+  override fun addProfileToDatabase(
+      userProfile: User,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection("profiles")
+        .document(userProfile.id)
+        .set(userProfile)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { exception -> onFailure(exception) }
+  }
 }
