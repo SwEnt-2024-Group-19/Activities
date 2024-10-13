@@ -144,7 +144,7 @@ fun CreateActivityScreen(
                         date = dueDate,
                         price = price.toDouble(),
                         placesLeft = parseFraction(placesLeft, 0) ?: 0,
-                        maxPlaces = parseFraction(placesLeft, 2) ?: 0,
+                        maxPlaces = parseFraction(placesLeft, 1) ?: 0,
                         creator = creator,
                         status = ActivityStatus.ACTIVE,
                         location = location,
@@ -241,5 +241,5 @@ fun Carousel() {
 
 fun parseFraction(fraction: String, index: Int): Int? {
   val parts = fraction.split("/")
-  return if (parts.size == 2) parts[0].toIntOrNull() else null
+  return if (parts.size == 2) parts[index].toIntOrNull() else null
 }
