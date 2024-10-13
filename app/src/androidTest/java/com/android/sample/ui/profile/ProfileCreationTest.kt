@@ -4,6 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -58,15 +60,24 @@ class ProfileCreationTest {
 
   @Test
   fun testProfileCreationScreenElementsDisplayed() {
-    // Create a ProfileViewModel using the mocked repository and test user ID
-    // Set the content for the test, passing the required parameters
-    // Perform assertions to check if elements are displayed
     composeTestRule.onNodeWithTag("profileCreationTitle").assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("nameTextField").assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("surnameTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("interestsTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("activitiesTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("photoTextField").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
+    composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
+    composeTestRule.onNodeWithTag("interestsTextField").performTextInput("Coding, Gaming")
+    composeTestRule.onNodeWithTag("activitiesTextField").performTextInput("Running, Swimming")
+    composeTestRule
+        .onNodeWithTag("photoTextField")
+        .performTextInput("https://example.com/photo.jpg")
+
+    composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
     composeTestRule.onNodeWithTag("createProfileButton").assertIsDisplayed()
   }
 
@@ -84,6 +95,8 @@ class ProfileCreationTest {
     // Perform an action that triggers navigation to the Profile screen
     // Verify that the navigation action was called with the correct route
     // Simulate successful profile creation when called
+    composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+
     composeTestRule.onNodeWithTag("createProfileButton").performClick()
     verify(navigationActions).navigateTo(Screen.OVERVIEW)
   }
@@ -99,9 +112,11 @@ class ProfileCreationTest {
     }
 
     // Perform the click action
+    composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
     composeTestRule.onNodeWithTag("createProfileButton").performClick()
 
     // Check if the error message is displayed
+    composeTestRule.onNodeWithTag("errorMessage").performScrollTo()
     composeTestRule.onNodeWithTag("errorMessage").assertIsDisplayed()
   }
 }
