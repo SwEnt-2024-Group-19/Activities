@@ -141,7 +141,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                         emailState.value,
                         passwordState.value,
                         context,
-                        onSuccess = { navigationActions.navigateTo(Screen.OVERVIEW) })
+                        onSuccess = { navigationActions.navigateTo(Screen.CREATE_PROFILE) })
                   }
                 }
               },
