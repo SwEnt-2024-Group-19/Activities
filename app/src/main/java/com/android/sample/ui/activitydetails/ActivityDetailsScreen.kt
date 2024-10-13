@@ -46,6 +46,7 @@ import com.android.sample.ui.navigation.Screen
 import java.util.Calendar
 import java.util.GregorianCalendar
 import kotlin.math.max
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,21 +138,21 @@ fun ActivityDetailsScreen(
           // Enroll button
           Button(
               onClick = {
-                if ((placesLeft ?: 0) > 0) {
+                if (((placesLeft ?: 0) >= 0) && ((placesLeft ?: 0) < (maxPlaces ?: 0))) {
                   val theActivity =
                       activity?.let { activity ->
                         Activity(
-                            uid = listActivityViewModel.getNewUid(),
-                            title = activityTitle ?: "",
-                            description = description ?: "",
+                            uid = activity.uid,
+                            title = activity.title,
+                            description = activity.description,
                             date = activity.date,
-                            price = price ?: 0.0,
-                            placesLeft = max((placesLeft ?: 0) - 1, 0),
-                            maxPlaces = maxPlaces ?: 0,
-                            creator = creator ?: "",
-                            status = status ?: ActivityStatus.ACTIVE,
-                            location = location ?: "",
-                            images = listOf(),
+                            price = activity.price,
+                            placesLeft = min((placesLeft ?: 0) + 1, maxPlaces ?: 0),
+                            maxPlaces = activity.maxPlaces,
+                            creator = activity.creator,
+                            status = activity.status,
+                            location = activity.location,
+                            images = activity.images,
                         )
                       }
                   if (theActivity != null) {
