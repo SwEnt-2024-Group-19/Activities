@@ -82,7 +82,7 @@ fun ListActivitiesScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
                       items(activities) { activity ->
-                        ActivityCard(viewModel,activity = activity, navigationActions)
+                        ActivityCard(viewModel, activity = activity, navigationActions)
                       }
                     }
               }
@@ -97,9 +97,11 @@ fun ListActivitiesScreen(
 }
 
 @Composable
-fun ActivityCard(viewModel: ListActivitiesViewModel,
+fun ActivityCard(
+    viewModel: ListActivitiesViewModel,
     activity: Activity,
-    navigationActions: NavigationActions) {
+    navigationActions: NavigationActions
+) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
