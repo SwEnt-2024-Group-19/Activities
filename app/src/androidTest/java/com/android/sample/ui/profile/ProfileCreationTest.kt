@@ -1,10 +1,11 @@
 package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
@@ -77,7 +78,11 @@ class ProfileCreationTest {
         .onNodeWithTag("photoTextField")
         .performTextInput("https://example.com/photo.jpg")
 
-    composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+    // composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("createProfileButton"))
+
     composeTestRule.onNodeWithTag("createProfileButton").assertIsDisplayed()
   }
 
@@ -95,7 +100,10 @@ class ProfileCreationTest {
     // Perform an action that triggers navigation to the Profile screen
     // Verify that the navigation action was called with the correct route
     // Simulate successful profile creation when called
-    composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+    // composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("createProfileButton"))
 
     composeTestRule.onNodeWithTag("createProfileButton").performClick()
     verify(navigationActions).navigateTo(Screen.OVERVIEW)
@@ -112,11 +120,16 @@ class ProfileCreationTest {
     }
 
     // Perform the click action
-    composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("createProfileButton"))
     composeTestRule.onNodeWithTag("createProfileButton").performClick()
 
     // Check if the error message is displayed
-    composeTestRule.onNodeWithTag("errorMessage").performScrollTo()
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("errorMessage"))
+
     composeTestRule.onNodeWithTag("errorMessage").assertIsDisplayed()
   }
 }
