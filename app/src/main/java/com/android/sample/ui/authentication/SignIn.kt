@@ -40,6 +40,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -164,9 +165,9 @@ fun signInWithEmailAndPassword(
     email: String,
     password: String,
     context: Context,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
 ) {
-  val auth = Firebase.auth
+  val auth = FirebaseAuth.getInstance()
   auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
     if (task.isSuccessful) {
       Log.d("SignInScreen", "signInWithEmail:success")

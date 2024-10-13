@@ -7,10 +7,13 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.ui.navigation.NavigationActions
+import com.google.firebase.auth.FirebaseAuth
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.*
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
@@ -18,6 +21,7 @@ class SignInScreenTest {
   private lateinit var navigationDestination: NavDestination
   private lateinit var navHostController: NavHostController
   private lateinit var navigationActions: NavigationActions
+  private lateinit var auth: FirebaseAuth
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -26,6 +30,7 @@ class SignInScreenTest {
     navigationDestination = mock(NavDestination::class.java)
     navHostController = mock(NavHostController::class.java)
     navigationActions = NavigationActions(navHostController)
+    auth = mock(FirebaseAuth::class.java)
   }
 
   @Test
