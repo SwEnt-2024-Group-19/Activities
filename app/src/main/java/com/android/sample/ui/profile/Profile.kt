@@ -50,8 +50,8 @@ fun ProfileScreen(userProfileViewModel: UserProfileViewModel) {
 
 @Composable
 fun LoadingScreen() {
-  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    Text("Loading profile...", color = Color.Gray)
+  Box(modifier = Modifier.fillMaxSize().testTag("loadingScreen"), contentAlignment = Alignment.Center) {
+    Text("Loading profile...", modifier = Modifier.testTag("loadingText"),color = Color.Gray)
   }
 }
 
@@ -118,9 +118,7 @@ fun ActivityBox(activity: String) {
 
 @Composable
 fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
-  val painter = // Optional: enable crossfade animation
-      // Optional: placeholder image
-      // Optional: error image if the URL load fails
+  val painter =
       rememberAsyncImagePainter(
           ImageRequest.Builder(LocalContext.current)
               .data(
@@ -129,9 +127,7 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
               .apply(
                   block =
                       fun ImageRequest.Builder.() {
-                        crossfade(true) // Optional: enable crossfade animation
-                        // Optional: placeholder image
-                        // Optional: error image if the URL load fails
+                        crossfade(true)
                       })
               .build())
 
@@ -139,6 +135,6 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
       painter = painter,
       contentDescription = "Profile Image",
       modifier = modifier,
-      contentScale = ContentScale.Crop // Adjust the scaling to suit your layout needs
+      contentScale = ContentScale.Crop
       )
 }

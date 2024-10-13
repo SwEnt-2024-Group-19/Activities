@@ -14,39 +14,55 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
 class ProfileScreenTest {
-  private lateinit var userProfileViewModel: UserProfileViewModel
-  private lateinit var testUser: User
+    private lateinit var userProfileViewModel: UserProfileViewModel
+    private lateinit var testUser: User
 
-  @get:Rule val composeTestRule = createComposeRule()
+    @get:Rule
+    val composeTestRule = createComposeRule()
 
-  @Before
-  fun setUp() {
-    userProfileViewModel = mock(UserProfileViewModel::class.java)
-    testUser =
-        User(
-            id = "123",
-            name = "Amine",
-            surname = "A",
-            photo = "",
-            interests = listOf("Cycling", "Reading"),
-            activities = listOf("Football"))
-    val userStateFlow = MutableStateFlow(testUser)
-    `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
-  }
+    @Before
+    fun setUp() {
+        userProfileViewModel = mock(UserProfileViewModel::class.java)
+        testUser =
+            User(
+                id = "123",
+                name = "Amine",
+                surname = "A",
+                photo = "",
+                interests = listOf("Cycling", "Reading"),
+                activities = listOf("Football")
+            )
+        val userStateFlow = MutableStateFlow(testUser)
+        `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
+    }
 
-  @Test
-  fun displayAllProfileComponents() {
-    composeTestRule.setContent { ProfileScreen(userProfileViewModel = userProfileViewModel) }
+    @Test
+    fun displayLoadingScreen() {
+        val userStateFlow = MutableStateFlow<User?>(null) // Represents loading state
+        `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
 
-    composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("userName").assertTextEquals("Amine A")
-    composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("interestsSection")
-        .assertTextEquals("Interests: Cycling, Reading")
-    composeTestRule.onNodeWithTag("activitiesSection").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("activitiesList").assertIsDisplayed()
-  }
+        composeTestRule.setContent {
+            ProfileScreen(userProfileViewModel = userProfileViewModel)
+        }
+        composeTestRule.onNodeWithTag("loadingText").assertTextEquals("Loading profile...")
+        composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
+    }
+    @Test
+    fun displayAllProfileComponents() {
+        composeTestRule.setContent {
+            ProfileScreen(userProfileViewModel = userProfileViewModel)
+        }
+
+        composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("userName").assertTextEquals("Amine A")
+        composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithTag("interestsSection")
+            .assertTextEquals("Interests: Cycling, Reading")
+        composeTestRule.onNodeWithTag("activitiesSection").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("activitiesList").assertIsDisplayed()
+
+    }
 }
