@@ -25,6 +25,13 @@ open class ProfileViewModel(private val repository: ProfilesRepository, userId: 
         onFailure = { Log.e("error", " not fetching") })
   }
 
+  fun createUserProfile(userProfile: User, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+    repository.addProfileToDatabase(
+        userProfile = userProfile,
+        onSuccess = { onSuccess() },
+        onFailure = { error -> onError(error) })
+  }
+
   companion object {
     fun Factory(uid: String): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {

@@ -33,14 +33,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.sample.model.profile.ProfilesRepositoryFirestore
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -64,7 +67,8 @@ fun SignInScreen(navigationActions: NavigationActions) {
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
-          })
+          },
+          navigationActions)
   val token = stringResource(R.string.default_web_client_id)
 
   // The main container for the screen
@@ -161,15 +165,15 @@ fun signInWithEmailAndPassword(
     email: String,
     password: String,
     context: Context,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
 ) {
-  val auth = Firebase.auth
+  val auth = FirebaseAuth.getInstance()
   auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
     if (task.isSuccessful) {
       Log.d("SignInScreen", "signInWithEmail:success")
       Toast.makeText(context, "Email login successful!", Toast.LENGTH_LONG).show()
       // Navigate to the next screen upon successful login
-      navigationActions.navigateTo(Screen.OVERVIEW)
+      checkUserProfile(auth.currentUser?.uid, navigationActions, context)
     } else {
       Log.w("SignInScreen", "signInWithEmail:failure", task.exception)
       Toast.makeText(context, "Email login failed!", Toast.LENGTH_LONG).show()
@@ -214,9 +218,12 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
 @Composable
 fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,
-    onAuthError: (ApiException) -> Unit
+    onAuthError: (ApiException) -> Unit,
+    navigationActions: NavigationActions
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
   val scope = rememberCoroutineScope()
+  val context = LocalContext.current
+
   return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
       result ->
     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -226,9 +233,37 @@ fun rememberFirebaseAuthLauncher(
       scope.launch {
         val authResult = Firebase.auth.signInWithCredential(credential).await()
         onAuthComplete(authResult)
+        val uid = Firebase.auth.currentUser?.uid
+        checkUserProfile(uid, navigationActions, context)
       }
     } catch (e: ApiException) {
       onAuthError(e)
     }
   }
+}
+
+private fun checkUserProfile(uid: String?, navigationActions: NavigationActions, context: Context) {
+  if (uid == null) {
+    Toast.makeText(context, "User ID is null, cannot proceed!", Toast.LENGTH_LONG).show()
+    return
+  }
+
+  val db = Firebase.firestore
+  val repository = ProfilesRepositoryFirestore(db)
+
+  repository.getUser(
+      uid,
+      onSuccess = { userProfile ->
+        if (userProfile == null) {
+          // If no profile exists, navigate to ProfileCreationScreen
+          navigationActions.navigateTo(Screen.CREATE_PROFILE)
+        } else {
+          // If the profile exists, navigate to the main screen
+          navigationActions.navigateTo(Screen.OVERVIEW)
+        }
+      },
+      onFailure = {
+        Toast.makeText(context, "Error checking user profile!", Toast.LENGTH_LONG).show()
+        Log.e("SignInScreen", "Error checking user profile: ${it.message}")
+      })
 }
