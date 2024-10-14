@@ -1,6 +1,6 @@
 package com.android.sample.model.activity
 
-import android.media.Image
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import coil3.Bitmap
+import com.android.sample.ui.dialogs.SimpleUser
 import com.google.firebase.Timestamp
 
 data class Activity(
@@ -27,10 +29,11 @@ data class Activity(
     var price: Double,
     var location: String,
     var creator: String,
-    var images: List<Image>,
+    var images: List<String>,
     var placesLeft: Long,
     var maxPlaces: Long,
-    var status: ActivityStatus
+    var status: ActivityStatus,
+    var participants:List<SimpleUser>
 )
 
 enum class ActivityStatus {
