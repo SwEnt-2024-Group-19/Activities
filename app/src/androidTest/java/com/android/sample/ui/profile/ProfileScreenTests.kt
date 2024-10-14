@@ -4,8 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.android.sample.model.User
-import com.android.sample.model.UserProfileViewModel
+import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -14,6 +14,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
 class ProfileScreenTest {
+
     private lateinit var userProfileViewModel: UserProfileViewModel
     private lateinit var testUser: User
 
@@ -65,4 +66,5 @@ class ProfileScreenTest {
         composeTestRule.onNodeWithTag("activitiesList").assertIsDisplayed()
 
     }
+ 
 }

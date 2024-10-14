@@ -144,6 +144,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
+    // Extended Material Icons
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.test.core.ktx)

@@ -1,4 +1,4 @@
-package com.android.sample.model
+package com.android.sample.model.profile
 
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
@@ -7,7 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesRepository {
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection("profiles").document(userId).get().addOnCompleteListener { task ->
+    db.collection("profiles").document("profiles-$userId").get().addOnCompleteListener { task ->
       if (task.isSuccessful) {
         val document = task.result
         if (document != null) {
@@ -57,5 +57,17 @@ class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesR
       Log.e("TodosRepositoryFirestore", "Error converting document to ToDo", e)
       null
     }
+  }
+
+  override fun addProfileToDatabase(
+      userProfile: User,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection("profiles")
+        .document(userProfile.id)
+        .set(userProfile)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { exception -> onFailure(exception) }
   }
 }
