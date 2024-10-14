@@ -30,9 +30,21 @@ data class Activity(
     var images: List<Image>,
     var placesLeft: Long,
     var maxPlaces: Long,
-    var status: ActivityStatus
+    var status: ActivityStatus,
+    val type: ActivityType
 )
 
+enum class ActivityType {
+  PRO,
+  INDIVIDUAL,
+  SOLO,
+}
+
+val types= listOf(
+    ActivityType.PRO,
+    ActivityType.INDIVIDUAL,
+    ActivityType.SOLO,
+)
 enum class ActivityStatus {
   ACTIVE,
   FINISHED,

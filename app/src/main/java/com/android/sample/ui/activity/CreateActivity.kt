@@ -20,13 +20,18 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,6 +51,7 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.types
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -64,6 +70,8 @@ fun CreateActivityScreen(
   var price by remember { mutableStateOf("") }
   var placesLeft by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Select a type") }
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
@@ -133,7 +141,47 @@ fun CreateActivityScreen(
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
               placeholder = { Text("Where is it taking place") },
           )
-          Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = !expanded
+                }
+            ) {
+                TextField(
+
+                    readOnly = true,
+                    value = selectedOption,
+                    onValueChange = { },
+                    label = { Text("Label") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded
+                        )
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    }
+                ) {
+                    types.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text= { Text(selectionOption.name) },
+                            onClick = {
+                                selectedOption = selectionOption.name
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(32.dp))
           Button(
               onClick = {
                 val calendar = GregorianCalendar()
@@ -160,6 +208,7 @@ fun CreateActivityScreen(
                             status = ActivityStatus.ACTIVE,
                             location = location,
                             images = listOf(),
+                            type = types.find { it.name == selectedOption } ?: types[0],
                         )
                     listActivityViewModel.addActivity(activity)
                     navigationActions.navigateTo(Screen.OVERVIEW)

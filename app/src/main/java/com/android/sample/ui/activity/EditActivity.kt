@@ -16,7 +16,10 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.types
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -58,6 +62,8 @@ fun EditActivityScreen(
   var location by remember { mutableStateOf(activity?.location) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember {  mutableStateOf(activity?.type.toString()) }
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -139,14 +145,7 @@ fun EditActivityScreen(
               placeholder = { Text("Places left/Total places") },
           )
           Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = location ?: "",
-              onValueChange = { location = it },
-              label = { Text("Location") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("Where is it taking place") },
-          )
-          Spacer(modifier = Modifier.height(32.dp))
+
           Button(
               onClick = {
                 val calendar = GregorianCalendar()
@@ -174,6 +173,7 @@ fun EditActivityScreen(
                             status = ActivityStatus.ACTIVE,
                             location = location ?: "",
                             images = listOf(),
+                            type = types.find { it.name == selectedOption } ?: types[0],
                         )
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
