@@ -2,16 +2,22 @@ package com.android.sample.ui.listActivities
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
+
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -45,7 +55,7 @@ import com.android.sample.ui.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun ListActivitiesScreen(
     viewModel: ListActivitiesViewModel,
@@ -53,21 +63,61 @@ fun ListActivitiesScreen(
     modifier: Modifier = Modifier
 ) {
   val uiState by viewModel.uiState.collectAsState()
+  var selectedFilter by remember{ mutableStateOf("")}
 
-  Scaffold(
-      modifier = modifier,
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
-      }) { paddingValues ->
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+
+            ) {
+                // Buttons for each type with equal size
+                FilterButton(
+                    label = "All",
+                    backgroundColor = Color(0xFFFFA07A), // Light Orange
+                    isSelected = selectedFilter =="",
+                    onClick = { selectedFilter = "" }
+                )
+                FilterButton(
+                    label = "Pro",
+                    backgroundColor = Color(0xFF90EE90), // Light Green
+                    isSelected = selectedFilter == ActivityType.PRO.name,
+                    onClick = { selectedFilter = ActivityType.PRO.name }
+                )
+                FilterButton(
+                    label = "Individual",
+                    backgroundColor = Color(0xFF9370DB), // Purple
+                    isSelected = selectedFilter == ActivityType.INDIVIDUAL.name,
+                    onClick = { selectedFilter = ActivityType.INDIVIDUAL.name }
+                )
+                FilterButton(
+                    label = "Solo",
+                    backgroundColor = Color(0xFFADD8E6), // Light Blue
+                    isSelected = selectedFilter == ActivityType.SOLO.name,
+                    onClick = { selectedFilter = ActivityType.SOLO.name }
+                )
+            }
+        },
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { route -> navigationActions.navigateTo(route) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = navigationActions.currentRoute())
+        }
+    ) { paddingValues ->
         Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-              val activities =
-                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              if (activities.isEmpty()) {
+                var activitiesList= (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+                if (selectedFilter.isNotEmpty()){
+
+                    activitiesList= activitiesList.filter { it.type.name==selectedFilter }
+                }
+              if (activitiesList.isEmpty()) {
                 Text(
                     text = "There is no activity yet.",
                     modifier =
@@ -81,7 +131,7 @@ fun ListActivitiesScreen(
                     modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
-                      items(activities) { activity ->
+                      items(activitiesList) { activity ->
                         ActivityCard(activity = activity, navigationActions)
                       }
                     }
@@ -171,4 +221,35 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
           Spacer(modifier = Modifier.height(8.dp))
         }
       }
+
+
 }
+@Composable
+fun FilterButton(
+    label: String,
+    backgroundColor: Color,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .width(80.dp) // Ensures all buttons have equal width
+            .clip(RoundedCornerShape(8.dp))
+            .background(backgroundColor)
+            .border(
+                width = if (isSelected) 2.dp else 0.dp, // Add border when selected
+                color = if (isSelected) Color.Black else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp)
+
+    ) {
+        Text(
+            text = label,
+            color = if (isSelected) Color.Black else Color.White, // Change text color when selected
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+        )
+    }
+}
+
