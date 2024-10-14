@@ -52,9 +52,11 @@ fun ProfileScreen(
 
 @Composable
 fun LoadingScreen() {
-  Box(modifier = Modifier.fillMaxSize().testTag("loadingScreen"), contentAlignment = Alignment.Center) {
-    Text("Loading profile...", modifier = Modifier.testTag("loadingText"),color = Color.Gray)
-  }
+  Box(
+      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+      contentAlignment = Alignment.Center) {
+        Text("Loading profile...", modifier = Modifier.testTag("loadingText"), color = Color.Gray)
+      }
 }
 
 @Composable
@@ -137,6 +139,5 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
       painter = painter,
       contentDescription = "Profile Image",
       modifier = modifier,
-      contentScale = ContentScale.Crop
-      )
+      contentScale = ContentScale.Crop)
 }
