@@ -1,5 +1,6 @@
 package com.android.sample.ui.activitydetails
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -72,6 +73,8 @@ fun ActivityDetailsScreen(
                 }"
         })
   }
+    val startTime by remember { mutableStateOf(activity?.startTime) }
+  val duration by remember { mutableStateOf(activity?.duration) }
   val location by remember { mutableStateOf(activity?.location) }
   val placesLeft by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
@@ -131,6 +134,22 @@ fun ActivityDetailsScreen(
             Spacer(modifier = Modifier.width(4.dp))
             Text(text = dueDate ?: "not defined yet")
           }
+/*
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.DateRange, contentDescription = "Schedule")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = startTime ?: "not defined yet")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.DateRange, contentDescription = "Schedule")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = duration ?: "not defined yet")
+            }
+
+ */
 
           Spacer(modifier = Modifier.height(32.dp))
 
@@ -145,6 +164,8 @@ fun ActivityDetailsScreen(
                             title = activityTitle ?: "",
                             description = description ?: "",
                             date = activity.date,
+                            startTime = startTime ?: "",
+                            duration = duration ?: "",
                             price = price ?: 0.0,
                             placesLeft = max((placesLeft ?: 0) - 1, 0),
                             maxPlaces = maxPlaces ?: 0,

@@ -64,6 +64,8 @@ fun CreateActivityScreen(
   var price by remember { mutableStateOf("") }
   var placesLeft by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
+  var startTime by remember { mutableStateOf("") }
+  var duration by remember { mutableStateOf("") }
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
@@ -110,6 +112,26 @@ fun CreateActivityScreen(
           Spacer(modifier = Modifier.height(8.dp))
 
           OutlinedTextField(
+              value = startTime,
+              onValueChange = { startTime = it },
+              label = { Text("Time") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              placeholder = { Text("HH:mm") },
+          )
+          Spacer(modifier = Modifier.height(8.dp))
+
+          OutlinedTextField(
+              value = duration,
+              onValueChange = { duration = it },
+              label = { Text("Duration") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              placeholder = { Text("HH:mm") },
+          )
+
+
+          Spacer(modifier = Modifier.height(8.dp))
+
+          OutlinedTextField(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
@@ -153,6 +175,8 @@ fun CreateActivityScreen(
                             title = title,
                             description = description,
                             date = Timestamp(calendar.time),
+                            startTime = startTime,
+                            duration = duration,
                             price = price.toDouble(),
                             placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
