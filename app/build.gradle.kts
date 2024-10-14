@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -143,6 +144,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
+    // Extended Material Icons
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.test.core.ktx)
@@ -187,6 +190,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.mockito.core)
+    testImplementation("org.mockito:mockito-inline:4.10.0")
+    testImplementation("org.mockito:mockito-core:4.10.0")
+
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.android)
@@ -226,8 +232,10 @@ dependencies {
     globalTestImplementation(libs.compose.test.junit)
     debugImplementation(libs.compose.test.manifest)
 
-
-
+    // ------------- Coil ------------------
+    implementation(libs.coil.compose)
+    implementation(libs.coil.kt.coil.compose)
+    implementation(libs.coil.network.okhttp)
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
 
@@ -276,3 +284,4 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
 }
+

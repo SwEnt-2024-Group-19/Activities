@@ -1,6 +1,6 @@
 package com.android.sample.model.activity
 
-interface ActivityRepository {
+interface ActivitiesRepository {
   fun getNewUid(): String
 
   fun init(onSuccess: () -> Unit)

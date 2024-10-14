@@ -1,5 +1,6 @@
 package com.android.sample.ui.activity
 
+import android.icu.util.GregorianCalendar
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AddCircle
@@ -44,22 +44,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityRepositoryFirestore
 import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ListActivityViewModel
+import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateActivityScreen(
-    listActivityViewModel: ListActivityViewModel,
-    activityRepositoryFirestore: ActivityRepositoryFirestore,
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
 ) {
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
-  var creator by remember { mutableStateOf("") }
+  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
   var location by remember { mutableStateOf("") }
   var price by remember { mutableStateOf("") }
   var placesLeft by remember { mutableStateOf("") }
@@ -136,22 +136,35 @@ fun CreateActivityScreen(
           Spacer(modifier = Modifier.height(32.dp))
           Button(
               onClick = {
-                val activity =
-                    Activity(
-                        uid = activityRepositoryFirestore.getNewUid(),
-                        title = title,
-                        description = description,
-                        date = dueDate,
-                        price = price.toDouble(),
-                        placesLeft = parseFraction(placesLeft, 0) ?: 0,
-                        maxPlaces = parseFraction(placesLeft, 2) ?: 0,
-                        creator = creator,
-                        status = ActivityStatus.ACTIVE,
-                        location = location,
-                        images = listOf(),
-                    )
-                listActivityViewModel.addActivity(activity)
-                navigationActions.navigateTo(Screen.OVERVIEW)
+                val calendar = GregorianCalendar()
+                val parts = dueDate.split("/")
+                if (parts.size == 3) {
+                  try {
+                    calendar.set(
+                        parts[2].toInt(),
+                        parts[1].toInt() - 1, // Months are 0-based
+                        parts[0].toInt(),
+                        0,
+                        0,
+                        0)
+                    val activity =
+                        Activity(
+                            uid = listActivityViewModel.getNewUid(),
+                            title = title,
+                            description = description,
+                            date = Timestamp(calendar.time),
+                            price = price.toDouble(),
+                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
+                            maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
+                            creator = creator,
+                            status = ActivityStatus.ACTIVE,
+                            location = location,
+                            images = listOf(),
+                        )
+                    listActivityViewModel.addActivity(activity)
+                    navigationActions.navigateTo(Screen.OVERVIEW)
+                  } catch (_: NumberFormatException) {}
+                }
               },
               modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
           ) {

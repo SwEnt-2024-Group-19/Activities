@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Delete
@@ -33,33 +32,48 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityRepositoryFirestore
 import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ListActivityViewModel
+import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.ui.navigation.BottomNavigationMenu
+import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
+import java.util.Calendar
+import java.util.GregorianCalendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivityScreen(
-    listActivityViewModel: ListActivityViewModel,
-    activityRepositoryFirestore: ActivityRepositoryFirestore,
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
+    modifier: Modifier = Modifier
 ) {
-  val t_activity = listActivityViewModel.selectedActivity.collectAsState().value
-  var title by remember { mutableStateOf(t_activity?.title) }
-  var description by remember { mutableStateOf(t_activity?.description) }
-  var creator by remember { mutableStateOf(t_activity?.creator) }
-  var location by remember { mutableStateOf(t_activity?.location) }
-  var price by remember { mutableStateOf(t_activity?.price.toString()) }
-  var placesLeft by remember { mutableStateOf(t_activity?.placesLeft.toString()) }
-  var dueDate by remember { mutableStateOf(t_activity?.date) }
-  val context = LocalContext.current
+  val activity = listActivityViewModel.selectedActivity.collectAsState().value
+  var title by remember { mutableStateOf(activity?.title) }
+  var description by remember { mutableStateOf(activity?.description) }
+  var creator by remember { mutableStateOf(activity?.creator) }
+  var location by remember { mutableStateOf(activity?.location) }
+  var price by remember { mutableStateOf(activity?.price.toString()) }
+  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
+  var dueDate by remember {
+    mutableStateOf(
+        activity?.date.let {
+          val calendar = GregorianCalendar()
+          if (activity != null) {
+            calendar.time = activity.date.toDate()
+          }
+          return@let "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
+                    calendar.get(
+                        Calendar.YEAR
+                    )
+                }"
+        })
+  }
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = { Text("Edit the activity") },
@@ -71,7 +85,12 @@ fun EditActivityScreen(
               }
             })
       },
-      content = { paddingValues ->
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      }) { paddingValues ->
         Column(
             modifier =
                 Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF)),
@@ -95,7 +114,7 @@ fun EditActivityScreen(
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
-              value = dueDate ?: "",
+              value = dueDate,
               onValueChange = { dueDate = it },
               label = { Text("Date") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
@@ -130,22 +149,36 @@ fun EditActivityScreen(
           Spacer(modifier = Modifier.height(32.dp))
           Button(
               onClick = {
-                val activity =
-                    Activity(
-                        uid = t_activity?.uid ?: "",
-                        title = title ?: "",
-                        description = description ?: "",
-                        date = dueDate ?: "",
-                        price = price.toDouble(),
-                        placesLeft = parseFraction(placesLeft, 0) ?: 0,
-                        maxPlaces = parseFraction(placesLeft, 2) ?: 0,
-                        creator = creator ?: "",
-                        status = ActivityStatus.ACTIVE,
-                        location = location ?: "",
-                        images = listOf(),
-                    )
-                listActivityViewModel.updateActivity(activity)
-                navigationActions.navigateTo(Screen.OVERVIEW)
+                val calendar = GregorianCalendar()
+                val parts = dueDate.split("/")
+                if (parts.size == 3) {
+                  try {
+                    calendar.set(
+                        parts[2].toInt(),
+                        parts[1].toInt() - 1, // Months are 0-based indexed
+                        parts[0].toInt(),
+                        0,
+                        0,
+                        0)
+
+                    val updatedActivity =
+                        Activity(
+                            uid = activity?.uid ?: "",
+                            title = title ?: "",
+                            description = description ?: "",
+                            date = Timestamp(calendar.time),
+                            price = price.toDouble(),
+                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
+                            maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
+                            creator = creator ?: "",
+                            status = ActivityStatus.ACTIVE,
+                            location = location ?: "",
+                            images = listOf(),
+                        )
+                    listActivityViewModel.updateActivity(updatedActivity)
+                    navigationActions.navigateTo(Screen.OVERVIEW)
+                  } catch (_: Exception) {}
+                }
               },
               modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
           ) {
@@ -170,7 +203,7 @@ fun EditActivityScreen(
                       disabledContainerColor = Color.Transparent,
                   ),
               onClick = {
-                listActivityViewModel.deleteActivityById(t_activity?.uid ?: "")
+                listActivityViewModel.deleteActivityById(activity?.uid ?: "")
                 navigationActions.navigateTo(Screen.OVERVIEW)
               },
               modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
@@ -188,6 +221,5 @@ fun EditActivityScreen(
             }
           }
         }
-      },
-  )
+      }
 }
