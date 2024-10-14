@@ -14,6 +14,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
 class ProfileScreenTest {
+
   private lateinit var userProfileViewModel: ProfileViewModel
   private lateinit var testUser: User
 
@@ -32,6 +33,16 @@ class ProfileScreenTest {
             activities = listOf("Football"))
     val userStateFlow = MutableStateFlow(testUser)
     `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
+  }
+
+  @Test
+  fun displayLoadingScreen() {
+    val userStateFlow = MutableStateFlow<User?>(null) // Represents loading state
+    `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
+
+    composeTestRule.setContent { ProfileScreen(userProfileViewModel = userProfileViewModel) }
+    composeTestRule.onNodeWithTag("loadingText").assertTextEquals("Loading profile...")
+    composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
   }
 
   @Test

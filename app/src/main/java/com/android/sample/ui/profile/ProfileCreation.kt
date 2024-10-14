@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -38,8 +40,14 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
   var errorMessage by remember { mutableStateOf<String?>(null) }
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
+  val scrollState = rememberScrollState()
+
   Column(
-      modifier = Modifier.fillMaxSize().padding(16.dp),
+      modifier =
+          Modifier.fillMaxSize()
+              .padding(16.dp)
+              .verticalScroll(scrollState)
+              .testTag("profileCreationScrollColumn"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         Text(
