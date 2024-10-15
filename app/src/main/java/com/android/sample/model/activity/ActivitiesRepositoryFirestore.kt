@@ -44,7 +44,8 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
                       listOf(),
                       data["placesLeft"] as Long,
                       data["maxPlaces"] as Long,
-                      ActivityStatus.valueOf(data["status"] as String))
+                      ActivityStatus.valueOf(data["status"] as String)
+                  , listOf())
                 }
                 .filterNotNull() // Filter out any null results
 
@@ -94,7 +95,7 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
         onSuccess()
       } else {
         result.exception?.let { e ->
-          Log.e("TodosRepositoryFirestore", "Error performing Firestore operation", e)
+          Log.e("ActivitiesRepositoryFirestore", "Error performing Firestore operation", e)
           onFailure(e)
         }
       }
