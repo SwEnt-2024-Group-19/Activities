@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -46,6 +48,8 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.ui.navigation.BottomNavigationMenu
+import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -64,23 +68,22 @@ fun CreateActivityScreen(
   var price by remember { mutableStateOf("") }
   var placesLeft by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
+  var startTime by remember { mutableStateOf("") }
+  var duration by remember { mutableStateOf("") }
+
+    // Add scroll
+    val scrollState = rememberScrollState()
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = { Text("Create a new activity") },
-            navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
-            })
+            )
       },
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF)),
+                Modifier.padding(paddingValues).fillMaxSize().verticalScroll(scrollState).background(color = Color(0xFFFFFFFF)),
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -107,6 +110,26 @@ fun CreateActivityScreen(
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
               placeholder = { Text("dd/mm/yyyy") },
           )
+          Spacer(modifier = Modifier.height(8.dp))
+
+          OutlinedTextField(
+              value = startTime,
+              onValueChange = { startTime = it },
+              label = { Text("Time") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              placeholder = { Text("HH:mm") },
+          )
+          Spacer(modifier = Modifier.height(8.dp))
+
+          OutlinedTextField(
+              value = duration,
+              onValueChange = { duration = it },
+              label = { Text("Duration") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              placeholder = { Text("HH:mm") },
+          )
+
+
           Spacer(modifier = Modifier.height(8.dp))
 
           OutlinedTextField(
@@ -153,6 +176,8 @@ fun CreateActivityScreen(
                             title = title,
                             description = description,
                             date = Timestamp(calendar.time),
+                            startTime = startTime,
+                            duration = duration,
                             price = price.toDouble(),
                             placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
@@ -181,6 +206,12 @@ fun CreateActivityScreen(
           }
         }
       },
+      bottomBar = {
+          BottomNavigationMenu(
+              onTabSelect = { route -> navigationActions.navigateTo(route) },
+              tabList = LIST_TOP_LEVEL_DESTINATION,
+              selectedItem = navigationActions.currentRoute())
+      }
   )
 }
 
