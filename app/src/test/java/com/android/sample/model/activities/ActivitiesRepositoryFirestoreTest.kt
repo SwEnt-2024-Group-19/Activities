@@ -1,4 +1,4 @@
-package com.github.se.bootcamp.model.todo
+package com.android.sample.model.activities
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider

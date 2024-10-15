@@ -51,31 +51,31 @@ class ListActivitiesViewModelTest {
         }
 
         @Test
-        fun getTodosCallsRepository() {
+        fun getActivitiesCallsRepository() {
             listActivitiesViewModel.getActivities()
             verify(activitiesRepository).getActivities(any(), any())
         }
 
         @Test
-        fun addToDoCallsRepository() {
+        fun addActivitiesCallsRepository() {
             listActivitiesViewModel.addActivity(activity)
             verify(activitiesRepository).addActivity(eq(activity), any(), any())
         }
 
         @Test
-        fun updateToDoCallsRepository() {
+        fun updateActivitiesCallsRepository() {
             listActivitiesViewModel.updateActivity(activity)
             verify(activitiesRepository).updateActivity(eq(activity), any(), any())
         }
 
         @Test
-        fun deleteToDoByIdCallsRepository() {
+        fun deleteActivityByIdCallsRepository() {
             listActivitiesViewModel.deleteActivityById(activity.uid)
             verify(activitiesRepository).deleteActivityById(eq(activity.uid), any(), any())
         }
 
         @Test
-        fun selectToDoUpdatesSelectedTodo() = runBlocking {
+        fun selectActivityUpdatesSelectedActivity() = runBlocking {
             listActivitiesViewModel.selectActivity(activity)
             val selected = listActivitiesViewModel.selectedActivity.first()
             assertThat(selected, `is`(activity))

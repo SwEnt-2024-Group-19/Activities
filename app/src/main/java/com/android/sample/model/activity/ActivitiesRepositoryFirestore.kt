@@ -95,7 +95,7 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
         onSuccess()
       } else {
         result.exception?.let { e ->
-          Log.e("TodosRepositoryFirestore", "Error performing Firestore operation", e)
+          Log.e("ActivitiesRepositoryFirestore", "Error performing Firestore operation", e)
           onFailure(e)
         }
       }
