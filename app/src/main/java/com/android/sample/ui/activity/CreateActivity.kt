@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -98,7 +99,7 @@ fun CreateActivityScreen(
               value = title,
               onValueChange = { title = it },
               label = { Text("Title") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
               placeholder = { Text("Give a title of the activity") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -106,7 +107,7 @@ fun CreateActivityScreen(
               value = description,
               onValueChange = { description = it },
               label = { Text("Description") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
               placeholder = { Text("Describe the activity") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -114,7 +115,7 @@ fun CreateActivityScreen(
               value = dueDate,
               onValueChange = { dueDate = it },
               label = { Text("Date") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateCreate"),
               placeholder = { Text("dd/mm/yyyy") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -123,7 +124,7 @@ fun CreateActivityScreen(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
               placeholder = { Text("Price/person") },
           )
 
@@ -132,7 +133,7 @@ fun CreateActivityScreen(
               value = placesLeft,
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
               placeholder = { Text("Places left/Total places") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -140,11 +141,12 @@ fun CreateActivityScreen(
               value = location,
               onValueChange = { location = it },
               label = { Text("Location") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
               placeholder = { Text("Where is it taking place") },
           )
           Spacer(modifier = Modifier.height(32.dp))
           Button(
+              enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
@@ -169,7 +171,7 @@ fun CreateActivityScreen(
                             creator = creator,
                             status = ActivityStatus.ACTIVE,
                             location = location,
-                            images = carouselItems.map{ it},
+                            images = carouselItems.map{it},
                             participants = listOf()
                         )
                     listActivityViewModel.addActivity(activity)
@@ -177,7 +179,8 @@ fun CreateActivityScreen(
                   } catch (_: NumberFormatException) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
+              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
+                  .testTag("createButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
