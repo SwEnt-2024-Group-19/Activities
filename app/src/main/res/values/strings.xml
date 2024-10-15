@@ -4,6 +4,17 @@
     <string name="title_activity_second">SecondActivity</string>
     <string name="default_web_client_id">701144582558-mgat0k47ht8ijib34asp8569nfd2d5uj.apps.googleusercontent.com</string>
 
-    <string name="title_activity">Give a title of the activity</string>
-    <string name="title_activity_create_activity">Create a new activity</string>
+    <string name="request_activity_title">Give a title of the activity</string>
+    <string name="title_screen_create_activity">Create a new activity</string>
+    <string name="Title">Title</string>
+    <string name="request_activity_description">Describe the activity</string>
+    <string name="request_date_activity_withFormat">dd/mm/yyyy</string>
+    <string name="request_startTime_activity_withFormat">HH:mm</string>
+    <string name="request_duration_activity_withFormat">HH:mm</string>
+    <string name="request_price_activity">Price/person</string>
+    <string name="request_placesLeft_activity">Places left/Total places</string>
+    <string name="request_location_activity">Where is it taking place</string>
+    <string name="button_create_activity">Create</string>
+
+
 </resources>

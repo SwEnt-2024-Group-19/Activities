@@ -78,7 +78,7 @@ fun CreateActivityScreen(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
-            title = { Text(text =  stringResource(id = R.string.title_activity_create_activity)) },
+            title = { Text(text =  stringResource(id = R.string.title_screen_create_activity)) },
             )
       },
       content = { paddingValues ->
@@ -93,7 +93,7 @@ fun CreateActivityScreen(
               onValueChange = { title = it },
               label = { Text("Title") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("Give a title of the activity") },
+              placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -101,7 +101,7 @@ fun CreateActivityScreen(
               onValueChange = { description = it },
               label = { Text("Description") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("Describe the activity") },
+              placeholder = { Text(text = stringResource(id = R.string.request_activity_description)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -109,7 +109,7 @@ fun CreateActivityScreen(
               onValueChange = { dueDate = it },
               label = { Text("Date") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("dd/mm/yyyy") },
+              placeholder = { Text(text = stringResource(id = R.string.request_date_activity_withFormat)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -118,7 +118,7 @@ fun CreateActivityScreen(
               onValueChange = { startTime = it },
               label = { Text("Time") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("HH:mm") },
+              placeholder = { Text(text = stringResource(id = R.string.request_startTime_activity_withFormat)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -127,7 +127,7 @@ fun CreateActivityScreen(
               onValueChange = { duration = it },
               label = { Text("Duration") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("HH:mm") },
+              placeholder = { Text(text = stringResource(id = R.string.request_duration_activity_withFormat)) },
           )
 
 
@@ -138,7 +138,7 @@ fun CreateActivityScreen(
               onValueChange = { price = it },
               label = { Text("Price") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("Price/person") },
+              placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
           )
 
           Spacer(modifier = Modifier.height(8.dp))
@@ -147,7 +147,7 @@ fun CreateActivityScreen(
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("Places left/Total places") },
+              placeholder = { Text(text = stringResource(id = R.string.request_placesLeft_activity)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -155,7 +155,7 @@ fun CreateActivityScreen(
               onValueChange = { location = it },
               label = { Text("Location") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("Where is it taking place") },
+              placeholder = { Text(text = stringResource(id = R.string.request_location_activity)) },
           )
           Spacer(modifier = Modifier.height(32.dp))
           Button(
@@ -202,7 +202,7 @@ fun CreateActivityScreen(
                   Icons.Filled.Add,
                   contentDescription = "add a new activity",
               )
-              Text("Create")
+              Text(text = stringResource(id = R.string.button_create_activity))
             }
           }
         }
