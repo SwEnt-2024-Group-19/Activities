@@ -111,10 +111,9 @@ fun ActivitiesApp(uid: String) {
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-      composable(Screen.PROFILE) {
-          ProfileScreen(profileViewModel) }
-      composable(Screen.EDIT_PROFILE) {
-          BlankScreen() }
+      composable(Screen.PROFILE) { ProfileScreen(profileViewModel, navigationActions) }
+      composable(Screen.EDIT_PROFILE) { BlankScreen() }
+
     }
   }
 }

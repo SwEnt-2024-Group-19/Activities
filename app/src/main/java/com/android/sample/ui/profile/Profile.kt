@@ -15,8 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -32,11 +38,12 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.ui.navigation.BottomNavigationMenu
+import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
+import com.android.sample.ui.navigation.NavigationActions
 
 @Composable
-fun ProfileScreen(
-    userProfileViewModel: ProfileViewModel,
-) {
+fun ProfileScreen(userProfileViewModel: ProfileViewModel, navigationActions: NavigationActions) {
 
   userProfileViewModel.userState.let {
     it.value?.let { it1 -> Log.e("not an error", "name" + it1.name) }
@@ -46,62 +53,87 @@ fun ProfileScreen(
   Log.e("not an error ", "interests are " + profileState.value?.interests.toString())
   when (val profile = profileState.value) {
     null -> LoadingScreen() // Show a loading indicator or a retry button
-    else -> ProfileContent(user = profile) // Proceed with showing profile content
+    else ->
+        ProfileContent(user = profile, navigationActions) // Proceed with showing profile content
   }
 }
 
 @Composable
 fun LoadingScreen() {
-  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-    Text("Loading profile...", color = Color.Gray)
-  }
+  Box(
+      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+      contentAlignment = Alignment.Center) {
+        Text("Loading profile...", modifier = Modifier.testTag("loadingText"), color = Color.Gray)
+      }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileContent(user: User) {
+fun ProfileContent(user: User, navigationActions: NavigationActions) {
 
-  Scaffold(modifier = Modifier.fillMaxSize().testTag("profileScreen")) { innerPadding ->
-    Column(
-        Modifier.fillMaxSize().padding(innerPadding),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-          Spacer(Modifier.height(16.dp))
-          Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
+  Scaffold(
+      modifier = Modifier.fillMaxSize().testTag("profileScreen"),
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      },
+      topBar = {
+        TopAppBar(
+            title = { Text("Profile") },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
+            })
+      }) { innerPadding ->
+        Column(
+            Modifier.fillMaxSize().padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Spacer(Modifier.height(16.dp))
+              Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
 
-          // Profile Picture
+              // Profile Picture
 
-          ProfileImage(
-              url = user.photo,
-              modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+              ProfileImage(
+                  url = user.photo,
+                  modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
-          // User Name and Surname
-          Text(
-              text = "${user.name} ${user.surname}",
-              fontSize = 20.sp,
-              modifier = Modifier.padding(top = 8.dp).testTag("userName"))
+              // User Name and Surname
+              Text(
+                  text = "${user.name} ${user.surname}",
+                  fontSize = 20.sp,
+                  modifier = Modifier.padding(top = 8.dp).testTag("userName"))
 
-          // Interests
-          Text(
-              text = "Interests: ${user.interests?.joinToString(", ")}",
-              fontSize = 18.sp,
-              modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
+              // Interests
+              Text(
+                  text = "Interests: ${user.interests?.joinToString(", ")}",
+                  fontSize = 18.sp,
+                  modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
 
-          Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(16.dp))
 
-          // Activities Section
-          Text(
-              text = "Activities Created",
-              fontSize = 24.sp,
-              modifier = Modifier.padding(start = 16.dp, top = 16.dp).testTag("activitiesSection"))
+              // Activities Section
+              Text(
+                  text = "Activities Created",
+                  fontSize = 24.sp,
+                  modifier =
+                      Modifier.padding(start = 16.dp, top = 16.dp).testTag("activitiesSection"))
 
-          LazyColumn(
-              modifier = Modifier.fillMaxSize().testTag("activitiesList"),
-              contentPadding = PaddingValues(16.dp)) {
-                user.activities?.let { activities ->
-                  items(activities.size) { index -> ActivityBox(activity = activities[index]) }
-                }
-              }
-        }
-  }
+              LazyColumn(
+                  modifier = Modifier.fillMaxSize().testTag("activitiesList"),
+                  contentPadding = PaddingValues(16.dp)) {
+                    user.activities?.let { activities ->
+                      items(activities.size) { index -> ActivityBox(activity = activities[index]) }
+                    }
+                  }
+            }
+      }
 }
 
 @Composable
@@ -120,9 +152,7 @@ fun ActivityBox(activity: String) {
 
 @Composable
 fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
-  val painter = // Optional: enable crossfade animation
-      // Optional: placeholder image
-      // Optional: error image if the URL load fails
+  val painter =
       rememberAsyncImagePainter(
           ImageRequest.Builder(LocalContext.current)
               .data(
@@ -131,9 +161,7 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
               .apply(
                   block =
                       fun ImageRequest.Builder.() {
-                        crossfade(true) // Optional: enable crossfade animation
-                        // Optional: placeholder image
-                        // Optional: error image if the URL load fails
+                        crossfade(true)
                       })
               .build())
 
@@ -141,6 +169,5 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
       painter = painter,
       contentDescription = "Profile Image",
       modifier = modifier,
-      contentScale = ContentScale.Crop // Adjust the scaling to suit your layout needs
-      )
+      contentScale = ContentScale.Crop)
 }
