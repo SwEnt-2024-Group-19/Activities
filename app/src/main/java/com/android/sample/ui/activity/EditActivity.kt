@@ -58,8 +58,6 @@ fun EditActivityScreen(
   var location by remember { mutableStateOf(activity?.location) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
-  var startTime by remember { mutableStateOf(activity?.startTime) }
-  var duration by remember { mutableStateOf(activity?.duration) }
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -125,26 +123,6 @@ fun EditActivityScreen(
           Spacer(modifier = Modifier.height(8.dp))
 
           OutlinedTextField(
-              value = startTime ?: "",
-              onValueChange = { startTime = it },
-              label = { Text("Time") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("HH:mm") },
-          )
-          Spacer(modifier = Modifier.height(8.dp))
-
-          OutlinedTextField(
-              value = duration?: "",
-              onValueChange = { duration = it },
-              label = { Text("Duration") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text("HH:mm") },
-          )
-
-
-          Spacer(modifier = Modifier.height(8.dp))
-
-          OutlinedTextField(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
@@ -189,8 +167,6 @@ fun EditActivityScreen(
                             title = title ?: "",
                             description = description ?: "",
                             date = Timestamp(calendar.time),
-                            startTime = startTime?: "",
-                            duration = duration?: "",
                             price = price.toDouble(),
                             placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
@@ -247,5 +223,3 @@ fun EditActivityScreen(
         }
       }
 }
-
-
