@@ -40,11 +40,13 @@ enum class ActivityType {
   SOLO,
 }
 
-val types= listOf(
-    ActivityType.PRO,
-    ActivityType.INDIVIDUAL,
-    ActivityType.SOLO,
-)
+val types =
+    listOf(
+        ActivityType.PRO,
+        ActivityType.INDIVIDUAL,
+        ActivityType.SOLO,
+    )
+
 enum class ActivityStatus {
   ACTIVE,
   FINISHED,

@@ -16,10 +16,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -62,8 +59,8 @@ fun EditActivityScreen(
   var location by remember { mutableStateOf(activity?.location) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember {  mutableStateOf(activity?.type.toString()) }
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {

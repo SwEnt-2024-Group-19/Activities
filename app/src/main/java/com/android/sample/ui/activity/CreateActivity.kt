@@ -20,7 +20,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -70,8 +69,8 @@ fun CreateActivityScreen(
   var price by remember { mutableStateOf("") }
   var placesLeft by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf("Select a type") }
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOption by remember { mutableStateOf("Select a type") }
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
@@ -141,47 +140,29 @@ fun CreateActivityScreen(
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
               placeholder = { Text("Where is it taking place") },
           )
-            Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(8.dp))
 
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                }
-            ) {
-                TextField(
-
-                    readOnly = true,
-                    value = selectedOption,
-                    onValueChange = { },
-                    label = { Text("Label") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expanded
-                        )
-                    },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier.menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = {
-                        expanded = false
-                    }
-                ) {
-                    types.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text= { Text(selectionOption.name) },
-                            onClick = {
-                                selectedOption = selectionOption.name
-                                expanded = false
-                            }
-                        )
-                    }
-                }
+          ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+            TextField(
+                readOnly = true,
+                value = selectedOption,
+                onValueChange = {},
+                label = { Text("Label") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                modifier = Modifier.menuAnchor())
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+              types.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption.name) },
+                    onClick = {
+                      selectedOption = selectionOption.name
+                      expanded = false
+                    })
+              }
             }
-            Spacer(modifier = Modifier.height(32.dp))
+          }
+          Spacer(modifier = Modifier.height(32.dp))
           Button(
               onClick = {
                 val calendar = GregorianCalendar()

@@ -8,9 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-
-
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,60 +60,53 @@ fun ListActivitiesScreen(
     modifier: Modifier = Modifier
 ) {
   val uiState by viewModel.uiState.collectAsState()
-  var selectedFilter by remember{ mutableStateOf("")}
+  var selectedFilter by remember { mutableStateOf("") }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceAround
+  Scaffold(
+      modifier = modifier,
+      topBar = {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceAround) {
 
-            ) {
-                // Buttons for each type with equal size
-                FilterButton(
-                    label = "All",
-                    backgroundColor = Color(0xFFFFA07A), // Light Orange
-                    isSelected = selectedFilter =="",
-                    onClick = { selectedFilter = "" }
-                )
-                FilterButton(
-                    label = "Pro",
-                    backgroundColor = Color(0xFF90EE90), // Light Green
-                    isSelected = selectedFilter == ActivityType.PRO.name,
-                    onClick = { selectedFilter = ActivityType.PRO.name }
-                )
-                FilterButton(
-                    label = "Individual",
-                    backgroundColor = Color(0xFF9370DB), // Purple
-                    isSelected = selectedFilter == ActivityType.INDIVIDUAL.name,
-                    onClick = { selectedFilter = ActivityType.INDIVIDUAL.name }
-                )
-                FilterButton(
-                    label = "Solo",
-                    backgroundColor = Color(0xFFADD8E6), // Light Blue
-                    isSelected = selectedFilter == ActivityType.SOLO.name,
-                    onClick = { selectedFilter = ActivityType.SOLO.name }
-                )
+              // Buttons for each type with equal size
+              FilterButton(
+                  label = "All",
+                  backgroundColor = Color(0xFFFFA07A), // Light Orange
+                  isSelected = selectedFilter == "",
+                  onClick = { selectedFilter = "" })
+              FilterButton(
+                  label = "Pro",
+                  backgroundColor = Color(0xFF90EE90), // Light Green
+                  isSelected = selectedFilter == ActivityType.PRO.name,
+                  onClick = { selectedFilter = ActivityType.PRO.name })
+              FilterButton(
+                  label = "Individual",
+                  backgroundColor = Color(0xFF9370DB), // Purple
+                  isSelected = selectedFilter == ActivityType.INDIVIDUAL.name,
+                  onClick = { selectedFilter = ActivityType.INDIVIDUAL.name })
+              FilterButton(
+                  label = "Solo",
+                  backgroundColor = Color(0xFFADD8E6), // Light Blue
+                  isSelected = selectedFilter == ActivityType.SOLO.name,
+                  onClick = { selectedFilter = ActivityType.SOLO.name })
             }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { route -> navigationActions.navigateTo(route) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = navigationActions.currentRoute())
-        }
-    ) { paddingValues ->
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      }) { paddingValues ->
         Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-                var activitiesList= (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-                if (selectedFilter.isNotEmpty()){
+              var activitiesList =
+                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+              if (selectedFilter.isNotEmpty()) {
 
-                    activitiesList= activitiesList.filter { it.type.name==selectedFilter }
-                }
+                activitiesList = activitiesList.filter { it.type.name == selectedFilter }
+              }
               if (activitiesList.isEmpty()) {
                 Text(
                     text = "There is no activity yet.",
@@ -221,35 +211,24 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
           Spacer(modifier = Modifier.height(8.dp))
         }
       }
-
-
 }
-@Composable
-fun FilterButton(
-    label: String,
-    backgroundColor: Color,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .width(80.dp) // Ensures all buttons have equal width
-            .clip(RoundedCornerShape(8.dp))
-            .background(backgroundColor)
-            .border(
-                width = if (isSelected) 2.dp else 0.dp, // Add border when selected
-                color = if (isSelected) Color.Black else Color.Transparent,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp, horizontal = 8.dp)
 
-    ) {
+@Composable
+fun FilterButton(label: String, backgroundColor: Color, isSelected: Boolean, onClick: () -> Unit) {
+  Box(
+      modifier =
+          Modifier.width(80.dp) // Ensures all buttons have equal width
+              .clip(RoundedCornerShape(8.dp))
+              .background(backgroundColor)
+              .border(
+                  width = if (isSelected) 2.dp else 0.dp, // Add border when selected
+                  color = if (isSelected) Color.Black else Color.Transparent,
+                  shape = RoundedCornerShape(8.dp))
+              .clickable(onClick = onClick)
+              .padding(vertical = 12.dp, horizontal = 8.dp)) {
         Text(
             text = label,
             color = if (isSelected) Color.Black else Color.White, // Change text color when selected
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
-        )
-    }
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
+      }
 }
-
