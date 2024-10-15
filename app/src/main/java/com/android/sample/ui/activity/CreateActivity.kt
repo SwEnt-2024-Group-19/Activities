@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -68,6 +70,9 @@ fun CreateActivityScreen(
   var dueDate by remember { mutableStateOf("") }
   var startTime by remember { mutableStateOf("") }
   var duration by remember { mutableStateOf("") }
+
+    // Add scroll
+    val scrollState = rememberScrollState()
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
@@ -78,7 +83,7 @@ fun CreateActivityScreen(
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF)),
+                Modifier.padding(paddingValues).fillMaxSize().verticalScroll(scrollState).background(color = Color(0xFFFFFFFF)),
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
