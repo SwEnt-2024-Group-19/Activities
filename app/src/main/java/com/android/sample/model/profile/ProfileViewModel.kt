@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,18 @@ open class ProfileViewModel(private val repository: ProfilesRepository, userId: 
   open val userState: StateFlow<User?> = userState_.asStateFlow()
 
   init {
-    fetchUserData(userId)
+    observeAuthState()
+  }
+
+  private fun observeAuthState() {
+    Firebase.auth.addAuthStateListener { auth ->
+      val currentUser = auth.currentUser
+      if (currentUser != null) {
+        fetchUserData(currentUser.uid)
+      } else {
+        Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
+      }
+    }
   }
 
   fun fetchUserData(userId: String) {
