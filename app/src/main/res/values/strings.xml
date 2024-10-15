@@ -3,4 +3,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_second">SecondActivity</string>
     <string name="default_web_client_id">701144582558-mgat0k47ht8ijib34asp8569nfd2d5uj.apps.googleusercontent.com</string>
+
+    <string name="title_activity">Give a title of the activity</string>
+    <string name="title_activity_create_activity">Create a new activity</string>
 </resources>
