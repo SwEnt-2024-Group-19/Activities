@@ -1,13 +1,12 @@
 package com.android.sample.ui.activity
 
 import android.icu.util.GregorianCalendar
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,14 +17,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,17 +38,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.ui.dialogs.AddUserDialog
+import com.android.sample.ui.dialogs.SimpleUser
+import com.android.sample.ui.navigation.BottomNavigationMenu
+import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -61,148 +62,216 @@ fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
 ) {
-    val IMAGE_PICK_CODE = 1000
-    val CAMERA_CAPTURE_CODE = 1001
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    var location by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var placesLeft by remember { mutableStateOf("") }
-    var dueDate by remember { mutableStateOf("") }
-    var carouselItems by remember { mutableStateOf(items) }
-    var showDialog by remember { mutableStateOf(false) }
+  val IMAGE_PICK_CODE = 1000
+  val CAMERA_CAPTURE_CODE = 1001
+  var title by remember { mutableStateOf("") }
+  var description by remember { mutableStateOf("") }
+  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+  var location by remember { mutableStateOf("") }
+  var price by remember { mutableStateOf("") }
+  var placesLeft by remember { mutableStateOf("") }
+  var dueDate by remember { mutableStateOf("") }
+  val carouselItems by remember { mutableStateOf(items) }
+  var showDialog by remember { mutableStateOf(false) }
+  val attendees_: List<SimpleUser> = listOf<SimpleUser>()
+  var attendees: List<SimpleUser> by remember { mutableStateOf(attendees_) }
 
-
-    Scaffold(
+  Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = { Text("Create a new activity") },
-            navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
-            })
+        )
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.ADD_ACTIVITY)
       },
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF))
-                    .verticalScroll(rememberScrollState()),
-        ) {
-          Carousel()
-          Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = title,
-              onValueChange = { title = it },
-              label = { Text("Title") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
-              placeholder = { Text("Give a title of the activity") },
-          )
-          Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = description,
-              onValueChange = { description = it },
-              label = { Text("Description") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
-              placeholder = { Text("Describe the activity") },
-          )
-          Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = dueDate,
-              onValueChange = { dueDate = it },
-              label = { Text("Date") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateCreate"),
-              placeholder = { Text("dd/mm/yyyy") },
-          )
-          Spacer(modifier = Modifier.height(8.dp))
-
-          OutlinedTextField(
-              value = price,
-              onValueChange = { price = it },
-              label = { Text("Price") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
-              placeholder = { Text("Price/person") },
-          )
-
-          Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = placesLeft,
-              onValueChange = { placesLeft = it },
-              label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
-              placeholder = { Text("Places left/Total places") },
-          )
-          Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = location,
-              onValueChange = { location = it },
-              label = { Text("Location") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
-              placeholder = { Text("Where is it taking place") },
-          )
-          Spacer(modifier = Modifier.height(32.dp))
-          Button(
-              enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
-              onClick = {
-                val calendar = GregorianCalendar()
-                val parts = dueDate.split("/")
-                if (parts.size == 3) {
-                  try {
-                    calendar.set(
-                        parts[2].toInt(),
-                        parts[1].toInt() - 1, // Months are 0-based
-                        parts[0].toInt(),
-                        0,
-                        0,
-                        0)
-                     val activity =
-                        Activity(
-                            uid = listActivityViewModel.getNewUid(),
-                            title = title,
-                            description = description,
-                            date = Timestamp(calendar.time),
-                            price = price.toDouble(),
-                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
-                            maxPlaces = parseFraction(placesLeft, 1)?.toLong() ?: 0.toLong(),
-                            creator = creator,
-                            status = ActivityStatus.ACTIVE,
-                            location = location,
-                            images = carouselItems.map{it},
-                            participants = listOf()
-                        )
-                    listActivityViewModel.addActivity(activity)
-                    navigationActions.navigateTo(Screen.OVERVIEW)
-                  } catch (_: NumberFormatException) {}
-                }
-              },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
-                  .testTag("createButton"),
-          ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Icon(
-                  Icons.Filled.Add,
-                  contentDescription = "add a new activity",
+                Modifier.padding(paddingValues)
+                    .fillMaxSize()
+                    .background(color = Color(0xFFFFFFFF))
+                    .verticalScroll(rememberScrollState())) {
+              Carousel()
+              Spacer(modifier = Modifier.height(8.dp))
+              OutlinedTextField(
+                  value = title,
+                  onValueChange = { title = it },
+                  label = { Text("Title") },
+                  modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
+                  placeholder = { Text("Give a title of the activity") },
               )
-              Text("Create")
+              Spacer(modifier = Modifier.height(8.dp))
+              OutlinedTextField(
+                  value = description,
+                  onValueChange = { description = it },
+                  label = { Text("Description") },
+                  modifier =
+                      Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
+                  placeholder = { Text("Describe the activity") },
+              )
+              Spacer(modifier = Modifier.height(8.dp))
+              OutlinedTextField(
+                  value = dueDate,
+                  onValueChange = { dueDate = it },
+                  label = { Text("Date") },
+                  modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateCreate"),
+                  placeholder = { Text("dd/mm/yyyy") },
+              )
+              Spacer(modifier = Modifier.height(8.dp))
+
+              OutlinedTextField(
+                  value = price,
+                  onValueChange = { price = it },
+                  label = { Text("Price") },
+                  modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
+                  placeholder = { Text("Price/person") },
+              )
+
+              Spacer(modifier = Modifier.height(8.dp))
+              OutlinedTextField(
+                  value = placesLeft,
+                  onValueChange = { placesLeft = it },
+                  label = { Text("Places Left") },
+                  modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
+                  placeholder = { Text("Places left/Total places") },
+              )
+              Spacer(modifier = Modifier.height(8.dp))
+              OutlinedTextField(
+                  value = location,
+                  onValueChange = { location = it },
+                  label = { Text("Location") },
+                  modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
+                  placeholder = { Text("Where is it taking place") },
+              )
+              Spacer(modifier = Modifier.height(32.dp))
+              Column(
+                  modifier = Modifier.fillMaxWidth().padding(8.dp).height(130.dp),
+                  verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = { showDialog = true },
+                        modifier =
+                            Modifier.width(300.dp).height(40.dp).testTag("addAttendeeButton"),
+                    ) {
+                      Row(
+                          horizontalArrangement =
+                              Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                          verticalAlignment = Alignment.CenterVertically,
+                      ) {
+                        Icon(
+                            Icons.Filled.Add,
+                            contentDescription = "add a new attendee",
+                        )
+                        Text("Add Attendee")
+                      }
+                    }
+
+                    LazyRow(
+                        modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
+                    ) {
+                      items(attendees.size) { index ->
+                        Row(
+                            modifier = Modifier.padding(8.dp).background(Color(0xFFFFFFFF)),
+                        ) {
+                          Text(
+                              text = attendees[index].name,
+                              modifier = Modifier.padding(8.dp),
+                              style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                          )
+                          Spacer(modifier = Modifier.width(8.dp))
+                          Text(
+                              text = attendees[index].surname,
+                              modifier = Modifier.padding(8.dp),
+                              style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                          )
+                          Spacer(modifier = Modifier.width(8.dp))
+                          Text(
+                              text = attendees[index].age.toString(),
+                              modifier = Modifier.padding(8.dp),
+                              style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                          )
+                          Button(
+                              onClick = { attendees = attendees.filter { it != attendees[index] } },
+                              modifier =
+                                  Modifier.width(40.dp)
+                                      .height(40.dp)
+                                      .testTag("removeAttendeeButton"),
+                          ) {
+                            Icon(
+                                Icons.Filled.PersonRemove,
+                                contentDescription = "remove attendee",
+                            )
+                          }
+                        }
+                      }
+                    }
+                  }
+              if (showDialog) {
+                AddUserDialog(
+                    onDismiss = { showDialog = false },
+                    onAddUser = { user -> attendees = attendees + user })
+              }
+              Spacer(modifier = Modifier.height(32.dp))
+              Button(
+                  enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
+                  onClick = {
+                    val calendar = GregorianCalendar()
+                    val parts = dueDate.split("/")
+                    if (parts.size == 3) {
+                      try {
+                        calendar.set(
+                            parts[2].toInt(),
+                            parts[1].toInt() - 1, // Months are 0-based
+                            parts[0].toInt(),
+                            0,
+                            0,
+                            0)
+                        val activity =
+                            Activity(
+                                uid = listActivityViewModel.getNewUid(),
+                                title = title,
+                                description = description,
+                                date = Timestamp(calendar.time),
+                                price = price.toDouble(),
+                                placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
+                                maxPlaces = parseFraction(placesLeft, 1)?.toLong() ?: 0.toLong(),
+                                creator = creator,
+                                status = ActivityStatus.ACTIVE,
+                                location = location,
+                                images = carouselItems.map { it },
+                                participants = attendees)
+                        listActivityViewModel.addActivity(activity)
+                        navigationActions.navigateTo(Screen.OVERVIEW)
+                      } catch (_: NumberFormatException) {}
+                    }
+                  },
+                  modifier =
+                      Modifier.width(300.dp)
+                          .height(40.dp)
+                          .testTag("createButton")
+                          .align(Alignment.CenterHorizontally),
+              ) {
+                Row(
+                    horizontalArrangement =
+                        Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                  Icon(
+                      Icons.Filled.Add,
+                      contentDescription = "add a new activity",
+                  )
+                  Text("Create")
+                }
+              }
+              Spacer(modifier = Modifier.height(16.dp))
             }
-          }
-        }
       },
   )
 }
-
-data class CarouselItem(
-    val id: Int,
-    val imageResId: String,
-    val contentDescription: String,
-)
 
 var items = listOf<String>()
 
@@ -215,11 +284,11 @@ fun Carousel() {
             modifier = Modifier.width(340.dp).height(135.dp),
         ) {
           items(items.size) { index ->
-              AsyncImage(
-                  model = items[index], // Utilise l'URL de l'image
-                  contentDescription = "image $index",
-                  contentScale = ContentScale.Crop,
-                  modifier = Modifier.padding(8.dp))
+            AsyncImage(
+                model = items[index], // Utilise l'URL de l'image
+                contentDescription = "image $index",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.padding(8.dp))
           }
         }
         Spacer(modifier = Modifier.width(16.dp))
