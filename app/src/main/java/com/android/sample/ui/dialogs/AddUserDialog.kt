@@ -25,38 +25,37 @@ fun AddUserDialog(
     onDismiss: () -> Unit,
     onAddUser: (SimpleUser) -> Unit,
 ) {
-    Column (
-        modifier = Modifier.fillMaxSize().padding(50.dp),
-    ){
-        var name by remember { mutableStateOf("") }
-        var surname by remember { mutableStateOf("") }
-        var age by remember { mutableStateOf("") }
+  Column(
+      modifier = Modifier.fillMaxSize().padding(50.dp),
+  ) {
+    var name by remember { mutableStateOf("") }
+    var surname by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
 
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") },
-        )
+    TextField(
+        value = name,
+        onValueChange = { name = it },
+        label = { Text("Name") },
+    )
 
-        TextField(
-            value = surname,
-            onValueChange = { surname = it },
-            label = { Text("Surname") },
-        )
+    TextField(
+        value = surname,
+        onValueChange = { surname = it },
+        label = { Text("Surname") },
+    )
 
-        TextField(
-            value = age,
-            onValueChange = { age = it },
-            label = { Text("Age") },
-        )
+    TextField(
+        value = age,
+        onValueChange = { age = it },
+        label = { Text("Age") },
+    )
 
-        Button(
-            onClick = {
-                onAddUser(SimpleUser(name, surname, age.toInt()))
-                onDismiss()
-            }
-        ) {
-            Text("Add user")
+    Button(
+        onClick = {
+          onAddUser(SimpleUser(name, surname, age.toInt()))
+          onDismiss()
+        }) {
+          Text("Add user")
         }
-    }
+  }
 }
