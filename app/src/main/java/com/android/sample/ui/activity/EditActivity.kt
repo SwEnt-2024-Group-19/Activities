@@ -16,12 +16,16 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -142,7 +146,26 @@ fun EditActivityScreen(
               placeholder = { Text("Places left/Total places") },
           )
           Spacer(modifier = Modifier.height(8.dp))
-
+          ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+            TextField(
+                readOnly = true,
+                value = selectedOption,
+                onValueChange = {},
+                label = { Text("Activity Type") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                modifier = Modifier.menuAnchor())
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+              types.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption.name) },
+                    onClick = {
+                      selectedOption = selectionOption.name
+                      expanded = false
+                    })
+              }
+            }
+          }
           Button(
               onClick = {
                 val calendar = GregorianCalendar()
@@ -187,7 +210,7 @@ fun EditActivityScreen(
                   Icons.Default.Done,
                   contentDescription = "add a new activity",
               )
-              Text("Delete", color = Color.Red)
+              Text("Create", color = Color.Red)
             }
           }
           Spacer(modifier = Modifier.height(16.dp))
@@ -214,7 +237,7 @@ fun EditActivityScreen(
                   Icons.Outlined.Delete,
                   contentDescription = "add a new activity",
               )
-              Text("Create")
+              Text("Delete")
             }
           }
         }
