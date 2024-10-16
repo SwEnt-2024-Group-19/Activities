@@ -19,66 +19,64 @@ import org.mockito.kotlin.eq
 
 class ListActivitiesViewModelTest {
 
-        private lateinit var activitiesRepository: ActivitiesRepository
-        private lateinit var listActivitiesViewModel: ListActivitiesViewModel
+  private lateinit var activitiesRepository: ActivitiesRepository
+  private lateinit var listActivitiesViewModel: ListActivitiesViewModel
 
-    private val activity =
-        Activity(
-            title = "FOOTBALL",
-            uid = "1",
-            status = ActivityStatus.ACTIVE,
-            location = "",
-            date = Timestamp.now(),
-            creator = "me",
-            description = "Do something",
-            placesLeft = 0,
-            maxPlaces = 0,
-            participants = listOf(),
-            images = listOf(),
-            price = 0.0
-        )
+  private val activity =
+      Activity(
+          title = "FOOTBALL",
+          uid = "1",
+          status = ActivityStatus.ACTIVE,
+          location = "",
+          date = Timestamp.now(),
+          creator = "me",
+          description = "Do something",
+          placesLeft = 0,
+          maxPlaces = 0,
+          participants = listOf(),
+          images = listOf(),
+          price = 0.0)
 
-        @Before
-        fun setUp() {
-            activitiesRepository = mock(ActivitiesRepository::class.java)
-            listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
-        }
+  @Before
+  fun setUp() {
+    activitiesRepository = mock(ActivitiesRepository::class.java)
+    listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
+  }
 
-        @Test
-        fun getNewUid() {
-            `when`(activitiesRepository.getNewUid()).thenReturn("uid")
-            assertThat(listActivitiesViewModel.getNewUid(), `is`("uid"))
-        }
+  @Test
+  fun getNewUid() {
+    `when`(activitiesRepository.getNewUid()).thenReturn("uid")
+    assertThat(listActivitiesViewModel.getNewUid(), `is`("uid"))
+  }
 
-        @Test
-        fun getActivitiesCallsRepository() {
-            listActivitiesViewModel.getActivities()
-            verify(activitiesRepository).getActivities(any(), any())
-        }
+  @Test
+  fun getActivitiesCallsRepository() {
+    listActivitiesViewModel.getActivities()
+    verify(activitiesRepository).getActivities(any(), any())
+  }
 
-        @Test
-        fun addActivitiesCallsRepository() {
-            listActivitiesViewModel.addActivity(activity)
-            verify(activitiesRepository).addActivity(eq(activity), any(), any())
-        }
+  @Test
+  fun addActivitiesCallsRepository() {
+    listActivitiesViewModel.addActivity(activity)
+    verify(activitiesRepository).addActivity(eq(activity), any(), any())
+  }
 
-        @Test
-        fun updateActivitiesCallsRepository() {
-            listActivitiesViewModel.updateActivity(activity)
-            verify(activitiesRepository).updateActivity(eq(activity), any(), any())
-        }
+  @Test
+  fun updateActivitiesCallsRepository() {
+    listActivitiesViewModel.updateActivity(activity)
+    verify(activitiesRepository).updateActivity(eq(activity), any(), any())
+  }
 
-        @Test
-        fun deleteActivityByIdCallsRepository() {
-            listActivitiesViewModel.deleteActivityById(activity.uid)
-            verify(activitiesRepository).deleteActivityById(eq(activity.uid), any(), any())
-        }
+  @Test
+  fun deleteActivityByIdCallsRepository() {
+    listActivitiesViewModel.deleteActivityById(activity.uid)
+    verify(activitiesRepository).deleteActivityById(eq(activity.uid), any(), any())
+  }
 
-        @Test
-        fun selectActivityUpdatesSelectedActivity() = runBlocking {
-            listActivitiesViewModel.selectActivity(activity)
-            val selected = listActivitiesViewModel.selectedActivity.first()
-            assertThat(selected, `is`(activity))
-        }
-    }
-
+  @Test
+  fun selectActivityUpdatesSelectedActivity() = runBlocking {
+    listActivitiesViewModel.selectActivity(activity)
+    val selected = listActivitiesViewModel.selectedActivity.first()
+    assertThat(selected, `is`(activity))
+  }
+}

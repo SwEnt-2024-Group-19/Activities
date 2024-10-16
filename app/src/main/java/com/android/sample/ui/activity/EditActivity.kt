@@ -63,8 +63,8 @@ fun EditActivityScreen(
   var location by remember { mutableStateOf(activity?.location) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
-    var startTime by remember { mutableStateOf(activity?.startTime) }
-    var duration by remember { mutableStateOf(activity?.duration) }
+  var startTime by remember { mutableStateOf(activity?.startTime) }
+  var duration by remember { mutableStateOf(activity?.duration) }
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -100,9 +100,10 @@ fun EditActivityScreen(
       }) { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF))
-                    .verticalScroll(rememberScrollState())
-                    ,
+                Modifier.padding(paddingValues)
+                    .fillMaxSize()
+                    .background(color = Color(0xFFFFFFFF))
+                    .verticalScroll(rememberScrollState()),
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -119,7 +120,9 @@ fun EditActivityScreen(
               onValueChange = { description = it },
               label = { Text("Description") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionEdit"),
-              placeholder = { Text(text = stringResource(id = R.string.request_activity_description)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_activity_description))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -127,7 +130,9 @@ fun EditActivityScreen(
               onValueChange = { dueDate = it },
               label = { Text("Date") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateEdit"),
-              placeholder = { Text(text = stringResource(id = R.string.request_date_activity_withFormat)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_date_activity_withFormat))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -163,8 +168,10 @@ fun EditActivityScreen(
               value = placesLeft,
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag( "inputPlacesLeftEdit"),
-              placeholder = { Text(text = stringResource(id = R.string.request_placesLeft_activity)) },
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_placesLeft_activity))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -172,7 +179,9 @@ fun EditActivityScreen(
               onValueChange = { location = it },
               label = { Text("Location") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationEdit"),
-              placeholder = { Text(text = stringResource(id = R.string.request_location_activity)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_location_activity))
+              },
           )
           Spacer(modifier = Modifier.height(32.dp))
           Button(
@@ -205,15 +214,17 @@ fun EditActivityScreen(
                             status = ActivityStatus.ACTIVE,
                             location = location ?: "",
                             images = listOf(),
-                            participants = listOf()
-                        )
+                            participants = listOf())
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: Exception) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
-                  .testTag("editButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("editButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -239,8 +250,11 @@ fun EditActivityScreen(
                 listActivityViewModel.deleteActivityById(activity?.uid ?: "")
                 navigationActions.navigateTo(Screen.OVERVIEW)
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally).
-                  testTag("deleteButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("deleteButton"),
           ) {
             Row(
                 Modifier.background(Color.Transparent),

@@ -1,8 +1,6 @@
 package com.android.sample.ui.activity
 
 import android.icu.util.GregorianCalendar
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -62,19 +59,19 @@ fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
 ) {
-    val IMAGE_PICK_CODE = 1000
-    val CAMERA_CAPTURE_CODE = 1001
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    var location by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var placesLeft by remember { mutableStateOf("") }
-    var dueDate by remember { mutableStateOf("") }
-    var startTime by remember { mutableStateOf("") }
-    var duration by remember { mutableStateOf("") }
-    var carouselItems by remember { mutableStateOf(items) }
-    var showDialog by remember { mutableStateOf(false) }
+  val IMAGE_PICK_CODE = 1000
+  val CAMERA_CAPTURE_CODE = 1001
+  var title by remember { mutableStateOf("") }
+  var description by remember { mutableStateOf("") }
+  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+  var location by remember { mutableStateOf("") }
+  var price by remember { mutableStateOf("") }
+  var placesLeft by remember { mutableStateOf("") }
+  var dueDate by remember { mutableStateOf("") }
+  var startTime by remember { mutableStateOf("") }
+  var duration by remember { mutableStateOf("") }
+  var carouselItems by remember { mutableStateOf(items) }
+  var showDialog by remember { mutableStateOf(false) }
 
   // Add scroll
   val scrollState = rememberScrollState()
@@ -84,7 +81,6 @@ fun CreateActivityScreen(
         TopAppBar(
             title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
         )
-
       },
       content = { paddingValues ->
         Column(
@@ -93,7 +89,6 @@ fun CreateActivityScreen(
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .background(color = Color(0xFFFFFFFF)),
-
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -125,7 +120,6 @@ fun CreateActivityScreen(
               placeholder = {
                 Text(text = stringResource(id = R.string.request_date_activity_withFormat))
               },
-
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -134,9 +128,7 @@ fun CreateActivityScreen(
               onValueChange = { startTime = it },
               label = { Text("Time") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = {
-                Text(text = stringResource(id = R.string.hour_min_format))
-              },
+              placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -145,9 +137,7 @@ fun CreateActivityScreen(
               onValueChange = { duration = it },
               label = { Text("Duration") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = {
-                Text(text = stringResource(id = R.string.hour_min_format))
-              },
+              placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
           )
 
           Spacer(modifier = Modifier.height(8.dp))
@@ -197,7 +187,7 @@ fun CreateActivityScreen(
                         0,
                         0,
                         0)
-                     val activity =
+                    val activity =
                         Activity(
                             uid = listActivityViewModel.getNewUid(),
                             title = title,
@@ -211,16 +201,18 @@ fun CreateActivityScreen(
                             creator = creator,
                             status = ActivityStatus.ACTIVE,
                             location = location,
-                            images = carouselItems.map{it},
-                            participants = listOf()
-                        )
+                            images = carouselItems.map { it },
+                            participants = listOf())
                     listActivityViewModel.addActivity(activity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
-                  .testTag("createButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("createButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -260,11 +252,11 @@ fun Carousel() {
             modifier = Modifier.width(340.dp).height(135.dp),
         ) {
           items(items.size) { index ->
-              AsyncImage(
-                  model = items[index], // Utilise l'URL de l'image
-                  contentDescription = "image $index",
-                  contentScale = ContentScale.Crop,
-                  modifier = Modifier.padding(8.dp))
+            AsyncImage(
+                model = items[index], // Utilise l'URL de l'image
+                contentDescription = "image $index",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.padding(8.dp))
           }
         }
         Spacer(modifier = Modifier.width(16.dp))

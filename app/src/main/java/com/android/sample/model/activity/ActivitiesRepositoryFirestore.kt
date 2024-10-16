@@ -46,8 +46,8 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
                       listOf(),
                       data["placesLeft"] as Long,
                       data["maxPlaces"] as Long,
-                      ActivityStatus.valueOf(data["status"] as String)
-                  , listOf())
+                      ActivityStatus.valueOf(data["status"] as String),
+                      listOf())
                 }
                 .filterNotNull() // Filter out any null results
 
