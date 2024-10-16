@@ -133,7 +133,7 @@ fun CreateActivityScreen(
               value = startTime,
               onValueChange = { startTime = it },
               label = { Text("Time") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputStartTimeCreate"),
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
               placeholder = {
                 Text(text = stringResource(id = R.string.hour_min_format))
               },
@@ -144,7 +144,7 @@ fun CreateActivityScreen(
               value = duration,
               onValueChange = { duration = it },
               label = { Text("Duration") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDurationCreate"),
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
               placeholder = {
                 Text(text = stringResource(id = R.string.hour_min_format))
               },

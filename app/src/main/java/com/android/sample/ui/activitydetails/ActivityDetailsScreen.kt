@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
@@ -193,17 +194,18 @@ fun ActivityDetailsScreen(
       }
 }
 
+
 @Composable
 fun Imagery() {
-  LazyRow(
-      modifier = Modifier.fillMaxWidth().height(200.dp).padding(3.dp),
-  ) {
-    items(com.android.sample.ui.activity.items.size) { index ->
-      Image(
-          painter = painterResource(id = com.android.sample.ui.activity.items[index].imageResId),
-          contentDescription = com.android.sample.ui.activity.items[index].contentDescription,
-          contentScale = ContentScale.Crop,
-          modifier = Modifier.padding(8.dp))
+    LazyRow(
+        modifier = Modifier.fillMaxWidth().height(200.dp).padding(3.dp),
+    ) {
+        items(com.android.sample.ui.activity.items.size) { index ->
+            AsyncImage(
+                model = com.android.sample.ui.activity.items[index], // Utilise l'URL de l'image
+                contentDescription = "Image $index",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.padding(8.dp))
+        }
     }
-  }
 }
