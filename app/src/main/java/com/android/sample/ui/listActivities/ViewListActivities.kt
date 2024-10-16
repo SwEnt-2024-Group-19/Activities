@@ -68,7 +68,7 @@ fun ListActivitiesScreen(
   Scaffold(
       modifier = modifier,
       topBar = {
-        Box(modifier = Modifier.height(35.dp)) { // Set the desired height here
+        Box(modifier = Modifier.height(35.dp).testTag("segmentedButtonRow")) { // Set the desired height here
           SingleChoiceSegmentedButtonRow {
             options.forEachIndexed { index, label ->
               SegmentedButton(
@@ -87,7 +87,7 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
-        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
+        Box(modifier = modifier.fillMaxSize().padding(paddingValues).testTag("bottomNavigationMenu")) {
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
               var activitiesList =
@@ -142,7 +142,7 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
 
   Card(
       modifier =
-          Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable {
+          Modifier.fillMaxWidth().testTag("activityCard").clip(RoundedCornerShape(16.dp)).clickable {
             navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
           },
       elevation = CardDefaults.cardElevation(8.dp)) {
