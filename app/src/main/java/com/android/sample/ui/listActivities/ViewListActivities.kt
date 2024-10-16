@@ -2,8 +2,6 @@ package com.android.sample.ui.listActivities
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +19,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,15 +36,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.types
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -61,36 +60,26 @@ fun ListActivitiesScreen(
 ) {
   val uiState by viewModel.uiState.collectAsState()
   var selectedFilter by remember { mutableStateOf("") }
+  var selectedIndex by remember { mutableStateOf(0) }
+  val all = "All"
+  val typesToString = types.map { it.name }
+  val options = listOf(all) + typesToString
 
   Scaffold(
       modifier = modifier,
       topBar = {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceAround) {
-
-              // Buttons for each type with equal size
-              FilterButton(
-                  label = "All",
-                  backgroundColor = Color(0xFFFFA07A), // Light Orange
-                  isSelected = selectedFilter == "",
-                  onClick = { selectedFilter = "" })
-              FilterButton(
-                  label = "Pro",
-                  backgroundColor = Color(0xFF90EE90), // Light Green
-                  isSelected = selectedFilter == ActivityType.PRO.name,
-                  onClick = { selectedFilter = ActivityType.PRO.name })
-              FilterButton(
-                  label = "Individual",
-                  backgroundColor = Color(0xFF9370DB), // Purple
-                  isSelected = selectedFilter == ActivityType.INDIVIDUAL.name,
-                  onClick = { selectedFilter = ActivityType.INDIVIDUAL.name })
-              FilterButton(
-                  label = "Solo",
-                  backgroundColor = Color(0xFFADD8E6), // Light Blue
-                  isSelected = selectedFilter == ActivityType.SOLO.name,
-                  onClick = { selectedFilter = ActivityType.SOLO.name })
+        Box(modifier = Modifier.height(35.dp)) { // Set the desired height here
+          SingleChoiceSegmentedButtonRow {
+            options.forEachIndexed { index, label ->
+              SegmentedButton(
+                  shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                  onClick = { selectedIndex = index },
+                  selected = index == selectedIndex) {
+                    Text(label)
+                  }
             }
+          }
+        }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -103,18 +92,28 @@ fun ListActivitiesScreen(
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
               var activitiesList =
                   (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              if (selectedFilter.isNotEmpty()) {
+              if (selectedIndex != 0) {
 
-                activitiesList = activitiesList.filter { it.type.name == selectedFilter }
+                activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
               }
               if (activitiesList.isEmpty()) {
-                Text(
-                    text = "There is no activity yet.",
-                    modifier =
-                        Modifier.padding(8.dp)
-                            .align(Alignment.Center)
-                            .testTag("emptyActivityPrompt"),
-                    color = MaterialTheme.colorScheme.onSurface)
+                if (selectedIndex == 0) {
+                  Text(
+                      text = "There is no activity yet.",
+                      modifier =
+                          Modifier.padding(8.dp)
+                              .align(Alignment.Center)
+                              .testTag("emptyActivityPrompt"),
+                      color = MaterialTheme.colorScheme.onSurface)
+                } else {
+                  Text(
+                      text = "There is no activity of this type yet.",
+                      modifier =
+                          Modifier.padding(8.dp)
+                              .align(Alignment.Center)
+                              .testTag("emptyActivityPrompt"),
+                      color = MaterialTheme.colorScheme.onSurface)
+                }
               } else {
 
                 LazyColumn(
@@ -210,25 +209,5 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
               modifier = Modifier.padding(horizontal = 16.dp))
           Spacer(modifier = Modifier.height(8.dp))
         }
-      }
-}
-
-@Composable
-fun FilterButton(label: String, backgroundColor: Color, isSelected: Boolean, onClick: () -> Unit) {
-  Box(
-      modifier =
-          Modifier.width(80.dp) // Ensures all buttons have equal width
-              .clip(RoundedCornerShape(8.dp))
-              .background(backgroundColor)
-              .border(
-                  width = if (isSelected) 2.dp else 0.dp, // Add border when selected
-                  color = if (isSelected) Color.Black else Color.Transparent,
-                  shape = RoundedCornerShape(8.dp))
-              .clickable(onClick = onClick)
-              .padding(vertical = 12.dp, horizontal = 8.dp)) {
-        Text(
-            text = label,
-            color = if (isSelected) Color.Black else Color.White, // Change text color when selected
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
       }
 }
