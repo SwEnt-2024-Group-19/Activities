@@ -134,13 +134,12 @@ fun EditActivityScreen(
           Spacer(modifier = Modifier.height(8.dp))
 
           OutlinedTextField(
-              value = duration?: "",
+              value = duration ?: "",
               onValueChange = { duration = it },
               label = { Text("Duration") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
               placeholder = { Text("HH:mm") },
           )
-
 
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -189,8 +188,8 @@ fun EditActivityScreen(
                             title = title ?: "",
                             description = description ?: "",
                             date = Timestamp(calendar.time),
-                            startTime = startTime?: "",
-                            duration = duration?: "",
+                            startTime = startTime ?: "",
+                            duration = duration ?: "",
                             price = price.toDouble(),
                             placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
@@ -247,5 +246,3 @@ fun EditActivityScreen(
         }
       }
 }
-
-

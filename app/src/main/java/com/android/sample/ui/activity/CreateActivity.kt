@@ -18,14 +18,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -72,19 +70,22 @@ fun CreateActivityScreen(
   var startTime by remember { mutableStateOf("") }
   var duration by remember { mutableStateOf("") }
 
-    // Add scroll
-    val scrollState = rememberScrollState()
+  // Add scroll
+  val scrollState = rememberScrollState()
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
-            title = { Text(text =  stringResource(id = R.string.title_screen_create_activity)) },
-            )
+            title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
+        )
       },
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().verticalScroll(scrollState).background(color = Color(0xFFFFFFFF)),
+                Modifier.padding(paddingValues)
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .background(color = Color(0xFFFFFFFF)),
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -101,7 +102,9 @@ fun CreateActivityScreen(
               onValueChange = { description = it },
               label = { Text("Description") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text(text = stringResource(id = R.string.request_activity_description)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_activity_description))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -109,7 +112,9 @@ fun CreateActivityScreen(
               onValueChange = { dueDate = it },
               label = { Text("Date") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text(text = stringResource(id = R.string.request_date_activity_withFormat)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_date_activity_withFormat))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -118,7 +123,9 @@ fun CreateActivityScreen(
               onValueChange = { startTime = it },
               label = { Text("Time") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text(text = stringResource(id = R.string.request_startTime_activity_withFormat)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_startTime_activity_withFormat))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -127,9 +134,10 @@ fun CreateActivityScreen(
               onValueChange = { duration = it },
               label = { Text("Duration") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text(text = stringResource(id = R.string.request_duration_activity_withFormat)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_duration_activity_withFormat))
+              },
           )
-
 
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -147,7 +155,9 @@ fun CreateActivityScreen(
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text(text = stringResource(id = R.string.request_placesLeft_activity)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_placesLeft_activity))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -155,7 +165,9 @@ fun CreateActivityScreen(
               onValueChange = { location = it },
               label = { Text("Location") },
               modifier = Modifier.padding(8.dp).fillMaxWidth(),
-              placeholder = { Text(text = stringResource(id = R.string.request_location_activity)) },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_location_activity))
+              },
           )
           Spacer(modifier = Modifier.height(32.dp))
           Button(
@@ -208,12 +220,11 @@ fun CreateActivityScreen(
         }
       },
       bottomBar = {
-          BottomNavigationMenu(
-              onTabSelect = { route -> navigationActions.navigateTo(route) },
-              tabList = LIST_TOP_LEVEL_DESTINATION,
-              selectedItem = navigationActions.currentRoute())
-      }
-  )
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      })
 }
 
 data class CarouselItem(

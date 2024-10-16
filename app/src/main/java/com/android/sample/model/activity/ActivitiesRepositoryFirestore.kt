@@ -39,7 +39,7 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
                       data["description"] as String,
                       data["date"] as Timestamp,
                       data["startTime"] as? String ?: "00:00",
-                      data["duration"]  as? String ?: "00:00",
+                      data["duration"] as? String ?: "00:00",
                       data["price"] as Double,
                       data["location"] as String,
                       data["creator"] as String,
