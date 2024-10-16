@@ -5,16 +5,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -35,32 +39,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.firestore
 import java.util.Calendar
 import java.util.GregorianCalendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivityScreen(
-    listActivityViewModel: ListActivitiesViewModel,
+    listActivityViewModel: ListActivitiesViewModel =
+        viewModel(factory = ListActivitiesViewModel.Factory),
     navigationActions: NavigationActions,
-    modifier: Modifier = Modifier
 ) {
+  var showDialog by remember { mutableStateOf(false) }
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
-  var title by remember { mutableStateOf(activity?.title) }
-  var description by remember { mutableStateOf(activity?.description) }
-  var creator by remember { mutableStateOf(activity?.creator) }
-  var location by remember { mutableStateOf(activity?.location) }
-  var price by remember { mutableStateOf(activity?.price.toString()) }
-  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
+  var title by remember { mutableStateOf(activity?.title ?: "") }
+  var description by remember { mutableStateOf(activity?.description ?: "") }
+  val creator by remember { mutableStateOf(activity?.creator ?: "") }
+  var location by remember { mutableStateOf(activity?.location ?: "") }
+  var price by remember { mutableStateOf(activity?.price.toString() ?: "") }
+  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString() ?: "") }
+  var attendees by remember { mutableStateOf(activity?.participants ?: listOf()) }
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -76,7 +92,7 @@ fun EditActivityScreen(
         })
   }
   Scaffold(
-      modifier = modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = { Text("Edit the activity") },
@@ -96,9 +112,10 @@ fun EditActivityScreen(
       }) { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF))
-                    .verticalScroll(rememberScrollState())
-                    ,
+                Modifier.padding(paddingValues)
+                    .fillMaxSize()
+                    .background(color = Color(0xFFFFFFFF))
+                    .verticalScroll(rememberScrollState()),
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -140,7 +157,7 @@ fun EditActivityScreen(
               value = placesLeft,
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag( "inputPlacesLeftEdit"),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
               placeholder = { Text("Places left/Total places") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -151,9 +168,75 @@ fun EditActivityScreen(
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationEdit"),
               placeholder = { Text("Where is it taking place") },
           )
+          Column(
+              modifier = Modifier.fillMaxWidth().padding(8.dp).height(130.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = { showDialog = true },
+                    modifier = Modifier.width(300.dp).height(40.dp).testTag("addAttendeeButton"),
+                ) {
+                  Row(
+                      horizontalArrangement =
+                          Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                      verticalAlignment = Alignment.CenterVertically,
+                  ) {
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = "add a new attendee",
+                    )
+                    Text("Add Attendee")
+                  }
+                }
+
+                LazyRow(
+                    modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
+                ) {
+                  items(attendees.size) { index ->
+                    Row(
+                        modifier = Modifier.padding(8.dp).background(Color(0xFFFFFFFF)),
+                    ) {
+                      Text(
+                          text = attendees[index].name,
+                          modifier = Modifier.padding(8.dp),
+                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                      )
+                      Spacer(modifier = Modifier.width(8.dp))
+                      Text(
+                          text = attendees[index].surname,
+                          modifier = Modifier.padding(8.dp),
+                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                      )
+                      Spacer(modifier = Modifier.width(8.dp))
+                      Text(
+                          text = attendees[index].age.toString(),
+                          modifier = Modifier.padding(8.dp),
+                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                      )
+                      Button(
+                          onClick = { attendees = attendees.filter { it != attendees[index] } },
+                          modifier =
+                              Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
+                      ) {
+                        Icon(
+                            Icons.Filled.PersonRemove,
+                            contentDescription = "remove attendee",
+                        )
+                      }
+                    }
+                  }
+                }
+              }
+          if (showDialog) {
+            AddUserDialog(
+                onDismiss = { showDialog = false },
+                onAddUser = { user -> attendees = attendees + user })
+          }
           Spacer(modifier = Modifier.height(32.dp))
           Button(
-              enabled = title!!.isNotEmpty() && description!!.isNotEmpty() && dueDate.isNotEmpty(),
+              enabled =
+                  title?.isNotEmpty() ?: false &&
+                      description?.isNotEmpty() ?: false &&
+                      dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
@@ -180,15 +263,17 @@ fun EditActivityScreen(
                             status = ActivityStatus.ACTIVE,
                             location = location ?: "",
                             images = listOf(),
-                            participants = listOf()
-                        )
+                            participants = attendees)
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: Exception) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
-                  .testTag("editButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("editButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -198,7 +283,7 @@ fun EditActivityScreen(
                   Icons.Default.Done,
                   contentDescription = "add a new activity",
               )
-              Text("Delete", color = Color.Red)
+              Text("Save", color = Color.White)
             }
           }
           Spacer(modifier = Modifier.height(16.dp))
@@ -214,8 +299,11 @@ fun EditActivityScreen(
                 listActivityViewModel.deleteActivityById(activity?.uid ?: "")
                 navigationActions.navigateTo(Screen.OVERVIEW)
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally).
-                  testTag("deleteButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("deleteButton"),
           ) {
             Row(
                 Modifier.background(Color.Transparent),
@@ -226,9 +314,32 @@ fun EditActivityScreen(
                   Icons.Outlined.Delete,
                   contentDescription = "add a new activity",
               )
-              Text("Create")
+              Text("Delete")
             }
           }
         }
       }
+}
+
+@Preview
+@Composable
+fun EditActivityScreenPreview() {
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
+  val lAV = ListActivitiesViewModel(ActivitiesRepositoryFirestore(Firebase.firestore))
+  lAV.selectActivity(
+      Activity(
+          uid = "1",
+          title = "Activity",
+          description = "Description",
+          date = Timestamp.now(),
+          price = 0.0,
+          placesLeft = 0,
+          maxPlaces = 0,
+          creator = "Creator",
+          status = ActivityStatus.ACTIVE,
+          location = "Location",
+          images = listOf(),
+          participants = listOf()))
+  EditActivityScreen(navigationActions = navigationActions)
 }
