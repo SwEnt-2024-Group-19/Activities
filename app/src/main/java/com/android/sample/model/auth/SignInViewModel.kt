@@ -27,7 +27,7 @@ constructor(
       onAuthError: (String) -> Unit,
       navigationActions: NavigationActions
   ) {
-      Log.d("SignInViewModel", "signInWithEmailAndPassword")
+    Log.d("SignInViewModel", "signInWithEmailAndPassword")
     viewModelScope.launch {
       try {
         val authResult = signInRepository.signInWithEmail(email, password)

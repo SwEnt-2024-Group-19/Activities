@@ -110,8 +110,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                               onAuthError,
                               navigationActions)
                     }
-                      Log.d("SignInScreen", "Sign in with email/password")
-
+                    Log.d("SignInScreen", "Sign in with email/password")
                   },
                   modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignInButton")) {
                     Text("Sign in with Email", fontSize = 16.sp)
