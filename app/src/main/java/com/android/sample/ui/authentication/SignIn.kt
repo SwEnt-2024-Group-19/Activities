@@ -12,16 +12,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,237 +25,183 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
-import com.android.sample.model.profile.ProfilesRepositoryFirestore
+import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) {
+fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewModel) {
   val context = LocalContext.current
   val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
-  val passwordErrorState = remember {
-    mutableStateOf<String?>(null)
-  } // State for password validation error
-  val launcher =
-      rememberFirebaseAuthLauncher(
-          onAuthComplete = { result ->
-            Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
-            Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            // Navigate to OverviewScreen upon successful login
-            navigationActions.navigateTo(Screen.OVERVIEW)
-          },
-          onAuthError = {
-            Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
-            Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
-          },
-          navigationActions)
+  val passwordErrorState = remember { mutableStateOf<String?>(null) }
+  val coroutineScope = rememberCoroutineScope()
   val token = stringResource(R.string.default_web_client_id)
 
-  // The main container for the screen
+  val onAuthSuccess = { Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show() }
+
+  val onAuthError = { errorMessage: String ->
+    Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+  }
+
+  // Google Sign-In Launcher
+  val googleSignInLauncher =
+      rememberGoogleSignInLauncher(viewModel, navigationActions, onAuthSuccess, onAuthError)
+
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       content = { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-          // App Logo Image
-          Image(
-              painter = painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
-              contentDescription = "App Logo",
-              modifier = Modifier.size(110.dp).testTag("AppLogo"))
-          Spacer(modifier = Modifier.height(48.dp))
+            verticalArrangement = Arrangement.Center) {
+              // App Logo
+              Image(
+                  painter = painterResource(id = R.drawable.google_logo),
+                  contentDescription = "App Logo",
+                  modifier = Modifier.size(110.dp).testTag("AppLogo"))
+              Spacer(modifier = Modifier.height(48.dp))
 
-          // Email and Password fields
-          OutlinedTextField(
-              value = emailState.value,
-              onValueChange = { emailState.value = it },
-              label = { Text("Email") },
-              modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
-          Spacer(modifier = Modifier.height(16.dp))
-          OutlinedTextField(
-              value = passwordState.value,
-              onValueChange = { passwordState.value = it },
-              label = { Text("Password") },
-              isError =
-                  passwordErrorState.value !=
-                      null, // Highlight the text field in red if there's an error
-              modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"))
-          // Display password error message below the password field
-          if (passwordErrorState.value != null) {
-            Text(
-                text = passwordErrorState.value ?: "",
-                color = Color.Red,
-                fontSize = 12.sp,
-                modifier = Modifier.align(Alignment.Start).padding(start = 40.dp, top = 4.dp))
-          }
-          Spacer(modifier = Modifier.height(16.dp))
+              // Email Input
+              OutlinedTextField(
+                  value = emailState.value,
+                  onValueChange = { emailState.value = it },
+                  label = { Text("Email") },
+                  modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
+              Spacer(modifier = Modifier.height(16.dp))
 
-          // Sign In with Email/Password Button
-          Button(
-              onClick = {
-                when {
-                  passwordState.value.isEmpty() -> {
-                    passwordErrorState.value =
-                        "Password cannot be empty" // Set the error message if password is empty
+              // Password Input
+              OutlinedTextField(
+                  value = passwordState.value,
+                  onValueChange = { passwordState.value = it },
+                  label = { Text("Password") },
+                  isError = passwordErrorState.value != null,
+                  modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"))
+
+              // Password Error
+              passwordErrorState.value?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier =
+                        Modifier.align(Alignment.Start)
+                            .padding(start = 40.dp)
+                            .testTag("PasswordErrorText"))
+              }
+
+              Spacer(modifier = Modifier.height(16.dp))
+
+              // Sign-In Button
+              Button(
+                  onClick = {
+                    when {
+                      passwordState.value.isEmpty() ->
+                          passwordErrorState.value = "Password cannot be empty"
+                      else ->
+                          viewModel.signInWithEmailAndPassword(
+                              emailState.value,
+                              passwordState.value,
+                              onAuthSuccess,
+                              onAuthError,
+                              navigationActions)
+                    }
+                      Log.d("SignInScreen", "Sign in with email/password")
+
+                  },
+                  modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignInButton")) {
+                    Text("Sign in with Email", fontSize = 16.sp)
                   }
-                  else -> {
-                    signInWithEmailAndPassword(
-                        emailState.value, passwordState.value, context, navigationActions)
+
+              Spacer(modifier = Modifier.height(16.dp))
+
+              // Google Sign-In Button
+              GoogleSignInButton(
+                  onSignInClick = {
+                    googleSignInLauncher.launch(rememberGoogleSignInIntent(context, token))
+                  })
+
+              Spacer(modifier = Modifier.height(16.dp))
+
+              // If user already has an account, navigate to the sign in screen
+              TextButton(
+                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                  modifier =
+                      Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignUpButton")) {
+                    Text("No account yet?", fontSize = 16.sp)
                   }
-                }
-              },
-              modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignInButton")) {
-                Text("Sign in with Email", fontSize = 16.sp)
-              }
-          Spacer(modifier = Modifier.height(16.dp))
 
-          // Authenticate With Google Button
-          GoogleSignInButton(
-              onSignInClick = {
-                val gso =
-                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(token)
-                        .requestEmail()
-                        .build()
-                val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                launcher.launch(googleSignInClient.signInIntent)
-              })
-
-          // If user already has an account, navigate to the sign in screen
-          TextButton(
-              onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-              modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignUpButton")) {
-                Text("No account yet?", fontSize = 16.sp)
-              }
-
-          // Continue as a guest button
-          TextButton(
-              onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
-              modifier =
-                  Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("ContinueAsGuestButton")) {
-                Text("Continue as a guest", fontSize = 16.sp)
-              }
-        }
+              // Continue as guest
+              TextButton(
+                  onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
+                  modifier = Modifier.testTag("ContinueAsGuestButton")) {
+                    Text("Continue as Guest")
+                  }
+            }
       })
 }
 
-fun signInWithEmailAndPassword(
-    email: String,
-    password: String,
-    context: Context,
+@Composable
+fun rememberGoogleSignInLauncher(
+    viewModel: SignInViewModel,
     navigationActions: NavigationActions,
-) {
-  val auth = FirebaseAuth.getInstance()
-  auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-    if (task.isSuccessful) {
-      Log.d("SignInScreen", "signInWithEmail:success")
-      Toast.makeText(context, "Email login successful!", Toast.LENGTH_LONG).show()
-      // Navigate to the next screen upon successful login
-      checkUserProfile(auth.currentUser?.uid, navigationActions, context)
-    } else {
-      Log.w("SignInScreen", "signInWithEmail:failure", task.exception)
-      Toast.makeText(context, "Email login failed!", Toast.LENGTH_LONG).show()
+    onAuthSuccess: () -> Unit,
+    onAuthError: (String) -> Unit
+): ManagedActivityResultLauncher<Intent, ActivityResult> {
+  val scope = rememberCoroutineScope()
+  return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+      result ->
+    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+    scope.launch {
+      try {
+        val account = task.getResult(ApiException::class.java)!!
+        val idToken = account.idToken // Extract the actual ID token
+        if (idToken != null) {
+          viewModel.handleGoogleSignInResult(idToken, onAuthSuccess, onAuthError, navigationActions)
+        } else {
+          onAuthError("Google Sign-in failed! Token is null.")
+        }
+      } catch (e: ApiException) {
+        onAuthError("Google Sign-in failed! ${e.message}")
+      }
     }
   }
+}
+
+fun rememberGoogleSignInIntent(context: Context, token: String): Intent {
+  val gso =
+      GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+          .requestIdToken(token)
+          .requestEmail()
+          .build()
+  return GoogleSignIn.getClient(context, gso).signInIntent
 }
 
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
       onClick = onSignInClick,
-      colors = ButtonDefaults.buttonColors(containerColor = Color.White), // Button color
-      shape = RoundedCornerShape(50), // Circular edges for the button
+      colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+      shape = RoundedCornerShape(50),
       border = BorderStroke(1.dp, Color.LightGray),
-      modifier =
-          Modifier.padding(8.dp)
-              .height(48.dp) // Adjust height as needed
-              .testTag("GoogleSignInButton")) {
+      modifier = Modifier.padding(8.dp).height(48.dp).testTag("GoogleSignInButton")) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth(0.8f)) {
-              // Load the Google logo from resources
               Image(
-                  painter =
-                      painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
+                  painter = painterResource(id = R.drawable.google_logo),
                   contentDescription = "Google Logo",
-                  modifier =
-                      Modifier.size(30.dp) // Size of the Google logo
-                          .padding(end = 8.dp))
-
-              // Text for the button
+                  modifier = Modifier.size(30.dp).padding(end = 8.dp))
               Text(
                   text = "Sign in with Google",
-                  color = Color.Gray, // Text color
-                  fontSize = 16.sp, // Font size
+                  color = Color.Gray,
+                  fontSize = 16.sp,
                   fontWeight = FontWeight.Medium)
             }
       }
-}
-
-@Composable
-fun rememberFirebaseAuthLauncher(
-    onAuthComplete: (AuthResult) -> Unit,
-    onAuthError: (ApiException) -> Unit,
-    navigationActions: NavigationActions
-): ManagedActivityResultLauncher<Intent, ActivityResult> {
-  val scope = rememberCoroutineScope()
-  val context = LocalContext.current
-
-  return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-      result ->
-    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-    try {
-      val account = task.getResult(ApiException::class.java)!!
-      val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-      scope.launch {
-        val authResult = Firebase.auth.signInWithCredential(credential).await()
-        onAuthComplete(authResult)
-        val uid = Firebase.auth.currentUser?.uid
-        checkUserProfile(uid, navigationActions, context)
-      }
-    } catch (e: ApiException) {
-      onAuthError(e)
-    }
-  }
-}
-
-private fun checkUserProfile(uid: String?, navigationActions: NavigationActions, context: Context) {
-  if (uid == null) {
-    Toast.makeText(context, "User ID is null, cannot proceed!", Toast.LENGTH_LONG).show()
-    return
-  }
-
-  val db = Firebase.firestore
-  val repository = ProfilesRepositoryFirestore(db)
-
-  repository.getUser(
-      uid,
-      onSuccess = { userProfile ->
-        if (userProfile == null) {
-          // If no profile exists, navigate to ProfileCreationScreen
-          navigationActions.navigateTo(Screen.CREATE_PROFILE)
-        } else {
-          // If the profile exists, navigate to the main screen
-          navigationActions.navigateTo(Screen.OVERVIEW)
-        }
-      },
-      onFailure = {
-        Toast.makeText(context, "Error checking user profile!", Toast.LENGTH_LONG).show()
-        Log.e("SignInScreen", "Error checking user profile: ${it.message}")
-      })
 }
