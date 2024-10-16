@@ -20,8 +20,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 
 @RunWith(AndroidJUnit4::class)
 class SignInScreenTest {
@@ -100,21 +100,20 @@ class SignInScreenTest {
 
     // Set up mock behavior for successful sign-in
     doAnswer { invocation ->
-      val onAuthSuccess = invocation.arguments[2] as () -> Unit
-      onAuthSuccess() // Simulate successful sign-in
-      null
-    }.`when`(viewModel).signInWithEmailAndPassword(
-      anyString(),
-      anyString(),
-      any(),  // non-null lambda for onAuthSuccess
-      any(),  // non-null lambda for onAuthError
-      eq(navigationActions)
-    )
+          val onAuthSuccess = invocation.arguments[2] as () -> Unit
+          onAuthSuccess() // Simulate successful sign-in
+          null
+        }
+        .`when`(viewModel)
+        .signInWithEmailAndPassword(
+            anyString(),
+            anyString(),
+            any(), // non-null lambda for onAuthSuccess
+            any(), // non-null lambda for onAuthError
+            eq(navigationActions))
 
     // Set the SignInScreen as the content to test
-    composeTestRule.setContent {
-      SignInScreen(navigationActions = navigationActions, viewModel)
-    }
+    composeTestRule.setContent { SignInScreen(navigationActions = navigationActions, viewModel) }
 
     // Simulate user input and click the sign-in button
     composeTestRule.onNodeWithTag("EmailTextField").performTextInput("user@example.com")
@@ -124,6 +123,4 @@ class SignInScreenTest {
     // Verify that the navigation to the Overview screen occurred
     verify(navigationActions).navigateTo(Screen.OVERVIEW)
   }
-
-
 }
