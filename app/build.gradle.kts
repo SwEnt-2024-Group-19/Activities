@@ -128,7 +128,7 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 
 dependencies {
 
-    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
 
     // Core
     implementation(libs.core.ktx)
