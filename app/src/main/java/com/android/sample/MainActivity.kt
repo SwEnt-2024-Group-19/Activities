@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
@@ -63,13 +64,15 @@ fun ActivitiesApp(uid: String) {
   val listActivitiesViewModel: ListActivitiesViewModel =
       viewModel(factory = ListActivitiesViewModel.Factory)
   val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(uid))
+  // need to add factory for SignInViewModel
+  val authViewModel: SignInViewModel = viewModel(factory = SignInViewModel.Factory())
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+      composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
       composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
       composable(Screen.CREATE_PROFILE) {
         ProfileCreationScreen(profileViewModel, navigationActions)
