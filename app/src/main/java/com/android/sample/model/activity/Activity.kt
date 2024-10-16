@@ -1,22 +1,5 @@
 package com.android.sample.model.activity
 
-
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
-import coil3.Bitmap
 import com.android.sample.ui.dialogs.SimpleUser
 import com.google.firebase.Timestamp
 
@@ -33,7 +16,7 @@ data class Activity(
     var placesLeft: Long,
     var maxPlaces: Long,
     var status: ActivityStatus,
-    var participants:List<SimpleUser>
+    var participants: List<SimpleUser>
 )
 
 enum class ActivityStatus {
@@ -41,32 +24,32 @@ enum class ActivityStatus {
   FINISHED,
 }
 
-enum class Category {
-  WORKSHOP,
-  TALK,
-  KEYNOTE,
-  BREAK,
-  LUNCH,
-  NETWORKING,
-  SOCIAL,
-  OTHER,
-}
+// enum class Category {
+//  WORKSHOP,
+//  TALK,
+//  KEYNOTE,
+//  BREAK,
+//  LUNCH,
+//  NETWORKING,
+//  SOCIAL,
+//  OTHER,
+// }
+//
+// val categories =
+//    listOf(
+//        Category.WORKSHOP,
+//        Category.TALK,
+//        Category.KEYNOTE,
+//        Category.BREAK,
+//        Category.LUNCH,
+//        Category.NETWORKING,
+//        Category.SOCIAL,
+//        Category.OTHER,
+//    )
 
-val categories =
-    listOf(
-        Category.WORKSHOP,
-        Category.TALK,
-        Category.KEYNOTE,
-        Category.BREAK,
-        Category.LUNCH,
-        Category.NETWORKING,
-        Category.SOCIAL,
-        Category.OTHER,
-    )
-
-//Setup later
-//@Composable
-//fun CategoryDropdown() {
+// Setup later
+// @Composable
+// fun CategoryDropdown() {
 //  var selectedCategory = remember { mutableStateOf<Category?>(null) }
 //  var open = remember { mutableStateOf(false) }
 //  Column {
@@ -93,9 +76,9 @@ val categories =
 //          }
 //        }
 //  }
-//}
+// }
 //
-//fun CategoryToString(category: MutableState<Category?>): String {
+// fun CategoryToString(category: MutableState<Category?>): String {
 //
 //  return when (category.value) {
 //    Category.WORKSHOP -> "Workshop"
@@ -108,4 +91,4 @@ val categories =
 //    Category.OTHER -> "Other"
 //    null -> ""
 //  }
-//}
+// }
