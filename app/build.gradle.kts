@@ -128,6 +128,8 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 
 dependencies {
 
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+
     // Core
     implementation(libs.core.ktx)
     implementation(libs.androidx.core.ktx)
@@ -190,8 +192,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.mockito.core)
-    testImplementation("org.mockito:mockito-inline:4.10.0")
-    testImplementation("org.mockito:mockito-core:4.10.0")
+
 
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)

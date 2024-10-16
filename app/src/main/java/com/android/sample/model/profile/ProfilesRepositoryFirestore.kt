@@ -4,7 +4,7 @@ import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesRepository {
+open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesRepository {
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     db.collection("profiles").document(userId).get().addOnCompleteListener { task ->
