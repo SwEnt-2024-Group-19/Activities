@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -95,7 +96,7 @@ fun CreateActivityScreen(
               value = title,
               onValueChange = { title = it },
               label = { Text("Title") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
               placeholder = { Text("Give a title of the activity") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -103,7 +104,7 @@ fun CreateActivityScreen(
               value = description,
               onValueChange = { description = it },
               label = { Text("Description") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
               placeholder = { Text("Describe the activity") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -111,7 +112,7 @@ fun CreateActivityScreen(
               value = dueDate,
               onValueChange = { dueDate = it },
               label = { Text("Date") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateCreate"),
               placeholder = { Text("dd/mm/yyyy") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -120,7 +121,7 @@ fun CreateActivityScreen(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
               placeholder = { Text("Price/person") },
           )
 
@@ -129,7 +130,7 @@ fun CreateActivityScreen(
               value = placesLeft,
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
               placeholder = { Text("Places left/Total places") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -137,31 +138,36 @@ fun CreateActivityScreen(
               value = location,
               onValueChange = { location = it },
               label = { Text("Location") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
               placeholder = { Text("Where is it taking place") },
           )
           Spacer(modifier = Modifier.height(8.dp))
 
-          ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-            TextField(
-                readOnly = true,
-                value = selectedOption,
-                onValueChange = {},
-                label = { Text("Label") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier.menuAnchor())
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-              types.forEach { selectionOption ->
-                DropdownMenuItem(
-                    text = { Text(selectionOption.name) },
-                    onClick = {
-                      selectedOption = selectionOption.name
-                      expanded = false
-                    })
+          ExposedDropdownMenuBox(
+              modifier = Modifier.testTag("chooseTypeMenu"),
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded }) {
+                TextField(
+                    readOnly = true,
+                    value = selectedOption,
+                    onValueChange = {},
+                    label = { Text("Activity Type") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor())
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                  types.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption.name) },
+                        onClick = {
+                          selectedOption = selectionOption.name
+                          expanded = false
+                        })
+                  }
+                }
               }
-            }
-          }
           Spacer(modifier = Modifier.height(32.dp))
           Button(
               onClick = {
@@ -196,7 +202,11 @@ fun CreateActivityScreen(
                   } catch (_: NumberFormatException) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("createButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
