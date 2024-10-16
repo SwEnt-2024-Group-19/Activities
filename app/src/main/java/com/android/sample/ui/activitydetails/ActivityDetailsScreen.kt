@@ -73,6 +73,7 @@ fun ActivityDetailsScreen(
                 }"
         })
   }
+
   val startTime by remember { mutableStateOf(activity?.startTime) }
   val duration by remember { mutableStateOf(activity?.duration) }
   val location by remember { mutableStateOf(activity?.location) }
@@ -171,6 +172,7 @@ fun ActivityDetailsScreen(
                             status = status ?: ActivityStatus.ACTIVE,
                             location = location ?: "",
                             images = listOf(),
+                            participants = listOf()
                         )
                       }
                   if (theActivity != null) {

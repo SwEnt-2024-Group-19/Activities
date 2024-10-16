@@ -38,15 +38,16 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
                       data["title"] as String,
                       data["description"] as String,
                       data["date"] as Timestamp,
-                      data["startTime"] as? String ?: "00:00",
-                      data["duration"] as? String ?: "00:00",
+                      data["startTime"] as? String ?: "HH:mm",
+                      data["duration"] as? String ?: "HH:mm",
                       data["price"] as Double,
                       data["location"] as String,
                       data["creator"] as String,
                       listOf(),
                       data["placesLeft"] as Long,
                       data["maxPlaces"] as Long,
-                      ActivityStatus.valueOf(data["status"] as String))
+                      ActivityStatus.valueOf(data["status"] as String)
+                  , listOf())
                 }
                 .filterNotNull() // Filter out any null results
 
@@ -96,7 +97,7 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
         onSuccess()
       } else {
         result.exception?.let { e ->
-          Log.e("TodosRepositoryFirestore", "Error performing Firestore operation", e)
+          Log.e("ActivitiesRepositoryFirestore", "Error performing Firestore operation", e)
           onFailure(e)
         }
       }

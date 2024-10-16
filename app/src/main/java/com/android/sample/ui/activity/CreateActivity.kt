@@ -37,12 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -60,15 +62,19 @@ fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
 ) {
-  var title by remember { mutableStateOf("") }
-  var description by remember { mutableStateOf("") }
-  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-  var location by remember { mutableStateOf("") }
-  var price by remember { mutableStateOf("") }
-  var placesLeft by remember { mutableStateOf("") }
-  var dueDate by remember { mutableStateOf("") }
-  var startTime by remember { mutableStateOf("") }
-  var duration by remember { mutableStateOf("") }
+    val IMAGE_PICK_CODE = 1000
+    val CAMERA_CAPTURE_CODE = 1001
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    var location by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var placesLeft by remember { mutableStateOf("") }
+    var dueDate by remember { mutableStateOf("") }
+    var startTime by remember { mutableStateOf("") }
+    var duration by remember { mutableStateOf("") }
+    var carouselItems by remember { mutableStateOf(items) }
+    var showDialog by remember { mutableStateOf(false) }
 
   // Add scroll
   val scrollState = rememberScrollState()
@@ -78,6 +84,7 @@ fun CreateActivityScreen(
         TopAppBar(
             title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
         )
+
       },
       content = { paddingValues ->
         Column(
@@ -86,6 +93,7 @@ fun CreateActivityScreen(
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .background(color = Color(0xFFFFFFFF)),
+
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -93,28 +101,31 @@ fun CreateActivityScreen(
               value = title,
               onValueChange = { title = it },
               label = { Text("Title") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
               placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
+
           OutlinedTextField(
               value = description,
               onValueChange = { description = it },
               label = { Text("Description") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_activity_description))
               },
           )
           Spacer(modifier = Modifier.height(8.dp))
+
           OutlinedTextField(
               value = dueDate,
               onValueChange = { dueDate = it },
               label = { Text("Date") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateCreate"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_date_activity_withFormat))
               },
+
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -122,9 +133,9 @@ fun CreateActivityScreen(
               value = startTime,
               onValueChange = { startTime = it },
               label = { Text("Time") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputStartTimeCreate"),
               placeholder = {
-                Text(text = stringResource(id = R.string.request_startTime_activity_withFormat))
+                Text(text = stringResource(id = R.string.hour_min_format))
               },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -133,9 +144,9 @@ fun CreateActivityScreen(
               value = duration,
               onValueChange = { duration = it },
               label = { Text("Duration") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDurationCreate"),
               placeholder = {
-                Text(text = stringResource(id = R.string.request_duration_activity_withFormat))
+                Text(text = stringResource(id = R.string.hour_min_format))
               },
           )
 
@@ -145,7 +156,7 @@ fun CreateActivityScreen(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
               placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
           )
 
@@ -154,23 +165,26 @@ fun CreateActivityScreen(
               value = placesLeft,
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_placesLeft_activity))
               },
           )
           Spacer(modifier = Modifier.height(8.dp))
+
           OutlinedTextField(
               value = location,
               onValueChange = { location = it },
               label = { Text("Location") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_location_activity))
               },
           )
           Spacer(modifier = Modifier.height(32.dp))
+
           Button(
+              enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
@@ -183,7 +197,7 @@ fun CreateActivityScreen(
                         0,
                         0,
                         0)
-                    val activity =
+                     val activity =
                         Activity(
                             uid = listActivityViewModel.getNewUid(),
                             title = title,
@@ -193,18 +207,20 @@ fun CreateActivityScreen(
                             duration = duration,
                             price = price.toDouble(),
                             placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
-                            maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
+                            maxPlaces = parseFraction(placesLeft, 1)?.toLong() ?: 0.toLong(),
                             creator = creator,
                             status = ActivityStatus.ACTIVE,
                             location = location,
-                            images = listOf(),
+                            images = carouselItems.map{it},
+                            participants = listOf()
                         )
                     listActivityViewModel.addActivity(activity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
+              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
+                  .testTag("createButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -229,25 +245,11 @@ fun CreateActivityScreen(
 
 data class CarouselItem(
     val id: Int,
-    @DrawableRes val imageResId: Int,
+    val imageResId: String,
     val contentDescription: String,
 )
 
-var items =
-    listOf(
-        CarouselItem(
-            0, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            1, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            2, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            3, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            4, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            5, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-    )
+var items = listOf<String>()
 
 @Composable
 fun Carousel() {
@@ -258,11 +260,11 @@ fun Carousel() {
             modifier = Modifier.width(340.dp).height(135.dp),
         ) {
           items(items.size) { index ->
-            Image(
-                painter = painterResource(id = items[index].imageResId),
-                contentDescription = items[index].contentDescription,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.padding(8.dp))
+              AsyncImage(
+                  model = items[index], // Utilise l'URL de l'image
+                  contentDescription = "image $index",
+                  contentScale = ContentScale.Crop,
+                  modifier = Modifier.padding(8.dp))
           }
         }
         Spacer(modifier = Modifier.width(16.dp))
@@ -297,5 +299,5 @@ fun Carousel() {
 
 fun parseFraction(fraction: String, index: Int): Int? {
   val parts = fraction.split("/")
-  return if (parts.size == 2) parts[0].toIntOrNull() else null
+  return parts[index].toIntOrNull()
 }

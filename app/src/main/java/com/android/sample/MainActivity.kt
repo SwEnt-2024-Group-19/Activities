@@ -57,7 +57,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ActivitiesApp(uid: String) {
-
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
@@ -100,7 +99,8 @@ fun ActivitiesApp(uid: String) {
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-      composable(Screen.PROFILE) { ProfileScreen(profileViewModel) }
+
+      composable(Screen.PROFILE) { ProfileScreen(profileViewModel, navigationActions) }
       composable(Screen.EDIT_PROFILE) { BlankScreen() }
     }
   }
