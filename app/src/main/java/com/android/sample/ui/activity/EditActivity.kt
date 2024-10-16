@@ -96,9 +96,10 @@ fun EditActivityScreen(
       }) { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF))
-                    .verticalScroll(rememberScrollState())
-                    ,
+                Modifier.padding(paddingValues)
+                    .fillMaxSize()
+                    .background(color = Color(0xFFFFFFFF))
+                    .verticalScroll(rememberScrollState()),
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -140,7 +141,7 @@ fun EditActivityScreen(
               value = placesLeft,
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag( "inputPlacesLeftEdit"),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
               placeholder = { Text("Places left/Total places") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -180,15 +181,17 @@ fun EditActivityScreen(
                             status = ActivityStatus.ACTIVE,
                             location = location ?: "",
                             images = listOf(),
-                            participants = listOf()
-                        )
+                            participants = listOf())
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: Exception) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
-                  .testTag("editButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("editButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -214,8 +217,11 @@ fun EditActivityScreen(
                 listActivityViewModel.deleteActivityById(activity?.uid ?: "")
                 navigationActions.navigateTo(Screen.OVERVIEW)
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally).
-                  testTag("deleteButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("deleteButton"),
           ) {
             Row(
                 Modifier.background(Color.Transparent),
