@@ -50,6 +50,7 @@ import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
+
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
@@ -61,6 +62,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
+    profileViewModel: ProfileViewModel
 ) {
   val IMAGE_PICK_CODE = 1000
   val CAMERA_CAPTURE_CODE = 1001
@@ -75,6 +77,7 @@ fun CreateActivityScreen(
   var showDialog by remember { mutableStateOf(false) }
   val attendees_: List<SimpleUser> = listOf<SimpleUser>()
   var attendees: List<SimpleUser> by remember { mutableStateOf(attendees_) }
+
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
@@ -268,6 +271,7 @@ fun CreateActivityScreen(
                 }
               }
               Spacer(modifier = Modifier.height(16.dp))
+
             }
       },
   )

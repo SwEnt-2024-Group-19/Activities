@@ -13,7 +13,7 @@ data class Activity(
     var location: String,
     var creator: String,
     var images: List<String>,
-    var placesLeft: Long,
+    var placesTaken: Long,
     var maxPlaces: Long,
     var status: ActivityStatus,
     var participants: List<SimpleUser>

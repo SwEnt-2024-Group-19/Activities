@@ -46,7 +46,7 @@ class ActivitiesRepositoryFirestoreTest {
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",
-          placesLeft = 0,
+          placesTaken = 0,
           maxPlaces = 0,
           participants = listOf(),
           images = listOf(),

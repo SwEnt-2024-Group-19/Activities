@@ -36,46 +36,59 @@ class CreateActivityScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private val mockViewModel = mockk<ListActivitiesViewModel>()
+  private val mockProfileViewModel = mockk<ProfileViewModel>()
   private val mockNavigationActions = mock<NavigationActions>()
 
   @Test
   fun createActivityScreen_displaysTitleField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputTitleCreate").assertExists()
     composeTestRule.onNodeWithTag("inputTitleCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysDescriptionField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysDateField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDateCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysPriceField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPriceCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysPlacesLeftField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputPlacesCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPlacesCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysLocationField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
     composeTestRule.onNodeWithTag("inputLocationCreate").assertIsDisplayed()
   }
@@ -192,5 +205,6 @@ class CreateActivityScreenTest {
   fun parseFraction_returnsNullForEmptyString() {
     val result = parseFraction("", 0)
     assertEquals(null, result)
+
   }
 }

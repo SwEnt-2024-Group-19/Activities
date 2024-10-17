@@ -77,6 +77,7 @@ fun EditActivityScreen(
   var price by remember { mutableStateOf(activity?.price.toString() ?: "") }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString() ?: "") }
   var attendees by remember { mutableStateOf(activity?.participants ?: listOf()) }
+
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -257,13 +258,14 @@ fun EditActivityScreen(
                             description = description ?: "",
                             date = Timestamp(calendar.time),
                             price = price.toDouble(),
-                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
+                            placesTaken = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
                             creator = creator ?: "",
                             status = ActivityStatus.ACTIVE,
                             location = location ?: "",
                             images = listOf(),
                             participants = attendees)
+
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: Exception) {}
