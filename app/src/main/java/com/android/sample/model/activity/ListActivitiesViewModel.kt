@@ -12,10 +12,6 @@ import kotlinx.coroutines.launch
 
 open class ListActivitiesViewModel(private val repository: ActivitiesRepository) : ViewModel() {
 
-  private val activity_ = MutableStateFlow<List<Activity>>(emptyList())
-  val activity: StateFlow<List<Activity>> = activity_.asStateFlow()
-
-  // Selected todo, i.e the todo for the detail view
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
@@ -23,16 +19,11 @@ open class ListActivitiesViewModel(private val repository: ActivitiesRepository)
   val uiState: StateFlow<ActivitiesUiState> = _uiState
 
   init {
-
     repository.init {
       // if (FirebaseAuth.getInstance().currentUser != null) {
       viewModelScope.launch { getActivities() }
       // }
     }
-  }
-
-  init {
-    repository.init { getActivities() }
   }
 
   fun getNewUid(): String {

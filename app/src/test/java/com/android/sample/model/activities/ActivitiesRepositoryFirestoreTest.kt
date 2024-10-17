@@ -1,10 +1,9 @@
-package com.android.sample.model.activities
-
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -12,6 +11,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
 import junit.framework.TestCase.fail
 import org.junit.Before
@@ -46,10 +46,13 @@ class ActivitiesRepositoryFirestoreTest {
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",
-          placesTaken = 0,
+          placesLeft = 0,
           maxPlaces = 0,
           participants = listOf(),
           images = listOf(),
+          duration = "00:30",
+          startTime = "09:00",
+          type = ActivityType.PRO,
           price = 0.0)
 
   @Before
@@ -75,60 +78,95 @@ class ActivitiesRepositoryFirestoreTest {
     assert(uid == "1")
   }
 
-  /**
-   * This test verifies that when fetching a ToDos list, the Firestore `get()` is called on the
-   * collection reference and not the document reference.
-   */
   @Test
   fun getActivities_callsDocuments() {
-    // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockActivityQuerySnapshot))
-
-    // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
     `when`(mockActivityQuerySnapshot.documents).thenReturn(listOf())
 
-    // Call the method under test
     activitiesRepositoryFirestore.getActivities(
-        onSuccess = {
+        onSuccess = {}, onFailure = { fail("Failure callback should not be called") })
 
-          // Do nothing; we just want to verify that the 'documents' field was accessed
-        },
-        onFailure = { fail("Failure callback should not be called") })
-
-    // Verify that the 'documents' field was accessed
     verify(timeout(100)) { (mockActivityQuerySnapshot).documents }
   }
 
-  /**
-   * This test verifies that when we add a new ToDo, the Firestore `set()` is called on the document
-   * reference. This does NOT CHECK the actual data being added
-   */
   @Test
   fun addActivity_shouldCallFirestoreCollection() {
-    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult<Void>(null))
 
-    // This test verifies that when we add a new ToDo, the Firestore `collection()` method is
-    // called.
     activitiesRepositoryFirestore.addActivity(activity, onSuccess = {}, onFailure = {})
 
     shadowOf(Looper.getMainLooper()).idle()
 
-    // Ensure Firestore collection method was called to reference the "ToDos" collection
     verify(mockDocumentReference).set(any())
   }
 
-  /**
-   * This check that the correct Firestore method is called when deleting. Does NOT CHECK that the
-   * correct data is deleted.
-   */
   @Test
   fun deleteActivitiesId_shouldCallDocumentReferenceDelete() {
-    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult(null))
+    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult<Void>(null))
 
     activitiesRepositoryFirestore.deleteActivityById("1", onSuccess = {}, onFailure = {})
 
-    shadowOf(Looper.getMainLooper()).idle() // Ensure all asynchronous operations complete
+    shadowOf(Looper.getMainLooper()).idle()
 
     verify(mockDocumentReference).delete()
+  }
+
+  @Test
+  fun addActivity_callsOnFailureOnError() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forException(exception))
+
+    var failureCalled = false
+    activitiesRepositoryFirestore.addActivity(
+        activity,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
+  }
+
+  @Test
+  fun deleteActivityById_callsOnFailureOnError() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forException(exception))
+
+    var failureCalled = false
+    activitiesRepositoryFirestore.deleteActivityById(
+        "1",
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
+  }
+
+  @Test
+  fun updateActivity_shouldCallFirestoreCollection() {
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult<Void>(null))
+
+    activitiesRepositoryFirestore.updateActivity(activity, onSuccess = {}, onFailure = {})
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    verify(mockDocumentReference).set(any())
+  }
+
+  @Test
+  fun updateActivity_callsOnFailureOnError() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forException(exception))
+
+    var failureCalled = false
+    activitiesRepositoryFirestore.updateActivity(
+        activity,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
   }
 }

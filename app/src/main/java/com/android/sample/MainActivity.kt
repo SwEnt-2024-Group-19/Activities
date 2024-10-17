@@ -89,6 +89,7 @@ fun ActivitiesApp(uid: String) {
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(listActivitiesViewModel, navigationActions)
       }
+
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
@@ -101,8 +102,14 @@ fun ActivitiesApp(uid: String) {
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-      composable(Screen.PROFILE) { ProfileScreen(profileViewModel, navigationActions) }
-      composable(Screen.EDIT_PROFILE) { BlankScreen() }
+      composable(Screen.PROFILE) {
+        ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
+      }
+      /*
+      composable(Screen.EDIT_PROFILE) {
+        EditProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
+      }
+       */
     }
   }
 }

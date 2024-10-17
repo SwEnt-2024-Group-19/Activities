@@ -33,24 +33,35 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                 .map { document ->
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
+                  val activityType =
+                      data["type"]?.let {
+                        try {
+                          ActivityType.valueOf(it as String)
+                        } catch (e: IllegalArgumentException) {
+                          ActivityType.SOLO // Replace with your default ActivityType
+                        }
+                      } ?: ActivityType.SOLO
                   Activity(
-                      uid = document.id,
-                      title = data["title"] as? String ?: "No Title",
-                      description = data["description"] as? String ?: "No Description",
-                      date = data["date"] as? Timestamp ?: Timestamp.now(),
-                      price = data["price"] as? Double ?: 0.0,
-                      location = data["location"] as? String ?: "Unknown Location",
-                      creator = data["creator"] as? String ?: "Anonymous",
-                      images = listOf(),
-                      placesTaken = data["placesTaken"] as? Long ?: 0L,
-                      maxPlaces = data["maxPlaces"] as? Long ?: 0L,
-                      status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+                      document.id,
+                      data["title"] as? String ?: "No Title",
+                      data["description"] as? String ?: "No Description",
+                      data["date"] as? Timestamp ?: Timestamp.now(),
+                      data["startTime"] as? String ?: "HH:mm",
+                      data["duration"] as? String ?: "HH:mm",
+                      data["price"] as? Double ?: 0.0,
+                      data["location"] as? String ?: "Unknown Location",
+                      data["creator"] as? String ?: "Anonymous",
+                      listOf(),
+                      data["placesLeft"] as? Long ?: 0,
+                      data["maxPlaces"] as? Long ?: 0,
+                      ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+                      activityType,
                       participants = listOf())
                 }
                 .filterNotNull() // Filter out any null results
 
         onSuccess(activities)
-      }
+      } else onFailure(e ?: Exception("Error getting documents"))
     }
   }
 
@@ -85,7 +96,7 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
         db.collection(activitiesCollectionPath).document(id).delete(), onSuccess, onFailure)
   }
 
-  private fun performFirestoreOperation(
+  fun performFirestoreOperation(
       task: Task<Void>,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
