@@ -2,16 +2,23 @@ package com.android.sample.ui.activitydetails
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachMoney
@@ -24,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -40,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import java.util.Calendar
@@ -51,7 +61,8 @@ import kotlin.math.min
 fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel =
         viewModel(factory = ListActivitiesViewModel.Factory),
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    profileViewModel: ProfileViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile =
@@ -204,6 +215,7 @@ fun ActivityDetailsScreen(
                       }
                   if (theActivity != null) {
                     listActivityViewModel.updateActivity(theActivity)
+                      profileViewModel.addActivity(profile.id, theActivity.uid)
                   }
                   Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
                   navigationActions.navigateTo(Screen.OVERVIEW)
