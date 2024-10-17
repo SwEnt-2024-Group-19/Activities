@@ -22,12 +22,16 @@ import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -52,6 +56,8 @@ import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.types
+
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -81,7 +87,8 @@ fun EditActivityScreen(
   var attendees by remember { mutableStateOf(activity?.participants ?: listOf()) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration) }
-
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
 
   var dueDate by remember {
     mutableStateOf(
@@ -193,6 +200,28 @@ fun EditActivityScreen(
 
           )
           Spacer(modifier = Modifier.height(8.dp))
+
+          ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+            TextField(
+                readOnly = true,
+                value = selectedOption,
+                onValueChange = {},
+                label = { Text("Activity Type") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                modifier = Modifier.menuAnchor())
+            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+              types.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption.name) },
+                    onClick = {
+                      selectedOption = selectionOption.name
+                      expanded = false
+                    })
+              }
+            }
+          }
+
           OutlinedTextField(
               value = location ?: "",
               onValueChange = { location = it },
@@ -266,6 +295,7 @@ fun EditActivityScreen(
                 onAddUser = { user -> attendees = attendees + user })
           }
           Spacer(modifier = Modifier.height(32.dp))
+
           Button(
               enabled =
                   title?.isNotEmpty() ?: false &&
@@ -299,6 +329,7 @@ fun EditActivityScreen(
                             status = ActivityStatus.ACTIVE,
                             location = location ?: "",
                             images = listOf(),
+                            type = types.find { it.name == selectedOption } ?: types[0],
                             participants = attendees)
 
 
@@ -321,6 +352,7 @@ fun EditActivityScreen(
                   Icons.Default.Done,
                   contentDescription = "add a new activity",
               )
+
               Text("Save", color = Color.White)
             }
           }

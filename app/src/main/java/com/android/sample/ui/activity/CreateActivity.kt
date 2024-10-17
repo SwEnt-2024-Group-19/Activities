@@ -21,12 +21,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,6 +51,9 @@ import coil.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.types
+import com.android.sample.model.profile.ProfileViewModel
+
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -63,6 +70,9 @@ fun CreateActivityScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel
 ) {
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf("Select a type") }
     val IMAGE_PICK_CODE = 1000
     val CAMERA_CAPTURE_CODE = 1001
     var title by remember { mutableStateOf("") }
@@ -193,6 +203,7 @@ fun CreateActivityScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
@@ -205,6 +216,34 @@ fun CreateActivityScreen(
                         Text(text = stringResource(id = R.string.request_location_activity))
                     },
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+
+              ExposedDropdownMenuBox(
+                  modifier = Modifier.testTag("chooseTypeMenu"),
+                  expanded = expanded,
+                  onExpandedChange = { expanded = !expanded }) {
+                    TextField(
+                        readOnly = true,
+                        value = selectedOption,
+                        onValueChange = {},
+                        label = { Text("Activity Type") },
+                        trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        modifier = Modifier.menuAnchor())
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                      types.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption.name) },
+                            onClick = {
+                              selectedOption = selectionOption.name
+                              expanded = false
+                            })
+                      }
+                    }
+                  }
+                
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Column(
@@ -358,7 +397,6 @@ fun CreateActivityScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-
 
             }
         },

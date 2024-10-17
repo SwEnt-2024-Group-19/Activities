@@ -18,8 +18,25 @@ data class Activity(
     var placesTaken: Long,
     var maxPlaces: Long,
     var status: ActivityStatus,
-    var participants: List<SimpleUser>
+
+    val type: ActivityType
+    var participants:List<SimpleUser>
+
+
 )
+
+enum class ActivityType {
+  PRO,
+  INDIVIDUAL,
+  SOLO,
+}
+
+val types =
+    listOf(
+        ActivityType.PRO,
+        ActivityType.INDIVIDUAL,
+        ActivityType.SOLO,
+    )
 
 enum class ActivityStatus {
   ACTIVE,

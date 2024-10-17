@@ -29,6 +29,7 @@ import com.android.sample.ui.listActivities.ListActivitiesScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.profile.EditProfileScreen
 import com.android.sample.ui.profile.ProfileCreationScreen
 import com.android.sample.ui.profile.ProfileScreen
 import com.android.sample.ui.theme.SampleAppTheme
@@ -102,8 +103,14 @@ fun ActivitiesApp(uid: String) {
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-      composable(Screen.PROFILE) { ProfileScreen(profileViewModel, navigationActions) }
-      composable(Screen.EDIT_PROFILE) { BlankScreen() }
+
+      composable(Screen.PROFILE) {
+        ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
+      }
+      composable(Screen.EDIT_PROFILE) {
+        EditProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
+      }
+
     }
   }
 }
