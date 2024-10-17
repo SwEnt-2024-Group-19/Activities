@@ -30,10 +30,7 @@ data class SimpleUser(
 )
 
 @Composable
-fun AddUserDialog(
-    onDismiss: () -> Unit,
-    onAddUser: (SimpleUser) -> Unit,
-) {
+fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (SimpleUser) -> Unit, modifier: Modifier) {
   Dialog(
       onDismissRequest = onDismiss,
       properties =
@@ -43,7 +40,8 @@ fun AddUserDialog(
           )) {
         Column(
             modifier =
-                Modifier.fillMaxWidth()
+                modifier
+                    .fillMaxWidth()
                     .height(300.dp)
                     .background(color = Color.White, shape = RoundedCornerShape(size = 16.dp)),
             verticalArrangement = Arrangement.Center,
