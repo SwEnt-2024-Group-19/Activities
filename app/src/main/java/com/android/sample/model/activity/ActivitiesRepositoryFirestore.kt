@@ -43,20 +43,20 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       } ?: ActivityType.SOLO
                   Activity(
                       document.id,
-                      data["title"] as String,
-                      data["description"] as String,
-                      data["date"] as Timestamp,
+                      data["title"] as? String ?: "No Title",
+                      data["description"] as? String ?: "No Description",
+                      data["date"] as? Timestamp ?: Timestamp.now(),
                       data["startTime"] as? String ?: "HH:mm",
                       data["duration"] as? String ?: "HH:mm",
-                      data["price"] as Double,
-                      data["location"] as String,
-                      data["creator"] as String,
+                      data["price"] as? Double ?: 0.0,
+                      data["location"] as? String ?: "Unknown Location",
+                      data["creator"] as? String ?: "Anonymous",
                       listOf(),
-                      data["placesLeft"] as Long,
-                      data["maxPlaces"] as Long,
-                      ActivityStatus.valueOf(data["status"] as String),
-                      participants = listOf(),
-                      type = activityType)
+                      data["placesLeft"] as? Long ?: 0,
+                      data["maxPlaces"] as? Long ?: 0,
+                      ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+                      activityType,
+                      participants = listOf())
                 }
                 .filterNotNull() // Filter out any null results
 
