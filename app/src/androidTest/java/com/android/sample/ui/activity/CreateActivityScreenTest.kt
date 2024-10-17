@@ -41,6 +41,7 @@ class CreateActivityScreenTest {
 
   @Test
   fun createActivityScreen_displaysTitleField() {
+
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }

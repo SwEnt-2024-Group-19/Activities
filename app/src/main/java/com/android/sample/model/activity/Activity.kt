@@ -8,6 +8,8 @@ data class Activity(
     var title: String,
     var description: String,
     var date: Timestamp,
+    var startTime: String,
+    var duration: String,
     // var category: Category,
     var price: Double,
     var location: String,

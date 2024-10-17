@@ -73,6 +73,7 @@ class ListActivitiesViewModelTest {
     verify(activitiesRepository).deleteActivityById(eq(activity.uid), any(), any())
   }
 
+
   @Test
   fun getActivitiesSuccessCallback() {
     val onSuccess = mock<() -> Unit>()
@@ -135,6 +136,7 @@ class ListActivitiesViewModelTest {
     listActivitiesViewModel.deleteActivityById(activity.uid)
     verify(activitiesRepository).getActivities(any(), any())
   }
+
 
   @Test
   fun selectActivityUpdatesSelectedActivity() = runBlocking {

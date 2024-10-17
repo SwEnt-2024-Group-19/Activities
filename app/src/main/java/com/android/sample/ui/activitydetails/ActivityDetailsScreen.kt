@@ -19,8 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -63,7 +66,6 @@ fun ActivityDetailsScreen(
   val profile =
       profileViewModel.userState.collectAsState().value
           ?: return Text(text = "No profile selected. Should not happen", color = Color.Black)
-
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
   val price by remember { mutableStateOf(activity?.price) }
@@ -81,9 +83,11 @@ fun ActivityDetailsScreen(
                 }"
         })
   }
+
+  val startTime by remember { mutableStateOf(activity?.startTime) }
+  val duration by remember { mutableStateOf(activity?.duration) }
   val placesTaken by remember { mutableStateOf(activity?.placesTaken) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
-
   val context = LocalContext.current
 
   Scaffold(
@@ -187,6 +191,20 @@ fun ActivityDetailsScreen(
                 Text(text = dueDate ?: "not defined yet")
               }
 
+          Spacer(modifier = Modifier.height(8.dp))
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.AccessTime, contentDescription = "Start Time")
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = startTime ?: "not defined yet")
+          }
+
+          Spacer(modifier = Modifier.height(8.dp))
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.Timelapse, contentDescription = "Duration")
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = duration ?: "not defined yet")
+          }
+
           Spacer(modifier = Modifier.height(32.dp))
 
           // Enroll button
@@ -201,6 +219,8 @@ fun ActivityDetailsScreen(
                             title = activity.title,
                             description = activity.description,
                             date = activity.date,
+                            startTime = startTime ?: "",
+                            duration = duration ?: "",
                             price = activity.price,
                             placesTaken = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
                             maxPlaces = activity.maxPlaces,

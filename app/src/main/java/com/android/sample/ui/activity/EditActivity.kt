@@ -39,10 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.android.sample.R
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -77,6 +79,9 @@ fun EditActivityScreen(
   var price by remember { mutableStateOf(activity?.price.toString() ?: "") }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString() ?: "") }
   var attendees by remember { mutableStateOf(activity?.participants ?: listOf()) }
+  var startTime by remember { mutableStateOf(activity?.startTime) }
+  var duration by remember { mutableStateOf(activity?.duration) }
+
 
   var dueDate by remember {
     mutableStateOf(
@@ -125,7 +130,7 @@ fun EditActivityScreen(
               onValueChange = { title = it },
               label = { Text("Title") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleEdit"),
-              placeholder = { Text("Give a title of the activity") },
+              placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -133,7 +138,9 @@ fun EditActivityScreen(
               onValueChange = { description = it },
               label = { Text("Description") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionEdit"),
-              placeholder = { Text("Describe the activity") },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_activity_description))
+              },
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -141,8 +148,29 @@ fun EditActivityScreen(
               onValueChange = { dueDate = it },
               label = { Text("Date") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateEdit"),
-              placeholder = { Text("dd/mm/yyyy") },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_date_activity_withFormat))
+              },
           )
+          Spacer(modifier = Modifier.height(8.dp))
+
+          OutlinedTextField(
+              value = startTime ?: "",
+              onValueChange = { startTime = it },
+              label = { Text("Time") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+          )
+          Spacer(modifier = Modifier.height(8.dp))
+
+          OutlinedTextField(
+              value = duration ?: "",
+              onValueChange = { duration = it },
+              label = { Text("Duration") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+          )
+
           Spacer(modifier = Modifier.height(8.dp))
 
           OutlinedTextField(
@@ -150,7 +178,7 @@ fun EditActivityScreen(
               onValueChange = { price = it },
               label = { Text("Price") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceEdit"),
-              placeholder = { Text("Price/person") },
+              placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
           )
 
           Spacer(modifier = Modifier.height(8.dp))
@@ -159,7 +187,10 @@ fun EditActivityScreen(
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
-              placeholder = { Text("Places left/Total places") },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_placesLeft_activity))
+              },
+
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
@@ -167,7 +198,9 @@ fun EditActivityScreen(
               onValueChange = { location = it },
               label = { Text("Location") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationEdit"),
-              placeholder = { Text("Where is it taking place") },
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_location_activity))
+              },
           )
           Column(
               modifier = Modifier.fillMaxWidth().padding(8.dp).height(130.dp),
@@ -257,6 +290,8 @@ fun EditActivityScreen(
                             title = title ?: "",
                             description = description ?: "",
                             date = Timestamp(calendar.time),
+                            startTime = startTime ?: "",
+                            duration = duration ?: "",
                             price = price.toDouble(),
                             placesTaken = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
@@ -265,6 +300,7 @@ fun EditActivityScreen(
                             location = location ?: "",
                             images = listOf(),
                             participants = attendees)
+
 
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
