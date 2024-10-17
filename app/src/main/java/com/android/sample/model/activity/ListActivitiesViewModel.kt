@@ -10,10 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ListActivitiesViewModel(private val repository: ActivitiesRepository) : ViewModel() {
-
-  private val activity_ = MutableStateFlow<List<Activity>>(emptyList())
-  val activity: StateFlow<List<Activity>> = activity_.asStateFlow()
+open class ListActivitiesViewModel(private val repository: ActivitiesRepository) : ViewModel() {
 
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()

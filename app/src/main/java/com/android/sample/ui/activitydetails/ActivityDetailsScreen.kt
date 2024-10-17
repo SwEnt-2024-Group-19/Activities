@@ -44,7 +44,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil3.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -86,7 +85,7 @@ fun ActivityDetailsScreen(
 
   val startTime by remember { mutableStateOf(activity?.startTime) }
   val duration by remember { mutableStateOf(activity?.duration) }
-  val placesTaken by remember { mutableStateOf(activity?.placesTaken) }
+  val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
   val context = LocalContext.current
 
@@ -222,14 +221,14 @@ fun ActivityDetailsScreen(
                             startTime = startTime ?: "",
                             duration = duration ?: "",
                             price = activity.price,
-                            placesTaken = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
+                            placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
                             maxPlaces = activity.maxPlaces,
                             creator = activity.creator,
                             status = activity.status,
                             location = activity.location,
                             images = activity.images,
+                            type = activity.type,
                             participants = activity.participants)
-
                       }
                   if (theActivity != null) {
                     listActivityViewModel.updateActivity(theActivity)
@@ -250,4 +249,3 @@ fun ActivityDetailsScreen(
         }
       }
 }
-

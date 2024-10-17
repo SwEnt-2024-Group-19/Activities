@@ -15,14 +15,11 @@ data class Activity(
     var location: String,
     var creator: String,
     var images: List<String>,
-    var placesTaken: Long,
+    var placesLeft: Long,
     var maxPlaces: Long,
     var status: ActivityStatus,
-
-    val type: ActivityType
-    var participants:List<SimpleUser>
-
-
+    val type: ActivityType,
+    var participants: List<SimpleUser>
 )
 
 enum class ActivityType {
