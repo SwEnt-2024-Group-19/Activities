@@ -2,9 +2,10 @@ package com.android.sample.model.profile
 
 import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesRepository {
+open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesRepository {
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     db.collection("profiles").document(userId).get().addOnCompleteListener { task ->
@@ -57,6 +58,27 @@ class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesR
       Log.e("TodosRepositoryFirestore", "Error converting document to ToDo", e)
       null
     }
+  }
+
+  override fun addActivity(
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection("profiles")
+        .document(userId)
+        .update("activities", FieldValue.arrayUnion(activityId))
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            task.exception?.let { e ->
+              Log.e("UserProfileRepository", "Error adding activity to profile", e)
+              onFailure(e)
+            }
+          }
+        }
   }
 
   override fun addProfileToDatabase(

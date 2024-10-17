@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -82,7 +81,7 @@ fun ListActivitiesScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
                       items(activities) { activity ->
-                        ActivityCard(activity = activity, navigationActions)
+                        ActivityCard(viewModel, activity = activity, navigationActions)
                       }
                     }
               }
@@ -97,13 +96,18 @@ fun ListActivitiesScreen(
 }
 
 @Composable
-fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
+fun ActivityCard(
+    viewModel: ListActivitiesViewModel,
+    activity: Activity,
+    navigationActions: NavigationActions
+) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
   Card(
       modifier =
           Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable {
+            viewModel.selectActivity(activity)
             navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
           },
       elevation = CardDefaults.cardElevation(8.dp)) {
@@ -153,7 +157,7 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
                     modifier = Modifier.weight(1f) // Takes up remaining space
                     )
                 Text(
-                    text = "${activity.placesLeft}/${activity.maxPlaces}",
+                    text = "${activity.placesTaken}/${activity.maxPlaces}",
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold, color = Color.Gray, fontSize = 16.sp),
