@@ -31,6 +31,7 @@ class ProfileCreationTest {
   // Mock or create a fake ProfilesRepository
   // private val mockProfilesRepository: ProfilesRepository = mock()
   @get:Rule val composeTestRule = createComposeRule()
+
   // Define a test user ID
   private val testUserId = "testUser123"
 

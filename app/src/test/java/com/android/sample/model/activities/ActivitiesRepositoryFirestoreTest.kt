@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -46,10 +47,13 @@ class ActivitiesRepositoryFirestoreTest {
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",
-          placesTaken = 0,
+          placesLeft = 0,
           maxPlaces = 0,
           participants = listOf(),
           images = listOf(),
+          duration = "00:30",
+          startTime = "09:00",
+          type = ActivityType.PRO,
           price = 0.0)
 
   @Before

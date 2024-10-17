@@ -44,20 +44,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.android.sample.R
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.android.sample.R
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
-
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -197,7 +197,6 @@ fun EditActivityScreen(
               placeholder = {
                 Text(text = stringResource(id = R.string.request_placesLeft_activity))
               },
-
           )
           Spacer(modifier = Modifier.height(8.dp))
 
@@ -323,7 +322,7 @@ fun EditActivityScreen(
                             startTime = startTime ?: "",
                             duration = duration ?: "",
                             price = price.toDouble(),
-                            placesTaken = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
+                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
                             creator = creator ?: "",
                             status = ActivityStatus.ACTIVE,
@@ -331,7 +330,6 @@ fun EditActivityScreen(
                             images = listOf(),
                             type = types.find { it.name == selectedOption } ?: types[0],
                             participants = attendees)
-
 
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
@@ -403,6 +401,8 @@ fun EditActivityScreenPreview() {
           title = "Activity",
           description = "Description",
           date = Timestamp.now(),
+          startTime = "Starting Time",
+          duration = "Duration",
           price = 0.0,
           placesLeft = 0,
           maxPlaces = 0,
@@ -410,6 +410,7 @@ fun EditActivityScreenPreview() {
           status = ActivityStatus.ACTIVE,
           location = "Location",
           images = listOf(),
+          type = ActivityType.PRO,
           participants = listOf()))
   EditActivityScreen(navigationActions = navigationActions)
 }
