@@ -19,8 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,7 +48,7 @@ import com.android.sample.model.profile.User
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
-import com.android.sample.ui.navigation.Screen
+
 
 @Composable
 fun ProfileScreen(
@@ -53,11 +57,13 @@ fun ProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
 
+
   val profileState = userProfileViewModel.userState.collectAsState()
 
   when (val profile = profileState.value) {
     null -> LoadingScreen() // Show a loading indicator or a retry button
     else ->
+
         ProfileContent(
             user = profile,
             navigationActions,
@@ -74,7 +80,9 @@ fun LoadingScreen() {
       }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 fun ProfileContent(
     user: User,
     navigationActions: NavigationActions,
@@ -83,18 +91,27 @@ fun ProfileContent(
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
-      floatingActionButton = {
-        FloatingActionButton(
-            onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) },
-            modifier = Modifier.testTag("EditProfileFab")) {
-              Icon(imageVector = Icons.Default.ModeEdit, contentDescription = "Edit")
-            }
-      },
+
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
+
+      },
+      topBar = {
+        TopAppBar(
+            title = { Text("Profile") },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
+            })
+
       }) { innerPadding ->
         Column(
             Modifier.fillMaxSize().padding(innerPadding),
@@ -127,6 +144,7 @@ fun ProfileContent(
                   text = "Activities Created",
                   fontSize = 24.sp,
                   modifier =
+
                       Modifier.padding(start = 16.dp, top = 16.dp)
                           .testTag("activitiesCreatedSection"))
 
@@ -206,6 +224,7 @@ fun ActivityCreatedBox(
           }
     }
   }
+
 }
 
 @Composable

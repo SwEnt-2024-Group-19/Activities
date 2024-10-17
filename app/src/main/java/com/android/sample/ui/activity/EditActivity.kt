@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -100,7 +103,9 @@ fun EditActivityScreen(
       }) { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF)),
+                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF))
+                    .verticalScroll(rememberScrollState())
+                    ,
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -108,7 +113,7 @@ fun EditActivityScreen(
               value = title ?: "",
               onValueChange = { title = it },
               label = { Text("Title") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleEdit"),
               placeholder = { Text("Give a title of the activity") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -116,7 +121,7 @@ fun EditActivityScreen(
               value = description ?: "",
               onValueChange = { description = it },
               label = { Text("Description") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionEdit"),
               placeholder = { Text("Describe the activity") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -124,7 +129,7 @@ fun EditActivityScreen(
               value = dueDate,
               onValueChange = { dueDate = it },
               label = { Text("Date") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateEdit"),
               placeholder = { Text("dd/mm/yyyy") },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -133,7 +138,7 @@ fun EditActivityScreen(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceEdit"),
               placeholder = { Text("Price/person") },
           )
 
@@ -142,10 +147,11 @@ fun EditActivityScreen(
               value = placesLeft,
               onValueChange = { placesLeft = it },
               label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag( "inputPlacesLeftEdit"),
               placeholder = { Text("Places left/Total places") },
           )
           Spacer(modifier = Modifier.height(8.dp))
+
           ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
             TextField(
                 readOnly = true,
@@ -166,7 +172,18 @@ fun EditActivityScreen(
               }
             }
           }
+
+          OutlinedTextField(
+              value = location ?: "",
+              onValueChange = { location = it },
+              label = { Text("Location") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationEdit"),
+              placeholder = { Text("Where is it taking place") },
+          )
+          Spacer(modifier = Modifier.height(32.dp))
+
           Button(
+              enabled = title!!.isNotEmpty() && description!!.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
@@ -194,13 +211,15 @@ fun EditActivityScreen(
                             location = location ?: "",
                             images = listOf(),
                             type = types.find { it.name == selectedOption } ?: types[0],
+                            participants = listOf()
                         )
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: Exception) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
+              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
+                  .testTag("editButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -226,7 +245,8 @@ fun EditActivityScreen(
                 listActivityViewModel.deleteActivityById(activity?.uid ?: "")
                 navigationActions.navigateTo(Screen.OVERVIEW)
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally),
+              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally).
+                  testTag("deleteButton"),
           ) {
             Row(
                 Modifier.background(Color.Transparent),

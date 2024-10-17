@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -63,16 +66,27 @@ fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
 ) {
-  var title by remember { mutableStateOf("") }
-  var description by remember { mutableStateOf("") }
-  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-  var location by remember { mutableStateOf("") }
-  var price by remember { mutableStateOf("") }
-  var placesLeft by remember { mutableStateOf("") }
-  var dueDate by remember { mutableStateOf("") }
+
+ 
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
   Scaffold(
+
+    val IMAGE_PICK_CODE = 1000
+    val CAMERA_CAPTURE_CODE = 1001
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    var location by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var placesLeft by remember { mutableStateOf("") }
+    var dueDate by remember { mutableStateOf("") }
+    var carouselItems by remember { mutableStateOf(items) }
+    var showDialog by remember { mutableStateOf(false) }
+
+
+    Scaffold(
+
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
@@ -88,7 +102,8 @@ fun CreateActivityScreen(
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF)),
+                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF))
+                    .verticalScroll(rememberScrollState()),
         ) {
           Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -170,6 +185,7 @@ fun CreateActivityScreen(
               }
           Spacer(modifier = Modifier.height(32.dp))
           Button(
+              enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
@@ -182,7 +198,7 @@ fun CreateActivityScreen(
                         0,
                         0,
                         0)
-                    val activity =
+                     val activity =
                         Activity(
                             uid = listActivityViewModel.getNewUid(),
                             title = title,
@@ -190,23 +206,27 @@ fun CreateActivityScreen(
                             date = Timestamp(calendar.time),
                             price = price.toDouble(),
                             placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
-                            maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
+                            maxPlaces = parseFraction(placesLeft, 1)?.toLong() ?: 0.toLong(),
                             creator = creator,
                             status = ActivityStatus.ACTIVE,
                             location = location,
-                            images = listOf(),
+                            images = carouselItems.map{it},
                             type = types.find { it.name == selectedOption } ?: types[0],
+                            participants = listOf()
+
                         )
                     listActivityViewModel.addActivity(activity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
                 }
               },
+
               modifier =
                   Modifier.width(300.dp)
                       .height(40.dp)
                       .align(Alignment.CenterHorizontally)
                       .testTag("createButton"),
+
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -226,25 +246,11 @@ fun CreateActivityScreen(
 
 data class CarouselItem(
     val id: Int,
-    @DrawableRes val imageResId: Int,
+    val imageResId: String,
     val contentDescription: String,
 )
 
-var items =
-    listOf(
-        CarouselItem(
-            0, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            1, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            2, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            3, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            4, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-        CarouselItem(
-            5, R.drawable.ic_launcher_background, "" /* Add a description for the image */),
-    )
+var items = listOf<String>()
 
 @Composable
 fun Carousel() {
@@ -255,11 +261,11 @@ fun Carousel() {
             modifier = Modifier.width(340.dp).height(135.dp),
         ) {
           items(items.size) { index ->
-            Image(
-                painter = painterResource(id = items[index].imageResId),
-                contentDescription = items[index].contentDescription,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.padding(8.dp))
+              AsyncImage(
+                  model = items[index], // Utilise l'URL de l'image
+                  contentDescription = "image $index",
+                  contentScale = ContentScale.Crop,
+                  modifier = Modifier.padding(8.dp))
           }
         }
         Spacer(modifier = Modifier.width(16.dp))
@@ -294,5 +300,5 @@ fun Carousel() {
 
 fun parseFraction(fraction: String, index: Int): Int? {
   val parts = fraction.split("/")
-  return if (parts.size == 2) parts[0].toIntOrNull() else null
+  return parts[index].toIntOrNull()
 }
