@@ -179,23 +179,24 @@ fun CreateActivityScreen(
                     ) {
                       items(attendees.size) { index ->
                         Row(
-                            modifier = Modifier.padding(8.dp).background(Color(0xFFFFFFFF)),
+                            modifier = Modifier.padding(8.dp).background(Color(0xFFFFFFFF))
+                                .testTag("attendeeRow${index}"),
                         ) {
                           Text(
                               text = attendees[index].name,
-                              modifier = Modifier.padding(8.dp),
+                              modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
                               style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                           )
                           Spacer(modifier = Modifier.width(8.dp))
                           Text(
                               text = attendees[index].surname,
-                              modifier = Modifier.padding(8.dp),
+                              modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
                               style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                           )
                           Spacer(modifier = Modifier.width(8.dp))
                           Text(
                               text = attendees[index].age.toString(),
-                              modifier = Modifier.padding(8.dp),
+                              modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
                               style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                           )
                           Button(
@@ -329,15 +330,4 @@ var items = listOf<String>()
 fun parseFraction(fraction: String, index: Int): Int? {
   val parts = fraction.split("/")
   return parts[index].toIntOrNull()
-}
-
-@Preview
-@Composable
-fun PreviewCreateActivityScreen() {
-  CreateActivityScreen(
-      listActivityViewModel =
-          ListActivitiesViewModel(ActivitiesRepositoryFirestore(Firebase.firestore)),
-      navigationActions = NavigationActions(rememberNavController()),
-      profileViewModel = ProfileViewModel(ProfilesRepositoryFirestore(Firebase.firestore), "uid"),
-  )
 }

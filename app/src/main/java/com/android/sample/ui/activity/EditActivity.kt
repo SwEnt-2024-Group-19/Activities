@@ -41,23 +41,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
-import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.ui.dialogs.AddUserDialog
-import com.android.sample.ui.navigation.BottomNavigationMenu
-import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.firestore
 import java.util.Calendar
 import java.util.GregorianCalendar
 
@@ -97,18 +90,14 @@ fun EditActivityScreen(
         TopAppBar(
             title = { Text("Edit the activity") },
             navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
+              IconButton(
+                  modifier = Modifier.testTag("goBackButton"),
+                  onClick = { navigationActions.goBack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
             })
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
         Column(
             modifier =
@@ -117,7 +106,7 @@ fun EditActivityScreen(
                     .background(color = Color(0xFFFFFFFF))
                     .verticalScroll(rememberScrollState()),
         ) {
-          Carousel()
+          // Carousel()
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
               value = title ?: "",
@@ -193,23 +182,26 @@ fun EditActivityScreen(
                 ) {
                   items(attendees.size) { index ->
                     Row(
-                        modifier = Modifier.padding(8.dp).background(Color(0xFFFFFFFF)),
+                        modifier =
+                            Modifier.padding(8.dp)
+                                .background(Color(0xFFFFFFFF))
+                                .testTag("attendeeRow${index}"),
                     ) {
                       Text(
                           text = attendees[index].name,
-                          modifier = Modifier.padding(8.dp),
+                          modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
                           style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                       )
                       Spacer(modifier = Modifier.width(8.dp))
                       Text(
                           text = attendees[index].surname,
-                          modifier = Modifier.padding(8.dp),
+                          modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
                           style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                       )
                       Spacer(modifier = Modifier.width(8.dp))
                       Text(
                           text = attendees[index].age.toString(),
-                          modifier = Modifier.padding(8.dp),
+                          modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
                           style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                       )
                       Button(
@@ -229,7 +221,8 @@ fun EditActivityScreen(
           if (showDialog) {
             AddUserDialog(
                 onDismiss = { showDialog = false },
-                onAddUser = { user -> attendees = attendees + user })
+                onAddUser = { user -> attendees = attendees + user },
+                modifier = Modifier.testTag("addUserDialog"))
           }
           Spacer(modifier = Modifier.height(32.dp))
           Button(
@@ -319,27 +312,4 @@ fun EditActivityScreen(
           }
         }
       }
-}
-
-@Preview
-@Composable
-fun EditActivityScreenPreview() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val lAV = ListActivitiesViewModel(ActivitiesRepositoryFirestore(Firebase.firestore))
-  lAV.selectActivity(
-      Activity(
-          uid = "1",
-          title = "Activity",
-          description = "Description",
-          date = Timestamp.now(),
-          price = 0.0,
-          placesLeft = 0,
-          maxPlaces = 0,
-          creator = "Creator",
-          status = ActivityStatus.ACTIVE,
-          location = "Location",
-          images = listOf(),
-          participants = listOf()))
-  EditActivityScreen(navigationActions = navigationActions)
 }

@@ -3,6 +3,7 @@ package com.android.sample.ui.activity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -134,5 +135,27 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
     composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+  }
+
+  @Test
+  fun SimpleUserIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
+    composeTestRule.onNodeWithTag("addAttendeeButton").performClick()
+    composeTestRule.onNodeWithTag("addUserDialog").assertExists()
+    composeTestRule.onNodeWithTag("nameTextFieldUser").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("surnameTextFieldUser").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ageTextFieldUser").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
+    composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
+    composeTestRule.onNodeWithTag("ageTextFieldUser").performTextInput("25")
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    composeTestRule.onNodeWithTag("addUserDialog").assertDoesNotExist()
+    composeTestRule.onNodeWithTag("attendeeRow0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John")
+    composeTestRule.onNodeWithTag("attendeeSurname0").assertTextEquals("Doe")
+    composeTestRule.onNodeWithTag("attendeeAge0").assertTextEquals("25")
   }
 }
