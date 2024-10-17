@@ -1,6 +1,7 @@
 package com.android.sample.ui.profile
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,14 +14,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.ModeEdit
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,7 +50,7 @@ import com.android.sample.model.profile.User
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
-
+import com.android.sample.ui.navigation.Screen
 
 @Composable
 fun ProfileScreen(
@@ -57,13 +59,11 @@ fun ProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
 
-
   val profileState = userProfileViewModel.userState.collectAsState()
 
   when (val profile = profileState.value) {
     null -> LoadingScreen() // Show a loading indicator or a retry button
     else ->
-
         ProfileContent(
             user = profile,
             navigationActions,
@@ -82,7 +82,6 @@ fun LoadingScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun ProfileContent(
     user: User,
     navigationActions: NavigationActions,
@@ -91,13 +90,11 @@ fun ProfileContent(
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
-
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
-
       },
       topBar = {
         TopAppBar(
@@ -111,7 +108,11 @@ fun ProfileContent(
                         contentDescription = "Back")
                   }
             })
-
+      },
+      floatingActionButton = {
+        FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
+          Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
+        }
       }) { innerPadding ->
         Column(
             Modifier.fillMaxSize().padding(innerPadding),
@@ -131,11 +132,7 @@ fun ProfileContent(
                   fontSize = 20.sp,
                   modifier = Modifier.padding(top = 8.dp).testTag("userName"))
 
-              // Interests
-              Text(
-                  text = "Interests: ${user.interests?.joinToString(", ")}",
-                  fontSize = 18.sp,
-                  modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
+              user.interests?.let { InterestsRow(it) }
 
               Spacer(modifier = Modifier.height(16.dp))
 
@@ -144,7 +141,6 @@ fun ProfileContent(
                   text = "Activities Created",
                   fontSize = 24.sp,
                   modifier =
-
                       Modifier.padding(start = 16.dp, top = 16.dp)
                           .testTag("activitiesCreatedSection"))
 
@@ -224,7 +220,6 @@ fun ActivityCreatedBox(
           }
     }
   }
-
 }
 
 @Composable
@@ -285,4 +280,23 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
       contentDescription = "Profile Image",
       modifier = modifier,
       contentScale = ContentScale.Crop)
+}
+
+@Composable
+fun InterestsRow(interests: List<String>) {
+  LazyRow(modifier = Modifier.padding(16.dp)) {
+    items(interests.size) { index -> InterestBox(interest = interests[index]) }
+  }
+}
+
+@Composable
+fun InterestBox(interest: String) {
+  Box(
+      modifier =
+          Modifier.padding(end = 8.dp)
+              .clip(RoundedCornerShape(8.dp))
+              .background(Color.LightGray)
+              .padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(text = interest, fontSize = 18.sp, color = Color.Black)
+      }
 }
