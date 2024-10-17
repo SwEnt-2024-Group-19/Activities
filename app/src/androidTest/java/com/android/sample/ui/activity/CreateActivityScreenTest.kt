@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.activity.CreateActivityScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -24,6 +25,7 @@ class CreateActivityScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   private val mockViewModel = mockk<ListActivitiesViewModel>()
+  private val mockProfileViewModel = mockk<ProfileViewModel>()
   private val mockNavigationActions = mock<NavigationActions>()
 
 
@@ -73,42 +75,54 @@ class CreateActivityScreenTest {
 
   @Test
   fun createActivityScreen_displaysTitleField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputTitleCreate").assertExists()
     composeTestRule.onNodeWithTag("inputTitleCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysDescriptionField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysDateField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDateCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysPriceField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPriceCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysPlacesLeftField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputPlacesCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPlacesCreate").assertIsDisplayed()
   }
 
   @Test
   fun createActivityScreen_displaysLocationField() {
-    composeTestRule.setContent { CreateActivityScreen(mockViewModel, mockNavigationActions) }
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
     composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
     composeTestRule.onNodeWithTag("inputLocationCreate").assertIsDisplayed()
   }

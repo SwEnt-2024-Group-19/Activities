@@ -91,13 +91,13 @@ fun ActivitiesApp(uid: String) {
         EditActivityScreen(listActivitiesViewModel, navigationActions)
       }
       composable(Screen.ACTIVITY_DETAILS) {
-        ActivityDetailsScreen(listActivitiesViewModel, navigationActions)
+        ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
       composable(Screen.ADD_ACTIVITY) {
-        CreateActivityScreen(listActivitiesViewModel, navigationActions)
+        CreateActivityScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
     }
 
