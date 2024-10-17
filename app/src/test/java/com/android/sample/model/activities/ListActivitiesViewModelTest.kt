@@ -74,6 +74,69 @@ class ListActivitiesViewModelTest {
   }
 
   @Test
+  fun getActivitiesSuccessCallback() {
+    val onSuccess = mock<() -> Unit>()
+    listActivitiesViewModel.getActivities(onSuccess, {})
+    verify(activitiesRepository).getActivities(any(), any())
+  }
+
+  @Test
+  fun getActivitiesUpdatesUiStateOnSuccess() {
+    val activities = listOf(activity)
+    `when`(activitiesRepository.getActivities(any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(List<Activity>) -> Unit>(0)
+      onSuccess(activities)
+    }
+    listActivitiesViewModel.getActivities()
+    assertThat(
+        listActivitiesViewModel.uiState.value,
+        `is`(ListActivitiesViewModel.ActivitiesUiState.Success(activities)))
+  }
+
+  @Test
+  fun getActivitiesUpdatesUiStateOnError() {
+    val exception = Exception("Test exception")
+    `when`(activitiesRepository.getActivities(any(), any())).thenAnswer {
+      val onFailure = it.getArgument<(Exception) -> Unit>(1)
+      onFailure(exception)
+    }
+    listActivitiesViewModel.getActivities()
+    assertThat(
+        listActivitiesViewModel.uiState.value,
+        `is`(ListActivitiesViewModel.ActivitiesUiState.Error(exception)))
+  }
+
+  @Test
+  fun addActivityCallsGetActivitiesOnSuccess() {
+    `when`(activitiesRepository.addActivity(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+    listActivitiesViewModel.addActivity(activity)
+    verify(activitiesRepository).getActivities(any(), any())
+  }
+
+  @Test
+  fun updateActivityCallsGetActivitiesOnSuccess() {
+    `when`(activitiesRepository.updateActivity(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+    listActivitiesViewModel.updateActivity(activity)
+    verify(activitiesRepository).getActivities(any(), any())
+  }
+
+  @Test
+  fun deleteActivityByIdCallsGetActivitiesOnSuccess() {
+    `when`(activitiesRepository.deleteActivityById(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+    listActivitiesViewModel.deleteActivityById(activity.uid)
+    verify(activitiesRepository).getActivities(any(), any())
+  }
+
+  @Test
   fun selectActivityUpdatesSelectedActivity() = runBlocking {
     listActivitiesViewModel.selectActivity(activity)
     val selected = listActivitiesViewModel.selectedActivity.first()

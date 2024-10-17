@@ -75,60 +75,56 @@ class ActivitiesRepositoryFirestoreTest {
     assert(uid == "1")
   }
 
-  /**
-   * This test verifies that when fetching a ToDos list, the Firestore `get()` is called on the
-   * collection reference and not the document reference.
-   */
   @Test
   fun getActivities_callsDocuments() {
-    // Ensure that mockToDoQuerySnapshot is properly initialized and mocked
     `when`(mockCollectionReference.get()).thenReturn(Tasks.forResult(mockActivityQuerySnapshot))
-
-    // Ensure the QuerySnapshot returns a list of mock DocumentSnapshots
     `when`(mockActivityQuerySnapshot.documents).thenReturn(listOf())
 
-    // Call the method under test
     activitiesRepositoryFirestore.getActivities(
-        onSuccess = {
+        onSuccess = {}, onFailure = { fail("Failure callback should not be called") })
 
-          // Do nothing; we just want to verify that the 'documents' field was accessed
-        },
-        onFailure = { fail("Failure callback should not be called") })
-
-    // Verify that the 'documents' field was accessed
     verify(timeout(100)) { (mockActivityQuerySnapshot).documents }
   }
 
-  /**
-   * This test verifies that when we add a new ToDo, the Firestore `set()` is called on the document
-   * reference. This does NOT CHECK the actual data being added
-   */
   @Test
   fun addActivity_shouldCallFirestoreCollection() {
-    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null))
 
-    // This test verifies that when we add a new ToDo, the Firestore `collection()` method is
-    // called.
     activitiesRepositoryFirestore.addActivity(activity, onSuccess = {}, onFailure = {})
 
     shadowOf(Looper.getMainLooper()).idle()
 
-    // Ensure Firestore collection method was called to reference the "ToDos" collection
     verify(mockDocumentReference).set(any())
   }
 
-  /**
-   * This check that the correct Firestore method is called when deleting. Does NOT CHECK that the
-   * correct data is deleted.
-   */
   @Test
   fun deleteActivitiesId_shouldCallDocumentReferenceDelete() {
     `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult(null))
 
     activitiesRepositoryFirestore.deleteActivityById("1", onSuccess = {}, onFailure = {})
 
-    shadowOf(Looper.getMainLooper()).idle() // Ensure all asynchronous operations complete
+    shadowOf(Looper.getMainLooper()).idle()
 
     verify(mockDocumentReference).delete()
+  }
+
+  @Test
+  fun updateActivity_shouldCallFirestoreCollection() {
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null))
+
+    activitiesRepositoryFirestore.updateActivity(activity, onSuccess = {}, onFailure = {})
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    verify(mockDocumentReference).set(any())
+  }
+
+  @Test
+  fun init_shouldCallOnSuccess() {
+    var onSuccessCalled = false
+
+    activitiesRepositoryFirestore.init { onSuccessCalled = true }
+
+    assert(onSuccessCalled)
   }
 }

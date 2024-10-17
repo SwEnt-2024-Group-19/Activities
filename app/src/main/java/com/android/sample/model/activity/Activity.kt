@@ -24,28 +24,28 @@ enum class ActivityStatus {
   FINISHED,
 }
 
-enum class Category {
-  WORKSHOP,
-  TALK,
-  KEYNOTE,
-  BREAK,
-  LUNCH,
-  NETWORKING,
-  SOCIAL,
-  OTHER,
-}
-
-val categories =
-    listOf(
-        Category.WORKSHOP,
-        Category.TALK,
-        Category.KEYNOTE,
-        Category.BREAK,
-        Category.LUNCH,
-        Category.NETWORKING,
-        Category.SOCIAL,
-        Category.OTHER,
-    )
+// enum class Category {
+//  WORKSHOP,
+//  TALK,
+//  KEYNOTE,
+//  BREAK,
+//  LUNCH,
+//  NETWORKING,
+//  SOCIAL,
+//  OTHER,
+// }
+//
+// val categories =
+//    listOf(
+//        Category.WORKSHOP,
+//        Category.TALK,
+//        Category.KEYNOTE,
+//        Category.BREAK,
+//        Category.LUNCH,
+//        Category.NETWORKING,
+//        Category.SOCIAL,
+//        Category.OTHER,
+//    )
 
 // Setup later
 // @Composable
