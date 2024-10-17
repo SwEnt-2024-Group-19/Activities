@@ -13,11 +13,4 @@ interface ProfilesRepository {
   fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   fun addProfileToDatabase(userProfile: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
-
-  fun deleteActivityFromProfile(
-      userId: String,
-      activityId: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  )
 }
