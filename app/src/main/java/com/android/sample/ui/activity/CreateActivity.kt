@@ -166,7 +166,7 @@ fun CreateActivityScreen(
                             description = description,
                             date = Timestamp(calendar.time),
                             price = price.toDouble(),
-                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
+                            placesTaken = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 1)?.toLong() ?: 0.toLong(),
                             creator = creator,
                             status = ActivityStatus.ACTIVE,

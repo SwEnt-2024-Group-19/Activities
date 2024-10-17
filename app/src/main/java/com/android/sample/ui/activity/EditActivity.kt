@@ -60,7 +60,7 @@ fun EditActivityScreen(
   var creator by remember { mutableStateOf(activity?.creator) }
   var location by remember { mutableStateOf(activity?.location) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
-  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
+  var placesLeft by remember { mutableStateOf(activity?.placesTaken.toString()) }
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -175,7 +175,7 @@ fun EditActivityScreen(
                             description = description ?: "",
                             date = Timestamp(calendar.time),
                             price = price.toDouble(),
-                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
+                            placesTaken = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
                             maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
                             creator = creator ?: "",
                             status = ActivityStatus.ACTIVE,
