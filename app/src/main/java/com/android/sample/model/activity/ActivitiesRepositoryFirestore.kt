@@ -33,11 +33,21 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                 .map { document ->
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
+                  val activityType =
+                      data["type"]?.let {
+                        try {
+                          ActivityType.valueOf(it as String)
+                        } catch (e: IllegalArgumentException) {
+                          ActivityType.SOLO // Replace with your default ActivityType
+                        }
+                      } ?: ActivityType.SOLO
                   Activity(
                       document.id,
                       data["title"] as String,
                       data["description"] as String,
                       data["date"] as Timestamp,
+                      data["startTime"] as? String ?: "HH:mm",
+                      data["duration"] as? String ?: "HH:mm",
                       data["price"] as Double,
                       data["location"] as String,
                       data["creator"] as String,
@@ -45,7 +55,7 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       data["placesLeft"] as Long,
                       data["maxPlaces"] as Long,
                       ActivityStatus.valueOf(data["status"] as String),
-                      listOf())
+                      activityType)
                 }
                 .filterNotNull() // Filter out any null results
 
