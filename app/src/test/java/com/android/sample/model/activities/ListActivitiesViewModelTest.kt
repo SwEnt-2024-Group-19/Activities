@@ -3,6 +3,7 @@ package com.android.sample.model.activities
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.first
@@ -35,6 +36,9 @@ class ListActivitiesViewModelTest {
           maxPlaces = 0,
           participants = listOf(),
           images = listOf(),
+          duration = "00:30",
+          startTime = "09:00",
+          type = ActivityType.PRO,
           price = 0.0)
 
   @Before
@@ -72,7 +76,6 @@ class ListActivitiesViewModelTest {
     listActivitiesViewModel.deleteActivityById(activity.uid)
     verify(activitiesRepository).deleteActivityById(eq(activity.uid), any(), any())
   }
-
 
   @Test
   fun getActivitiesSuccessCallback() {
@@ -136,7 +139,6 @@ class ListActivitiesViewModelTest {
     listActivitiesViewModel.deleteActivityById(activity.uid)
     verify(activitiesRepository).getActivities(any(), any())
   }
-
 
   @Test
   fun selectActivityUpdatesSelectedActivity() = runBlocking {

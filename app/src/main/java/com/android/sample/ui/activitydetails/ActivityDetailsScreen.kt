@@ -229,7 +229,6 @@ fun ActivityDetailsScreen(
                             images = activity.images,
                             type = activity.type,
                             participants = activity.participants)
-
                       }
                   if (theActivity != null) {
                     listActivityViewModel.updateActivity(theActivity)
@@ -250,4 +249,3 @@ fun ActivityDetailsScreen(
         }
       }
 }
-

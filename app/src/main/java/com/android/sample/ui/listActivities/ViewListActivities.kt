@@ -68,18 +68,22 @@ fun ListActivitiesScreen(
   Scaffold(
       modifier = modifier,
       topBar = {
-        Box(modifier = Modifier.height(35.dp).testTag("segmentedButtonRow")) { // Set the desired height here
-          SingleChoiceSegmentedButtonRow {
-            options.forEachIndexed { index, label ->
-              SegmentedButton(
-                  shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                  onClick = { selectedIndex = index },
-                  selected = index == selectedIndex) {
-                    Text(label)
-                  }
+        Box(
+            modifier =
+                Modifier.height(35.dp)
+                    .testTag("segmentedButtonRow")) { // Set the desired height here
+              SingleChoiceSegmentedButtonRow {
+                options.forEachIndexed { index, label ->
+                  SegmentedButton(
+                      shape =
+                          SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                      onClick = { selectedIndex = index },
+                      selected = index == selectedIndex) {
+                        Text(label)
+                      }
+                }
+              }
             }
-          }
-        }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -87,70 +91,69 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
-        Box(modifier = modifier.fillMaxSize().padding(paddingValues).testTag("bottomNavigationMenu")) {
-          when (uiState) {
-            is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-              var activitiesList =
-                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              if (selectedIndex != 0) {
+        Box(
+            modifier =
+                modifier.fillMaxSize().padding(paddingValues).testTag("bottomNavigationMenu")) {
+              when (uiState) {
+                is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+                  var activitiesList =
+                      (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+                  if (selectedIndex != 0) {
 
-                activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
-              }
-              if (activitiesList.isEmpty()) {
-                if (selectedIndex == 0) {
-                  Text(
-                      text = "There is no activity yet.",
-                      modifier =
-                          Modifier.padding(8.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
-                      color = MaterialTheme.colorScheme.onSurface)
-                } else {
-                  Text(
-                      text = "There is no activity of this type yet.",
-                      modifier =
-                          Modifier.padding(8.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
-                      color = MaterialTheme.colorScheme.onSurface)
-                }
-              } else {
-
-                LazyColumn(
-                    modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                      // Use LazyColumn to efficiently display the list of activities
-
-                      items(activitiesList) { activity ->
-                        ActivityCard(activity = activity, navigationActions)
-
-                      }
+                    activitiesList =
+                        activitiesList.filter { it.type.name == options[selectedIndex] }
+                  }
+                  if (activitiesList.isEmpty()) {
+                    if (selectedIndex == 0) {
+                      Text(
+                          text = "There is no activity yet.",
+                          modifier =
+                              Modifier.padding(8.dp)
+                                  .align(Alignment.Center)
+                                  .testTag("emptyActivityPrompt"),
+                          color = MaterialTheme.colorScheme.onSurface)
+                    } else {
+                      Text(
+                          text = "There is no activity of this type yet.",
+                          modifier =
+                              Modifier.padding(8.dp)
+                                  .align(Alignment.Center)
+                                  .testTag("emptyActivityPrompt"),
+                          color = MaterialTheme.colorScheme.onSurface)
                     }
+                  } else {
+
+                    LazyColumn(
+                        modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                          // Use LazyColumn to efficiently display the list of activities
+
+                          items(activitiesList) { activity ->
+                            ActivityCard(activity = activity, navigationActions)
+                          }
+                        }
+                  }
+                }
+                is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+                  val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+                  Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
+                }
               }
             }
-            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-              Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
-            }
-          }
-        }
       }
 }
 
 @Composable
-fun ActivityCard(
-
-    activity: Activity,
-    navigationActions: NavigationActions
-) {
+fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
   Card(
       modifier =
-          Modifier.fillMaxWidth().testTag("activityCard").clip(RoundedCornerShape(16.dp)).clickable {
-            navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-          },
+          Modifier.fillMaxWidth()
+              .testTag("activityCard")
+              .clip(RoundedCornerShape(16.dp))
+              .clickable { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
       elevation = CardDefaults.cardElevation(8.dp)) {
         Column {
           // Box for overlaying the title on the image

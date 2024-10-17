@@ -19,7 +19,7 @@ data class Activity(
     var maxPlaces: Long,
     var status: ActivityStatus,
     val type: ActivityType,
-    var participants:List<SimpleUser>
+    var participants: List<SimpleUser>
 )
 
 enum class ActivityType {

@@ -34,7 +34,7 @@ fun AddUserDialog(
     onDismiss: () -> Unit,
     onAddUser: (SimpleUser) -> Unit,
 ) {
-  
+
   Dialog(
       onDismissRequest = onDismiss,
       properties =
