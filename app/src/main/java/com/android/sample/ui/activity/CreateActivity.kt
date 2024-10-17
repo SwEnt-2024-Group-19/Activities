@@ -1,8 +1,6 @@
 package com.android.sample.ui.activity
 
 import android.icu.util.GregorianCalendar
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,16 +38,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -60,21 +57,21 @@ import com.google.firebase.auth.FirebaseAuth
 fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
+    profileViewModel: ProfileViewModel
 ) {
-    val IMAGE_PICK_CODE = 1000
-    val CAMERA_CAPTURE_CODE = 1001
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    var location by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var placesLeft by remember { mutableStateOf("") }
-    var dueDate by remember { mutableStateOf("") }
-    var carouselItems by remember { mutableStateOf(items) }
-    var showDialog by remember { mutableStateOf(false) }
+  val IMAGE_PICK_CODE = 1000
+  val CAMERA_CAPTURE_CODE = 1001
+  var title by remember { mutableStateOf("") }
+  var description by remember { mutableStateOf("") }
+  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+  var location by remember { mutableStateOf("") }
+  var price by remember { mutableStateOf("") }
+  var placesLeft by remember { mutableStateOf("") }
+  var dueDate by remember { mutableStateOf("") }
+  var carouselItems by remember { mutableStateOf(items) }
+  var showDialog by remember { mutableStateOf(false) }
 
-
-    Scaffold(
+  Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
@@ -90,7 +87,9 @@ fun CreateActivityScreen(
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues).fillMaxSize().background(color = Color(0xFFFFFFFF))
+                Modifier.padding(paddingValues)
+                    .fillMaxSize()
+                    .background(color = Color(0xFFFFFFFF))
                     .verticalScroll(rememberScrollState()),
         ) {
           Carousel()
@@ -149,6 +148,7 @@ fun CreateActivityScreen(
               enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
+                val id = listActivityViewModel.getNewUid()
                 val parts = dueDate.split("/")
                 if (parts.size == 3) {
                   try {
@@ -159,7 +159,7 @@ fun CreateActivityScreen(
                         0,
                         0,
                         0)
-                     val activity =
+                    val activity =
                         Activity(
                             uid = listActivityViewModel.getNewUid(),
                             title = title,
@@ -171,16 +171,19 @@ fun CreateActivityScreen(
                             creator = creator,
                             status = ActivityStatus.ACTIVE,
                             location = location,
-                            images = carouselItems.map{it},
-                            participants = listOf()
-                        )
+                            images = carouselItems.map { it },
+                            participants = listOf())
                     listActivityViewModel.addActivity(activity)
+                    profileViewModel.addActivity(creator, id)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
                 }
               },
-              modifier = Modifier.width(300.dp).height(40.dp).align(Alignment.CenterHorizontally)
-                  .testTag("createButton"),
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .align(Alignment.CenterHorizontally)
+                      .testTag("createButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -215,11 +218,11 @@ fun Carousel() {
             modifier = Modifier.width(340.dp).height(135.dp),
         ) {
           items(items.size) { index ->
-              AsyncImage(
-                  model = items[index], // Utilise l'URL de l'image
-                  contentDescription = "image $index",
-                  contentScale = ContentScale.Crop,
-                  modifier = Modifier.padding(8.dp))
+            AsyncImage(
+                model = items[index], // Utilise l'URL de l'image
+                contentDescription = "image $index",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.padding(8.dp))
           }
         }
         Spacer(modifier = Modifier.width(16.dp))

@@ -44,6 +44,14 @@ open class ProfileViewModel(private val repository: ProfilesRepository, userId: 
         onFailure = { error -> onError(error) })
   }
 
+  fun addActivity(userId: String, activityId: String) {
+    repository.addActivity(
+        userId = userId,
+        activityId = activityId,
+        onSuccess = { fetchUserData(userId) },
+        onFailure = {})
+  }
+
   companion object {
     fun Factory(uid: String): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
