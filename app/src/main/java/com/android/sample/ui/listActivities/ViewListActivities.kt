@@ -198,7 +198,7 @@ fun ActivityCard(
                     modifier = Modifier.weight(1f) // Takes up remaining space
                     )
                 Text(
-                    text = "${activity.placesTaken}/${activity.maxPlaces}",
+                    text = "${activity.placesLeft}/${activity.maxPlaces}",
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold, color = Color.Gray, fontSize = 16.sp),

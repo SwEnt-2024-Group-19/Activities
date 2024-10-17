@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
@@ -82,6 +83,7 @@ fun CreateActivityScreen(
     var price by remember { mutableStateOf("") }
     var placesLeft by remember { mutableStateOf("") }
     var dueDate by remember { mutableStateOf("") }
+    var type by remember{ mutableStateOf("")}
 
     var startTime by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("") }
@@ -218,32 +220,32 @@ fun CreateActivityScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-              ExposedDropdownMenuBox(
-                  modifier = Modifier.testTag("chooseTypeMenu"),
-                  expanded = expanded,
-                  onExpandedChange = { expanded = !expanded }) {
+                ExposedDropdownMenuBox(
+                    modifier = Modifier.testTag("chooseTypeMenu"),
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }) {
                     TextField(
                         readOnly = true,
                         value = selectedOption,
                         onValueChange = {},
                         label = { Text("Activity Type") },
                         trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
                         colors = ExposedDropdownMenuDefaults.textFieldColors(),
                         modifier = Modifier.menuAnchor())
                     ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                      types.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(selectionOption.name) },
-                            onClick = {
-                              selectedOption = selectionOption.name
-                              expanded = false
-                            })
-                      }
+                        types.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                text = { Text(selectionOption.name) },
+                                onClick = {
+                                    selectedOption = selectionOption.name
+                                    expanded = false
+                                })
+                        }
                     }
-                  }
-                
+                }
+
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Column(
@@ -369,7 +371,8 @@ fun CreateActivityScreen(
                                         status = ActivityStatus.ACTIVE,
                                         location = location,
                                         images = carouselItems.map { it },
-                                        participants = attendees
+                                        participants = attendees,
+                                        type= types.find { it.name==selectedOption }?:types[0],
                                     )
                                 listActivityViewModel.addActivity(activity)
                                 navigationActions.navigateTo(Screen.OVERVIEW)

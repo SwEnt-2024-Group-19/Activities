@@ -31,7 +31,7 @@ class ListActivitiesViewModelTest {
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",
-          placesTaken = 0,
+          placesLeft = 0,
           maxPlaces = 0,
           participants = listOf(),
           images = listOf(),
