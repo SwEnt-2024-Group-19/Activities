@@ -1,6 +1,7 @@
 package com.android.sample.model.profile
 
 import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -91,5 +92,48 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
         .set(userProfile)
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { exception -> onFailure(exception) }
+  }
+
+  override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    performFirestoreOperation(
+        db.collection("profiles").document(user.id).set(user), onSuccess, onFailure)
+  }
+
+  override fun deleteActivityFromProfile(
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection("profiles")
+        .document(userId)
+        .update("activities", FieldValue.arrayRemove(activityId))
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            task.exception?.let { e ->
+              Log.e("UserProfileRepository", "Error deleting activity from profile", e)
+              onFailure(e)
+            }
+          }
+        }
+  }
+
+  private fun performFirestoreOperation(
+      task: Task<Void>,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    task.addOnCompleteListener { result ->
+      if (result.isSuccessful) {
+        onSuccess()
+      } else {
+        result.exception?.let { e ->
+          Log.e("TodosRepositoryFirestore", "Error performing Firestore operation", e)
+          onFailure(e)
+        }
+      }
+    }
   }
 }
