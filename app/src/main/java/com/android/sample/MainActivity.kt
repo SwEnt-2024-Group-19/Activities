@@ -90,6 +90,7 @@ fun ActivitiesApp(uid: String) {
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(listActivitiesViewModel, navigationActions)
       }
+
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
