@@ -1,5 +1,3 @@
-package com.android.sample.model.activities
-
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
@@ -13,6 +11,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
 import junit.framework.TestCase.fail
 import org.junit.Before
@@ -92,7 +91,7 @@ class ActivitiesRepositoryFirestoreTest {
 
   @Test
   fun addActivity_shouldCallFirestoreCollection() {
-    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null))
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult<Void>(null))
 
     activitiesRepositoryFirestore.addActivity(activity, onSuccess = {}, onFailure = {})
 
@@ -103,7 +102,7 @@ class ActivitiesRepositoryFirestoreTest {
 
   @Test
   fun deleteActivitiesId_shouldCallDocumentReferenceDelete() {
-    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult(null))
+    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult<Void>(null))
 
     activitiesRepositoryFirestore.deleteActivityById("1", onSuccess = {}, onFailure = {})
 
@@ -113,8 +112,40 @@ class ActivitiesRepositoryFirestoreTest {
   }
 
   @Test
+  fun addActivity_callsOnFailureOnError() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forException(exception))
+
+    var failureCalled = false
+    activitiesRepositoryFirestore.addActivity(
+        activity,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
+  }
+
+  @Test
+  fun deleteActivityById_callsOnFailureOnError() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forException(exception))
+
+    var failureCalled = false
+    activitiesRepositoryFirestore.deleteActivityById(
+        "1",
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
+  }
+
+  @Test
   fun updateActivity_shouldCallFirestoreCollection() {
-    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null))
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult<Void>(null))
 
     activitiesRepositoryFirestore.updateActivity(activity, onSuccess = {}, onFailure = {})
 
@@ -124,11 +155,18 @@ class ActivitiesRepositoryFirestoreTest {
   }
 
   @Test
-  fun init_shouldCallOnSuccess() {
-    var onSuccessCalled = false
+  fun updateActivity_callsOnFailureOnError() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forException(exception))
 
-    activitiesRepositoryFirestore.init { onSuccessCalled = true }
+    var failureCalled = false
+    activitiesRepositoryFirestore.updateActivity(
+        activity,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
 
-    assert(onSuccessCalled)
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
   }
 }
