@@ -5,7 +5,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
+open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
 
   private val activitiesCollectionPath = "activities"
   private val TAG = "ActivitiesRepositoryFirestore"
@@ -34,18 +34,18 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
                   Activity(
-                      document.id,
-                      data["title"] as String,
-                      data["description"] as String,
-                      data["date"] as Timestamp,
-                      data["price"] as Double,
-                      data["location"] as String,
-                      data["creator"] as String,
-                      listOf(),
-                      data["placesLeft"] as Long,
-                      data["maxPlaces"] as Long,
-                      ActivityStatus.valueOf(data["status"] as String),
-                      listOf())
+                      uid = document.id,
+                      title = data["title"] as? String ?: "No Title",
+                      description = data["description"] as? String ?: "No Description",
+                      date = data["date"] as? Timestamp ?: Timestamp.now(),
+                      price = data["price"] as? Double ?: 0.0,
+                      location = data["location"] as? String ?: "Unknown Location",
+                      creator = data["creator"] as? String ?: "Anonymous",
+                      images = listOf(),
+                      placesTaken = data["placesTaken"] as? Long ?: 0L,
+                      maxPlaces = data["maxPlaces"] as? Long ?: 0L,
+                      status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+                      participants = listOf())
                 }
                 .filterNotNull() // Filter out any null results
 

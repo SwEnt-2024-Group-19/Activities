@@ -1,10 +1,8 @@
 package com.android.sample.ui.activitydetails
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,13 +38,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.navigation.NavigationActions
@@ -67,7 +62,9 @@ fun ActivityDetailsScreen(
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile =
       profileViewModel.userState.collectAsState().value
-          ?: return Text(text = "No profile selected. Should not happen", color = Color.Black)
+          ?: return Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = "No profile selected. Should not happen", color = Color.Black)
+          }
 
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
@@ -95,12 +92,11 @@ fun ActivityDetailsScreen(
       topBar = {
         TopAppBar(
             title = {
-              Box(
-                  modifier = Modifier.fillMaxWidth().testTag("topAppBar"),
-                  contentAlignment = Alignment.Center) {
-                    Text("Title", color = Color.White)
-                  }
+              Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text("Title", color = Color.White)
+              }
             },
+            modifier = Modifier.testTag("topAppBar"),
             navigationIcon = {
               IconButton(
                   modifier = Modifier.testTag("goBackButton"),
@@ -123,7 +119,8 @@ fun ActivityDetailsScreen(
                   Modifier.fillMaxWidth()
                       .aspectRatio(16 / 9f)
                       .padding(16.dp)
-                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))) {
+                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                      .testTag("image")) {
                 // Optional: Add placeholder text in the center
                 Text(
                     text = "Activity Image",
@@ -134,13 +131,12 @@ fun ActivityDetailsScreen(
 
           // Title
           Box(
-              modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+              modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("title"),
               contentAlignment = Alignment.Center) {
                 Text(
                     text = activityTitle ?: "title not specified",
-                    style =
-                        MaterialTheme.typography.headlineMedium, // Change this to a larger style
-                    modifier = Modifier.testTag("Title"))
+                    modifier = Modifier.testTag("titleText"),
+                    style = MaterialTheme.typography.headlineMedium)
               }
 
           Spacer(modifier = Modifier.height(8.dp))
@@ -161,74 +157,56 @@ fun ActivityDetailsScreen(
                 Text(
                     text = description ?: "description not specified",
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 8.dp))
+                    modifier = Modifier.padding(horizontal = 8.dp).testTag("descriptionText"))
               }
 
-          Spacer(modifier = Modifier.height(16.dp))
-
-          //  price and schedule
           Spacer(modifier = Modifier.height(8.dp))
+          //  price
           Row(
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.SpaceBetween,
-              modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.testTag("priceIcon")) {
-                      Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                      Spacer(modifier = Modifier.width(4.dp))
-                      Text(
-                          text =
-                              if (price != null) "${price.toString()} CHF" else "not defined yet")
-                    }
+              modifier = Modifier.testTag("price")) {
+                Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = if (price != null) "${price.toString()} CHF" else "not defined yet",
+                    modifier = Modifier.testTag("priceText"))
               }
           Spacer(modifier = Modifier.height(8.dp))
+          // schedule
           Row(
               verticalAlignment = Alignment.CenterVertically,
               modifier = Modifier.testTag("schedule")) {
                 Icon(Icons.Default.DateRange, contentDescription = "Schedule")
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(text = dueDate ?: "not defined yet")
+                Text(
+                    text = dueDate ?: "not defined yet",
+                    modifier = Modifier.testTag("scheduleText"))
               }
 
           Spacer(modifier = Modifier.height(32.dp))
 
           // Enroll button
-          Button(
-              onClick = {
-                if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                  val theActivity =
-                      activity?.let { activity ->
-                        Activity(
-                            uid = activity.uid,
-                            title = activity.title,
-                            description = activity.description,
-                            date = activity.date,
-                            price = activity.price,
-                            placesTaken = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
-                            maxPlaces = activity.maxPlaces,
-                            creator = activity.creator,
-                            status = activity.status,
-                            location = activity.location,
-                            images = activity.images,
-                            participants = activity.participants)
-                      }
-                  if (theActivity != null) {
+          if (activity?.status == ActivityStatus.ACTIVE) {
+            Button(
+                onClick = {
+                  if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
+                    val theActivity =
+                        activity.copy(placesTaken = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
                     listActivityViewModel.updateActivity(theActivity)
-                      profileViewModel.addActivity(profile.id, theActivity.uid)
+                    profileViewModel.addActivity(profile.id, theActivity.uid)
+                    Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
+                    navigationActions.navigateTo(Screen.OVERVIEW)
+                  } else {
+                    Toast.makeText(
+                            context, "Enroll failed, limit of places reached", Toast.LENGTH_SHORT)
+                        .show()
                   }
-                  Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                  navigationActions.navigateTo(Screen.OVERVIEW)
-                } else {
-                  Toast.makeText(
-                          context, "Enroll failed, limit of places reached", Toast.LENGTH_SHORT)
-                      .show()
+                },
+                modifier =
+                    Modifier.fillMaxWidth().padding(horizontal = 24.dp).testTag("enrollButton")) {
+                  Text(text = "Enroll")
                 }
-              },
-              modifier =
-                  Modifier.fillMaxWidth().padding(horizontal = 24.dp).testTag("enrollButton")) {
-                Text(text = "Enroll")
-              }
+          }
         }
       }
 }
