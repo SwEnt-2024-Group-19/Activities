@@ -55,7 +55,8 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       data["placesLeft"] as Long,
                       data["maxPlaces"] as Long,
                       ActivityStatus.valueOf(data["status"] as String),
-                      activityType)
+                      participants = listOf(),
+                      type = activityType)
                 }
                 .filterNotNull() // Filter out any null results
 
