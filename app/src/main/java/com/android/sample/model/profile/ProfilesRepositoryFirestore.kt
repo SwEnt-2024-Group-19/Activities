@@ -1,7 +1,6 @@
 package com.android.sample.model.profile
 
 import android.util.Log
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,20 +32,11 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
       val name = document.getString("name") ?: return null
       val surname = document.getString("surname") ?: return null
       val photo = document.getString("photo") ?: return null
-      Log.e("not an error", "id is $id")
-      Log.e("not an error", "name is $name")
-      Log.e("not an error", "surname is $surname")
-      Log.e("not an error", "photo url is $photo")
-
       val interests =
           (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null
       Log.e("not an error", "interests are $interests")
       val activities =
           (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null
-      //  Log.e("not an error", "activities are "+ activities.toString())
-
-      // val activities = document.get("activities") as? List<*>
-      // val interests = document.get("interests") as? List<*>
 
       User(
           id = id,
@@ -56,7 +46,7 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
           activities = activities,
           photo = photo)
     } catch (e: Exception) {
-      Log.e("TodosRepositoryFirestore", "Error converting document to ToDo", e)
+      Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null
     }
   }
@@ -75,7 +65,7 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
             onSuccess()
           } else {
             task.exception?.let { e ->
-              Log.e("UserProfileRepository", "Error adding activity to profile", e)
+              Log.e("ProfilesRepository", "Error adding activity to profile", e)
               onFailure(e)
             }
           }
@@ -95,8 +85,14 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
   }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    performFirestoreOperation(
-        db.collection("profiles").document(user.id).set(user), onSuccess, onFailure)
+    db.collection("profiles")
+        .document(user.id)
+        .set(user)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { exception ->
+          Log.e("ProfilesRepository", "Error updating user profile", exception)
+          onFailure(exception)
+        }
   }
 
   override fun deleteActivityFromProfile(
@@ -113,27 +109,10 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
             onSuccess()
           } else {
             task.exception?.let { e ->
-              Log.e("UserProfileRepository", "Error deleting activity from profile", e)
+              Log.e("ProfilesRepository", "Error deleting activity from profile", e)
               onFailure(e)
             }
           }
         }
-  }
-
-  private fun performFirestoreOperation(
-      task: Task<Void>,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    task.addOnCompleteListener { result ->
-      if (result.isSuccessful) {
-        onSuccess()
-      } else {
-        result.exception?.let { e ->
-          Log.e("TodosRepositoryFirestore", "Error performing Firestore operation", e)
-          onFailure(e)
-        }
-      }
-    }
   }
 }
