@@ -103,14 +103,10 @@ fun ActivitiesApp(uid: String) {
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-
       composable(Screen.PROFILE) {
         ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
       }
-      composable(Screen.EDIT_PROFILE) {
-        EditProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
-      }
-
+      composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
     }
   }
 }
