@@ -5,7 +5,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
+open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
 
   private val activitiesCollectionPath = "activities"
   private val TAG = "ActivitiesRepositoryFirestore"
@@ -50,7 +50,7 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
                 .filterNotNull() // Filter out any null results
 
         onSuccess(activities)
-      }
+      } else onFailure(e ?: Exception("Error getting documents"))
     }
   }
 
@@ -85,7 +85,7 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
         db.collection(activitiesCollectionPath).document(id).delete(), onSuccess, onFailure)
   }
 
-  private fun performFirestoreOperation(
+  fun performFirestoreOperation(
       task: Task<Void>,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
