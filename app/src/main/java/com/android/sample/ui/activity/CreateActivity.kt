@@ -46,6 +46,7 @@ import coil.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -56,6 +57,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
+    profileViewModel: ProfileViewModel
 ) {
   val IMAGE_PICK_CODE = 1000
   val CAMERA_CAPTURE_CODE = 1001
@@ -146,6 +148,7 @@ fun CreateActivityScreen(
               enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
+                val id = listActivityViewModel.getNewUid()
                 val parts = dueDate.split("/")
                 if (parts.size == 3) {
                   try {
@@ -171,6 +174,7 @@ fun CreateActivityScreen(
                             images = carouselItems.map { it },
                             participants = listOf())
                     listActivityViewModel.addActivity(activity)
+                    profileViewModel.addActivity(creator, id)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
                 }
