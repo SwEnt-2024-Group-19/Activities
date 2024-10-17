@@ -35,7 +35,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,7 +75,7 @@ fun ActivityDetailsScreen(
                 }"
         })
   }
-  val placesLeft by remember { mutableStateOf(activity?.placesLeft) }
+  val placesTaken by remember { mutableStateOf(activity?.placesTaken) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
 
   val context = LocalContext.current
@@ -186,7 +185,7 @@ fun ActivityDetailsScreen(
           // Enroll button
           Button(
               onClick = {
-                if (((placesLeft ?: 0) >= 0) && ((placesLeft ?: 0) < (maxPlaces ?: 0))) {
+                if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
                   val theActivity =
                       activity?.let { activity ->
                         Activity(
@@ -195,7 +194,7 @@ fun ActivityDetailsScreen(
                             description = activity.description,
                             date = activity.date,
                             price = activity.price,
-                            placesLeft = min((placesLeft ?: 0) + 1, maxPlaces ?: 0),
+                            placesTaken = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
                             maxPlaces = activity.maxPlaces,
                             creator = activity.creator,
                             status = activity.status,
