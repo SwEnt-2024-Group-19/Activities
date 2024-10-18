@@ -66,7 +66,7 @@ fun ListActivitiesScreen(
   val options = listOf(all) + typesToString
 
   Scaffold(
-      modifier = modifier,
+      modifier = modifier.testTag("listActivitiesScreen"),
       topBar = {
         Box(
             modifier =

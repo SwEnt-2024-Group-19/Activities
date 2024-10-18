@@ -89,7 +89,7 @@ fun CreateActivityScreen(
   var attendees: List<SimpleUser> by remember { mutableStateOf(attendees_) }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
       topBar = {
         TopAppBar(
             title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
