@@ -110,7 +110,7 @@ class ProfileScreenTest {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel, navigationActions, listActivitiesViewModel)
     }
-    composeTestRule.onNodeWithTag("loadingText").assertTextEquals("Loading profile...")
+    composeTestRule.onNodeWithTag("loadingText").assertTextEquals("You do not have a profile")
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
   }
 
