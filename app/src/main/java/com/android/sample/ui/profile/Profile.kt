@@ -86,11 +86,6 @@ fun LoadingScreen(navigationActions: NavigationActions) {
                         contentDescription = "Back")
                   }
             })
-      },
-      floatingActionButton = {
-        FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
-          Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
-        }
       }) { innerPadding ->
         Column(
             Modifier.fillMaxSize().padding(innerPadding),
@@ -136,6 +131,11 @@ fun ProfileContent(
                         contentDescription = "Back")
                   }
             })
+      },
+      floatingActionButton = {
+        FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
+          Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
+        }
       }) { innerPadding ->
         Column(
             Modifier.fillMaxSize().padding(innerPadding),
