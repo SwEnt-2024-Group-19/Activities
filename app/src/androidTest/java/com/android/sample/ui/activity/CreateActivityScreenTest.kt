@@ -3,10 +3,13 @@ package com.android.sample.ui.activity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
@@ -66,6 +69,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputTitleCreate"))
     composeTestRule.onNodeWithTag("inputTitleCreate").assertExists()
     composeTestRule.onNodeWithTag("inputTitleCreate").assertIsDisplayed()
   }
@@ -75,6 +81,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDescriptionCreate"))
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertIsDisplayed()
   }
@@ -84,6 +93,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDateCreate"))
     composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDateCreate").assertIsDisplayed()
   }
@@ -93,6 +105,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPriceCreate").assertIsDisplayed()
   }
@@ -102,6 +117,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputPlacesCreate"))
     composeTestRule.onNodeWithTag("inputPlacesCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPlacesCreate").assertIsDisplayed()
   }
@@ -111,6 +129,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputLocationCreate"))
     composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
     composeTestRule.onNodeWithTag("inputLocationCreate").assertIsDisplayed()
   }
@@ -120,6 +141,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
     composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
@@ -128,12 +152,33 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputTitleCreate"))
     composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Title")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDescriptionCreate"))
     composeTestRule.onNodeWithTag("inputDescriptionCreate").performTextInput("Description")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDateCreate"))
     composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputPlacesCreate"))
     composeTestRule.onNodeWithTag("inputPlacesCreate").performTextInput("10/20")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputLocationCreate"))
     composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Location")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
     composeTestRule.onNodeWithTag("createButton").assertIsEnabled()
   }
 
@@ -142,14 +187,41 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputTitleCreate"))
     composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
     composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputTitleCreate"))
     composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Title")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDescriptionCreate"))
     composeTestRule.onNodeWithTag("inputDescriptionCreate").performTextInput("Description")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDateCreate"))
     composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputPlacesCreate"))
     composeTestRule.onNodeWithTag("inputPlacesCreate").performTextInput("10/20")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputLocationCreate"))
     composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Location")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
     composeTestRule.onNodeWithTag("createButton").assertIsEnabled()
   }
 
@@ -158,9 +230,21 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputTitleCreate"))
     composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Title")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDateCreate"))
     composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
     composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
@@ -169,7 +253,9 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
-
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("chooseTypeMenu"))
     // Simulate a click to open the dropdown
     composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
 
@@ -186,6 +272,9 @@ class CreateActivityScreenTest {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
 
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("chooseTypeMenu"))
     // Open the dropdown
     composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
 
@@ -210,5 +299,29 @@ class CreateActivityScreenTest {
 
     // Verify that the selected option is now displayed in the TextField
     composeTestRule.onNodeWithText(types[2].name).assertIsDisplayed()
+  }
+
+  @Test
+  fun simpleUserIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("addAttendeeButton"))
+    composeTestRule.onNodeWithTag("addAttendeeButton").performClick()
+    composeTestRule.onNodeWithTag("addUserDialog").assertExists()
+    composeTestRule.onNodeWithTag("nameTextFieldUser").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("surnameTextFieldUser").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ageTextFieldUser").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addUserButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
+    composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
+    composeTestRule.onNodeWithTag("ageTextFieldUser").performTextInput("25")
+    composeTestRule.onNodeWithTag("addUserButton").performClick()
+    // composeTestRule.onNodeWithTag("attendeeRow0").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John")
+    composeTestRule.onNodeWithTag("attendeeSurname0").assertTextEquals("Doe")
+    composeTestRule.onNodeWithTag("attendeeAge0").assertTextEquals("25")
   }
 }

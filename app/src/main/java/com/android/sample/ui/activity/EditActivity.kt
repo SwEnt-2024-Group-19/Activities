@@ -124,7 +124,8 @@ fun EditActivityScreen(
                 Modifier.padding(paddingValues)
                     .fillMaxSize()
                     .background(color = Color(0xFFFFFFFF))
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .testTag("activityEditScreen"),
         ) {
           // Carousel()
           Spacer(modifier = Modifier.height(8.dp))

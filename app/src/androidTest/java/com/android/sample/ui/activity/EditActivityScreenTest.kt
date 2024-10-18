@@ -3,9 +3,11 @@ package com.android.sample.ui.activity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
@@ -61,14 +63,31 @@ class EditActivityScreenTest {
   @Test
   fun displayAllComponents() {
     composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputTitleEdit"))
+    composeTestRule.onNodeWithTag("inputTitleEdit").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("inputTitleEdit").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputTitleEdit").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputDescriptionEdit"))
     composeTestRule.onNodeWithTag("inputDescriptionEdit").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputLocationEdit"))
     composeTestRule.onNodeWithTag("inputLocationEdit").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputDateEdit"))
     composeTestRule.onNodeWithTag("inputDateEdit").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputPriceEdit"))
     composeTestRule.onNodeWithTag("inputPriceEdit").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputPlacesLeftEdit"))
     composeTestRule.onNodeWithTag("inputPlacesLeftEdit").assertIsDisplayed()
   }
 
@@ -77,23 +96,41 @@ class EditActivityScreenTest {
     composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
 
     composeTestRule.waitForIdle()
-
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputTitleEdit"))
     composeTestRule.onNodeWithTag("inputTitleEdit").assertTextContains(activity.title)
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputDescriptionEdit"))
     composeTestRule.onNodeWithTag("inputDescriptionEdit").assertTextContains(activity.description)
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputDateEdit"))
     composeTestRule.onNodeWithTag("inputDateEdit").assertTextContains("5/9/2024")
   }
 
   @Test
   fun saveButtonSavesActivity() {
     composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputTitleEdit"))
     composeTestRule.onNodeWithTag("inputTitleEdit").performTextInput("Updated Title")
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputDescriptionEdit"))
     composeTestRule.onNodeWithTag("inputDescriptionEdit").performTextInput("Updated Description")
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("editButton"))
     composeTestRule.onNodeWithTag("editButton").performClick()
   }
 
   @Test
   fun goBackButtonNavigatesBack() {
     composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+
     composeTestRule.onNodeWithTag("goBackButton").performClick()
     verify(navigationActions).goBack()
   }
@@ -101,15 +138,30 @@ class EditActivityScreenTest {
   @Test
   fun inputFieldsUpdateViewModel() {
     composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputTitleEdit"))
     composeTestRule.onNodeWithTag("inputTitleEdit").performTextInput("Updated Title")
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputDescriptionEdit"))
     composeTestRule.onNodeWithTag("inputDescriptionEdit").performTextInput("Updated Description")
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputLocationEdit"))
     composeTestRule.onNodeWithTag("inputLocationEdit").performTextInput("Updated Location")
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("inputDateEdit"))
     composeTestRule.onNodeWithTag("inputDateEdit").performTextInput("5/10/2024")
   }
 
   @Test
   fun addAttendeeButton_opensAddUserDialog() {
     composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("addAttendeeButton"))
     composeTestRule.onNodeWithTag("addAttendeeButton").performClick()
     composeTestRule.onNodeWithTag("addUserDialog").assertExists()
   }
@@ -117,6 +169,9 @@ class EditActivityScreenTest {
   @Test
   fun simpleUserIsDisplayed() {
     composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("addAttendeeButton"))
     composeTestRule.onNodeWithTag("addAttendeeButton").performClick()
     composeTestRule.onNodeWithTag("addUserDialog").assertExists()
     composeTestRule.onNodeWithTag("nameTextFieldUser").assertIsDisplayed()
