@@ -125,18 +125,18 @@ fun ListActivitiesScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
 
-                          items(activitiesList) { activity ->
-                            ActivityCard(activity = activity, navigationActions, viewModel)
-                          }
-                        }
-                  }
-                }
-                is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-                  val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-                  Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
-                }
+                      items(activitiesList) { activity ->
+                        ActivityCard(activity = activity, navigationActions, viewModel)
+                      }
+                    }
               }
             }
+            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+              Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
+            }
+          }
+        }
       }
 }
 
