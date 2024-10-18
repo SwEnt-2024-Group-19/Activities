@@ -409,5 +409,6 @@ var items = listOf<String>()
 
 fun parseFraction(fraction: String, index: Int): Int? {
   val parts = fraction.split("/")
-  return parts[index].toIntOrNull()
+    return if (parts.size == 2) parts[index].toIntOrNull()
+    else null
 }
