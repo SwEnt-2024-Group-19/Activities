@@ -75,6 +75,7 @@ fun ListActivitiesScreen(
               SingleChoiceSegmentedButtonRow {
                 options.forEachIndexed { index, label ->
                   SegmentedButton(
+                      modifier = Modifier.testTag("segmentedButton$label"),
                       shape =
                           SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                       onClick = { selectedIndex = index },

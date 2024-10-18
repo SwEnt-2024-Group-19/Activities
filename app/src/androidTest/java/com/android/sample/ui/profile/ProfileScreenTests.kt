@@ -114,29 +114,29 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
   }
 
-    @Test
-    fun displayAllProfileComponents() {
-      composeTestRule.setContent {
-        ProfileScreen(
-            userProfileViewModel = userProfileViewModel,
-            navigationActions = navigationActions,
-            listActivitiesViewModel)
-      }
-
-      composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("userName").assertTextEquals("Amine A")
-      composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("interestsSection")
-          .assertTextEquals("Interests: Cycling, Reading")
-      composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
-      composeTestRule
-          .onNodeWithTag("goBackButton")
-          .performClick() // test for if on click it goes back
+  @Test
+  fun displayAllProfileComponents() {
+    composeTestRule.setContent {
+      ProfileScreen(
+          userProfileViewModel = userProfileViewModel,
+          navigationActions = navigationActions,
+          listActivitiesViewModel)
     }
+
+    composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("userName").assertTextEquals("Amine A")
+    composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("interestsSection")
+        .assertTextEquals("Interests: Cycling, Reading")
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("goBackButton")
+        .performClick() // test for if on click it goes back
+  }
 
   @Test
   fun displaysActivitiesLists() {
