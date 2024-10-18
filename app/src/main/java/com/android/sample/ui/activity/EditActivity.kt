@@ -104,11 +104,13 @@ fun EditActivityScreen(
         TopAppBar(
             title = { Text("Edit the activity") },
             navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
             })
       },
       bottomBar = {
@@ -122,7 +124,8 @@ fun EditActivityScreen(
                 Modifier.padding(paddingValues)
                     .fillMaxSize()
                     .background(color = Color(0xFFFFFFFF))
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .testTag("activityEditScreen"),
         ) {
           // Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -194,26 +197,31 @@ fun EditActivityScreen(
           )
           Spacer(modifier = Modifier.height(8.dp))
 
-          ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-            TextField(
-                readOnly = true,
-                value = selectedOption,
-                onValueChange = {},
-                label = { Text("Activity Type") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier.menuAnchor())
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-              types.forEach { selectionOption ->
-                DropdownMenuItem(
-                    text = { Text(selectionOption.name) },
-                    onClick = {
-                      selectedOption = selectionOption.name
-                      expanded = false
-                    })
+          ExposedDropdownMenuBox(
+              modifier = Modifier.testTag("chooseTypeMenu"),
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded }) {
+                TextField(
+                    readOnly = true,
+                    value = selectedOption,
+                    onValueChange = {},
+                    label = { Text("Activity Type") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor())
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                  types.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption.name) },
+                        onClick = {
+                          selectedOption = selectionOption.name
+                          expanded = false
+                        })
+                  }
+                }
               }
-            }
-          }
 
           OutlinedTextField(
               value = location ?: "",
@@ -289,15 +297,12 @@ fun EditActivityScreen(
             AddUserDialog(
                 onDismiss = { showDialog = false },
                 onAddUser = { user -> attendees = attendees + user },
-                modifier = Modifier.testTag("addUserDialog"))
+            )
           }
           Spacer(modifier = Modifier.height(32.dp))
 
           Button(
-              enabled =
-                  title?.isNotEmpty() ?: false &&
-                      description?.isNotEmpty() ?: false &&
-                      dueDate.isNotEmpty(),
+              enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
