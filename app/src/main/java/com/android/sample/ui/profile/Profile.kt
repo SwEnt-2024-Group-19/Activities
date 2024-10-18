@@ -137,7 +137,7 @@ fun ProfileContent(
                   fontSize = 24.sp,
                   modifier =
                       Modifier.padding(start = 16.dp, top = 16.dp)
-                          .testTag("activitiesCreatedSection"))
+                          .testTag("activitiesCreatedTitle"))
 
               LazyColumn(
                   modifier = Modifier.height(200.dp).testTag("activitiesCreatedList"),
@@ -159,7 +159,7 @@ fun ProfileContent(
                   fontSize = 24.sp,
                   modifier =
                       Modifier.padding(start = 16.dp, top = 16.dp)
-                          .testTag("activitiesEnrolledSection"))
+                          .testTag("activitiesEnrolledTitle"))
 
               LazyColumn(
                   modifier = Modifier.fillMaxSize().testTag("activitiesEnrolledList"),
@@ -193,10 +193,14 @@ fun ActivityCreatedBox(
     if (thisActivity.creator == user.id) {
       Row(
           modifier =
-              Modifier.fillMaxWidth().padding(8.dp).clip(RoundedCornerShape(16.dp)).clickable {
-                listActivitiesViewModel.selectActivity(thisActivity)
-                // navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
-              },
+              Modifier.fillMaxWidth()
+                  .testTag("activityCreated")
+                  .padding(8.dp)
+                  .clip(RoundedCornerShape(16.dp))
+                  .clickable {
+                    listActivitiesViewModel.selectActivity(thisActivity)
+                    navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
+                  },
           verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = R.drawable.foot),
@@ -232,9 +236,11 @@ fun ActivityEnrolledBox(
     if (thisActivity.creator != user.id) {
       Row(
           modifier =
-              Modifier.fillMaxWidth().padding(8.dp).clip(RoundedCornerShape(16.dp)).clickable {
-                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-              },
+              Modifier.fillMaxWidth()
+                  .testTag("activityEnrolled")
+                  .padding(8.dp)
+                  .clip(RoundedCornerShape(16.dp))
+                  .clickable { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
           verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = R.drawable.foot),
