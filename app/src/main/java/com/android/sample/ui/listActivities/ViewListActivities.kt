@@ -55,7 +55,7 @@ fun ListActivitiesScreen(
   val uiState by viewModel.uiState.collectAsState()
 
   Scaffold(
-      modifier = modifier,
+      modifier = modifier.testTag("listActivitiesScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },

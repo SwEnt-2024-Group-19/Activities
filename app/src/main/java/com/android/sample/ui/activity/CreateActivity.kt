@@ -72,7 +72,7 @@ fun CreateActivityScreen(
   var showDialog by remember { mutableStateOf(false) }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
       topBar = {
         TopAppBar(
             title = { Text("Create a new activity") },
