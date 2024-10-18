@@ -136,7 +136,7 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
     composeTestRule.onNodeWithText(types[2].name).performClick()
     composeTestRule.onNodeWithText(types[2].name).assertIsDisplayed()
-      composeTestRule.onNodeWithText(types[0].name).assertIsNotDisplayed()
+    composeTestRule.onNodeWithText(types[0].name).assertIsNotDisplayed()
   }
   //  @Test
   //  fun addAttendeeButton_opensAddUserDialog() {
