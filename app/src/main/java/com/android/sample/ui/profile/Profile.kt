@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,8 +42,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.sample.R
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -58,7 +61,7 @@ fun ProfileScreen(
   val profileState = userProfileViewModel.userState.collectAsState()
 
   when (val profile = profileState.value) {
-    null -> LoadingScreen() // Show a loading indicator or a retry button
+    null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
     else ->
         ProfileContent(
             user = profile,
@@ -67,13 +70,35 @@ fun ProfileScreen(
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadingScreen() {
-  Box(
+fun LoadingScreen(navigationActions: NavigationActions) {
+  Scaffold(
       modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
-      contentAlignment = Alignment.Center) {
-        Text("Loading profile...", modifier = Modifier.testTag("loadingText"), color = Color.Gray)
+      topBar = {
+          TopAppBar(
+              title = { Text("Profile") },
+              navigationIcon = {
+                  IconButton(
+                      onClick = { navigationActions.goBack() },
+                      modifier = Modifier.testTag("goBackButton")) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                          contentDescription = "Back")
+                  }
+              })
+      }){innerPadding ->
+      Column(Modifier.fillMaxSize().padding(innerPadding),
+          horizontalAlignment = Alignment.CenterHorizontally){
+      Text("You do not have a profile", modifier = Modifier.testTag("loadingText"), color = Color.Black)
+      Button(
+          onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+          modifier = Modifier.testTag("signInButton")
+      ) {
+          Text("Go to Sign In Page")
       }
+  }
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
