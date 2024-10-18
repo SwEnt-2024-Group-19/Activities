@@ -34,10 +34,8 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
       val photo = document.getString("photo") ?: return null
       val interests =
           (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null
-      Log.e("not an error", "interests are $interests")
       val activities =
           (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null
-
       User(
           id = id,
           name = name,
