@@ -2,7 +2,6 @@ package com.android.sample.ui.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -44,10 +43,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.sample.R
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -78,32 +75,37 @@ fun LoadingScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
       topBar = {
-          TopAppBar(
-              title = { Text("Profile") },
-              navigationIcon = {
-                  IconButton(
-                      onClick = { navigationActions.goBack() },
-                      modifier = Modifier.testTag("goBackButton")) {
-                      Icon(
-                          imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                          contentDescription = "Back")
+        TopAppBar(
+            title = { Text("Profile") },
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
                   }
-              })}
-      , floatingActionButton = {
-          FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
-              Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
-          }}){innerPadding ->
-      Column(Modifier.fillMaxSize().padding(innerPadding),
-          horizontalAlignment = Alignment.CenterHorizontally){
-      Text("You do not have a profile", modifier = Modifier.testTag("loadingText"), color = Color.Black)
-      Button(
-          onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-          modifier = Modifier.testTag("signInButton")
-      ) {
-          Text("Go to Sign In Page")
+            })
+      },
+      floatingActionButton = {
+        FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
+          Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
+        }
+      }) { innerPadding ->
+        Column(
+            Modifier.fillMaxSize().padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Text(
+                  "You do not have a profile",
+                  modifier = Modifier.testTag("loadingText"),
+                  color = Color.Black)
+              Button(
+                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                  modifier = Modifier.testTag("signInButton")) {
+                    Text("Go to Sign In Page")
+                  }
+            }
       }
-  }
-  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
