@@ -32,7 +32,6 @@ import com.android.sample.ui.navigation.Screen
 import com.android.sample.ui.profile.EditProfileScreen
 import com.android.sample.ui.profile.ProfileCreationScreen
 import com.android.sample.ui.profile.ProfileScreen
-import com.android.sample.ui.theme.SampleAppTheme
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
@@ -45,14 +44,12 @@ class MainActivity : ComponentActivity() {
     auth.currentUser?.let { auth.signOut() }
 
     setContent {
-      SampleAppTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
             color = MaterialTheme.colorScheme.background) {
               ActivitiesApp(auth.currentUser?.uid ?: "")
             }
-      }
     }
   }
 }
@@ -109,13 +106,4 @@ fun ActivitiesApp(uid: String) {
       composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
     }
   }
-}
-
-@Composable
-fun BlankScreen() {
-  Surface(
-      modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.blank_screen },
-      color = MaterialTheme.colorScheme.background) {
-        Text(text = "Blank Screen")
-      }
 }
