@@ -1,3 +1,5 @@
+package com.android.sample.model.activities
+
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
@@ -46,14 +48,15 @@ class ActivitiesRepositoryFirestoreTest {
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",
-          placesLeft = 0,
-          maxPlaces = 0,
+          placesLeft = 5,
+          maxPlaces = 10,
           participants = listOf(),
           images = listOf(),
+          price = 0.0,
+          startTime = "09:30",
           duration = "00:30",
-          startTime = "09:00",
           type = ActivityType.PRO,
-          price = 0.0)
+      )
 
   @Before
   fun setUp() {

@@ -101,7 +101,8 @@ fun CreateActivityScreen(
                 Modifier.padding(paddingValues)
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .background(color = Color(0xFFFFFFFF)),
+                    .background(color = Color(0xFFFFFFFF))
+                    .testTag("activityCreateScreen"),
         ) {
           // Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -279,7 +280,7 @@ fun CreateActivityScreen(
             AddUserDialog(
                 onDismiss = { showDialog = false },
                 onAddUser = { user -> attendees = attendees + user },
-                modifier = Modifier.testTag("addUserDialog"))
+            )
           }
 
           Spacer(modifier = Modifier.height(32.dp))
