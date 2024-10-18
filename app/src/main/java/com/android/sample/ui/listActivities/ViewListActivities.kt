@@ -129,7 +129,7 @@ fun ListActivitiesScreen(
                           // Use LazyColumn to efficiently display the list of activities
 
                           items(activitiesList) { activity ->
-                            ActivityCard(activity = activity, navigationActions)
+                            ActivityCard(activity = activity, navigationActions, viewModel)
                           }
                         }
                   }
@@ -144,7 +144,11 @@ fun ListActivitiesScreen(
 }
 
 @Composable
-fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
+fun ActivityCard(
+    activity: Activity,
+    navigationActions: NavigationActions,
+    listActivitiesViewModel: ListActivitiesViewModel
+) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
@@ -153,7 +157,10 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
           Modifier.fillMaxWidth()
               .testTag("activityCard")
               .clip(RoundedCornerShape(16.dp))
-              .clickable { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
+              .clickable {
+                listActivitiesViewModel.selectActivity(activity)
+                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+              },
       elevation = CardDefaults.cardElevation(8.dp)) {
         Column {
           // Box for overlaying the title on the image
