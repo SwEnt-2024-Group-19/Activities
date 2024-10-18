@@ -19,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.mock
 
@@ -47,14 +46,6 @@ class EditProfileScreenTest {
     navigationActions = Mockito.mock(NavigationActions::class.java)
     `when`(navigationActions.currentRoute()).thenReturn(PROFILE)
     `when`(profileViewModel.userState).thenReturn(userStateFlow)
-    doAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(User) -> Unit>(1)
-          onSuccess(profile) // Call onSuccess with some result if needed
-          val onFailure = invocation.getArgument<(String) -> Unit>(2)
-          onFailure("Error") // Call onFailure with some error if needed
-        }
-        .`when`(profileViewModel)
-        .updateProfile(profile)
   }
 
   @Test
