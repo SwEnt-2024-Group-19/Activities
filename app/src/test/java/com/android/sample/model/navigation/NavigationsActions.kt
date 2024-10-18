@@ -19,37 +19,37 @@ import org.mockito.kotlin.eq
 
 class NavigationActionsTest {
 
-    private lateinit var navigationDestination: NavDestination
-    private lateinit var navHostController: NavHostController
-    private lateinit var navigationActions: NavigationActions
+  private lateinit var navigationDestination: NavDestination
+  private lateinit var navHostController: NavHostController
+  private lateinit var navigationActions: NavigationActions
 
-    @Before
-    fun setUp() {
-        navigationDestination = mock(NavDestination::class.java)
-        navHostController = mock(NavHostController::class.java)
-        navigationActions = NavigationActions(navHostController)
-    }
+  @Before
+  fun setUp() {
+    navigationDestination = mock(NavDestination::class.java)
+    navHostController = mock(NavHostController::class.java)
+    navigationActions = NavigationActions(navHostController)
+  }
 
-    @Test
-    fun navigateToCallsController() {
-        navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
-        verify(navHostController).navigate(eq(Route.OVERVIEW), any<NavOptionsBuilder.() -> Unit>())
+  @Test
+  fun navigateToCallsController() {
+    navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
+    verify(navHostController).navigate(eq(Route.OVERVIEW), any<NavOptionsBuilder.() -> Unit>())
 
-        navigationActions.navigateTo(Screen.ADD_ACTIVITY)
-        verify(navHostController).navigate(Screen.ADD_ACTIVITY)
-    }
+    navigationActions.navigateTo(Screen.ADD_ACTIVITY)
+    verify(navHostController).navigate(Screen.ADD_ACTIVITY)
+  }
 
-    @Test
-    fun goBackCallsController() {
-        navigationActions.goBack()
-        verify(navHostController).popBackStack()
-    }
+  @Test
+  fun goBackCallsController() {
+    navigationActions.goBack()
+    verify(navHostController).popBackStack()
+  }
 
-    @Test
-    fun currentRouteWorksWithDestination() {
-        `when`(navHostController.currentDestination).thenReturn(navigationDestination)
-        `when`(navigationDestination.route).thenReturn(Route.OVERVIEW)
+  @Test
+  fun currentRouteWorksWithDestination() {
+    `when`(navHostController.currentDestination).thenReturn(navigationDestination)
+    `when`(navigationDestination.route).thenReturn(Route.OVERVIEW)
 
-        assertThat(navigationActions.currentRoute(), `is`(Route.OVERVIEW))
-    }
+    assertThat(navigationActions.currentRoute(), `is`(Route.OVERVIEW))
+  }
 }
