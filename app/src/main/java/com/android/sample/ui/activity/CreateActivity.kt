@@ -279,7 +279,7 @@ fun CreateActivityScreen(
             AddUserDialog(
                 onDismiss = { showDialog = false },
                 onAddUser = { user -> attendees = attendees + user },
-                modifier = Modifier.testTag("addUserDialog"))
+            )
           }
 
           Spacer(modifier = Modifier.height(32.dp))

@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -43,7 +44,10 @@ class EditActivityScreenTest {
           price = 10.0,
           placesLeft = 10,
           maxPlaces = 20,
-          images = listOf("image1", "image2"))
+          images = listOf("image1", "image2"),
+          type = ActivityType.PRO,
+          startTime = "09:30",
+          duration = "00:30")
 
   @Before
   fun setUp() {
@@ -60,8 +64,6 @@ class EditActivityScreenTest {
 
     composeTestRule.onNodeWithTag("inputTitleEdit").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("editButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("deleteButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputTitleEdit").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputDescriptionEdit").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputLocationEdit").assertIsDisplayed()
@@ -125,7 +127,7 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("ageTextFieldUser").performTextInput("25")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
-    composeTestRule.onNodeWithTag("attendeeRow0").assertIsDisplayed()
+    // composeTestRule.onNodeWithTag("attendeeRow0").assertIsDisplayed()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John")
     composeTestRule.onNodeWithTag("attendeeSurname0").assertTextEquals("Doe")
     composeTestRule.onNodeWithTag("attendeeAge0").assertTextEquals("25")

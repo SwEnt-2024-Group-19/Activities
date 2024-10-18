@@ -104,11 +104,13 @@ fun EditActivityScreen(
         TopAppBar(
             title = { Text("Edit the activity") },
             navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Back")
-              }
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Back")
+                  }
             })
       },
       bottomBar = {
@@ -289,15 +291,12 @@ fun EditActivityScreen(
             AddUserDialog(
                 onDismiss = { showDialog = false },
                 onAddUser = { user -> attendees = attendees + user },
-                modifier = Modifier.testTag("addUserDialog"))
+            )
           }
           Spacer(modifier = Modifier.height(32.dp))
 
           Button(
-              enabled =
-                  title?.isNotEmpty() ?: false &&
-                      description?.isNotEmpty() ?: false &&
-                      dueDate.isNotEmpty(),
+              enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
