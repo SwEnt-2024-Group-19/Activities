@@ -56,14 +56,6 @@ open class ProfileViewModel(private val repository: ProfilesRepository, userId: 
     repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
   }
 
-  fun deleteActivityFromProfile(userId: String, activityId: String) {
-    repository.deleteActivityFromProfile(
-        userId = userId,
-        activityId = activityId,
-        onSuccess = { fetchUserData(userId) },
-        onFailure = {})
-  }
-
   companion object {
     fun Factory(uid: String): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {

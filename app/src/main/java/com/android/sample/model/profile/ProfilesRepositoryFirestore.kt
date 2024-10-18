@@ -94,25 +94,4 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
           onFailure(exception)
         }
   }
-
-  override fun deleteActivityFromProfile(
-      userId: String,
-      activityId: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection("profiles")
-        .document(userId)
-        .update("activities", FieldValue.arrayRemove(activityId))
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            onSuccess()
-          } else {
-            task.exception?.let { e ->
-              Log.e("ProfilesRepository", "Error deleting activity from profile", e)
-              onFailure(e)
-            }
-          }
-        }
-  }
 }
