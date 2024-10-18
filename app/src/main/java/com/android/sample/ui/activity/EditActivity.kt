@@ -197,26 +197,31 @@ fun EditActivityScreen(
           )
           Spacer(modifier = Modifier.height(8.dp))
 
-          ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-            TextField(
-                readOnly = true,
-                value = selectedOption,
-                onValueChange = {},
-                label = { Text("Activity Type") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier.menuAnchor())
-            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-              types.forEach { selectionOption ->
-                DropdownMenuItem(
-                    text = { Text(selectionOption.name) },
-                    onClick = {
-                      selectedOption = selectionOption.name
-                      expanded = false
-                    })
+          ExposedDropdownMenuBox(
+              modifier = Modifier.testTag("chooseTypeMenu"),
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded }) {
+                TextField(
+                    readOnly = true,
+                    value = selectedOption,
+                    onValueChange = {},
+                    label = { Text("Activity Type") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor())
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                  types.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        text = { Text(selectionOption.name) },
+                        onClick = {
+                          selectedOption = selectionOption.name
+                          expanded = false
+                        })
+                  }
+                }
               }
-            }
-          }
 
           OutlinedTextField(
               value = location ?: "",

@@ -1,7 +1,6 @@
 package com.android.sample.ui.profile
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,14 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -108,11 +104,6 @@ fun ProfileContent(
                         contentDescription = "Back")
                   }
             })
-      },
-      floatingActionButton = {
-        FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
-          Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
-        }
       }) { innerPadding ->
         Column(
             Modifier.fillMaxSize().padding(innerPadding),
@@ -132,7 +123,11 @@ fun ProfileContent(
                   fontSize = 20.sp,
                   modifier = Modifier.padding(top = 8.dp).testTag("userName"))
 
-              user.interests?.let { InterestsRow(it) }
+              // Interests
+              Text(
+                  text = "Interests: ${user.interests?.joinToString(", ")}",
+                  fontSize = 18.sp,
+                  modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
 
               Spacer(modifier = Modifier.height(16.dp))
 
@@ -142,7 +137,7 @@ fun ProfileContent(
                   fontSize = 24.sp,
                   modifier =
                       Modifier.padding(start = 16.dp, top = 16.dp)
-                          .testTag("activitiesCreatedSection"))
+                          .testTag("activitiesCreatedTitle"))
 
               LazyColumn(
                   modifier = Modifier.height(200.dp).testTag("activitiesCreatedList"),
@@ -164,7 +159,7 @@ fun ProfileContent(
                   fontSize = 24.sp,
                   modifier =
                       Modifier.padding(start = 16.dp, top = 16.dp)
-                          .testTag("activitiesEnrolledSection"))
+                          .testTag("activitiesEnrolledTitle"))
 
               LazyColumn(
                   modifier = Modifier.fillMaxSize().testTag("activitiesEnrolledList"),
@@ -198,10 +193,14 @@ fun ActivityCreatedBox(
     if (thisActivity.creator == user.id) {
       Row(
           modifier =
-              Modifier.fillMaxWidth().padding(8.dp).clip(RoundedCornerShape(16.dp)).clickable {
-                listActivitiesViewModel.selectActivity(thisActivity)
-                navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
-              },
+              Modifier.fillMaxWidth()
+                  .testTag("activityCreated")
+                  .padding(8.dp)
+                  .clip(RoundedCornerShape(16.dp))
+                  .clickable {
+                    listActivitiesViewModel.selectActivity(thisActivity)
+                    navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
+                  },
           verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = R.drawable.foot),
@@ -237,9 +236,11 @@ fun ActivityEnrolledBox(
     if (thisActivity.creator != user.id) {
       Row(
           modifier =
-              Modifier.fillMaxWidth().padding(8.dp).clip(RoundedCornerShape(16.dp)).clickable {
-                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-              },
+              Modifier.fillMaxWidth()
+                  .testTag("activityEnrolled")
+                  .padding(8.dp)
+                  .clip(RoundedCornerShape(16.dp))
+                  .clickable { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
           verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = R.drawable.foot),
@@ -280,23 +281,4 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
       contentDescription = "Profile Image",
       modifier = modifier,
       contentScale = ContentScale.Crop)
-}
-
-@Composable
-fun InterestsRow(interests: List<String>) {
-  LazyRow(modifier = Modifier.padding(16.dp)) {
-    items(interests.size) { index -> InterestBox(interest = interests[index]) }
-  }
-}
-
-@Composable
-fun InterestBox(interest: String) {
-  Box(
-      modifier =
-          Modifier.padding(end = 8.dp)
-              .clip(RoundedCornerShape(8.dp))
-              .background(Color.LightGray)
-              .padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(text = interest, fontSize = 18.sp, color = Color.Black)
-      }
 }

@@ -61,7 +61,7 @@ fun ListActivitiesScreen(
   val uiState by viewModel.uiState.collectAsState()
   var selectedFilter by remember { mutableStateOf("") }
   var selectedIndex by remember { mutableStateOf(0) }
-  val all = "All"
+  val all = "ALL"
   val typesToString = types.map { it.name }
   val options = listOf(all) + typesToString
 
@@ -75,6 +75,7 @@ fun ListActivitiesScreen(
               SingleChoiceSegmentedButtonRow {
                 options.forEachIndexed { index, label ->
                   SegmentedButton(
+                      modifier = Modifier.testTag("segmentedButton$label"),
                       shape =
                           SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                       onClick = { selectedIndex = index },
@@ -91,55 +92,52 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
-        Box(
-            modifier =
-                modifier.fillMaxSize().padding(paddingValues).testTag("bottomNavigationMenu")) {
-              when (uiState) {
-                is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-                  var activitiesList =
-                      (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-                  if (selectedIndex != 0) {
+        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
+          when (uiState) {
+            is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+              var activitiesList =
+                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+              if (selectedIndex != 0) {
 
-                    activitiesList =
-                        activitiesList.filter { it.type.name == options[selectedIndex] }
-                  }
-                  if (activitiesList.isEmpty()) {
-                    if (selectedIndex == 0) {
-                      Text(
-                          text = "There is no activity yet.",
-                          modifier =
-                              Modifier.padding(8.dp)
-                                  .align(Alignment.Center)
-                                  .testTag("emptyActivityPrompt"),
-                          color = MaterialTheme.colorScheme.onSurface)
-                    } else {
-                      Text(
-                          text = "There is no activity of this type yet.",
-                          modifier =
-                              Modifier.padding(8.dp)
-                                  .align(Alignment.Center)
-                                  .testTag("emptyActivityPrompt"),
-                          color = MaterialTheme.colorScheme.onSurface)
+                activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
+              }
+              if (activitiesList.isEmpty()) {
+                if (selectedIndex == 0) {
+                  Text(
+                      text = "There is no activity yet.",
+                      modifier =
+                          Modifier.padding(8.dp)
+                              .align(Alignment.Center)
+                              .testTag("emptyActivityPrompt"),
+                      color = MaterialTheme.colorScheme.onSurface)
+                } else {
+                  Text(
+                      text = "There is no activity of this type yet.",
+                      modifier =
+                          Modifier.padding(8.dp)
+                              .align(Alignment.Center)
+                              .testTag("emptyActivityPrompt"),
+                      color = MaterialTheme.colorScheme.onSurface)
+                }
+              } else {
+
+                LazyColumn(
+                    modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                      // Use LazyColumn to efficiently display the list of activities
+
+                      items(activitiesList) { activity ->
+                        ActivityCard(activity = activity, navigationActions, viewModel)
+                      }
                     }
-                  } else {
-
-                    LazyColumn(
-                        modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                          // Use LazyColumn to efficiently display the list of activities
-
-                          items(activitiesList) { activity ->
-                            ActivityCard(activity = activity, navigationActions, viewModel)
-                          }
-                        }
-                  }
-                }
-                is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-                  val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-                  Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
-                }
               }
             }
+            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+              Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
+            }
+          }
+        }
       }
 }
 
