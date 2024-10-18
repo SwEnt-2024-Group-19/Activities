@@ -138,7 +138,7 @@ class ProfileScreenTest {
         .performClick() // test for if on click it goes back
   }
 
-   @Test
+  @Test
   fun displaysActivitiesLists() {
     composeTestRule.setContent {
       ProfileScreen(
