@@ -2,9 +2,11 @@ package com.android.sample.ui.activityDetails
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
@@ -105,7 +107,9 @@ class ActivityDetailsScreenAndroidTest {
           navigationActions = mockNavigationActions,
           profileViewModel = mockProfileViewModel)
     }
-
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("enrollButton"))
     composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed()
   }
 
@@ -120,7 +124,6 @@ class ActivityDetailsScreenAndroidTest {
           navigationActions = mockNavigationActions,
           profileViewModel = mockProfileViewModel)
     }
-
     composeTestRule.onNodeWithTag("enrollButton").assertDoesNotExist()
   }
 

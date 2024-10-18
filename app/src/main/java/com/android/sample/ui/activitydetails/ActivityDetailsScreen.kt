@@ -107,101 +107,111 @@ fun ActivityDetailsScreen(
                     titleContentColor = Color.White // Title text color
                     ))
       }) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
-          // Image section
-          Box(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .aspectRatio(16 / 9f)
-                      .padding(16.dp)
-                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                      .testTag("image")) {
-                // Optional: Add placeholder text in the center
-                Text(
-                    text = "Activity Image",
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.Center))
-              }
-          Spacer(modifier = Modifier.height(16.dp))
-
-          // Title
-          Box(
-              modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("title"),
-              contentAlignment = Alignment.Center) {
-                Text(
-                    text = activityTitle ?: "title not specified",
-                    modifier = Modifier.testTag("titleText"),
-                    style = MaterialTheme.typography.headlineMedium)
-              }
-
-          Spacer(modifier = Modifier.height(8.dp))
-
-          // Description
-          Column(
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(150.dp)
-                      .padding(8.dp)
-                      .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                      .verticalScroll(rememberScrollState())
-                      .testTag("description")) {
-                Text(
-                    text = "Description:",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
-                Text(
-                    text = description ?: "description not specified",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 8.dp).testTag("descriptionText"))
-              }
-
-          Spacer(modifier = Modifier.height(8.dp))
-          //  price
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.testTag("price")) {
-                Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = if (price != null) "${price.toString()} CHF" else "not defined yet",
-                    modifier = Modifier.testTag("priceText"))
-              }
-          Spacer(modifier = Modifier.height(8.dp))
-          // schedule
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.testTag("schedule")) {
-                Icon(Icons.Default.DateRange, contentDescription = "Schedule")
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = dueDate ?: "not defined yet",
-                    modifier = Modifier.testTag("scheduleText"))
-              }
-
-          Spacer(modifier = Modifier.height(32.dp))
-
-          // Enroll button
-          if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
-            Button(
-                onClick = {
-                  if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                    val theActivity =
-                        activity.copy(placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
-                    listActivityViewModel.updateActivity(theActivity)
-                    profileViewModel.addActivity(profile.id, theActivity.uid)
-                    Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                    navigationActions.navigateTo(Screen.OVERVIEW)
-                  } else {
-                    Toast.makeText(
-                            context, "Enroll failed, limit of places reached", Toast.LENGTH_SHORT)
-                        .show()
+        Column(
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .testTag("activityDetailsScreen")) {
+              // Image section
+              Box(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .aspectRatio(16 / 9f)
+                          .padding(16.dp)
+                          .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                          .testTag("image")) {
+                    // Optional: Add placeholder text in the center
+                    Text(
+                        text = "Activity Image",
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.Center))
                   }
-                },
-                modifier =
-                    Modifier.fillMaxWidth().padding(horizontal = 24.dp).testTag("enrollButton")) {
-                  Text(text = "Enroll")
-                }
-          }
-        }
+              Spacer(modifier = Modifier.height(16.dp))
+
+              // Title
+              Box(
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("title"),
+                  contentAlignment = Alignment.Center) {
+                    Text(
+                        text = activityTitle ?: "title not specified",
+                        modifier = Modifier.testTag("titleText"),
+                        style = MaterialTheme.typography.headlineMedium)
+                  }
+
+              Spacer(modifier = Modifier.height(8.dp))
+
+              // Description
+              Column(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .height(150.dp)
+                          .padding(8.dp)
+                          .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                          .verticalScroll(rememberScrollState())
+                          .testTag("description")) {
+                    Text(
+                        text = "Description:",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                    Text(
+                        text = description ?: "description not specified",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 8.dp).testTag("descriptionText"))
+                  }
+
+              Spacer(modifier = Modifier.height(8.dp))
+              //  price
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag("price")) {
+                    Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (price != null) "${price.toString()} CHF" else "not defined yet",
+                        modifier = Modifier.testTag("priceText"))
+                  }
+              Spacer(modifier = Modifier.height(8.dp))
+              // schedule
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag("schedule")) {
+                    Icon(Icons.Default.DateRange, contentDescription = "Schedule")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = dueDate ?: "not defined yet",
+                        modifier = Modifier.testTag("scheduleText"))
+                  }
+
+              Spacer(modifier = Modifier.height(32.dp))
+
+              // Enroll button
+              if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
+                Button(
+                    onClick = {
+                      if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
+                        val theActivity =
+                            activity.copy(placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                        listActivityViewModel.updateActivity(theActivity)
+                        profileViewModel.addActivity(profile.id, theActivity.uid)
+                        Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
+                        navigationActions.navigateTo(Screen.OVERVIEW)
+                      } else {
+                        Toast.makeText(
+                                context,
+                                "Enroll failed, limit of places reached",
+                                Toast.LENGTH_SHORT)
+                            .show()
+                      }
+                    },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            .testTag("enrollButton")) {
+                      Text(text = "Enroll")
+                    }
+              }
+            }
       }
 }
