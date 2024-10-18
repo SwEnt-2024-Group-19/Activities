@@ -5,85 +5,52 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.NavDestination
-import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.*
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class SignUpScreenTest {
-  private lateinit var navigationDestination: NavDestination
-  private lateinit var navHostController: NavHostController
   private lateinit var navigationActions: NavigationActions
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
-    navigationDestination = mock(NavDestination::class.java)
-    navHostController = mock(NavHostController::class.java)
-    navigationActions = NavigationActions(navHostController)
+    navigationActions = mock(NavigationActions::class.java)
+    composeTestRule.setContent {
+      SignUpScreen(navigationActions = navigationActions) // Passing null for simplicity
+    }
   }
 
-  @Test
-  fun testEmailTextFieldExists() {
+  fun emailTextFieldExists() {
     // Set the SignUpScreen as the content to test
-    composeTestRule.setContent {
-      SignUpScreen(
-          navigationActions = NavigationActions(navHostController)) // Passing null for simplicity
-    }
-
-    // Check if the email text field exists and is displayed
     composeTestRule.onNodeWithTag("EmailTextField").assertIsDisplayed()
   }
 
-  @Test
-  fun testPasswordTextFieldExists() {
+  fun passwordTextFieldExists() {
     // Set the SignUpScreen as the content to test
-    composeTestRule.setContent {
-      SignUpScreen(
-          navigationActions = NavigationActions(navHostController)) // Passing null for simplicity
-    }
-
-    // Check if the password text field exists and is displayed
     composeTestRule.onNodeWithTag("PasswordTextField").assertIsDisplayed()
   }
 
-  @Test
-  fun testSignUpButtonExists() {
+  fun signUpButtonExists() {
     // Set the SignUpScreen as the content to test
-    composeTestRule.setContent {
-      SignUpScreen(
-          navigationActions = NavigationActions(navHostController)) // Passing null for simplicity
-    }
-
-    // Check if the sign-in button exists and is displayed
-    composeTestRule.onNodeWithTag("SignUpButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("signUpButton").assertIsDisplayed()
   }
 
-  @Test
-  fun testGoToSignInButtonExists() {
+  fun goToSignInButtonExists() {
     // Set the SignUpScreen as the content to test
-    composeTestRule.setContent {
-      SignUpScreen(
-          navigationActions = NavigationActions(navHostController)) // Passing null for simplicity
-    }
-
-    // Check if the sign-in button exists and is displayed
     composeTestRule.onNodeWithTag("GoToSignInButton").assertIsDisplayed()
   }
 
   @Test
   fun testInvalidEmailShowsErrorMessage() {
-    composeTestRule.setContent {
-      SignUpScreen(navigationActions = NavigationActions(navHostController))
-    }
-
     // Enter an invalid email
     composeTestRule.onNodeWithTag("EmailTextField").performTextInput("invalidemail")
 
@@ -97,9 +64,6 @@ class SignUpScreenTest {
   @Test
   fun testShortPasswordShowsErrorMessage() {
     // Set the SignUpScreen as the content to test
-    composeTestRule.setContent {
-      SignUpScreen(navigationActions = NavigationActions(navHostController))
-    }
 
     composeTestRule.onNodeWithTag("EmailTextField").performTextInput("abcde@gmail.com")
 
@@ -110,15 +74,13 @@ class SignUpScreenTest {
     composeTestRule.onNodeWithTag("SignUpButton").performClick()
 
     // Check if the error message for a short password is displayed
+
     composeTestRule.onNodeWithTag("PasswordErrorText").assertIsDisplayed()
   }
 
   @Test
   fun testFalseEmailShowsErrorMessage() {
     // Set the SignUpScreen as the content to test
-    composeTestRule.setContent {
-      SignUpScreen(navigationActions = NavigationActions(navHostController))
-    }
 
     composeTestRule.onNodeWithTag("EmailTextField").performTextInput("abcde")
 
@@ -130,5 +92,30 @@ class SignUpScreenTest {
 
     // Check if the error message for a short password is displayed
     composeTestRule.onNodeWithTag("EmailErrorText").assertIsDisplayed()
+  }
+
+  @Test
+  fun testEmptyPasswordShowsErrorMessage() {
+
+    // Enter a valid email
+    composeTestRule.onNodeWithTag("EmailTextField").performTextInput("validemail@gmail.com")
+
+    // Leave password field empty
+    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("")
+
+    // Click on the Sign-Up button
+    composeTestRule.onNodeWithTag("SignUpButton").performClick()
+
+    // Check if the error message for an empty password is displayed
+    composeTestRule.onNodeWithTag("PasswordErrorText").assertIsDisplayed()
+  }
+
+  @Test
+  fun testGoToSignInButtonNavigatesToSignIn() {
+    // Click on the "Go to Sign-In" button
+    composeTestRule.onNodeWithTag("GoToSignInButton").performClick()
+
+    // Check if the navigation action to the SignIn screen is called
+    verify(navigationActions).navigateTo(Screen.AUTH)
   }
 }

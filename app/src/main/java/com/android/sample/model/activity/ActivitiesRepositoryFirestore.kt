@@ -5,7 +5,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
+open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
 
   private val activitiesCollectionPath = "activities"
   private val TAG = "ActivitiesRepositoryFirestore"
@@ -33,24 +33,35 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
                 .map { document ->
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
+                  val activityType =
+                      data["type"]?.let {
+                        try {
+                          ActivityType.valueOf(it as String)
+                        } catch (e: IllegalArgumentException) {
+                          ActivityType.SOLO // Replace with your default ActivityType
+                        }
+                      } ?: ActivityType.SOLO
                   Activity(
                       document.id,
-                      data["title"] as String,
-                      data["description"] as String,
-                      data["date"] as Timestamp,
-                      data["price"] as Double,
-                      data["location"] as String,
-                      data["creator"] as String,
+                      data["title"] as? String ?: "No Title",
+                      data["description"] as? String ?: "No Description",
+                      data["date"] as? Timestamp ?: Timestamp.now(),
+                      data["startTime"] as? String ?: "HH:mm",
+                      data["duration"] as? String ?: "HH:mm",
+                      data["price"] as? Double ?: 0.0,
+                      data["location"] as? String ?: "Unknown Location",
+                      data["creator"] as? String ?: "Anonymous",
                       listOf(),
-                      data["placesLeft"] as Long,
-                      data["maxPlaces"] as Long,
-                      ActivityStatus.valueOf(data["status"] as String),
-                      listOf())
+                      data["placesLeft"] as? Long ?: 0,
+                      data["maxPlaces"] as? Long ?: 0,
+                      ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+                      activityType,
+                      participants = listOf())
                 }
                 .filterNotNull() // Filter out any null results
 
         onSuccess(activities)
-      }
+      } else onFailure(e ?: Exception("Error getting documents"))
     }
   }
 
@@ -85,7 +96,7 @@ class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Activit
         db.collection(activitiesCollectionPath).document(id).delete(), onSuccess, onFailure)
   }
 
-  private fun performFirestoreOperation(
+  fun performFirestoreOperation(
       task: Task<Void>,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit

@@ -32,20 +32,11 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
       val name = document.getString("name") ?: return null
       val surname = document.getString("surname") ?: return null
       val photo = document.getString("photo") ?: return null
-      Log.e("not an error", "id is $id")
-      Log.e("not an error", "name is $name")
-      Log.e("not an error", "surname is $surname")
-      Log.e("not an error", "photo url is $photo")
-
       val interests =
           (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null
       Log.e("not an error", "interests are $interests")
       val activities =
           (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null
-      //  Log.e("not an error", "activities are "+ activities.toString())
-
-      // val activities = document.get("activities") as? List<*>
-      // val interests = document.get("interests") as? List<*>
 
       User(
           id = id,
@@ -55,7 +46,7 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
           activities = activities,
           photo = photo)
     } catch (e: Exception) {
-      Log.e("TodosRepositoryFirestore", "Error converting document to ToDo", e)
+      Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null
     }
   }
@@ -74,7 +65,7 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
             onSuccess()
           } else {
             task.exception?.let { e ->
-              Log.e("UserProfileRepository", "Error adding activity to profile", e)
+              Log.e("ProfilesRepository", "Error adding activity to profile", e)
               onFailure(e)
             }
           }
@@ -91,5 +82,16 @@ open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : Prof
         .set(userProfile)
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { exception -> onFailure(exception) }
+  }
+
+  override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    db.collection("profiles")
+        .document(user.id)
+        .set(user)
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { exception ->
+          Log.e("ProfilesRepository", "Error updating user profile", exception)
+          onFailure(exception)
+        }
   }
 }

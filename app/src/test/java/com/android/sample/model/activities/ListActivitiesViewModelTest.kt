@@ -3,6 +3,7 @@ package com.android.sample.model.activities
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.first
@@ -35,6 +36,9 @@ class ListActivitiesViewModelTest {
           maxPlaces = 0,
           participants = listOf(),
           images = listOf(),
+          duration = "00:30",
+          startTime = "09:00",
+          type = ActivityType.PRO,
           price = 0.0)
 
   @Before
@@ -71,6 +75,69 @@ class ListActivitiesViewModelTest {
   fun deleteActivityByIdCallsRepository() {
     listActivitiesViewModel.deleteActivityById(activity.uid)
     verify(activitiesRepository).deleteActivityById(eq(activity.uid), any(), any())
+  }
+
+  @Test
+  fun getActivitiesSuccessCallback() {
+    val onSuccess = mock<() -> Unit>()
+    listActivitiesViewModel.getActivities(onSuccess, {})
+    verify(activitiesRepository).getActivities(any(), any())
+  }
+
+  @Test
+  fun getActivitiesUpdatesUiStateOnSuccess() {
+    val activities = listOf(activity)
+    `when`(activitiesRepository.getActivities(any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(List<Activity>) -> Unit>(0)
+      onSuccess(activities)
+    }
+    listActivitiesViewModel.getActivities()
+    assertThat(
+        listActivitiesViewModel.uiState.value,
+        `is`(ListActivitiesViewModel.ActivitiesUiState.Success(activities)))
+  }
+
+  @Test
+  fun getActivitiesUpdatesUiStateOnError() {
+    val exception = Exception("Test exception")
+    `when`(activitiesRepository.getActivities(any(), any())).thenAnswer {
+      val onFailure = it.getArgument<(Exception) -> Unit>(1)
+      onFailure(exception)
+    }
+    listActivitiesViewModel.getActivities()
+    assertThat(
+        listActivitiesViewModel.uiState.value,
+        `is`(ListActivitiesViewModel.ActivitiesUiState.Error(exception)))
+  }
+
+  @Test
+  fun addActivityCallsGetActivitiesOnSuccess() {
+    `when`(activitiesRepository.addActivity(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+    listActivitiesViewModel.addActivity(activity)
+    verify(activitiesRepository).getActivities(any(), any())
+  }
+
+  @Test
+  fun updateActivityCallsGetActivitiesOnSuccess() {
+    `when`(activitiesRepository.updateActivity(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+    listActivitiesViewModel.updateActivity(activity)
+    verify(activitiesRepository).getActivities(any(), any())
+  }
+
+  @Test
+  fun deleteActivityByIdCallsGetActivitiesOnSuccess() {
+    `when`(activitiesRepository.deleteActivityById(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+    listActivitiesViewModel.deleteActivityById(activity.uid)
+    verify(activitiesRepository).getActivities(any(), any())
   }
 
   @Test

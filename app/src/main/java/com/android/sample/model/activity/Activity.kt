@@ -8,6 +8,8 @@ data class Activity(
     var title: String,
     var description: String,
     var date: Timestamp,
+    var startTime: String,
+    var duration: String,
     // var category: Category,
     var price: Double,
     var location: String,
@@ -16,36 +18,50 @@ data class Activity(
     var placesLeft: Long,
     var maxPlaces: Long,
     var status: ActivityStatus,
+    val type: ActivityType,
     var participants: List<SimpleUser>
 )
+
+enum class ActivityType {
+  PRO,
+  INDIVIDUAL,
+  SOLO,
+}
+
+val types =
+    listOf(
+        ActivityType.PRO,
+        ActivityType.INDIVIDUAL,
+        ActivityType.SOLO,
+    )
 
 enum class ActivityStatus {
   ACTIVE,
   FINISHED,
 }
 
-enum class Category {
-  WORKSHOP,
-  TALK,
-  KEYNOTE,
-  BREAK,
-  LUNCH,
-  NETWORKING,
-  SOCIAL,
-  OTHER,
-}
-
-val categories =
-    listOf(
-        Category.WORKSHOP,
-        Category.TALK,
-        Category.KEYNOTE,
-        Category.BREAK,
-        Category.LUNCH,
-        Category.NETWORKING,
-        Category.SOCIAL,
-        Category.OTHER,
-    )
+// enum class Category {
+//  WORKSHOP,
+//  TALK,
+//  KEYNOTE,
+//  BREAK,
+//  LUNCH,
+//  NETWORKING,
+//  SOCIAL,
+//  OTHER,
+// }
+//
+// val categories =
+//    listOf(
+//        Category.WORKSHOP,
+//        Category.TALK,
+//        Category.KEYNOTE,
+//        Category.BREAK,
+//        Category.LUNCH,
+//        Category.NETWORKING,
+//        Category.SOCIAL,
+//        Category.OTHER,
+//    )
 
 // Setup later
 // @Composable

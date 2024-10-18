@@ -52,6 +52,10 @@ open class ProfileViewModel(private val repository: ProfilesRepository, userId: 
         onFailure = {})
   }
 
+  fun updateProfile(user: User) {
+    repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
+  }
+
   companion object {
     fun Factory(uid: String): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
