@@ -40,6 +40,12 @@ class NavigationActionsTest {
   }
 
   @Test
+  fun navigateToWithDestinationCallsController() {
+    navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
+    navigationDestination.route?.let { verify(navHostController).navigate(it) }
+  }
+
+  @Test
   fun goBackCallsController() {
     navigationActions.goBack()
     verify(navHostController).popBackStack()
