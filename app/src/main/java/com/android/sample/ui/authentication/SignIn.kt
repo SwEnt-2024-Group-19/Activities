@@ -61,7 +61,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             verticalArrangement = Arrangement.Center) {
               // App Logo
               Image(
-                  painter = painterResource(id = R.drawable.google_logo),
+                  painter = painterResource(id = R.drawable.aptivity_logo),
                   contentDescription = "App Logo",
                   modifier = Modifier.size(110.dp).testTag("AppLogo"))
               Spacer(modifier = Modifier.height(48.dp))
