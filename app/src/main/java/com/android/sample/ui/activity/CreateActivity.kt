@@ -316,6 +316,7 @@ fun CreateActivityScreen(
                             participants = attendees,
                             type = types.find { it.name == selectedOption } ?: types[0])
                     listActivityViewModel.addActivity(activity)
+                    profileViewModel.addActivity(creator, activity.uid)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
                 }
