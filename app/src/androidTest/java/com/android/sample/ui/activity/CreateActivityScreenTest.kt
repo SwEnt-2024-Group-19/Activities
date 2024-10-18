@@ -98,8 +98,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("createButton").assertIsEnabled()
   }
 
-
-
   @Test
   fun createButton_isDisabledWhenFieldsAreCleared() {
     composeTestRule.setContent {
