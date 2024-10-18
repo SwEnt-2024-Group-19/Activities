@@ -75,7 +75,6 @@ fun ListActivitiesScreen(
               SingleChoiceSegmentedButtonRow {
                 options.forEachIndexed { index, label ->
                   SegmentedButton(
-                      modifier = Modifier.testTag("segmentedButton$label"),
                       shape =
                           SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                       onClick = { selectedIndex = index },
@@ -126,23 +125,27 @@ fun ListActivitiesScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
 
-                      items(activitiesList) { activity ->
-                        ActivityCard(activity = activity, navigationActions)
-                      }
-                    }
+                          items(activitiesList) { activity ->
+                            ActivityCard(activity = activity, navigationActions, viewModel)
+                          }
+                        }
+                  }
+                }
+                is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+                  val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+                  Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
+                }
               }
             }
-            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-              Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
-            }
-          }
-        }
       }
 }
 
 @Composable
-fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
+fun ActivityCard(
+    activity: Activity,
+    navigationActions: NavigationActions,
+    listActivitiesViewModel: ListActivitiesViewModel
+) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
@@ -151,7 +154,10 @@ fun ActivityCard(activity: Activity, navigationActions: NavigationActions) {
           Modifier.fillMaxWidth()
               .testTag("activityCard")
               .clip(RoundedCornerShape(16.dp))
-              .clickable { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
+              .clickable {
+                listActivitiesViewModel.selectActivity(activity)
+                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+              },
       elevation = CardDefaults.cardElevation(8.dp)) {
         Column {
           // Box for overlaying the title on the image

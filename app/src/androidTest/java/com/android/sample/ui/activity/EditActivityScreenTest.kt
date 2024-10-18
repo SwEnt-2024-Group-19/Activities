@@ -17,13 +17,13 @@ import com.android.sample.model.activity.types
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import java.util.GregorianCalendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import java.util.GregorianCalendar
 
 class EditActivityScreenTest {
   private lateinit var activitiesRepository: ActivitiesRepository
