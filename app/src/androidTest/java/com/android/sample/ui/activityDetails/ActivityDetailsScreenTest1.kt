@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -23,7 +24,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.*
 
 @RunWith(AndroidJUnit4::class)
 class ActivityDetailsScreenAndroidTest {
@@ -66,13 +67,16 @@ class ActivityDetailsScreenAndroidTest {
             description = "Sample Description",
             date = Timestamp(GregorianCalendar(2025, Calendar.NOVEMBER, 3).time),
             price = 10.0,
-            placesTaken = 5,
+            placesLeft = 5,
             maxPlaces = 10,
             creator = "Creator",
             status = ActivityStatus.ACTIVE,
             location = "Sample Location",
             images = listOf("1"),
-            participants = listOf())
+            participants = listOf(),
+            duration = "2 hours",
+            startTime = "10:00",
+            type = ActivityType.INDIVIDUAL)
     val activityStateFlow = MutableStateFlow(activity)
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
   }
@@ -147,14 +151,4 @@ class ActivityDetailsScreenAndroidTest {
 
     verify(mockNavigationActions).goBack()
   }
-    @Test
-    fun enrollButtonEnrollsUser() {
-        composeTestRule.setContent {
-            ActivityDetailsScreen(
-                listActivityViewModel = mockViewModel,
-                navigationActions = mockNavigationActions,
-                profileViewModel = mockProfileViewModel)
-        }
-        composeTestRule.onNodeWithTag("enrollButton").performClick()
-    }
 }

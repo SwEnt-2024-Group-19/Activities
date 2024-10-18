@@ -60,11 +60,7 @@ fun ActivityDetailsScreen(
     profileViewModel: ProfileViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
-  val profile =
-      profileViewModel.userState.collectAsState().value
-          ?: return Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "No profile selected. Should not happen", color = Color.Black)
-          }
+  val profile = profileViewModel.userState.collectAsState().value
 
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
@@ -83,9 +79,8 @@ fun ActivityDetailsScreen(
                 }"
         })
   }
-  val placesTaken by remember { mutableStateOf(activity?.placesTaken) }
+  val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
-
   val context = LocalContext.current
 
   Scaffold(
@@ -186,12 +181,12 @@ fun ActivityDetailsScreen(
           Spacer(modifier = Modifier.height(32.dp))
 
           // Enroll button
-          if (activity?.status == ActivityStatus.ACTIVE) {
+          if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
             Button(
                 onClick = {
                   if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
                     val theActivity =
-                        activity.copy(placesTaken = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                        activity.copy(placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
                     listActivityViewModel.updateActivity(theActivity)
                     profileViewModel.addActivity(profile.id, theActivity.uid)
                     Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
