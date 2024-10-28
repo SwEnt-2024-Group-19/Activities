@@ -74,6 +74,12 @@ fun ProfileScreen(
 fun LoadingScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      },
       topBar = {
         TopAppBar(
             title = { Text("Profile") },
