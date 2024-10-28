@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
     alias(libs.plugins.sonar)
+    alias(libs.plugins.kapt)
     id("jacoco")
 }
 
@@ -239,6 +240,9 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 
 }
 
