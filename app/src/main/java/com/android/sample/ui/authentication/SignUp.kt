@@ -98,7 +98,9 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 passwordErrorState.value = null // Clear error when user starts typing
               },
               isPasswordVisible = isPasswordVisible.value,
-              onPasswordVisibilityChange = {},
+              onPasswordVisibilityChange = {
+                  isPasswordVisible.value = !isPasswordVisible.value
+              },
               passwordError = passwordErrorState.value)
           // Display password error message below the password field
           if (passwordErrorState.value != null) {
