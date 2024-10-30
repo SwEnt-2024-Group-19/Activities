@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,6 +29,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.sample.ui.components.EmailTextField
+import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
@@ -50,6 +51,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
   val passwordErrorState = remember {
     mutableStateOf<String?>(null)
   } // State for password validation error
+  val isPasswordVisible = remember { mutableStateOf(false) }
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
@@ -67,17 +69,13 @@ fun SignUpScreen(navigationActions: NavigationActions) {
           Spacer(modifier = Modifier.height(48.dp))
 
           // Email field
-          OutlinedTextField(
-              value = emailState.value,
-              onValueChange = {
+          EmailTextField(
+              email = emailState.value,
+              onEmailChange = {
                 emailState.value = it
                 emailErrorState.value = null // Clear error when user starts typing
               },
-              label = { Text("Email") },
-              isError =
-                  emailErrorState.value !=
-                      null, // Highlight the text field in red if there's an error
-              modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
+              emailError = emailErrorState.value)
 
           // Display email error message below the email field
           if (emailErrorState.value != null) {
@@ -93,17 +91,15 @@ fun SignUpScreen(navigationActions: NavigationActions) {
 
           Spacer(modifier = Modifier.height(16.dp))
           // Password field
-          OutlinedTextField(
-              value = passwordState.value,
-              onValueChange = {
+          PasswordTextField(
+              password = passwordState.value,
+              onPasswordChange = {
                 passwordState.value = it
                 passwordErrorState.value = null // Clear error when user starts typing
               },
-              label = { Text("Password") },
-              isError =
-                  passwordErrorState.value !=
-                      null, // Highlight the text field in red if there's an error
-              modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"))
+              isPasswordVisible = isPasswordVisible.value,
+              onPasswordVisibilityChange = {},
+              passwordError = passwordErrorState.value)
           // Display password error message below the password field
           if (passwordErrorState.value != null) {
             Text(
