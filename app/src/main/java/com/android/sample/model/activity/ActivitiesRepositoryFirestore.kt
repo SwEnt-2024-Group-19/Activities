@@ -34,13 +34,13 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                 .map { document ->
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
-                    val participants = (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
+                  val participants =
+                      (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
                         SimpleUser(
                             name = participantData["name"] as? String ?: "No Name",
                             surname = participantData["surname"] as? String ?: "No Surname",
-                            age = participantData["age"] as? Int ?: 0
-                        )
-                    } ?: listOf()
+                            age = participantData["age"] as? Int ?: 0)
+                      } ?: listOf()
                   val activityType =
                       data["type"]?.let {
                         try {
@@ -50,8 +50,8 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                         }
                       } ?: ActivityType.SOLO
                   Activity(
-                      uid=document.id,
-                      title=data["title"] as? String ?: "No Title",
+                      uid = document.id,
+                      title = data["title"] as? String ?: "No Title",
                       description = data["description"] as? String ?: "No Description",
                       date = data["date"] as? Timestamp ?: Timestamp.now(),
                       startTime = data["startTime"] as? String ?: "HH:mm",
@@ -62,10 +62,9 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       images = listOf(),
                       placesLeft = data["placesLeft"] as? Long ?: 0,
                       maxPlaces = data["maxPlaces"] as? Long ?: 0,
-                      status =  ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+                      status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
                       type = activityType,
-                      participants = participants
-                  )
+                      participants = participants)
                 }
                 .filterNotNull() // Filter out any null results
 
