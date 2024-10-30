@@ -82,7 +82,6 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                   onPasswordVisibilityChange = {
                     isPasswordVisible.value = !isPasswordVisible.value
                   },
-                  passwordError = passwordErrorState.value,
               )
 
               // Password Error
