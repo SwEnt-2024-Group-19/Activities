@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.icu.util.GregorianCalendar
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -66,15 +67,15 @@ fun CreateActivityScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel
 ) {
-
+  val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
-  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+  val creator = FirebaseAuth.getInstance().currentUser?.uid!!
   var location by remember { mutableStateOf("") }
   var price by remember { mutableStateOf("") }
-  var placesLeft by remember { mutableStateOf("") }
+    var placesMax by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
 
   var startTime by remember { mutableStateOf("") }
@@ -89,7 +90,9 @@ fun CreateActivityScreen(
   var attendees: List<SimpleUser> by remember { mutableStateOf(attendees_) }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
+      modifier = Modifier
+          .fillMaxSize()
+          .testTag("createActivityScreen"),
       topBar = {
         TopAppBar(
             title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
@@ -98,11 +101,12 @@ fun CreateActivityScreen(
       content = { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues)
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .background(color = Color(0xFFFFFFFF))
-                    .testTag("activityCreateScreen"),
+            Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                //.background(color = Color(0xFFFFFFFF))
+                .testTag("activityCreateScreen"),
         ) {
           // Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -110,7 +114,10 @@ fun CreateActivityScreen(
               value = title,
               onValueChange = { title = it },
               label = { Text("Title") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputTitleCreate"),
               placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -119,7 +126,10 @@ fun CreateActivityScreen(
               value = description,
               onValueChange = { description = it },
               label = { Text("Description") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputDescriptionCreate"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_activity_description))
               },
@@ -130,7 +140,10 @@ fun CreateActivityScreen(
               value = dueDate,
               onValueChange = { dueDate = it },
               label = { Text("Date") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateCreate"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputDateCreate"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_date_activity_withFormat))
               },
@@ -141,7 +154,9 @@ fun CreateActivityScreen(
               value = startTime,
               onValueChange = { startTime = it },
               label = { Text("Time") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth(),
               placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -150,7 +165,9 @@ fun CreateActivityScreen(
               value = duration,
               onValueChange = { duration = it },
               label = { Text("Duration") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth(),
               placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
           )
 
@@ -160,27 +177,35 @@ fun CreateActivityScreen(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputPriceCreate"),
               placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
           )
 
           Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = placesLeft,
-              onValueChange = { placesLeft = it },
-              label = { Text("Places Left") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
-              placeholder = {
-                Text(text = stringResource(id = R.string.request_placesLeft_activity))
-              },
-          )
-          Spacer(modifier = Modifier.height(8.dp))
-
+            OutlinedTextField(
+                value = placesMax,
+                onValueChange = { placesMax = it },
+                label = { Text("Total Places") },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .testTag("inputPlacesCreate"),
+                placeholder = {
+                    Text(text = stringResource(id = R.string.request_placesMax_activity))
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
               value = location,
               onValueChange = { location = it },
               label = { Text("Location") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputLocationCreate"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_location_activity))
               },
@@ -191,7 +216,7 @@ fun CreateActivityScreen(
               modifier = Modifier.testTag("chooseTypeMenu"),
               expanded = expanded,
               onExpandedChange = { expanded = !expanded }) {
-                TextField(
+                OutlinedTextField(
                     readOnly = true,
                     value = selectedOption,
                     onValueChange = {},
@@ -216,11 +241,19 @@ fun CreateActivityScreen(
           Spacer(modifier = Modifier.height(32.dp))
 
           Column(
-              modifier = Modifier.fillMaxWidth().padding(8.dp).height(130.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp)) {
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(8.dp)
+                  .height(130.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp),
+              horizontalAlignment = Alignment.CenterHorizontally,
+          ) {
                 Button(
                     onClick = { showDialog = true },
-                    modifier = Modifier.width(300.dp).height(40.dp).testTag("addAttendeeButton"),
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(40.dp)
+                        .testTag("addAttendeeButton"),
                 ) {
                   Row(
                       horizontalArrangement =
@@ -234,46 +267,72 @@ fun CreateActivityScreen(
                     Text("Add Attendee")
                   }
                 }
-
-                LazyRow(
-                    modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
-                ) {
-                  items(attendees.size) { index ->
-                    Row(
-                        modifier =
-                            Modifier.padding(8.dp)
-                                .background(Color(0xFFFFFFFF))
-                                .testTag("attendeeRow${index}"),
+                if(attendees.isNotEmpty()) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .height(85.dp)
+                            .padding(8.dp),
                     ) {
-                      Text(
-                          text = attendees[index].name,
-                          modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      Text(
-                          text = attendees[index].surname,
-                          modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      Text(
-                          text = attendees[index].age.toString(),
-                          modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Button(
-                          onClick = { attendees = attendees.filter { it != attendees[index] } },
-                          modifier =
-                              Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
-                      ) {
-                        Icon(
-                            Icons.Filled.PersonRemove,
-                            contentDescription = "remove attendee",
-                        )
-                      }
+                        items(attendees.size) { index ->
+                            Row(
+                                modifier =
+                                Modifier
+                                    .padding(8.dp)
+                                    .background(Color(0xFFFFFFFF))
+                                    .testTag("attendeeRow${index}"),
+                            ) {
+                                Text(
+                                    text = attendees[index].name,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .testTag("attendeeName${index}"),
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    ),
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = attendees[index].surname,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .testTag("attendeeSurname${index}"),
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    ),
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = attendees[index].age.toString(),
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .testTag("attendeeAge${index}"),
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    ),
+                                )
+                                Button(
+                                    onClick = {
+                                        attendees = attendees.filter { it != attendees[index] }
+                                    },
+                                    modifier =
+                                    Modifier
+                                        .width(40.dp)
+                                        .height(40.dp)
+                                        .testTag("removeAttendeeButton"),
+                                ) {
+                                    Icon(
+                                        Icons.Filled.PersonRemove,
+                                        contentDescription = "remove attendee",
+                                    )
+                                }
+                            }
+                        }
                     }
-                  }
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
               }
           if (showDialog) {
@@ -283,13 +342,25 @@ fun CreateActivityScreen(
             )
           }
 
-          Spacer(modifier = Modifier.height(32.dp))
+
           Button(
               enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
+                  val timeFormat = startTime.split(":")
+                    if(timeFormat.size != 2) {
+                        Toast.makeText(
+                            context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                  val durationFormat = duration.split(":")
+                    if(durationFormat.size != 2) {
+                        Toast.makeText(
+                            context, "Invalid format, duration must be HH:MM.", Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
-                if (parts.size == 3) {
+                if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
                   try {
                     calendar.set(
                         parts[2].toInt(),
@@ -307,8 +378,8 @@ fun CreateActivityScreen(
                             startTime = startTime,
                             duration = duration,
                             price = price.toDouble(),
-                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
-                            maxPlaces = parseFraction(placesLeft, 1)?.toLong() ?: 0.toLong(),
+                            placesLeft = attendees.size.toLong(),
+                            maxPlaces = placesMax.toLongOrNull()?:0,
                             creator = creator,
                             status = ActivityStatus.ACTIVE,
                             location = location,
@@ -320,12 +391,19 @@ fun CreateActivityScreen(
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
                 }
+                  if(parts.size != 3) {
+                      Toast.makeText(
+                          context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT
+                      ).show()
+                  }
+
               },
               modifier =
-                  Modifier.width(300.dp)
-                      .height(40.dp)
-                      .testTag("createButton")
-                      .align(Alignment.CenterHorizontally),
+              Modifier
+                  .width(300.dp)
+                  .height(40.dp)
+                  .testTag("createButton")
+                  .align(Alignment.CenterHorizontally),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -408,7 +486,4 @@ var items = listOf<String>()
 //    }
 // }
 
-fun parseFraction(fraction: String, index: Int): Int? {
-  val parts = fraction.split("/")
-  return if (parts.size == 2) parts[index].toIntOrNull() else null
-}
+
