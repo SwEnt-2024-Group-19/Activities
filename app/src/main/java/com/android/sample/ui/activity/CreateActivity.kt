@@ -72,7 +72,7 @@ fun CreateActivityScreen(
   var selectedOption by remember { mutableStateOf("Select a type") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
-  val creator = FirebaseAuth.getInstance().currentUser?.uid!!
+  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
   var location by remember { mutableStateOf("") }
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
