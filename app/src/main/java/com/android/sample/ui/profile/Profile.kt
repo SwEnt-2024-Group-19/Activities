@@ -50,7 +50,6 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -60,9 +59,9 @@ fun ProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
 
-    LaunchedEffect  (Unit){
-        userProfileViewModel.fetchUserData(FirebaseAuth.getInstance().currentUser?.uid ?: "")
-    }
+  LaunchedEffect(Unit) {
+    userProfileViewModel.fetchUserData(FirebaseAuth.getInstance().currentUser?.uid ?: "")
+  }
   val profileState = userProfileViewModel.userState.collectAsState()
 
   when (val profile = profileState.value) {
