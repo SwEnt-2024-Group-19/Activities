@@ -328,8 +328,7 @@ fun CreateActivityScreen(
                             images = carouselItems.map { it },
                             participants = attendees,
                             type = types.find { it.name == selectedOption } ?: types[0],
-                            comments = listOf()
-                        )
+                            comments = listOf())
                     listActivityViewModel.addActivity(activity)
                     profileViewModel.addActivity(creator, activity.uid)
                     navigationActions.navigateTo(Screen.OVERVIEW)

@@ -337,8 +337,7 @@ fun EditActivityScreen(
                             images = listOf(),
                             type = types.find { it.name == selectedOption } ?: types[0],
                             participants = attendees,
-                            comments = activity?.comments ?: listOf()
-                        )
+                            comments = activity?.comments ?: listOf())
 
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)
