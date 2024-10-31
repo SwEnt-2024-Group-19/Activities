@@ -26,6 +26,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -49,6 +50,7 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ProfileScreen(
@@ -56,7 +58,7 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
-
+    
   val profileState = userProfileViewModel.userState.collectAsState()
 
   when (val profile = profileState.value) {
@@ -143,66 +145,75 @@ fun ProfileContent(
           Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
         }
       }) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("profileContent"),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
-              item {
-                Spacer(Modifier.height(16.dp))
-                Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
+        Column(
+            Modifier.fillMaxSize().padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Spacer(Modifier.height(16.dp))
+              Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
 
-                // Profile Picture
-                ProfileImage(
-                    url = user.photo,
-                    modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+              // Profile Picture
 
-                // User Name and Surname
-                Text(
-                    text = "${user.name} ${user.surname}",
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(top = 8.dp).testTag("userName"))
+              ProfileImage(
+                  url = user.photo,
+                  modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
-                // Interests
-                Text(
-                    text = "Interests: ${user.interests?.joinToString(", ")}",
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
-              }
+              // User Name and Surname
+              Text(
+                  text = "${user.name} ${user.surname}",
+                  fontSize = 20.sp,
+                  modifier = Modifier.padding(top = 8.dp).testTag("userName"))
 
-              item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Activities Created",
-                    fontSize = 24.sp,
-                    modifier = Modifier.testTag("activitiesCreatedTitle"))
-              }
+              // Interests
+              Text(
+                  text = "Interests: ${user.interests?.joinToString(", ")}",
+                  fontSize = 18.sp,
+                  modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
 
-              user.activities?.let {
-                items(it.size) { index ->
-                  ActivityCreatedBox(
-                      activity = user.activities[index],
-                      user = user,
-                      listActivitiesViewModel = listActivitiesViewModel,
-                      navigationActions = navigationActions)
-                }
-              }
+              Spacer(modifier = Modifier.height(16.dp))
 
-              item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Activities Enrolled in",
-                    fontSize = 24.sp,
-                    modifier = Modifier.testTag("activitiesEnrolledTitle"))
-              }
+              // Activities Section
+              Text(
+                  text = "Activities Created",
+                  fontSize = 24.sp,
+                  modifier =
+                      Modifier.padding(start = 16.dp, top = 16.dp)
+                          .testTag("activitiesCreatedTitle"))
 
-              user.activities?.let {
-                items(it.size) { index ->
-                  ActivityEnrolledBox(
-                      activity = user.activities[index],
-                      user = user,
-                      listActivitiesViewModel = listActivitiesViewModel,
-                      navigationActions = navigationActions)
-                }
-              }
+              LazyColumn(
+                  modifier = Modifier.height(200.dp).testTag("activitiesCreatedList"),
+                  contentPadding = PaddingValues(16.dp)) {
+                    user.activities?.let { activities ->
+                      items(activities.size) { index ->
+                        ActivityCreatedBox(
+                            activity = activities[index],
+                            user,
+                            listActivitiesViewModel,
+                            navigationActions)
+                      }
+                    }
+                  }
+              Spacer(modifier = Modifier.height(16.dp))
+
+              Text(
+                  text = "Activities Enrolled in",
+                  fontSize = 24.sp,
+                  modifier =
+                      Modifier.padding(start = 16.dp, top = 16.dp)
+                          .testTag("activitiesEnrolledTitle"))
+
+              LazyColumn(
+                  modifier = Modifier.fillMaxSize().testTag("activitiesEnrolledList"),
+                  contentPadding = PaddingValues(16.dp)) {
+                    user.activities?.let { activities ->
+                      items(activities.size) { index ->
+                        ActivityEnrolledBox(
+                            activity = activities[index],
+                            user,
+                            listActivitiesViewModel,
+                            navigationActions)
+                      }
+                    }
+                  }
             }
       }
 }
