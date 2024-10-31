@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,7 +33,9 @@ import com.android.sample.ui.profile.EditProfileScreen
 import com.android.sample.ui.profile.ProfileCreationScreen
 import com.android.sample.ui.profile.ProfileScreen
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   private lateinit var auth: FirebaseAuth
 
@@ -62,7 +65,7 @@ fun ActivitiesApp(uid: String) {
       viewModel(factory = ListActivitiesViewModel.Factory)
   val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(uid))
   // need to add factory for SignInViewModel
-  val authViewModel: SignInViewModel = viewModel(factory = SignInViewModel.Factory())
+  val authViewModel: SignInViewModel = hiltViewModel()
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
     navigation(
@@ -86,7 +89,6 @@ fun ActivitiesApp(uid: String) {
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(listActivitiesViewModel, navigationActions)
       }
-
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }

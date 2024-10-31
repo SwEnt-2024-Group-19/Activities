@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.icu.util.GregorianCalendar
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -66,7 +67,7 @@ fun CreateActivityScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel
 ) {
-
+  val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
   var title by remember { mutableStateOf("") }
@@ -74,7 +75,7 @@ fun CreateActivityScreen(
   val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
   var location by remember { mutableStateOf("") }
   var price by remember { mutableStateOf("") }
-  var placesLeft by remember { mutableStateOf("") }
+  var placesMax by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
 
   var startTime by remember { mutableStateOf("") }
@@ -101,7 +102,7 @@ fun CreateActivityScreen(
                 Modifier.padding(paddingValues)
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .background(color = Color(0xFFFFFFFF))
+                    // .background(color = Color(0xFFFFFFFF))
                     .testTag("activityCreateScreen"),
         ) {
           // Carousel()
@@ -166,16 +167,15 @@ fun CreateActivityScreen(
 
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
-              value = placesLeft,
-              onValueChange = { placesLeft = it },
-              label = { Text("Places Left") },
+              value = placesMax,
+              onValueChange = { placesMax = it },
+              label = { Text("Total Places") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
               placeholder = {
-                Text(text = stringResource(id = R.string.request_placesLeft_activity))
+                Text(text = stringResource(id = R.string.request_placesMax_activity))
               },
           )
           Spacer(modifier = Modifier.height(8.dp))
-
           OutlinedTextField(
               value = location,
               onValueChange = { location = it },
@@ -191,7 +191,7 @@ fun CreateActivityScreen(
               modifier = Modifier.testTag("chooseTypeMenu"),
               expanded = expanded,
               onExpandedChange = { expanded = !expanded }) {
-                TextField(
+                OutlinedTextField(
                     readOnly = true,
                     value = selectedOption,
                     onValueChange = {},
@@ -217,65 +217,68 @@ fun CreateActivityScreen(
 
           Column(
               modifier = Modifier.fillMaxWidth().padding(8.dp).height(130.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = { showDialog = true },
-                    modifier = Modifier.width(300.dp).height(40.dp).testTag("addAttendeeButton"),
-                ) {
+              verticalArrangement = Arrangement.spacedBy(8.dp),
+              horizontalAlignment = Alignment.CenterHorizontally,
+          ) {
+            Button(
+                onClick = { showDialog = true },
+                modifier = Modifier.width(300.dp).height(40.dp).testTag("addAttendeeButton"),
+            ) {
+              Row(
+                  horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                  verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = "add a new attendee",
+                )
+                Text("Add Attendee")
+              }
+            }
+            if (attendees.isNotEmpty()) {
+              LazyRow(
+                  modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
+              ) {
+                items(attendees.size) { index ->
                   Row(
-                      horizontalArrangement =
-                          Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                      verticalAlignment = Alignment.CenterVertically,
+                      modifier =
+                          Modifier.padding(8.dp)
+                              .background(Color(0xFFFFFFFF))
+                              .testTag("attendeeRow${index}"),
                   ) {
-                    Icon(
-                        Icons.Filled.Add,
-                        contentDescription = "add a new attendee",
+                    Text(
+                        text = attendees[index].name,
+                        modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                     )
-                    Text("Add Attendee")
-                  }
-                }
-
-                LazyRow(
-                    modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
-                ) {
-                  items(attendees.size) { index ->
-                    Row(
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = attendees[index].surname,
+                        modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = attendees[index].age.toString(),
+                        modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                    )
+                    Button(
+                        onClick = { attendees = attendees.filter { it != attendees[index] } },
                         modifier =
-                            Modifier.padding(8.dp)
-                                .background(Color(0xFFFFFFFF))
-                                .testTag("attendeeRow${index}"),
+                            Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
                     ) {
-                      Text(
-                          text = attendees[index].name,
-                          modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                      Icon(
+                          Icons.Filled.PersonRemove,
+                          contentDescription = "remove attendee",
                       )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      Text(
-                          text = attendees[index].surname,
-                          modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      Text(
-                          text = attendees[index].age.toString(),
-                          modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Button(
-                          onClick = { attendees = attendees.filter { it != attendees[index] } },
-                          modifier =
-                              Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
-                      ) {
-                        Icon(
-                            Icons.Filled.PersonRemove,
-                            contentDescription = "remove attendee",
-                        )
-                      }
                     }
                   }
                 }
               }
+              Spacer(modifier = Modifier.height(32.dp))
+            }
+          }
           if (showDialog) {
             AddUserDialog(
                 onDismiss = { showDialog = false },
@@ -283,13 +286,23 @@ fun CreateActivityScreen(
             )
           }
 
-          Spacer(modifier = Modifier.height(32.dp))
           Button(
               enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
+                val timeFormat = startTime.split(":")
+                if (timeFormat.size != 2) {
+                  Toast.makeText(context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
+                      .show()
+                }
+                val durationFormat = duration.split(":")
+                if (durationFormat.size != 2) {
+                  Toast.makeText(
+                          context, "Invalid format, duration must be HH:MM.", Toast.LENGTH_SHORT)
+                      .show()
+                }
                 val calendar = GregorianCalendar()
                 val parts = dueDate.split("/")
-                if (parts.size == 3) {
+                if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
                   try {
                     calendar.set(
                         parts[2].toInt(),
@@ -307,8 +320,8 @@ fun CreateActivityScreen(
                             startTime = startTime,
                             duration = duration,
                             price = price.toDouble(),
-                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
-                            maxPlaces = parseFraction(placesLeft, 1)?.toLong() ?: 0.toLong(),
+                            placesLeft = attendees.size.toLong(),
+                            maxPlaces = placesMax.toLongOrNull() ?: 0,
                             creator = creator,
                             status = ActivityStatus.ACTIVE,
                             location = location,
@@ -319,6 +332,11 @@ fun CreateActivityScreen(
                     profileViewModel.addActivity(creator, activity.uid)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: NumberFormatException) {}
+                }
+                if (parts.size != 3) {
+                  Toast.makeText(
+                          context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
+                      .show()
                 }
               },
               modifier =
@@ -407,8 +425,3 @@ var items = listOf<String>()
 //        }
 //    }
 // }
-
-fun parseFraction(fraction: String, index: Int): Int? {
-  val parts = fraction.split("/")
-  return if (parts.size == 2) parts[index].toIntOrNull() else null
-}

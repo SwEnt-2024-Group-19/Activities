@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
     alias(libs.plugins.sonar)
+    alias(libs.plugins.kapt)
+    id("dagger.hilt.android.plugin")
     id("jacoco")
 }
 
@@ -63,6 +65,8 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs += "-Xjvm-default=all"
+        languageVersion = "1.8"
     }
 
     packaging {
@@ -85,6 +89,10 @@ android {
             isReturnDefaultValues = true
         }
     }
+    kapt {
+        correctErrorTypes = true
+    }
+
 
     // Robolectric needs to be run only in debug. But its tests are placed in the shared source set (test)
     // The next lines transfers the src/test/* from shared to the testDebug one
@@ -155,7 +163,23 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material)
 
+    //----
 
+    // JUnit for unit testing
+    testImplementation("junit:junit:4.13.2")
+
+    // MockK for mocking
+    testImplementation("io.mockk:mockk:1.13.2") // Or replace with Mockito if preferred:
+    // testImplementation("org.mockito:mockito-core:5.5.0")
+
+    // Coroutines Test for testing coroutines
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // AndroidX Core Testing library for LiveData and ViewModel testing (optional)
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+
+
+    //----
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -217,6 +241,7 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
+
     // ------------- Jetpack Compose ------------------
 
 
@@ -239,6 +264,13 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
+
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    kapt(libs.hilt.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler)
+
 
 }
 
