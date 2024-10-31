@@ -3,6 +3,7 @@ package com.android.sample.ui.activitydetails
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,8 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,9 +64,12 @@ fun ActivityDetailsScreen(
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
+  // Check if the user is already enrolled in the activity
+  val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
 
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
+  val location by remember { mutableStateOf(activity?.location) }
   val price by remember { mutableStateOf(activity?.price) }
   val dueDate by remember {
     mutableStateOf(
@@ -81,6 +88,8 @@ fun ActivityDetailsScreen(
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
   val context = LocalContext.current
+  val startTime by remember { mutableStateOf(activity?.startTime) }
+  val duration by remember { mutableStateOf(activity?.duration) }
 
   Scaffold(
       topBar = {
@@ -156,17 +165,30 @@ fun ActivityDetailsScreen(
                   }
 
               Spacer(modifier = Modifier.height(8.dp))
-              //  price
+              // Price and Distance Row
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("price")) {
-                    Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (price != null) "${price.toString()} CHF" else "not defined yet",
-                        modifier = Modifier.testTag("priceText"))
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  modifier = Modifier.fillMaxWidth().testTag("price&&location")) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
+                      Spacer(modifier = Modifier.width(4.dp))
+                      Text(
+                          text =
+                              if (price != null) "${price.toString()} CHF" else "not defined yet",
+                          modifier = Modifier.testTag("priceText"))
+                    }
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Icon(Icons.Default.LocationOn, contentDescription = "Location")
+                      Spacer(modifier = Modifier.width(4.dp))
+                      Text(
+                          text = location ?: "not defined yet",
+                          modifier = Modifier.testTag("locationText"))
+                    }
                   }
               Spacer(modifier = Modifier.height(8.dp))
+
               // schedule
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -174,10 +196,19 @@ fun ActivityDetailsScreen(
                     Icon(Icons.Default.DateRange, contentDescription = "Schedule")
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = dueDate ?: "not defined yet",
+                        text = if (startTime != null) "$dueDate at $startTime" else dueDate,
                         modifier = Modifier.testTag("scheduleText"))
                   }
-
+              // duration
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag("duration")) {
+                    Icon(Icons.Default.AccessTime, contentDescription = "duration")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = duration ?: "not defined yet",
+                        modifier = Modifier.testTag("durationText"))
+                  }
               Spacer(modifier = Modifier.height(32.dp))
 
               // Enroll button
@@ -186,13 +217,21 @@ fun ActivityDetailsScreen(
                   Button(
                       onClick = {
                         if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                          val theActivity =
-                              activity.copy(
-                                  placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
-                          listActivityViewModel.updateActivity(theActivity)
-                          profileViewModel.addActivity(profile.id, theActivity.uid)
-                          Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                          navigationActions.navigateTo(Screen.OVERVIEW)
+                          if (isUserEnrolled) {
+                            Toast.makeText(
+                                    context,
+                                    "You are already enrolled in this activity",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          } else {
+                            val theActivity =
+                                activity.copy(
+                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                            listActivityViewModel.updateActivity(theActivity)
+                            profileViewModel.addActivity(profile.id, theActivity.uid)
+                            Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
+                            navigationActions.navigateTo(Screen.OVERVIEW)
+                          }
                         } else {
                           Toast.makeText(
                                   context,
