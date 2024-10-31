@@ -1,7 +1,10 @@
 package com.android.sample.ui.profile
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -116,7 +120,6 @@ fun ProfileContent(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
-
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
       bottomBar = {
@@ -143,75 +146,84 @@ fun ProfileContent(
           Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
         }
       }) { innerPadding ->
-        Column(
+        LazyColumn(
             Modifier.fillMaxSize().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Spacer(Modifier.height(16.dp))
-              Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
+              item {
+                Spacer(Modifier.height(16.dp))
+                Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
 
-              // Profile Picture
+                // Profile Picture
 
-              ProfileImage(
-                  url = user.photo,
-                  modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+                ProfileImage(
+                    url = user.photo,
+                    modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
-              // User Name and Surname
-              Text(
-                  text = "${user.name} ${user.surname}",
-                  fontSize = 20.sp,
-                  modifier = Modifier.padding(top = 8.dp).testTag("userName"))
-
-              // Interests
-              Text(
-                  text = "Interests: ${user.interests?.joinToString(", ")}",
-                  fontSize = 18.sp,
-                  modifier = Modifier.padding(top = 8.dp).testTag("interestsSection"))
-
-              Spacer(modifier = Modifier.height(16.dp))
-
-              // Activities Section
-              Text(
-                  text = "Activities Created",
-                  fontSize = 24.sp,
-                  modifier =
-                      Modifier.padding(start = 16.dp, top = 16.dp)
-                          .testTag("activitiesCreatedTitle"))
-
-              LazyColumn(
-                  modifier = Modifier.height(200.dp).testTag("activitiesCreatedList"),
-                  contentPadding = PaddingValues(16.dp)) {
-                    user.activities?.let { activities ->
-                      items(activities.size) { index ->
-                        ActivityCreatedBox(
-                            activity = activities[index],
-                            user,
-                            listActivitiesViewModel,
-                            navigationActions)
+                // User Name and Surname
+                Text(
+                    text = "${user.name} ${user.surname}",
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(top = 8.dp).testTag("userName"))
+              }
+              item {
+                // Interests Section
+                Text(
+                    text = "Interests",
+                    fontSize = 24.sp,
+                    modifier =
+                        Modifier.padding(start = 16.dp, top = 16.dp).testTag("interestsSection"))
+              }
+              item {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp)) {
+                      user.interests?.let { interests ->
+                        items(interests.size) { index ->
+                          InterestBox(interest = user.interests[index])
+                        }
                       }
                     }
-                  }
-              Spacer(modifier = Modifier.height(16.dp))
+              }
 
-              Text(
-                  text = "Activities Enrolled in",
-                  fontSize = 24.sp,
-                  modifier =
-                      Modifier.padding(start = 16.dp, top = 16.dp)
-                          .testTag("activitiesEnrolledTitle"))
+              item {
+                // Activities Section
+                Text(
+                    text = "Activities Created",
+                    fontSize = 24.sp,
+                    modifier =
+                        Modifier.padding(start = 16.dp, top = 16.dp)
+                            .testTag("activitiesCreatedTitle"))
+              }
+              // Activities Created
+              user.activities?.let { activities ->
+                items(activities.size) { index ->
+                  ActivityCreatedBox(
+                      activity = activities[index],
+                      user,
+                      listActivitiesViewModel,
+                      navigationActions)
+                }
+              }
 
-              LazyColumn(
-                  modifier = Modifier.fillMaxSize().testTag("activitiesEnrolledList"),
-                  contentPadding = PaddingValues(16.dp)) {
-                    user.activities?.let { activities ->
-                      items(activities.size) { index ->
-                        ActivityEnrolledBox(
-                            activity = activities[index],
-                            user,
-                            listActivitiesViewModel,
-                            navigationActions)
-                      }
-                    }
-                  }
+              item { // Activities Enrolled in
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Activities Enrolled in",
+                    fontSize = 24.sp,
+                    modifier =
+                        Modifier.padding(start = 16.dp, top = 16.dp)
+                            .testTag("activitiesEnrolledTitle"))
+              }
+              // Activities Enrolled
+              user.activities?.let { activities ->
+                items(activities.size) { index ->
+                  ActivityEnrolledBox(
+                      activity = activities[index],
+                      user,
+                      listActivitiesViewModel,
+                      navigationActions)
+                }
+              }
             }
       }
 }
@@ -313,10 +325,21 @@ fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
                         crossfade(true)
                       })
               .build())
-
   Image(
       painter = painter,
       contentDescription = "Profile Image",
       modifier = modifier,
       contentScale = ContentScale.Crop)
+}
+
+@Composable
+fun InterestBox(interest: String) {
+  Box(
+      modifier =
+          Modifier.background(Color.LightGray, RoundedCornerShape(8.dp))
+              .padding(horizontal = 12.dp, vertical = 8.dp)
+              .testTag("$interest"),
+      contentAlignment = Alignment.Center) {
+        Text(text = interest, fontSize = 18.sp, color = Color.Black)
+      }
 }
