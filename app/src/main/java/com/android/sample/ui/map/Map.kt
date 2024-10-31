@@ -24,7 +24,6 @@ fun MapScreen(navigationActions: NavigationActions) {
             val cameraPositionState = rememberCameraPositionState {
                 position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
             }
-
             GoogleMap(
                 modifier = Modifier.fillMaxSize().padding(pd).testTag("mapScreen"),
                 cameraPositionState = cameraPositionState) {
