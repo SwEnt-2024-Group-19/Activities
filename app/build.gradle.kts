@@ -163,7 +163,23 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material)
 
+    //----
 
+    // JUnit for unit testing
+    testImplementation("junit:junit:4.13.2")
+
+    // MockK for mocking
+    testImplementation("io.mockk:mockk:1.13.2") // Or replace with Mockito if preferred:
+    // testImplementation("org.mockito:mockito-core:5.5.0")
+
+    // Coroutines Test for testing coroutines
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // AndroidX Core Testing library for LiveData and ViewModel testing (optional)
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+
+
+    //----
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
