@@ -21,13 +21,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -85,12 +85,8 @@ fun ActivityDetailsScreen(
 
   Scaffold(
       topBar = {
-        TopAppBar(
-            title = {
-              Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text("Title", color = Color.White)
-              }
-            },
+        CenterAlignedTopAppBar(
+            title = { Text("Activity Details", color = Color.White) },
             modifier = Modifier.testTag("topAppBar"),
             navigationIcon = {
               IconButton(
@@ -128,7 +124,6 @@ fun ActivityDetailsScreen(
                         color = Color.White,
                         modifier = Modifier.align(Alignment.Center))
                   }
-              Spacer(modifier = Modifier.height(16.dp))
 
               // Title
               Box(
