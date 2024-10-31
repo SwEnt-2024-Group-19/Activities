@@ -184,7 +184,6 @@ fun ActivityDetailsScreen(
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
                 if (activity.creator != profile.id) {
                   Button(
-
                       onClick = {
                         if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
                           val theActivity =
