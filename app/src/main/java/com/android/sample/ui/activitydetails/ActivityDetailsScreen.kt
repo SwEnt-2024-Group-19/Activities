@@ -186,56 +186,58 @@ fun ActivityDetailsScreen(
               Spacer(modifier = Modifier.height(32.dp))
 
               // Enroll button
-              if (activity?.status == ActivityStatus.ACTIVE && profile != null){
-                  if(activity.creator != profile.id) {
-                    Button(
-                        onClick = {
+              if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
+                if (activity.creator != profile.id) {
+                  Button(
+
+                      onClick = {
                         if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                            val theActivity =
-                                activity.copy(placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
-                            listActivityViewModel.updateActivity(theActivity)
-                            profileViewModel.addActivity(profile.id, theActivity.uid)
-                            Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                            navigationActions.navigateTo(Screen.OVERVIEW)
+                          val theActivity =
+                              activity.copy(
+                                  placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                          listActivityViewModel.updateActivity(theActivity)
+                          profileViewModel.addActivity(profile.id, theActivity.uid)
+                          Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
+                          navigationActions.navigateTo(Screen.OVERVIEW)
                         } else {
-                            Toast.makeText(
-                                    context,
-                                    "Enroll failed, limit of places reached",
-                                    Toast.LENGTH_SHORT)
-                                .show()
+                          Toast.makeText(
+                                  context,
+                                  "Enroll failed, limit of places reached",
+                                  Toast.LENGTH_SHORT)
+                              .show()
                         }
-                        },
-                        modifier =
-                            Modifier.fillMaxWidth()
-                                .padding(horizontal = 24.dp)
-                                .testTag("enrollButton")) {
+                      },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 24.dp)
+                              .testTag("enrollButton")) {
                         Text(text = "Enroll")
-                        }
-                  } else  {
-                    Button(
-                        onClick = {
-                                navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
-                        },
-                        modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(horizontal = 24.dp)
-                            .testTag("enrollButton")) {
+                      }
+                } else {
+                  Button(
+                      onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 24.dp)
+                              .testTag("editButton")) {
                         Text(text = "Edit")
-                    }
-              }} else if(activity?.status == ActivityStatus.FINISHED) {
-                Text(
-                    text = "Activity is not active",
-                    modifier = Modifier.testTag("notActiveText"))
-            }else {
+                      }
+                }
+              } else if (activity?.status == ActivityStatus.FINISHED) {
+                Text(text = "Activity is not active", modifier = Modifier.testTag("notActiveText"))
+              } else {
                 Text(
                     text = "You need to be logged in to enroll",
                     modifier = Modifier.testTag("notLoggedInText"))
-                Button(onClick={navigationActions.navigateTo(Screen.AUTH)},
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .testTag("loginButton")) {
-                    Text(text = "Login/Register")
-            }}
-      }}
-
+                Button(
+                    onClick = { navigationActions.navigateTo(Screen.AUTH) },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            .testTag("loginButton")) {
+                      Text(text = "Login/Register")
+                    }
+              }
+            }
+      }
 }
