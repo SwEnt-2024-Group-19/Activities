@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.ui.components.EmailTextField
+import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -39,9 +41,8 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
   val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
-  val coroutineScope = rememberCoroutineScope()
   val token = stringResource(R.string.default_web_client_id)
-
+  val isPasswordVisible = remember { mutableStateOf(false) }
   val onAuthSuccess = { Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show() }
 
   val onAuthError = { errorMessage: String ->
@@ -67,20 +68,21 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
               Spacer(modifier = Modifier.height(48.dp))
 
               // Email Input
-              OutlinedTextField(
-                  value = emailState.value,
-                  onValueChange = { emailState.value = it },
-                  label = { Text("Email") },
-                  modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
+              EmailTextField(
+                  email = emailState.value,
+                  onEmailChange = { emailState.value = it },
+                  emailError = null)
               Spacer(modifier = Modifier.height(16.dp))
 
               // Password Input
-              OutlinedTextField(
-                  value = passwordState.value,
-                  onValueChange = { passwordState.value = it },
-                  label = { Text("Password") },
-                  isError = passwordErrorState.value != null,
-                  modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"))
+              PasswordTextField(
+                  password = passwordState.value,
+                  onPasswordChange = { passwordState.value = it },
+                  isPasswordVisible = isPasswordVisible.value,
+                  onPasswordVisibilityChange = {
+                    isPasswordVisible.value = !isPasswordVisible.value
+                  },
+              )
 
               // Password Error
               passwordErrorState.value?.let {

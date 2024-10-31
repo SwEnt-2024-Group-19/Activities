@@ -107,6 +107,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                   userProfile = userProfile,
                   onSuccess = {
                     Log.d("ProfileCreation", "Profile created successfully")
+                    viewModel.fetchUserData(uid)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   },
                   onError = { error ->

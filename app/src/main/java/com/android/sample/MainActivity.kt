@@ -18,7 +18,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.auth.SignInViewModel
-import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
@@ -50,10 +49,10 @@ class MainActivity : ComponentActivity() {
     setContent {
       // A surface container using the 'background' color from the theme
       Surface(
-        modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
-        color = MaterialTheme.colorScheme.background) {
-        ActivitiesApp(auth.currentUser?.uid ?: "")
-      }
+          modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
+          color = MaterialTheme.colorScheme.background) {
+            ActivitiesApp(auth.currentUser?.uid ?: "")
+          }
     }
   }
 }
@@ -64,16 +63,15 @@ fun ActivitiesApp(uid: String) {
   val navigationActions = NavigationActions(navController)
 
   val listActivitiesViewModel: ListActivitiesViewModel =
-    viewModel(factory = ListActivitiesViewModel.Factory)
+      viewModel(factory = ListActivitiesViewModel.Factory)
   val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(uid))
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
-  val locationViewModel: LocationViewModel = hiltViewModel()
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
     navigation(
-      startDestination = Screen.AUTH,
-      route = Route.AUTH,
+        startDestination = Screen.AUTH,
+        route = Route.AUTH,
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
       composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
@@ -83,8 +81,8 @@ fun ActivitiesApp(uid: String) {
     }
 
     navigation(
-      startDestination = Screen.OVERVIEW,
-      route = Route.OVERVIEW,
+        startDestination = Screen.OVERVIEW,
+        route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) {
         ListActivitiesScreen(listActivitiesViewModel, navigationActions)
@@ -95,6 +93,7 @@ fun ActivitiesApp(uid: String) {
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
+
     }
 
     navigation(startDestination = Screen.MAP, route = Route.MAP) {
@@ -103,8 +102,7 @@ fun ActivitiesApp(uid: String) {
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
       composable(Screen.ADD_ACTIVITY) {
-        CreateActivityScreen(
-          listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+        CreateActivityScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
     }
 
