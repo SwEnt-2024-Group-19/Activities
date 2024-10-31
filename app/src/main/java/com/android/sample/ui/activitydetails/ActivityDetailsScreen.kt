@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -43,12 +44,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
+import java.util.UUID
 import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +86,14 @@ fun ActivityDetailsScreen(
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
   val context = LocalContext.current
+    val testcomment = Comment(
+        uid = "1",
+        userId = "1",
+        userName = "John",
+        content = "This is a comment",
+        timestamp = Timestamp.now()
+    )
+  var comments by remember { mutableStateOf(activity?.comments ?: listOf(testcomment)) }
 
   Scaffold(
       topBar = {
@@ -212,6 +224,119 @@ fun ActivityDetailsScreen(
                       Text(text = "Enroll")
                     }
               }
+            CommentSection(
+                comments = comments,
+                onAddComment = { content ->
+                    val newComment = Comment(
+                        uid = UUID.randomUUID().toString(),
+                        userId = profile?.id ?: "anonymous",
+                        userName = profile?.name ?: "anonymous",
+                        content = content,
+                        timestamp = Timestamp.now()
+                    )
+                    // listActivityViewModel.addCommentToActivity(activity!!.uid, newComment)
+                    comments += newComment
+                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                },
+                onReplyComment = { replyContent, comment ->
+                    val reply = Comment(
+                        uid = UUID.randomUUID().toString(),
+                        userId = profile?.id ?: "anonymous",
+                        userName = profile?.name ?: "anonymous",
+                        content = replyContent,
+                        timestamp = Timestamp.now()
+                    )
+                    //listActivityViewModel.addReplyToComment(activity!!.uid, comment.uid, reply)
+                    comment.replies += reply
+                    comments = comments.map { if (it.uid == comment.uid) comment else it }
+                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                }
+            )
             }
       }
 }
+
+@Composable
+fun CommentSection(
+    comments: List<Comment>,
+    onAddComment: (String) -> Unit,
+    onReplyComment: (String, Comment) -> Unit
+) {
+    val newCommentText = remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
+
+        comments.forEach { comment ->
+            CommentItem(comment, onReplyComment)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Input field for new comments
+        OutlinedTextField(
+            value = newCommentText.value,
+            onValueChange = { newCommentText.value = it },
+            label = { Text("Add a comment") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Button(
+            onClick = {
+                onAddComment(newCommentText.value)
+                newCommentText.value = ""
+            },
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            Text("Post Comment")
+        }
+    }
+}
+
+@Composable
+fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit) {
+    var showReplyField by remember { mutableStateOf(false) }
+    var replyText by remember { mutableStateOf("") }
+
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text(text = "${comment.userName}: ${comment.content}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = comment.timestamp.toDate().toString(), style = MaterialTheme.typography.bodySmall)
+
+        // Toggle button to show/hide the reply input field
+        Button(
+            onClick = { showReplyField = !showReplyField },
+            modifier = Modifier.padding(top = 4.dp)
+        ) {
+            Text(if (showReplyField) "Cancel" else "Reply")
+        }
+
+        // Conditionally show the reply input field
+        if (showReplyField) {
+            OutlinedTextField(
+                value = replyText,
+                onValueChange = { replyText = it },
+                label = { Text("Reply") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = {
+                    onReplyComment(replyText, comment)
+                    replyText = ""
+                    showReplyField = false
+                },
+                modifier = Modifier.padding(top = 4.dp)
+            ) {
+                Text("Post Reply")
+            }
+        }
+
+        // Show replies indented
+        comment.replies.forEach { reply ->
+            Box(modifier = Modifier.padding(start = 16.dp)) {
+                CommentItem(reply, onReplyComment)
+            }
+        }
+    }
+}
+
