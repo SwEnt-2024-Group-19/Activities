@@ -1,5 +1,6 @@
 package com.android.sample.ui.activity
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,7 +32,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -70,14 +71,16 @@ fun EditActivityScreen(
         viewModel(factory = ListActivitiesViewModel.Factory),
     navigationActions: NavigationActions,
 ) {
+  val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   var title by remember { mutableStateOf(activity?.title ?: "") }
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
   var location by remember { mutableStateOf(activity?.location ?: "") }
-  var price by remember { mutableStateOf(activity?.price.toString() ?: "") }
-  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString() ?: "") }
+  var price by remember { mutableStateOf(activity?.price.toString()) }
+  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
+  var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants ?: listOf()) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration) }
@@ -130,7 +133,7 @@ fun EditActivityScreen(
           // Carousel()
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
-              value = title ?: "",
+              value = title,
               onValueChange = { title = it },
               label = { Text("Title") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleEdit"),
@@ -138,7 +141,7 @@ fun EditActivityScreen(
           )
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
-              value = description ?: "",
+              value = description,
               onValueChange = { description = it },
               label = { Text("Description") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionEdit"),
@@ -187,21 +190,20 @@ fun EditActivityScreen(
 
           Spacer(modifier = Modifier.height(8.dp))
           OutlinedTextField(
-              value = placesLeft,
-              onValueChange = { placesLeft = it },
-              label = { Text("Places Left") },
+              value = maxPlaces,
+              onValueChange = { maxPlaces = it },
+              label = { Text("Total Places") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
               placeholder = {
-                Text(text = stringResource(id = R.string.request_placesLeft_activity))
+                Text(text = stringResource(id = R.string.request_placesMax_activity))
               },
           )
           Spacer(modifier = Modifier.height(8.dp))
-
           ExposedDropdownMenuBox(
               modifier = Modifier.testTag("chooseTypeMenu"),
               expanded = expanded,
               onExpandedChange = { expanded = !expanded }) {
-                TextField(
+                OutlinedTextField(
                     readOnly = true,
                     value = selectedOption,
                     onValueChange = {},
@@ -224,7 +226,7 @@ fun EditActivityScreen(
               }
 
           OutlinedTextField(
-              value = location ?: "",
+              value = location,
               onValueChange = { location = it },
               label = { Text("Location") },
               modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationEdit"),
@@ -252,42 +254,44 @@ fun EditActivityScreen(
                   }
                 }
 
-                LazyRow(
-                    modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
-                ) {
-                  items(attendees.size) { index ->
-                    Row(
-                        modifier =
-                            Modifier.padding(8.dp)
-                                .background(Color(0xFFFFFFFF))
-                                .testTag("attendeeRow${index}"),
-                    ) {
-                      Text(
-                          text = attendees[index].name,
-                          modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      Text(
-                          text = attendees[index].surname,
-                          modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Spacer(modifier = Modifier.width(8.dp))
-                      Text(
-                          text = attendees[index].age.toString(),
-                          modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
-                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                      )
-                      Button(
-                          onClick = { attendees = attendees.filter { it != attendees[index] } },
+                if (attendees.isNotEmpty()) {
+                  LazyRow(
+                      modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
+                  ) {
+                    items(attendees.size) { index ->
+                      Row(
                           modifier =
-                              Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
+                              Modifier.padding(8.dp)
+                                  .background(Color(0xFFFFFFFF))
+                                  .testTag("attendeeRow${index}"),
                       ) {
-                        Icon(
-                            Icons.Filled.PersonRemove,
-                            contentDescription = "remove attendee",
+                        Text(
+                            text = attendees[index].name,
+                            modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
+                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                         )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = attendees[index].surname,
+                            modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
+                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = attendees[index].age.toString(),
+                            modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
+                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                        )
+                        Button(
+                            onClick = { attendees = attendees.filter { it != attendees[index] } },
+                            modifier =
+                                Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
+                        ) {
+                          Icon(
+                              Icons.Filled.PersonRemove,
+                              contentDescription = "remove attendee",
+                          )
+                        }
                       }
                     }
                   }
@@ -319,17 +323,17 @@ fun EditActivityScreen(
                     val updatedActivity =
                         Activity(
                             uid = activity?.uid ?: "",
-                            title = title ?: "",
-                            description = description ?: "",
+                            title = title,
+                            description = description,
                             date = Timestamp(calendar.time),
                             startTime = startTime ?: "",
                             duration = duration ?: "",
                             price = price.toDouble(),
-                            placesLeft = parseFraction(placesLeft, 0)?.toLong() ?: 0.toLong(),
-                            maxPlaces = parseFraction(placesLeft, 2)?.toLong() ?: 0.toLong(),
-                            creator = creator ?: "",
+                            placesLeft = attendees.size.toLong(),
+                            maxPlaces = maxPlaces.toLongOrNull() ?: 0,
+                            creator = creator,
                             status = ActivityStatus.ACTIVE,
-                            location = location ?: "",
+                            location = location,
                             images = listOf(),
                             type = types.find { it.name == selectedOption } ?: types[0],
                             participants = attendees)
@@ -338,6 +342,10 @@ fun EditActivityScreen(
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   } catch (_: Exception) {}
                 }
+
+                Toast.makeText(
+                        context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
+                    .show()
               },
               modifier =
                   Modifier.width(300.dp)

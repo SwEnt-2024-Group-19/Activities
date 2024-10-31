@@ -1,6 +1,7 @@
 package com.android.sample.model.activity
 
 import android.util.Log
+import com.android.sample.ui.dialogs.SimpleUser
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,6 +34,13 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                 .map { document ->
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
+                  val participants =
+                      (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
+                        SimpleUser(
+                            name = participantData["name"] as? String ?: "No Name",
+                            surname = participantData["surname"] as? String ?: "No Surname",
+                            age = participantData["age"] as? Int ?: 0)
+                      } ?: listOf()
                   val activityType =
                       data["type"]?.let {
                         try {
@@ -42,21 +50,21 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                         }
                       } ?: ActivityType.SOLO
                   Activity(
-                      document.id,
-                      data["title"] as? String ?: "No Title",
-                      data["description"] as? String ?: "No Description",
-                      data["date"] as? Timestamp ?: Timestamp.now(),
-                      data["startTime"] as? String ?: "HH:mm",
-                      data["duration"] as? String ?: "HH:mm",
-                      data["price"] as? Double ?: 0.0,
-                      data["location"] as? String ?: "Unknown Location",
-                      data["creator"] as? String ?: "Anonymous",
-                      listOf(),
-                      data["placesLeft"] as? Long ?: 0,
-                      data["maxPlaces"] as? Long ?: 0,
-                      ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
-                      activityType,
-                      participants = listOf())
+                      uid = document.id,
+                      title = data["title"] as? String ?: "No Title",
+                      description = data["description"] as? String ?: "No Description",
+                      date = data["date"] as? Timestamp ?: Timestamp.now(),
+                      startTime = data["startTime"] as? String ?: "HH:mm",
+                      duration = data["duration"] as? String ?: "HH:mm",
+                      price = data["price"] as? Double ?: 0.0,
+                      location = data["location"] as? String ?: "Unknown Location",
+                      creator = data["creator"] as? String ?: "Anonymous",
+                      images = listOf(),
+                      placesLeft = data["placesLeft"] as? Long ?: 0,
+                      maxPlaces = data["maxPlaces"] as? Long ?: 0,
+                      status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+                      type = activityType,
+                      participants = participants)
                 }
                 .filterNotNull() // Filter out any null results
 

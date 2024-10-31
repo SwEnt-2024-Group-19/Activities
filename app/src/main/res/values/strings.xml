@@ -11,7 +11,8 @@
     <string name="request_date_activity_withFormat">dd/mm/yyyy</string>
     <string name="hour_min_format">HH:mm</string>
     <string name="request_price_activity">Price/person</string>
-    <string name="request_placesLeft_activity">Places left/Total places</string>
+    <string name="request_placesLeft_activity">Places left</string>
+    <string name="request_placesMax_activity">Total Places</string>
     <string name="request_location_activity">Where is it taking place</string>
     <string name="button_create_activity">Create</string>
 
