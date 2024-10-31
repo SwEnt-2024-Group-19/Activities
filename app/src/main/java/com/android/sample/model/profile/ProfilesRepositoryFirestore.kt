@@ -4,8 +4,10 @@ import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import javax.inject.Inject
 
-open class ProfilesRepositoryFirestore(private val db: FirebaseFirestore) : ProfilesRepository {
+open class ProfilesRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
+    ProfilesRepository {
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     db.collection("profiles").document(userId).get().addOnCompleteListener { task ->
