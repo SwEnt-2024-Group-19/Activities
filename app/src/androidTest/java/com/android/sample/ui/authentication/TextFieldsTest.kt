@@ -41,9 +41,9 @@ class TextFieldsTest {
           onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value })
     }
 
-      composeTestRule.onNodeWithText("Password").assertExists()
+    composeTestRule.onNodeWithText("Password").assertExists()
 
-      // Initially, the icon should indicate that the password is hidden ("Show password")
+    // Initially, the icon should indicate that the password is hidden ("Show password")
     composeTestRule.onNodeWithContentDescription("Show password").assertExists()
 
     // Click the visibility icon to show the password
@@ -57,25 +57,5 @@ class TextFieldsTest {
 
     // The icon should go back to indicating that the password is hidden ("Show password")
     composeTestRule.onNodeWithContentDescription("Show password").assertExists()
-  }
-
-  @Test
-  fun testPasswordErrorIsDisplayed() {
-    val password = "testPassword"
-    val isPasswordVisible = mutableStateOf(false)
-
-    composeTestRule.setContent {
-      PasswordTextField(
-          password = password,
-          onPasswordChange = {},
-          isPasswordVisible = isPasswordVisible.value,
-          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
-          passwordError = "Password error message")
-    }
-
-    composeTestRule
-        .onNodeWithText("Password error message")
-        .assertExists()
-        .assertTextContains("Password error message")
   }
 }

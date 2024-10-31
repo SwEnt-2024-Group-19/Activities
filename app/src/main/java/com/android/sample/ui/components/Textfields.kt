@@ -22,23 +22,22 @@ fun PasswordTextField(
     isPasswordVisible: Boolean,
     onPasswordVisibilityChange: () -> Unit,
 ) {
-    OutlinedTextField(
-        value = password,
-        onValueChange = onPasswordChange,
-        label = { Text("Password") },
-        visualTransformation =
-        if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        trailingIcon = {
-            IconButton(onClick = onPasswordVisibilityChange) {
-                Icon(
-                    imageVector =
-                    if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                    contentDescription = if (isPasswordVisible) "Hide password" else "Show password"
-                )
-            }
-        },
-    )
-
+  OutlinedTextField(
+      value = password,
+      modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"),
+      onValueChange = onPasswordChange,
+      label = { Text("Password") },
+      visualTransformation =
+          if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+      trailingIcon = {
+        IconButton(onClick = onPasswordVisibilityChange) {
+          Icon(
+              imageVector =
+                  if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+              contentDescription = if (isPasswordVisible) "Hide password" else "Show password")
+        }
+      },
+  )
 }
 
 @Composable
@@ -47,21 +46,13 @@ fun EmailTextField(
     onEmailChange: (String) -> Unit,
     emailError: String?,
 ) {
-    OutlinedTextField(
-        value = email,
-        onValueChange = onEmailChange,
-        label = { Text("Email") },
-        isError = emailError != null,
-        modifier = Modifier
-            .fillMaxWidth(0.8f)
-            .testTag("EmailTextField")
-    )
-    emailError?.let {
-        Text(
-            text = it,
-            color = Color.Red,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(start = 16.dp)
-        )
-    }
+  OutlinedTextField(
+      value = email,
+      onValueChange = onEmailChange,
+      label = { Text("Email") },
+      isError = emailError != null,
+      modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
+  emailError?.let {
+    Text(text = it, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 16.dp))
+  }
 }
