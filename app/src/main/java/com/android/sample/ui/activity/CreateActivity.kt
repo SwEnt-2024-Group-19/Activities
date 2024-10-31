@@ -20,11 +20,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -188,7 +190,11 @@ fun CreateActivityScreen(
           Spacer(modifier = Modifier.height(8.dp))
 
           ExposedDropdownMenuBox(
-              modifier = Modifier.testTag("chooseTypeMenu"),
+              modifier =
+                  Modifier.testTag("chooseTypeMenu")
+                      .align(Alignment.CenterHorizontally)
+                      .fillMaxWidth()
+                      .padding(8.dp),
               expanded = expanded,
               onExpandedChange = { expanded = !expanded }) {
                 OutlinedTextField(
@@ -200,70 +206,69 @@ fun CreateActivityScreen(
                       ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier.menuAnchor())
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                  types.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        text = { Text(selectionOption.name) },
-                        onClick = {
-                          selectedOption = selectionOption.name
-                          expanded = false
-                        })
-                  }
-                }
+                    modifier = Modifier.menuAnchor().fillMaxWidth())
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                      types.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            text = { Text(selectionOption.name) },
+                            onClick = {
+                              selectedOption = selectionOption.name
+                              expanded = false
+                            })
+                      }
+                    }
               }
 
           Spacer(modifier = Modifier.height(32.dp))
 
-          Column(
-              modifier = Modifier.fillMaxWidth().padding(8.dp).height(130.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp),
-              horizontalAlignment = Alignment.CenterHorizontally,
+          Button(
+              onClick = { showDialog = true },
+              modifier =
+                  Modifier.width(300.dp)
+                      .height(40.dp)
+                      .testTag("addAttendeeButton")
+                      .align(Alignment.CenterHorizontally),
           ) {
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier.width(300.dp).height(40.dp).testTag("addAttendeeButton"),
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-              Row(
-                  horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                  verticalAlignment = Alignment.CenterVertically,
-              ) {
-                Icon(
-                    Icons.Filled.Add,
-                    contentDescription = "add a new attendee",
-                )
-                Text("Add Attendee")
-              }
+              Icon(
+                  Icons.Filled.Add,
+                  contentDescription = "add a new attendee",
+              )
+              Text("Add Attendee")
             }
-            if (attendees.isNotEmpty()) {
-              LazyRow(
-                  modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
-              ) {
-                items(attendees.size) { index ->
-                  Row(
-                      modifier =
-                          Modifier.padding(8.dp)
-                              .background(Color(0xFFFFFFFF))
-                              .testTag("attendeeRow${index}"),
-                  ) {
-                    Text(
-                        text = attendees[index].name,
-                        modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = attendees[index].surname,
-                        modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = attendees[index].age.toString(),
-                        modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                    )
-                    Button(
+          }
+          if (attendees.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
+            ) {
+              items(attendees.size) { index ->
+                Card(
+                    modifier =
+                        Modifier.padding(8.dp)
+                            .background(Color(0xFFFFFFFF))
+                            .testTag("attendeeRow${index}"),
+                ) {
+                  Row {
+                    Column(modifier = Modifier.padding(8.dp)) {
+                      Text(
+                          text = "${attendees[index].name} ${attendees[index].surname}",
+                          modifier = Modifier.testTag("attendeeName${index}"),
+                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                      )
+                      Text(
+                          text = "Age: ${attendees[index].age}",
+                          modifier = Modifier.testTag("attendeeAge${index}"),
+                          style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
+                      )
+                    }
+                    IconButton(
                         onClick = { attendees = attendees.filter { it != attendees[index] } },
                         modifier =
                             Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
@@ -276,16 +281,16 @@ fun CreateActivityScreen(
                   }
                 }
               }
-              Spacer(modifier = Modifier.height(32.dp))
             }
           }
+
           if (showDialog) {
             AddUserDialog(
                 onDismiss = { showDialog = false },
                 onAddUser = { user -> attendees = attendees + user },
             )
           }
-
+          Spacer(modifier = Modifier.height(32.dp))
           Button(
               enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
               onClick = {
@@ -331,7 +336,9 @@ fun CreateActivityScreen(
                     listActivityViewModel.addActivity(activity)
                     profileViewModel.addActivity(creator, activity.uid)
                     navigationActions.navigateTo(Screen.OVERVIEW)
-                  } catch (_: NumberFormatException) {}
+                  } catch (_: NumberFormatException) {
+                    println("There is an error")
+                  }
                 }
                 if (parts.size != 3) {
                   Toast.makeText(
