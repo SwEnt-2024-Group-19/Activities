@@ -132,6 +132,7 @@ class ActivityDetailsScreenAndroidTest {
         .onNodeWithTag("notActiveText")
         .assertIsDisplayed()
         .assertTextContains("Activity is not active")
+    composeTestRule.onNodeWithText("Activity is not active").assertIsDisplayed()
   }
 
   @Test
@@ -172,6 +173,7 @@ class ActivityDetailsScreenAndroidTest {
     }
 
     composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Enroll").assertIsDisplayed()
   }
 
   @Test
@@ -185,6 +187,7 @@ class ActivityDetailsScreenAndroidTest {
           navigationActions = mockNavigationActions,
           profileViewModel = mockProfileViewModel)
     }
+    composeTestRule.onNodeWithText("Edit").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editButton").assertIsDisplayed().performClick()
     verify(mockNavigationActions).navigateTo(Screen.EDIT_ACTIVITY)
   }
@@ -201,7 +204,7 @@ class ActivityDetailsScreenAndroidTest {
           profileViewModel = mockProfileViewModel,
           navigationActions = mockNavigationActions)
     }
-
+    composeTestRule.onNodeWithText("Login/Register").assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed().performClick()
 
     verify(mockNavigationActions).navigateTo(Screen.AUTH)
@@ -222,7 +225,6 @@ class ActivityDetailsScreenAndroidTest {
     }
 
     composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed().performClick()
-
     composeTestRule.onNodeWithText("Enroll failed, limit of places reached").isDisplayed()
   }
 }
