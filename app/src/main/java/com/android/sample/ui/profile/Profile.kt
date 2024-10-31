@@ -58,7 +58,7 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
-    
+
   val profileState = userProfileViewModel.userState.collectAsState()
 
   when (val profile = profileState.value) {
