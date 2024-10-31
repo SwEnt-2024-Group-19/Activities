@@ -31,7 +31,7 @@ class NominatimLocationRepositoryTest {
         val query = "Central Park"
         val mockResponseBody = """
             [
-                {"lat": 40.785091, "lon": -73.968285, "display_name": "Central Park, NYC"}
+                {"lat": 40.785091, "lon": -73.968285, "display_name": "Central Park"}
             ]
         """.trimIndent()
         val mockResponse = createMockResponse(mockResponseBody, 200)

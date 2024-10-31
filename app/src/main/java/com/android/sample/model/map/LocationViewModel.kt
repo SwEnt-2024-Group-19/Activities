@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import okhttp3.OkHttpClient
+import javax.inject.Inject
 
-class LocationViewModel(val repository: LocationRepository) : ViewModel() {
+class LocationViewModel
+    @Inject
+    constructor(private val repository: LocationRepository) : ViewModel() {
     private val query_ = MutableStateFlow("")
     val query: StateFlow<String> = query_
 

@@ -9,8 +9,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
+import javax.inject.Inject
 
-class NominatimLocationRepository(val client: OkHttpClient) : LocationRepository {
+class NominatimLocationRepository
+    @Inject
+    constructor(private val client: OkHttpClient) : LocationRepository {
 
     private fun parseBody(body: String): List<Location> {
         val jsonArray = JSONArray(body)
