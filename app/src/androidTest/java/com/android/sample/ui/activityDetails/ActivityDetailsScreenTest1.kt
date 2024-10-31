@@ -76,7 +76,7 @@ class ActivityDetailsScreenAndroidTest {
             location = "Sample Location",
             images = listOf("1"),
             participants = listOf(),
-            duration = "2 hours",
+            duration = "02:00",
             startTime = "10:00",
             type = ActivityType.INDIVIDUAL)
     val activityStateFlow = MutableStateFlow(activity)
@@ -95,8 +95,9 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("image").assertIsDisplayed()
     composeTestRule.onNodeWithTag("title").assertIsDisplayed()
     composeTestRule.onNodeWithTag("description").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("price").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("price&&location").assertIsDisplayed()
     composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("duration").assertIsDisplayed()
   }
 
   @Test
@@ -139,7 +140,9 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("titleText").assertTextContains("Sample Activity")
     composeTestRule.onNodeWithTag("descriptionText").assertTextContains("Sample Description")
     composeTestRule.onNodeWithTag("priceText").assertTextContains("10.0 CHF")
-    composeTestRule.onNodeWithTag("scheduleText").assertTextContains("3/11/2025")
+    composeTestRule.onNodeWithTag("locationText").assertTextContains("Sample Location")
+    composeTestRule.onNodeWithTag("scheduleText").assertTextContains("3/11/2025 at 10:00")
+    composeTestRule.onNodeWithTag("durationText").assertTextContains("02:00")
   }
 
   @Test
