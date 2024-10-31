@@ -184,7 +184,6 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     // composeTestRule.onNodeWithTag("attendeeRow0").assertIsDisplayed()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John")
-    composeTestRule.onNodeWithTag("attendeeSurname0").assertTextEquals("Doe")
     composeTestRule.onNodeWithTag("attendeeAge0").assertTextEquals("25")
   }
 }

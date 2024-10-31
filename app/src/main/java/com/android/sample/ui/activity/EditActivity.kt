@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -124,11 +125,12 @@ fun EditActivityScreen(
       }) { paddingValues ->
         Column(
             modifier =
-                Modifier.padding(paddingValues)
-                    .fillMaxSize()
-                    .background(color = Color(0xFFFFFFFF))
-                    .verticalScroll(rememberScrollState())
-                    .testTag("activityEditScreen"),
+            Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(color = Color(0xFFFFFFFF))
+                .verticalScroll(rememberScrollState())
+                .testTag("activityEditScreen"),
         ) {
           // Carousel()
           Spacer(modifier = Modifier.height(8.dp))
@@ -136,7 +138,10 @@ fun EditActivityScreen(
               value = title,
               onValueChange = { title = it },
               label = { Text("Title") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleEdit"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputTitleEdit"),
               placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -144,7 +149,10 @@ fun EditActivityScreen(
               value = description,
               onValueChange = { description = it },
               label = { Text("Description") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionEdit"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputDescriptionEdit"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_activity_description))
               },
@@ -154,7 +162,10 @@ fun EditActivityScreen(
               value = dueDate,
               onValueChange = { dueDate = it },
               label = { Text("Date") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateEdit"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputDateEdit"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_date_activity_withFormat))
               },
@@ -165,7 +176,9 @@ fun EditActivityScreen(
               value = startTime ?: "",
               onValueChange = { startTime = it },
               label = { Text("Time") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth(),
               placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
           )
           Spacer(modifier = Modifier.height(8.dp))
@@ -174,7 +187,9 @@ fun EditActivityScreen(
               value = duration ?: "",
               onValueChange = { duration = it },
               label = { Text("Duration") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth(),
               placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
           )
 
@@ -184,7 +199,10 @@ fun EditActivityScreen(
               value = price,
               onValueChange = { price = it },
               label = { Text("Price") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceEdit"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputPriceEdit"),
               placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
           )
 
@@ -193,14 +211,18 @@ fun EditActivityScreen(
               value = maxPlaces,
               onValueChange = { maxPlaces = it },
               label = { Text("Total Places") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputPlacesLeftEdit"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_placesMax_activity))
               },
           )
           Spacer(modifier = Modifier.height(8.dp))
           ExposedDropdownMenuBox(
-              modifier = Modifier.testTag("chooseTypeMenu"),
+              modifier = Modifier.testTag("chooseTypeMenu").fillMaxWidth()
+                  .padding(8.dp),
               expanded = expanded,
               onExpandedChange = { expanded = !expanded }) {
                 OutlinedTextField(
@@ -212,10 +234,12 @@ fun EditActivityScreen(
                       ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier.menuAnchor())
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    modifier = Modifier.menuAnchor().fillMaxWidth())
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                   types.forEach { selectionOption ->
                     DropdownMenuItem(
+                        modifier = Modifier.fillMaxWidth().padding(8.dp),
                         text = { Text(selectionOption.name) },
                         onClick = {
                           selectedOption = selectionOption.name
@@ -229,81 +253,106 @@ fun EditActivityScreen(
               value = location,
               onValueChange = { location = it },
               label = { Text("Location") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationEdit"),
+              modifier = Modifier
+                  .padding(8.dp)
+                  .fillMaxWidth()
+                  .testTag("inputLocationEdit"),
               placeholder = {
                 Text(text = stringResource(id = R.string.request_location_activity))
               },
           )
-          Column(
-              modifier = Modifier.fillMaxWidth().padding(8.dp).height(130.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = { showDialog = true },
-                    modifier = Modifier.width(300.dp).height(40.dp).testTag("addAttendeeButton"),
+
+            Button(
+                onClick = { showDialog = true },
+                modifier =
+                Modifier
+                    .width(300.dp)
+                    .height(40.dp)
+                    .testTag("addAttendeeButton")
+                    .align(Alignment.CenterHorizontally),
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        8.dp,
+                        Alignment.CenterHorizontally
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                  Row(
-                      horizontalArrangement =
-                          Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                      verticalAlignment = Alignment.CenterVertically,
-                  ) {
                     Icon(
                         Icons.Filled.Add,
                         contentDescription = "add a new attendee",
                     )
                     Text("Add Attendee")
-                  }
                 }
-
-                if (attendees.isNotEmpty()) {
-                  LazyRow(
-                      modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
-                  ) {
+            }
+            if (attendees.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .height(85.dp)
+                        .padding(8.dp),
+                ) {
                     items(attendees.size) { index ->
-                      Row(
-                          modifier =
-                              Modifier.padding(8.dp)
-                                  .background(Color(0xFFFFFFFF))
-                                  .testTag("attendeeRow${index}"),
-                      ) {
-                        Text(
-                            text = attendees[index].name,
-                            modifier = Modifier.padding(8.dp).testTag("attendeeName${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = attendees[index].surname,
-                            modifier = Modifier.padding(8.dp).testTag("attendeeSurname${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = attendees[index].age.toString(),
-                            modifier = Modifier.padding(8.dp).testTag("attendeeAge${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
-                        Button(
-                            onClick = { attendees = attendees.filter { it != attendees[index] } },
+                        Card(
                             modifier =
-                                Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
-                        ) {
-                          Icon(
-                              Icons.Filled.PersonRemove,
-                              contentDescription = "remove attendee",
-                          )
+                            Modifier
+                                .padding(8.dp)
+                                .background(Color(0xFFFFFFFF))
+                                .testTag("attendeeRow${index}"),
+
+                            ) {
+                            Row {
+                                Column(
+                                    modifier = Modifier.padding(8.dp)
+                                ) {
+                                    Text(
+                                        text = "${attendees[index].name} ${attendees[index].surname}",
+                                        modifier = Modifier
+                                            .testTag("attendeeName${index}"),
+                                        style = TextStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        ),
+                                    )
+                                    Text(
+                                        text = "Age: ${attendees[index].age}",
+                                        modifier = Modifier
+                                            .testTag("attendeeAge${index}"),
+                                        style = TextStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        ),
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        attendees = attendees.filter { it != attendees[index] }
+                                    },
+                                    modifier =
+                                    Modifier
+                                        .width(40.dp)
+                                        .height(40.dp)
+                                        .testTag("removeAttendeeButton"),
+
+                                    ) {
+                                    Icon(
+                                        Icons.Filled.PersonRemove,
+                                        contentDescription = "remove attendee",
+                                    )
+                                }
+                            }
                         }
-                      }
+
                     }
-                  }
                 }
-              }
+            }
           if (showDialog) {
             AddUserDialog(
                 onDismiss = { showDialog = false },
                 onAddUser = { user -> attendees = attendees + user },
             )
           }
-          Spacer(modifier = Modifier.height(32.dp))
+          Spacer(Modifier.height(16.dp))
 
           Button(
               enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
@@ -343,15 +392,19 @@ fun EditActivityScreen(
                   } catch (_: Exception) {}
                 }
 
-                Toast.makeText(
-                        context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
-                    .show()
+                  if(parts.size!=3){
+                      Toast.makeText(
+                          context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT
+                      )
+                          .show()
+                  }
               },
               modifier =
-                  Modifier.width(300.dp)
-                      .height(40.dp)
-                      .align(Alignment.CenterHorizontally)
-                      .testTag("editButton"),
+              Modifier
+                  .width(300.dp)
+                  .height(40.dp)
+                  .align(Alignment.CenterHorizontally)
+                  .testTag("editButton"),
           ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -379,10 +432,11 @@ fun EditActivityScreen(
                 navigationActions.navigateTo(Screen.OVERVIEW)
               },
               modifier =
-                  Modifier.width(300.dp)
-                      .height(40.dp)
-                      .align(Alignment.CenterHorizontally)
-                      .testTag("deleteButton"),
+              Modifier
+                  .width(300.dp)
+                  .height(40.dp)
+                  .align(Alignment.CenterHorizontally)
+                  .testTag("deleteButton"),
           ) {
             Row(
                 Modifier.background(Color.Transparent),
