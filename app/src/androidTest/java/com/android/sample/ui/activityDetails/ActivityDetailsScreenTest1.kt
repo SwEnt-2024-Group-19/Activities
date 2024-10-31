@@ -78,7 +78,9 @@ class ActivityDetailsScreenAndroidTest {
             participants = listOf(),
             duration = "2 hours",
             startTime = "10:00",
-            type = ActivityType.INDIVIDUAL)
+            type = ActivityType.INDIVIDUAL,
+            comments = listOf()
+        )
     val activityStateFlow = MutableStateFlow(activity)
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
   }
