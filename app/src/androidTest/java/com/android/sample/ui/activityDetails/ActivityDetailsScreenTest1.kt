@@ -58,6 +58,7 @@ class ActivityDetailsScreenAndroidTest {
             photo = "",
             interests = listOf("Cycling", "Reading"),
             activities = listOf("Football"))
+
     val userStateFlow = MutableStateFlow(testUser)
     `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
 
@@ -118,13 +119,13 @@ class ActivityDetailsScreenAndroidTest {
   fun enrollButtonIsNotDisplayedWhenActivityIsFinished() {
     activity = activity.copy(status = ActivityStatus.FINISHED)
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
-
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
           profileViewModel = mockProfileViewModel)
     }
+
     composeTestRule.onNodeWithTag("enrollButton").assertDoesNotExist()
   }
 
@@ -156,5 +157,70 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("goBackButton").performClick()
 
     verify(mockNavigationActions).goBack()
+  }
+
+  @Test
+  fun enrollButton_displays_whenUserLoggedIn() {
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Enroll").assertIsDisplayed()
+  }
+
+  @Test
+  fun enrollButton_displaysForActiveActivity_whenUserIsNotCreator() {
+    val activity1 = activity.copy(creator = "123")
+    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity1))
+
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
+    composeTestRule.onNodeWithText("Edit").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("editButton").assertIsDisplayed().performClick()
+    verify(mockNavigationActions).navigateTo(Screen.EDIT_ACTIVITY)
+  }
+
+  @Test
+  fun loginRegisterButton_displays_whenUserIsNotLoggedIn() {
+    // Set the user state to null to simulate the user not being logged in
+    val userStateFlow = MutableStateFlow<User?>(null)
+    `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
+
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          profileViewModel = mockProfileViewModel,
+          navigationActions = mockNavigationActions)
+    }
+    composeTestRule.onNodeWithText("Login/Register").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed().performClick()
+
+    verify(mockNavigationActions).navigateTo(Screen.AUTH)
+  }
+
+  @Test
+  fun enrollFailureToast_displays_whenPlacesAreFull() {
+    // Set placesLeft equal to maxPlaces to simulate full capacity
+    activity = activity.copy(placesLeft = activity.maxPlaces)
+    val activityStateFlow = MutableStateFlow(activity)
+    `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
+
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          profileViewModel = mockProfileViewModel,
+          navigationActions = mockNavigationActions)
+    }
+
+    composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Enroll failed, limit of places reached").isDisplayed()
   }
 }

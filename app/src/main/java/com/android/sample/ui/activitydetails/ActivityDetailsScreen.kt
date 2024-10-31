@@ -230,93 +230,56 @@ fun ActivityDetailsScreen(
                 }
               Spacer(modifier = Modifier.height(32.dp))
 
-            // Participants section
-            Text(
-                text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // List of participants
-            Column {
-                activity?.participants?.forEach { participant ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    ) {
-                        // Placeholder for participant picture
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                .padding(8.dp)
-                        ) {
-                            Text(
-                                text = "P", // Placeholder for profile picture
-                                color = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        // Participant name
-                        Text(
-                            text = participant.name, // Display the participant's name
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
-                Button(
-                    onClick = {
-                      if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                          if(isUserEnrolled){
-                              Toast.makeText(
+                if (activity.creator != profile.id) {
+                  Button(
+                      onClick = {
+                        if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
+                          val theActivity =
+                              activity.copy(
+                                  placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                          listActivityViewModel.updateActivity(theActivity)
+                          profileViewModel.addActivity(profile.id, theActivity.uid)
+                          Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
+                          navigationActions.navigateTo(Screen.OVERVIEW)
+                        } else {
+                          Toast.makeText(
                                   context,
-                                  "You are already enrolled in this activity",
+                                  "Enroll failed, limit of places reached",
                                   Toast.LENGTH_SHORT)
-                                  .show()
-                          }else {
-                              val theActivity =
-                                  activity.copy(
-                                      placesLeft = min(
-                                          (placesTaken ?: 0) + 1,
-                                          maxPlaces ?: 0
-                                      ),
-                                        participants = activity.participants.plus(
-                                            SimpleUser(
-                                                name = profile.name,
-                                                surname = profile.surname,
-                                                age = 0
-                                            )
-                                        )
-                                  )
-                              listActivityViewModel.updateActivity(theActivity)
-                              profileViewModel.addActivity(profile.id, theActivity.uid)
-                              Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT)
-                                  .show()
-                              navigationActions.navigateTo(Screen.OVERVIEW)
-                          }
-                      } else {
-
-                        Toast.makeText(
-                                context,
-                                "Enroll failed, limit of places reached",
-                                Toast.LENGTH_SHORT)
-                            .show()
+                              .show()
+                        }
+                      },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 24.dp)
+                              .testTag("enrollButton")) {
+                        Text(text = "Enroll")
                       }
-                    },
+                } else {
+                  Button(
+                      onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 24.dp)
+                              .testTag("editButton")) {
+                        Text(text = "Edit")
+                      }
+                }
+              } else if (activity?.status == ActivityStatus.FINISHED) {
+                Text(text = "Activity is not active", modifier = Modifier.testTag("notActiveText"))
+              } else {
+                Text(
+                    text = "You need to be logged in to enroll",
+                    modifier = Modifier.testTag("notLoggedInText"))
+                Button(
+                    onClick = { navigationActions.navigateTo(Screen.AUTH) },
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .testTag("enrollButton")) {
-                      Text(text = "Enroll")
+                        Modifier.fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            .testTag("loginButton")) {
+                      Text(text = "Login/Register")
                     }
               }
             }
