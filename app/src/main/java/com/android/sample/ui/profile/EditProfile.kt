@@ -15,16 +15,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.ui.navigation.NavigationActions
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: NavigationActions) {
   val profile =
@@ -75,6 +77,14 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               ProfileImage(
                   url = photo,
                   modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+
+              OutlinedTextField(
+                  value = photo.toString(),
+                  onValueChange = { photo = it },
+                  label = { Text("Photo URL") },
+                  placeholder = { Text("Your photo URL") },
+                  modifier = Modifier.fillMaxWidth().testTag("inputProfilePhoto"))
+
               OutlinedTextField(
                   value = name,
                   onValueChange = { name = it },
@@ -87,45 +97,45 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                   label = { Text("Surname") },
                   placeholder = { Text("Your surname") },
                   modifier = Modifier.fillMaxWidth().height(100.dp).testTag("inputProfileSurname"))
+
               // Interest list and add button
               var newInterest by remember { mutableStateOf("") }
               var newListInterests by remember { mutableStateOf(interests) }
 
-              LazyRow(modifier = Modifier.padding(16.dp).testTag("interestsList")) {
-                newListInterests?.let {
-                  items(it.size, key = { it }) { index ->
-                    InterestEditBox(
-                        interest = newListInterests!![index],
-                        onRemove = {
-                          newListInterests = newListInterests!! - newListInterests!![index]
-                        },
-                        modifier = Modifier.testTag("interestItem-$index"))
-                  }
-                }
-                item {
-                  OutlinedTextField(
-                      value = newInterest,
-                      onValueChange = { newInterest = it },
-                      label = { Text("New Interest") },
-                      modifier = Modifier.width(200.dp).testTag("newInterestInput"))
-                  Spacer(modifier = Modifier.width(8.dp))
-                  Button(
-                      onClick = {
-                        if (newInterest.isNotBlank()) {
-                          newListInterests = newListInterests?.plus(newInterest)
-                          newInterest = "" // Clear the field after adding
-                        }
-                      },
-                      modifier =
-                          Modifier.padding(end = 8.dp)
-                              .clip(RoundedCornerShape(8.dp))
-                              .background(Color.LightGray)
-                              .padding(horizontal = 16.dp, vertical = 8.dp)
-                              .testTag("addInterestButton")) {
-                        Text("Add")
+              LazyRow(
+                  modifier = Modifier.padding(16.dp).testTag("interestsList"),
+                  horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    newListInterests?.let {
+                      items(it.size, key = { it }) { index ->
+                        InterestEditBox(
+                            interest = newListInterests!![index],
+                            onRemove = {
+                              newListInterests = newListInterests!! - newListInterests!![index]
+                            })
                       }
-                }
-              }
+                    }
+                  }
+
+              OutlinedTextField(
+                  value = newInterest,
+                  onValueChange = { newInterest = it },
+                  label = { Text("New Interest") },
+                  modifier = Modifier.width(200.dp).testTag("newInterestInput"))
+              Spacer(modifier = Modifier.width(8.dp))
+              Button(
+                  onClick = {
+                    if (newInterest.isNotBlank()) {
+                      newListInterests = newListInterests?.plus(newInterest)
+                      newInterest = "" // Clear the field after adding
+                    }
+                  },
+                  modifier =
+                      Modifier.padding(end = 8.dp)
+                          .clip(RoundedCornerShape(8.dp))
+                          .padding(horizontal = 16.dp, vertical = 8.dp)
+                          .testTag("addInterestButton")) {
+                    Text("Add")
+                  }
 
               Button(
                   onClick = {
@@ -149,14 +159,18 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
 }
 
 @Composable
-fun InterestEditBox(interest: String, onRemove: () -> Unit, modifier: Modifier) {
-  Box(modifier = modifier) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-      Text(text = interest, fontSize = 18.sp, color = Color.Black)
-      Spacer(Modifier.width(8.dp))
-      IconButton(onClick = onRemove) {
-        Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
+fun InterestEditBox(interest: String, onRemove: () -> Unit) {
+  Box(
+      modifier =
+          Modifier.background(Color.LightGray, RoundedCornerShape(8.dp))
+              .padding(horizontal = 12.dp, vertical = 8.dp)
+              .testTag("$interest")) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Text(text = interest, fontSize = 18.sp, color = Color.Black)
+          Spacer(Modifier.width(8.dp))
+          IconButton(onClick = onRemove) {
+            Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
+          }
+        }
       }
-    }
-  }
 }
