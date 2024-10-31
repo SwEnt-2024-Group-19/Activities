@@ -10,9 +10,11 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
+@HiltViewModel
 open class SignInViewModel
 @Inject
 constructor(

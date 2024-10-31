@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.gms)
     alias(libs.plugins.sonar)
     alias(libs.plugins.kapt)
+    id("dagger.hilt.android.plugin")
     id("jacoco")
 }
 
@@ -64,6 +65,8 @@ android {
 
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs += "-Xjvm-default=all"
+        languageVersion = "1.8"
     }
 
     packaging {
@@ -86,6 +89,10 @@ android {
             isReturnDefaultValues = true
         }
     }
+    kapt {
+        correctErrorTypes = true
+    }
+
 
     // Robolectric needs to be run only in debug. But its tests are placed in the shared source set (test)
     // The next lines transfers the src/test/* from shared to the testDebug one
@@ -218,6 +225,7 @@ dependencies {
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
 
+
     // ------------- Jetpack Compose ------------------
 
 
@@ -242,7 +250,11 @@ dependencies {
     testImplementation(libs.robolectric)
 
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler)
+
 
 }
 

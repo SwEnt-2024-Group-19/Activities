@@ -5,4 +5,7 @@ plugins {
     alias(libs.plugins.ktfmt) apply false
     alias(libs.plugins.gms) apply false
     alias(libs.plugins.kapt) apply false
+    alias(libs.plugins.hilt) apply false
+
+
 }
