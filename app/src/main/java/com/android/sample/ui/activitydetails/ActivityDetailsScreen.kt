@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,7 +48,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
-import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import java.util.Calendar
@@ -66,12 +64,12 @@ fun ActivityDetailsScreen(
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
-    // Check if the user is already enrolled in the activity
-    val isUserEnrolled = profile?.activities?.contains(activity?.uid)?: false
+  // Check if the user is already enrolled in the activity
+  val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
 
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
-    val location by remember { mutableStateOf(activity?.location) }
+  val location by remember { mutableStateOf(activity?.location) }
   val price by remember { mutableStateOf(activity?.price) }
   val dueDate by remember {
     mutableStateOf(
@@ -90,8 +88,8 @@ fun ActivityDetailsScreen(
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
   val context = LocalContext.current
-    val startTime by remember { mutableStateOf(activity?.startTime) }
-    val duration by remember { mutableStateOf(activity?.duration) }
+  val startTime by remember { mutableStateOf(activity?.startTime) }
+  val duration by remember { mutableStateOf(activity?.duration) }
 
   Scaffold(
       topBar = {
@@ -115,34 +113,29 @@ fun ActivityDetailsScreen(
       }) { padding ->
         Column(
             modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-                .testTag("activityDetailsScreen")) {
+                Modifier.fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .testTag("activityDetailsScreen")) {
               // Image section
               Box(
                   modifier =
-                  Modifier
-                      .fillMaxWidth()
-                      .aspectRatio(16 / 9f)
-                      .padding(16.dp)
-                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                      .testTag("image")) {
+                      Modifier.fillMaxWidth()
+                          .aspectRatio(16 / 9f)
+                          .padding(16.dp)
+                          .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                          .testTag("image")) {
                     // Optional: Add placeholder text in the center
                     Text(
                         text = "Activity Image",
                         color = Color.White,
                         modifier = Modifier.align(Alignment.Center))
-              }
+                  }
 
               // Title
               Box(
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 8.dp)
-                      .testTag("title"),
+                  modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("title"),
                   contentAlignment = Alignment.Center) {
                     Text(
                         text = activityTitle ?: "title not specified",
@@ -155,13 +148,12 @@ fun ActivityDetailsScreen(
               // Description
               Column(
                   modifier =
-                  Modifier
-                      .fillMaxWidth()
-                      .height(150.dp)
-                      .padding(8.dp)
-                      .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
-                      .verticalScroll(rememberScrollState())
-                      .testTag("description")) {
+                      Modifier.fillMaxWidth()
+                          .height(150.dp)
+                          .padding(8.dp)
+                          .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                          .verticalScroll(rememberScrollState())
+                          .testTag("description")) {
                     Text(
                         text = "Description:",
                         style = MaterialTheme.typography.headlineSmall,
@@ -169,65 +161,54 @@ fun ActivityDetailsScreen(
                     Text(
                         text = description ?: "description not specified",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .testTag("descriptionText"))
+                        modifier = Modifier.padding(horizontal = 8.dp).testTag("descriptionText"))
                   }
 
               Spacer(modifier = Modifier.height(8.dp))
-            // Price and Distance Row
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("price&&location")
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (price != null) "${price.toString()} CHF" else "not defined yet",
-                        modifier = Modifier.testTag("priceText")
-                    )
-                }
+              // Price and Distance Row
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  modifier = Modifier.fillMaxWidth().testTag("price&&location")) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
+                      Spacer(modifier = Modifier.width(4.dp))
+                      Text(
+                          text =
+                              if (price != null) "${price.toString()} CHF" else "not defined yet",
+                          modifier = Modifier.testTag("priceText"))
+                    }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.LocationOn, contentDescription = "Location")
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = location?: "not defined yet",
-                        modifier = Modifier.testTag("locationText")
-                    )
-                }
-            }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Icon(Icons.Default.LocationOn, contentDescription = "Location")
+                      Spacer(modifier = Modifier.width(4.dp))
+                      Text(
+                          text = location ?: "not defined yet",
+                          modifier = Modifier.testTag("locationText"))
+                    }
+                  }
               Spacer(modifier = Modifier.height(8.dp))
 
-
-                // schedule
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.testTag("schedule")
-                ) {
+              // schedule
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag("schedule")) {
                     Icon(Icons.Default.DateRange, contentDescription = "Schedule")
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text =  if(startTime!=null)"$dueDate at $startTime" else dueDate,
-                        modifier = Modifier.testTag("scheduleText")
-                    )
-                }
-                //duration
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.testTag("duration")
-                ) {
+                        text = if (startTime != null) "$dueDate at $startTime" else dueDate,
+                        modifier = Modifier.testTag("scheduleText"))
+                  }
+              // duration
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag("duration")) {
                     Icon(Icons.Default.AccessTime, contentDescription = "duration")
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = duration?: "not defined yet",
-                        modifier = Modifier.testTag("durationText")
-                    )
-                }
+                        text = duration ?: "not defined yet",
+                        modifier = Modifier.testTag("durationText"))
+                  }
               Spacer(modifier = Modifier.height(32.dp))
 
               // Enroll button
@@ -236,13 +217,21 @@ fun ActivityDetailsScreen(
                   Button(
                       onClick = {
                         if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                          val theActivity =
-                              activity.copy(
-                                  placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
-                          listActivityViewModel.updateActivity(theActivity)
-                          profileViewModel.addActivity(profile.id, theActivity.uid)
-                          Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                          navigationActions.navigateTo(Screen.OVERVIEW)
+                          if (isUserEnrolled) {
+                            Toast.makeText(
+                                    context,
+                                    "You are already enrolled in this activity",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          } else {
+                            val theActivity =
+                                activity.copy(
+                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                            listActivityViewModel.updateActivity(theActivity)
+                            profileViewModel.addActivity(profile.id, theActivity.uid)
+                            Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
+                            navigationActions.navigateTo(Screen.OVERVIEW)
+                          }
                         } else {
                           Toast.makeText(
                                   context,
