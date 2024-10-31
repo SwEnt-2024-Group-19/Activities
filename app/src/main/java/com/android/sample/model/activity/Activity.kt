@@ -19,7 +19,17 @@ data class Activity(
     var maxPlaces: Long,
     var status: ActivityStatus,
     val type: ActivityType,
-    var participants: List<SimpleUser>
+    var participants: List<SimpleUser>,
+    var comments: List<Comment>
+)
+
+data class Comment(
+    val uid: String,
+    val userId: String,
+    val userName: String,
+    val content: String,
+    val timestamp: Timestamp,
+    var replies: List<Comment> = emptyList()
 )
 
 enum class ActivityType {
