@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -19,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -34,8 +38,8 @@ import com.google.firebase.auth.FirebaseAuth
 fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: NavigationActions) {
   var name by remember { mutableStateOf("") }
   var surname by remember { mutableStateOf("") }
-  var interests by remember { mutableStateOf("") }
-  var activities by remember { mutableStateOf("") }
+  var interests by remember { mutableStateOf(listOf<String>()) }
+  // var activities by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
   var errorMessage by remember { mutableStateOf<String?>(null) }
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -74,18 +78,54 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
             modifier = Modifier.testTag("surnameTextField"))
         Spacer(modifier = Modifier.padding(8.dp))
 
+        var newInterest by remember { mutableStateOf("") }
+        var newListInterests by remember { mutableStateOf(interests) }
+
+        LazyRow(
+            modifier = Modifier.padding(16.dp).testTag("interestsList"),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              newListInterests.let {
+                items(it.size, key = { it }) { index ->
+                  InterestEditBox(
+                      interest = newListInterests[index],
+                      onRemove = { newListInterests = newListInterests - newListInterests[index] })
+                }
+              }
+            }
+
         OutlinedTextField(
+            value = newInterest,
+            onValueChange = { newInterest = it },
+            label = { Text("New Interest") },
+            modifier = Modifier.width(200.dp).testTag("newInterestInput"))
+        Spacer(modifier = Modifier.width(8.dp))
+        Button(
+            onClick = {
+              if (newInterest.isNotBlank()) {
+                newListInterests = newListInterests.plus(newInterest)
+                newInterest = "" // Clear the field after adding
+              }
+            },
+            modifier =
+                Modifier.padding(end = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .testTag("addInterestButton")) {
+              Text("Add")
+            }
+
+        /*OutlinedTextField(
             value = interests,
             onValueChange = { interests = it },
             label = { Text("Interests (comma-separated)") },
             modifier = Modifier.testTag("interestsTextField"))
-        Spacer(modifier = Modifier.padding(8.dp))
-        OutlinedTextField(
+        Spacer(modifier = Modifier.padding(8.dp))*/
+        /*OutlinedTextField(
             value = activities,
             onValueChange = { activities = it },
             label = { Text("Activities (comma-separated)") },
             modifier = Modifier.testTag("activitiesTextField"))
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.padding(8.dp))*/
 
         OutlinedTextField(
             value = photo,
@@ -100,13 +140,14 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                       id = uid,
                       name = name,
                       surname = surname,
-                      interests = interests.split(","),
+                      interests = newListInterests,
                       activities = emptyList(),
                       photo = photo)
               viewModel.createUserProfile(
                   userProfile = userProfile,
                   onSuccess = {
                     Log.d("ProfileCreation", "Profile created successfully")
+                    viewModel.fetchUserData(uid)
                     navigationActions.navigateTo(Screen.OVERVIEW)
                   },
                   onError = { error ->

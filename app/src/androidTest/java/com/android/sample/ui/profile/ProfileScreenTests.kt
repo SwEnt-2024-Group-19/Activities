@@ -126,9 +126,9 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
     composeTestRule.onNodeWithTag("userName").assertTextEquals("Amine A")
     composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("interestsSection")
-        .assertTextEquals("Interests: Cycling, Reading")
+    composeTestRule.onNodeWithTag("Cycling").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Reading").assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
     composeTestRule

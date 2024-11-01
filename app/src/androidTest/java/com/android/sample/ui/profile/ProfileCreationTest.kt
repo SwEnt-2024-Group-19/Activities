@@ -47,7 +47,7 @@ class ProfileCreationTest {
     `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
     `when`(mockFirebaseUser.uid).thenReturn("testUser123")
 
-    profileViewModel = ProfileViewModel(repository = mockProfilesRepository, userId = testUserId)
+    profileViewModel = ProfileViewModel(repository = mockProfilesRepository)
 
     `when`(mockProfilesRepository.getUser(any(), any(), any())).thenAnswer { invocation ->
       val onSuccess = invocation.getArgument<(User?) -> Unit>(1)
@@ -67,14 +67,15 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("nameTextField").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("surnameTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("interestsTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("activitiesTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("newInterestInput").assertIsDisplayed()
     composeTestRule.onNodeWithTag("photoTextField").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
-    composeTestRule.onNodeWithTag("interestsTextField").performTextInput("Coding, Gaming")
-    composeTestRule.onNodeWithTag("activitiesTextField").performTextInput("Running, Swimming")
+    composeTestRule.onNodeWithTag("interestsLists")
+    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Android")
+    composeTestRule.onNodeWithTag("addInterestButton").performClick()
+
     composeTestRule
         .onNodeWithTag("photoTextField")
         .performTextInput("https://example.com/photo.jpg")

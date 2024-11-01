@@ -63,7 +63,7 @@ fun ActivitiesApp(uid: String) {
 
   val listActivitiesViewModel: ListActivitiesViewModel =
       viewModel(factory = ListActivitiesViewModel.Factory)
-  val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(uid))
+  val profileViewModel: ProfileViewModel = hiltViewModel()
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
 
@@ -89,7 +89,6 @@ fun ActivitiesApp(uid: String) {
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(listActivitiesViewModel, navigationActions)
       }
-
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
