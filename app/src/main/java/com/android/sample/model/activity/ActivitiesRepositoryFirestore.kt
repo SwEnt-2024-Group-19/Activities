@@ -49,6 +49,27 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                           ActivityType.SOLO // Replace with your default ActivityType
                         }
                       } ?: ActivityType.SOLO
+                  val comments =
+                      (data["comments"] as? List<Map<String, Any>>)?.map { commentData ->
+                        Comment(
+                            uid = commentData["uid"] as? String ?: "No UID",
+                            userId = commentData["userId"] as? String ?: "No User ID",
+                            userName = commentData["userName"] as? String ?: "No User Name",
+                            content = commentData["content"] as? String ?: "No Content",
+                            timestamp = commentData["timestamp"] as? Timestamp ?: Timestamp.now(),
+                            replies =
+                                (commentData["replies"] as? List<Map<String, Any>>)?.map { replyData
+                                  ->
+                                  Comment(
+                                      uid = replyData["uid"] as? String ?: "No UID",
+                                      userId = replyData["userId"] as? String ?: "No User ID",
+                                      userName = replyData["userName"] as? String ?: "No User Name",
+                                      content = replyData["content"] as? String ?: "No Content",
+                                      timestamp =
+                                          replyData["timestamp"] as? Timestamp ?: Timestamp.now(),
+                                  )
+                                } ?: emptyList())
+                      } ?: emptyList()
                   Activity(
                       uid = document.id,
                       title = data["title"] as? String ?: "No Title",
@@ -64,7 +85,8 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       maxPlaces = data["maxPlaces"] as? Long ?: 0,
                       status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
                       type = activityType,
-                      participants = participants)
+                      participants = participants,
+                      comments = comments)
                 }
                 .filterNotNull() // Filter out any null results
 
