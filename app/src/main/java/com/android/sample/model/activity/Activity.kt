@@ -20,7 +20,7 @@ data class Activity(
     var status: ActivityStatus,
     val type: ActivityType,
     var participants: List<SimpleUser>,
-    var comments: List<Comment>
+    var comments: List<Comment> = emptyList()
 )
 
 data class Comment(
