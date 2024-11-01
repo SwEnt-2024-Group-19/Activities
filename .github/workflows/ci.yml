@@ -18,6 +18,13 @@ jobs:
     # Execute the CI on the course's runners
     runs-on: ubuntu-latest
 
+
+    env:
+      app_name: "Activities"
+    defaults:
+        run:
+            working-directory: ./${{ env.base_folder }}
+
     steps:
       # First step : Checkout the repository on the runner
       - name: Checkout
