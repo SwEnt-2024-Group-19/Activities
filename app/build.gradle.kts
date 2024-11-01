@@ -30,14 +30,25 @@ android {
             useSupportLibrary = true
         }
     }
+    signingConfigs {
+        create("release") {
+            // Resolve the keystore path safely
+            storeFile = file("keystore/keystore.jks")
+            storePassword = (System.getenv("KEYSTORE_PASSWORD") ?: properties["KEYSTORE_PASSWORD"]) as String?
+            keyAlias = (System.getenv("KEY_ALIAS") ?: properties["KEY_ALIAS"]) as String?
+            keyPassword = (System.getenv("KEY_PASSWORD") ?: properties["KEY_PASSWORD"]) as String?
+        }
+    }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
 
         debug {
@@ -51,15 +62,7 @@ android {
     if (localPropertiesFile.exists()) {
         localProperties.load(FileInputStream(localPropertiesFile))
     }
-    signingConfigs {
-        create("release") {
-            // Resolve the keystore path safely
-            storeFile = file("keystore/keystore.jks")
-            storePassword = (System.getenv("KEYSTORE_PASSWORD") ?: properties["KEYSTORE_PASSWORD"]) as String?
-            keyAlias = (System.getenv("KEY_ALIAS") ?: properties["KEY_ALIAS"]) as String?
-            keyPassword = (System.getenv("KEY_PASSWORD") ?: properties["KEY_PASSWORD"]) as String?
-        }
-    }
+
 
     testCoverage {
         jacocoVersion = "0.8.8"
