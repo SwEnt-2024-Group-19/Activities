@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - setup/apkCI
 
   pull_request:
     types:
