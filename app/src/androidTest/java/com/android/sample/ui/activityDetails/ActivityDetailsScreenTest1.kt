@@ -170,12 +170,15 @@ class ActivityDetailsScreenAndroidTest {
           profileViewModel = mockProfileViewModel)
     }
 
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("enrollButton"))
     composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed()
     composeTestRule.onNodeWithText("Enroll").assertIsDisplayed()
   }
 
   @Test
-  fun enrollButton_displaysForActiveActivity_whenUserIsNotCreator() {
+  fun editButton_displaysForActiveActivity_whenUserIsTheCreator() {
     val activity1 = activity.copy(creator = "123")
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity1))
 
@@ -185,6 +188,10 @@ class ActivityDetailsScreenAndroidTest {
           navigationActions = mockNavigationActions,
           profileViewModel = mockProfileViewModel)
     }
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("editButton"))
+
     composeTestRule.onNodeWithText("Edit").assertIsDisplayed()
     composeTestRule.onNodeWithTag("editButton").assertIsDisplayed().performClick()
     verify(mockNavigationActions).navigateTo(Screen.EDIT_ACTIVITY)
@@ -202,6 +209,9 @@ class ActivityDetailsScreenAndroidTest {
           profileViewModel = mockProfileViewModel,
           navigationActions = mockNavigationActions)
     }
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("loginButton"))
     composeTestRule.onNodeWithText("Login/Register").assertIsDisplayed()
     composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed().performClick()
 
@@ -221,6 +231,9 @@ class ActivityDetailsScreenAndroidTest {
           profileViewModel = mockProfileViewModel,
           navigationActions = mockNavigationActions)
     }
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("enrollButton"))
 
     composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithText("Enroll failed, limit of places reached").isDisplayed()
