@@ -3,6 +3,7 @@ package com.android.sample.ui.activitydetails
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,14 +19,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,12 +47,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
+import java.util.UUID
 import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,9 +68,12 @@ fun ActivityDetailsScreen(
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
+  // Check if the user is already enrolled in the activity
+  val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
 
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
+  val location by remember { mutableStateOf(activity?.location) }
   val price by remember { mutableStateOf(activity?.price) }
   val dueDate by remember {
     mutableStateOf(
@@ -82,6 +92,9 @@ fun ActivityDetailsScreen(
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
   val context = LocalContext.current
+  val startTime by remember { mutableStateOf(activity?.startTime) }
+  val duration by remember { mutableStateOf(activity?.duration) }
+  var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
   Scaffold(
       topBar = {
@@ -157,17 +170,30 @@ fun ActivityDetailsScreen(
                   }
 
               Spacer(modifier = Modifier.height(8.dp))
-              //  price
+              // Price and Distance Row
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("price")) {
-                    Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (price != null) "${price.toString()} CHF" else "not defined yet",
-                        modifier = Modifier.testTag("priceText"))
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  modifier = Modifier.fillMaxWidth().testTag("price&&location")) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
+                      Spacer(modifier = Modifier.width(4.dp))
+                      Text(
+                          text =
+                              if (price != null) "${price.toString()} CHF" else "not defined yet",
+                          modifier = Modifier.testTag("priceText"))
+                    }
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                      Icon(Icons.Default.LocationOn, contentDescription = "Location")
+                      Spacer(modifier = Modifier.width(4.dp))
+                      Text(
+                          text = location ?: "not defined yet",
+                          modifier = Modifier.testTag("locationText"))
+                    }
                   }
               Spacer(modifier = Modifier.height(8.dp))
+
               // schedule
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -175,38 +201,184 @@ fun ActivityDetailsScreen(
                     Icon(Icons.Default.DateRange, contentDescription = "Schedule")
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = dueDate ?: "not defined yet",
+                        text = if (startTime != null) "$dueDate at $startTime" else dueDate,
                         modifier = Modifier.testTag("scheduleText"))
                   }
-
+              // duration
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag("duration")) {
+                    Icon(Icons.Default.AccessTime, contentDescription = "duration")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = duration ?: "not defined yet",
+                        modifier = Modifier.testTag("durationText"))
+                  }
               Spacer(modifier = Modifier.height(32.dp))
 
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
-                Button(
-                    onClick = {
-                      if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                        val theActivity =
-                            activity.copy(placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
-                        listActivityViewModel.updateActivity(theActivity)
-                        profileViewModel.addActivity(profile.id, theActivity.uid)
-                        Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                        navigationActions.navigateTo(Screen.OVERVIEW)
-                      } else {
-                        Toast.makeText(
-                                context,
-                                "Enroll failed, limit of places reached",
-                                Toast.LENGTH_SHORT)
-                            .show()
+                if (activity.creator != profile.id) {
+                  Button(
+                      onClick = {
+                        if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
+                          if (isUserEnrolled) {
+                            Toast.makeText(
+                                    context,
+                                    "You are already enrolled in this activity",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          } else {
+                            val theActivity =
+                                activity.copy(
+                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                            listActivityViewModel.updateActivity(theActivity)
+                            profileViewModel.addActivity(profile.id, theActivity.uid)
+                            Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
+                            navigationActions.navigateTo(Screen.OVERVIEW)
+                          }
+                        } else {
+                          Toast.makeText(
+                                  context,
+                                  "Enroll failed, limit of places reached",
+                                  Toast.LENGTH_SHORT)
+                              .show()
+                        }
+                      },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 24.dp)
+                              .testTag("enrollButton")) {
+                        Text(text = "Enroll")
                       }
-                    },
+                } else {
+                  Button(
+                      onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 24.dp)
+                              .testTag("editButton")) {
+                        Text(text = "Edit")
+                      }
+                }
+              } else if (activity?.status == ActivityStatus.FINISHED) {
+                Text(text = "Activity is not active", modifier = Modifier.testTag("notActiveText"))
+              } else {
+                Text(
+                    text = "You need to be logged in to enroll",
+                    modifier = Modifier.testTag("notLoggedInText"))
+                Button(
+                    onClick = { navigationActions.navigateTo(Screen.AUTH) },
                     modifier =
                         Modifier.fillMaxWidth()
                             .padding(horizontal = 24.dp)
-                            .testTag("enrollButton")) {
-                      Text(text = "Enroll")
+                            .testTag("loginButton")) {
+                      Text(text = "Login/Register")
                     }
               }
+              CommentSection(
+                  comments = comments,
+                  onAddComment = { content ->
+                    val newComment =
+                        Comment(
+                            uid = UUID.randomUUID().toString(),
+                            userId = profile?.id ?: "anonymous",
+                            userName = profile?.name ?: "anonymous",
+                            content = content,
+                            timestamp = Timestamp.now())
+                    // listActivityViewModel.addCommentToActivity(activity!!.uid, newComment)
+                    comments += newComment
+                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                  },
+                  onReplyComment = { replyContent, comment ->
+                    val reply =
+                        Comment(
+                            uid = UUID.randomUUID().toString(),
+                            userId = profile?.id ?: "anonymous",
+                            userName = profile?.name ?: "anonymous",
+                            content = replyContent,
+                            timestamp = Timestamp.now())
+                    // listActivityViewModel.addReplyToComment(activity!!.uid, comment.uid, reply)
+                    comment.replies += reply
+                    comments = comments.map { if (it.uid == comment.uid) comment else it }
+                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                  })
             }
       }
+}
+
+@Composable
+fun CommentSection(
+    comments: List<Comment>,
+    onAddComment: (String) -> Unit,
+    onReplyComment: (String, Comment) -> Unit
+) {
+  val newCommentText = remember { mutableStateOf("") }
+
+  Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+    Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
+
+    comments.forEach { comment -> CommentItem(comment, onReplyComment) }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    // Input field for new comments
+    OutlinedTextField(
+        value = newCommentText.value,
+        onValueChange = { newCommentText.value = it },
+        label = { Text("Add a comment") },
+        modifier = Modifier.fillMaxWidth())
+
+    Button(
+        onClick = {
+          onAddComment(newCommentText.value)
+          newCommentText.value = ""
+        },
+        modifier = Modifier.padding(top = 8.dp)) {
+          Text("Post Comment")
+        }
+  }
+}
+
+@Composable
+fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit) {
+  var showReplyField by remember { mutableStateOf(false) }
+  var replyText by remember { mutableStateOf("") }
+
+  Column(modifier = Modifier.padding(8.dp)) {
+    Text(
+        text = "${comment.userName}: ${comment.content}",
+        style = MaterialTheme.typography.bodyMedium)
+    Text(text = comment.timestamp.toDate().toString(), style = MaterialTheme.typography.bodySmall)
+
+    // Toggle button to show/hide the reply input field
+    Button(
+        onClick = { showReplyField = !showReplyField }, modifier = Modifier.padding(top = 4.dp)) {
+          Text(if (showReplyField) "Cancel" else "Reply")
+        }
+
+    // Conditionally show the reply input field
+    if (showReplyField) {
+      OutlinedTextField(
+          value = replyText,
+          onValueChange = { replyText = it },
+          label = { Text("Reply") },
+          modifier = Modifier.fillMaxWidth())
+
+      Button(
+          onClick = {
+            onReplyComment(replyText, comment)
+            replyText = ""
+            showReplyField = false
+          },
+          modifier = Modifier.padding(top = 4.dp)) {
+            Text("Post Reply")
+          }
+    }
+
+    // Show replies indented
+    comment.replies.forEach { reply ->
+      Box(modifier = Modifier.padding(start = 16.dp)) { CommentItem(reply, onReplyComment) }
+    }
+  }
 }

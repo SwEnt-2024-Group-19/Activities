@@ -6,11 +6,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-open class ProfileViewModel(private val repository: ProfilesRepository, userId: String) :
+@HiltViewModel
+open class ProfileViewModel @Inject constructor(private val repository: ProfilesRepository) :
     ViewModel() {
   private var userState_ = MutableStateFlow<User?>(null)
   open val userState: StateFlow<User?> = userState_.asStateFlow()
@@ -57,11 +60,11 @@ open class ProfileViewModel(private val repository: ProfilesRepository, userId: 
   }
 
   companion object {
-    fun Factory(uid: String): ViewModelProvider.Factory =
+    fun Factory(): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
           @Suppress("UNCHECKED_CAST")
           override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ProfileViewModel(ProfilesRepositoryFirestore(Firebase.firestore), uid) as T
+            return ProfileViewModel(ProfilesRepositoryFirestore(Firebase.firestore)) as T
           }
         }
   }

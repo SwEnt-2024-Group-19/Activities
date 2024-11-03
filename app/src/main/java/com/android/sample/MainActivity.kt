@@ -64,7 +64,7 @@ fun ActivitiesApp(uid: String) {
 
   val listActivitiesViewModel: ListActivitiesViewModel =
       viewModel(factory = ListActivitiesViewModel.Factory)
-  val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory(uid))
+  val profileViewModel: ProfileViewModel = hiltViewModel()
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
 

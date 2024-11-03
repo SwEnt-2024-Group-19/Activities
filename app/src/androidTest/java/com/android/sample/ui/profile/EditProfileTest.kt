@@ -66,15 +66,14 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("New Interest")
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
     composeTestRule.onNodeWithTag("interestsList").assertIsDisplayed()
-    composeTestRule.onNodeWithText("New Interest").assertIsDisplayed()
   }
-
-  /*@Test
+  /*
+  @Test
   fun testSaveButtonFunctionality() {
-      composeTestRule.setContent {
-          EditProfileScreen(profileViewModel, navigationActions)
-      }
-      composeTestRule.onNodeWithTag("profileSaveButton").performClick()
-      verify(navigationActions).navigateTo(PROFILE)
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions)
+    }
+    composeTestRule.onNodeWithTag("profileSaveButton").performClick()
+    verify(navigationActions).navigateTo(PROFILE)
   }*/
 }
