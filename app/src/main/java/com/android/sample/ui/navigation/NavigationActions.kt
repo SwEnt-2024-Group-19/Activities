@@ -13,6 +13,7 @@ object Route {
   const val OVERVIEW = "Overview"
   const val PROFILE = "Profile"
   const val ADD_ACTIVITY = "AddActivity"
+  const val CHOOSE_ACCOUNT = "ChooseAccount"
 }
 
 object Screen {
@@ -25,6 +26,7 @@ object Screen {
   const val ACTIVITY_DETAILS = "ActivityDetails Screen"
   const val EDIT_PROFILE = "EditProfile Screen"
   const val CREATE_PROFILE = "CreateProfile Screen"
+  const val CHOOSE_ACCOUNT = "ChooseAccount Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)

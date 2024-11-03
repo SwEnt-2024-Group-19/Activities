@@ -1,6 +1,7 @@
 package com.android.sample
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
 import com.android.sample.ui.activity.EditActivityScreen
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
+import com.android.sample.ui.authentication.ChooseAccountScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
 import com.android.sample.ui.listActivities.ListActivitiesScreen
@@ -43,21 +45,26 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
 
     auth = FirebaseAuth.getInstance()
-    auth.currentUser?.let { auth.signOut() }
+    val currentUser = auth.currentUser
+    if (currentUser != null && currentUser.isAnonymous) {
+      auth.signOut()
+    }
+    val startDestination = if (auth.currentUser != null) Route.CHOOSE_ACCOUNT else Route.AUTH
+    // log current user
+    Log.d("MainActivity", "Current user: ${auth.currentUser?.uid}")
 
     setContent {
-      // A surface container using the 'background' color from the theme
       Surface(
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
-            ActivitiesApp(auth.currentUser?.uid ?: "")
+            ActivitiesApp(auth.currentUser?.uid ?: "", startDestination)
           }
     }
   }
 }
 
 @Composable
-fun ActivitiesApp(uid: String) {
+fun ActivitiesApp(uid: String, startDestination: String) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
@@ -67,7 +74,8 @@ fun ActivitiesApp(uid: String) {
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
 
-  NavHost(navController = navController, startDestination = Route.AUTH) {
+  NavHost(navController = navController, startDestination = startDestination) {
+    composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
