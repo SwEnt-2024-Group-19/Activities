@@ -14,6 +14,7 @@ object Route {
   const val PROFILE = "Profile"
   const val ADD_ACTIVITY = "AddActivity"
   const val MAP = "Map"
+  const val CHOOSE_ACCOUNT = "ChooseAccount"
 }
 
 object Screen {
@@ -27,6 +28,7 @@ object Screen {
   const val EDIT_PROFILE = "EditProfile Screen"
   const val CREATE_PROFILE = "CreateProfile Screen"
   const val MAP = "Map Screen"
+  const val CHOOSE_ACCOUNT = "ChooseAccount Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
@@ -42,13 +44,11 @@ object TopLevelDestinations {
           route = Route.ADD_ACTIVITY,
           icon = Icons.Outlined.AddCircleOutline,
           textId = "Add Activity")
-  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Menu, textId = "Map")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(
         TopLevelDestinations.OVERVIEW,
-        TopLevelDestinations.MAP,
         TopLevelDestinations.ADD_ACTIVITY,
         TopLevelDestinations.PROFILE)
 
