@@ -124,29 +124,25 @@ class ChooseAccountScreenTest {
     verify(navigationActions).navigateTo(Screen.OVERVIEW)
   }
 
-
-    @Test
-    fun displaysPlaceholder_whenProfileImageUrlIsEmpty() {
-        // Setup the mock user profile with an empty photo URL
-        val userProfile = User(
+  @Test
+  fun displaysPlaceholder_whenProfileImageUrlIsEmpty() {
+    // Setup the mock user profile with an empty photo URL
+    val userProfile =
+        User(
             name = "John Doe",
             photo = "",
             interests = listOf(),
             surname = "Doe",
             id = "123",
-            activities = listOf()
-        )
-        whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
+            activities = listOf())
+    whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
-        // Set the content once for this test
-        composeTestRule.setContent {
-            ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel)
-        }
-
-        // Check that the profile picture node exists, regardless of URL content
-        composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+    // Set the content once for this test
+    composeTestRule.setContent {
+      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel)
     }
 
-
-
+    // Check that the profile picture node exists, regardless of URL content
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+  }
 }
