@@ -93,7 +93,6 @@ fun ActivitiesApp(uid: String) {
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
-
     }
 
     navigation(startDestination = Screen.MAP, route = Route.MAP) {

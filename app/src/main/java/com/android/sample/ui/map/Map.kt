@@ -16,41 +16,40 @@ import com.google.maps.android.compose.*
 
 @Composable
 fun MapScreen(navigationActions: NavigationActions) {
-    //  val activities by locationViewModel.locationSuggestions.collectAsState()
+  //  val activities by locationViewModel.locationSuggestions.collectAsState()
 
-    Scaffold(
-        content = { pd ->
-            val defaultLocation = LatLng(37.7749, -122.4194)
-            val cameraPositionState = rememberCameraPositionState {
-                position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
+  Scaffold(
+      content = { pd ->
+        val defaultLocation = LatLng(37.7749, -122.4194)
+        val cameraPositionState = rememberCameraPositionState {
+          position = CameraPosition.fromLatLngZoom(defaultLocation, 10f)
+        }
+        GoogleMap(
+            modifier = Modifier.fillMaxSize().padding(pd).testTag("mapScreen"),
+            cameraPositionState = cameraPositionState) {
+              /*activities
+                 .filter { it.location != null }
+                 .forEach { item ->
+                     item.location?.let { LatLng(item.location!!.latitude, it.longitude) }
+                         ?.let {
+                             MarkerState(
+                                 position = it
+                             )
+                         }?.let {
+                             Marker(
+                                 state = it,
+                                 title = item.title,
+                                 snippet = item.description,
+                             )
+                         }
+                 }
+              */
             }
-            GoogleMap(
-                modifier = Modifier.fillMaxSize().padding(pd).testTag("mapScreen"),
-                cameraPositionState = cameraPositionState) {
-                /*activities
-                   .filter { it.location != null }
-                   .forEach { item ->
-                       item.location?.let { LatLng(item.location!!.latitude, it.longitude) }
-                           ?.let {
-                               MarkerState(
-                                   position = it
-                               )
-                           }?.let {
-                               Marker(
-                                   state = it,
-                                   title = item.title,
-                                   snippet = item.description,
-                               )
-                           }
-                   }
-                */
-            }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { route -> navigationActions.navigateTo(route) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.MAP)
-        })
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.MAP)
+      })
 }
-
