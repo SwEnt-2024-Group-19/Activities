@@ -15,7 +15,6 @@ object Route {
   const val ADD_ACTIVITY = "AddActivity"
   const val MAP = "Map"
   const val CHOOSE_ACCOUNT = "ChooseAccount"
-
 }
 
 object Screen {
