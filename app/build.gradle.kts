@@ -31,9 +31,9 @@ android {
         }
 
         buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY")}\"")
-        val apiKey: String = project.findProperty("API_KEY") as String? ?: throw IllegalArgumentException("API_KEY not found")
-       // manifestPlaceholders["MAPS_API_KEY"] = apiKey
+        manifestPlaceholders["MAPS_API_KEY"] = project.findProperty("API_KEY") ?: "default_value_if_not_found"
     }
+
 
     buildTypes {
         release {
