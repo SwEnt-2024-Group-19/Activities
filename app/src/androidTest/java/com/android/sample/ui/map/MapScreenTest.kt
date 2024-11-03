@@ -13,7 +13,8 @@ import org.mockito.Mockito.`when`
 
 class MapScreenTest {
 
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val composeTestRule = createComposeRule()
 
   private lateinit var navigationActions: NavigationActions
 
@@ -32,4 +33,5 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
   }
+
 }
