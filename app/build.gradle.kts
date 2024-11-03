@@ -18,6 +18,15 @@ android {
     namespace = "com.android.sample"
     compileSdk = 34
 
+    // Load the API key from local.properties
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
+    val mapsApiKey: String = System.getenv("MAPS_API_KEY") ?: localProperties.getProperty("MAPS_API_KEY") ?: ""
+
     defaultConfig {
         applicationId = "com.android.sample"
         minSdk = 28
@@ -30,8 +39,8 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY")}\"")
-        manifestPlaceholders["MAPS_API_KEY"] = project.findProperty("API_KEY") ?: "default_value_if_not_found"
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
 
@@ -49,12 +58,7 @@ android {
             enableAndroidTestCoverage = true
         }
     }
-    // Load the API key from local.properties
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localProperties.load(FileInputStream(localPropertiesFile))
-    }
+
     signingConfigs {
         create("release") {
             // Resolve the keystore path safely
