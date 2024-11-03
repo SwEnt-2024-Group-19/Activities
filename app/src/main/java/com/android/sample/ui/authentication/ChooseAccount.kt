@@ -39,7 +39,7 @@ fun ChooseAccountScreen(
   val userProfile by profileViewModel.userState.collectAsState()
 
   LazyColumn(
-      modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+      modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp).testTag("chooseAccountScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         // Greeting Text
@@ -49,32 +49,36 @@ fun ChooseAccountScreen(
               fontSize = 24.sp,
               fontWeight = FontWeight.Bold,
               textAlign = TextAlign.Center,
-              modifier = Modifier.padding(bottom = 16.dp),
+              modifier = Modifier.padding(bottom = 16.dp).testTag("greetingText"),
               overflow = TextOverflow.Ellipsis,
               maxLines = 2)
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
+
         // Profile Image
         item {
           ProfileImage(
               url = userProfile?.photo,
               modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
         }
+
         item { Spacer(modifier = Modifier.height(16.dp)) }
 
+        // Continue as Text (Clickable)
         item {
           Text(
-              text = "Continue as ${userProfile?.name }",
+              text = "Continue as ${userProfile?.name}",
               fontSize = 16.sp,
               color = Color.Blue,
               fontWeight = FontWeight.SemiBold,
-              textDecoration = TextDecoration.Underline, // Underline to indicate clickable text
+              textDecoration = TextDecoration.Underline,
               modifier =
-                  Modifier.padding(vertical = 8.dp).clickable {
-                    navigationActions.navigateTo(Screen.OVERVIEW)
-                  })
+                  Modifier.padding(vertical = 8.dp)
+                      .clickable { navigationActions.navigateTo(Screen.OVERVIEW) }
+                      .testTag("continueText"))
         }
+
         item { Spacer(modifier = Modifier.height(16.dp)) }
 
         // Switch Account Button
@@ -85,7 +89,10 @@ fun ChooseAccountScreen(
                 navigationActions.navigateTo(Screen.AUTH)
               },
               modifier =
-                  Modifier.fillMaxWidth(0.8f).height(48.dp).clip(RoundedCornerShape(12.dp))) {
+                  Modifier.fillMaxWidth(0.8f)
+                      .height(48.dp)
+                      .clip(RoundedCornerShape(12.dp))
+                      .testTag("switchAccountButton")) {
                 Text(
                     text = "Switch Account",
                     fontSize = 16.sp,
