@@ -21,7 +21,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.ModeEdit
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,6 +35,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +59,8 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
 fun ProfileScreen(
@@ -120,6 +128,8 @@ fun ProfileContent(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
+  var showMenu by remember { mutableStateOf(false) } // To control the visibility of the menu
+
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
       bottomBar = {
@@ -139,6 +149,32 @@ fun ProfileContent(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "Back")
                   }
+            },
+            actions = {
+              IconButton(
+                  onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
+                    Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
+                  }
+
+              // DropdownMenu for options
+              DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                DropdownMenuItem(
+                    text = { Text("Logout") },
+                    onClick = {
+                      showMenu = false
+                      Firebase.auth.signOut()
+                      navigationActions.navigateTo(Screen.AUTH)
+                      // Handle logout action
+                    },
+                    enabled = Firebase.auth.currentUser?.isAnonymous == false)
+
+                DropdownMenuItem(
+                    text = { Text("General Terms") },
+                    onClick = {
+                      showMenu = false
+                      // Handle general terms action
+                    })
+              }
             })
       },
       floatingActionButton = {
@@ -154,7 +190,6 @@ fun ProfileContent(
                 Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
 
                 // Profile Picture
-
                 ProfileImage(
                     url = user.photo,
                     modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
@@ -186,7 +221,9 @@ fun ProfileContent(
               }
 
               item {
+
                 // Activities Section
+
                 Text(
                     text = "Activities Created",
                     fontSize = 24.sp,
@@ -194,7 +231,9 @@ fun ProfileContent(
                         Modifier.padding(start = 16.dp, top = 16.dp)
                             .testTag("activitiesCreatedTitle"))
               }
+
               // Activities Created
+
               user.activities?.let { activities ->
                 items(activities.size) { index ->
                   ActivityCreatedBox(
@@ -207,6 +246,7 @@ fun ProfileContent(
 
               item { // Activities Enrolled in
                 Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
                     text = "Activities Enrolled in",
                     fontSize = 24.sp,
@@ -214,7 +254,9 @@ fun ProfileContent(
                         Modifier.padding(start = 16.dp, top = 16.dp)
                             .testTag("activitiesEnrolledTitle"))
               }
+
               // Activities Enrolled
+
               user.activities?.let { activities ->
                 items(activities.size) { index ->
                   ActivityEnrolledBox(
