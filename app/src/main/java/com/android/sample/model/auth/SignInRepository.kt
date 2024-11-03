@@ -14,4 +14,6 @@ interface SignInRepository {
       onAuthSuccess: () -> Unit,
       onAuthError: (String) -> Unit
   )
+
+  fun signOut()
 }
