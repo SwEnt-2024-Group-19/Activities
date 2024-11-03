@@ -16,7 +16,6 @@ import com.google.maps.android.compose.*
 
 @Composable
 fun MapScreen(navigationActions: NavigationActions) {
-  //  val activities by locationViewModel.locationSuggestions.collectAsState()
 
   Scaffold(
       content = { pd ->
@@ -26,25 +25,7 @@ fun MapScreen(navigationActions: NavigationActions) {
         }
         GoogleMap(
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapScreen"),
-            cameraPositionState = cameraPositionState) {
-              /*activities
-                 .filter { it.location != null }
-                 .forEach { item ->
-                     item.location?.let { LatLng(item.location!!.latitude, it.longitude) }
-                         ?.let {
-                             MarkerState(
-                                 position = it
-                             )
-                         }?.let {
-                             Marker(
-                                 state = it,
-                                 title = item.title,
-                                 snippet = item.description,
-                             )
-                         }
-                 }
-              */
-            }
+            cameraPositionState = cameraPositionState) {}
       },
       bottomBar = {
         BottomNavigationMenu(

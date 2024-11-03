@@ -209,6 +209,7 @@ dependencies {
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
+    testImplementation("io.mockk:mockk:1.12.0")
     testImplementation(libs.json)
 
     // Test UI
