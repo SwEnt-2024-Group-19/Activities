@@ -1,5 +1,6 @@
 package com.android.sample.model.activity
 
+import android.graphics.Bitmap
 import com.android.sample.ui.dialogs.SimpleUser
 import com.google.firebase.Timestamp
 
@@ -14,7 +15,7 @@ data class Activity(
     var price: Double,
     var location: String,
     var creator: String,
-    var images: List<String>,
+    var images: List<Bitmap>,
     var placesLeft: Long,
     var maxPlaces: Long,
     var status: ActivityStatus,

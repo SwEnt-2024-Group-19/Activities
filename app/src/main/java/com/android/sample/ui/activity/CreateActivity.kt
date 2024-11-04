@@ -401,7 +401,7 @@ fun CreateActivityScreen(
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
                               location = location,
-                              images = listOf(),
+                              images = items,
                               participants = attendees,
                               type = types.find { it.name == selectedOption } ?: types[0],
                               comments = listOf())

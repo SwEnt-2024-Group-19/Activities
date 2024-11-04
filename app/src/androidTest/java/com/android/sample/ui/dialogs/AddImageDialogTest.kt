@@ -18,7 +18,7 @@ class AddImageDialogTest {
 
     composeTestRule.onNodeWithText("Add an image").assertExists()
     composeTestRule.onNodeWithText("Choose from gallery").assertExists()
-    composeTestRule.onNodeWithText("Take a photo").assertExists()
+    composeTestRule.onNodeWithText("Take pictures with camera").assertExists()
   }
 
   @Test
@@ -39,7 +39,7 @@ class AddImageDialogTest {
       AddImageDialog(onDismiss = {}, onGalleryClick = {}, onCameraClick = { cameraClicked = true })
     }
 
-    composeTestRule.onNodeWithText("Take a photo").performClick()
+    composeTestRule.onNodeWithText("Take pictures with camera").performClick()
     assert(cameraClicked)
   }
 }
