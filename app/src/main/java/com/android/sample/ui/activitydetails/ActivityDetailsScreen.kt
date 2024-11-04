@@ -97,6 +97,11 @@ fun ActivityDetailsScreen(
   val duration by remember { mutableStateOf(activity?.duration) }
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
+    val deleteComment: (Comment) -> Unit = { commentToDelete ->
+        comments = comments.filter { it.uid != commentToDelete.uid }
+        listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+    }
+
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
@@ -338,7 +343,8 @@ fun ActivityDetailsScreen(
                     comment.replies += reply
                     comments = comments.map { if (it.uid == comment.uid) comment else it }
                     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
-                  })
+                  },
+                  onDeleteComment = deleteComment)
             }
       }
 }
@@ -347,14 +353,15 @@ fun ActivityDetailsScreen(
 fun CommentSection(
     comments: List<Comment>,
     onAddComment: (String) -> Unit,
-    onReplyComment: (String, Comment) -> Unit
+    onReplyComment: (String, Comment) -> Unit,
+    onDeleteComment: (Comment) -> Unit
 ) {
   val newCommentText = remember { mutableStateOf("") }
 
   Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
-    comments.forEach { comment -> CommentItem(comment, onReplyComment) }
+    comments.forEach { comment -> CommentItem(comment, onReplyComment, onDeleteComment) }
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -377,7 +384,7 @@ fun CommentSection(
 }
 
 @Composable
-fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit) {
+fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit, onDeleteComment: (Comment) -> Unit) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
 
@@ -386,6 +393,14 @@ fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit) {
         text = "${comment.userName}: ${comment.content}",
         style = MaterialTheme.typography.bodyMedium)
     Text(text = comment.timestamp.toDate().toString(), style = MaterialTheme.typography.bodySmall)
+
+
+      Button(
+          onClick = { onDeleteComment(comment) }, // Call onDeleteComment
+          modifier = Modifier.padding(top = 4.dp)
+      ) {
+          Text("Delete")
+      }
 
     // Toggle button to show/hide the reply input field
     Button(
@@ -414,7 +429,7 @@ fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit) {
 
     // Show replies indented
     comment.replies.forEach { reply ->
-      Box(modifier = Modifier.padding(start = 16.dp)) { CommentItem(reply, onReplyComment) }
+      Box(modifier = Modifier.padding(start = 16.dp)) { CommentItem(reply, onReplyComment, onDeleteComment) }
     }
   }
 }
