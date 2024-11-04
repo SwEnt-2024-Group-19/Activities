@@ -45,11 +45,7 @@ object TopLevelDestinations {
           route = Route.ADD_ACTIVITY,
           icon = Icons.Outlined.AddCircleOutline,
           textId = "Add Activity")
-    val MAP =
-        TopLevelDestination(
-            route = Route.MAP,
-            icon = Icons.Outlined.Map,
-            textId = "Map")
+  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Map, textId = "Map")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
@@ -57,7 +53,8 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.OVERVIEW,
         TopLevelDestinations.MAP,
         TopLevelDestinations.ADD_ACTIVITY,
-        TopLevelDestinations.PROFILE,)
+        TopLevelDestinations.PROFILE,
+    )
 
 open class NavigationActions(
     private val navController: NavHostController,
