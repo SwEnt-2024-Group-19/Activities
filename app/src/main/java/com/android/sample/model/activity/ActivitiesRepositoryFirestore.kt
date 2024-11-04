@@ -1,6 +1,7 @@
 package com.android.sample.model.activity
 
 import android.util.Log
+import com.android.sample.model.map.Location
 import com.android.sample.ui.dialogs.SimpleUser
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
@@ -78,7 +79,7 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       startTime = data["startTime"] as? String ?: "HH:mm",
                       duration = data["duration"] as? String ?: "HH:mm",
                       price = data["price"] as? Double ?: 0.0,
-                      location = data["location"] as? String ?: "Unknown Location",
+                      location = data["location"] as? Location ?: Location(0.0, 0.0,"Unknown Location"),
                       creator = data["creator"] as? String ?: "Anonymous",
                       images = listOf(),
                       placesLeft = data["placesLeft"] as? Long ?: 0,
