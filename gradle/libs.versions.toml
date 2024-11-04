@@ -5,7 +5,7 @@ coilComposeVersion = "2.1.0"
 coilNetworkOkhttp = "3.0.0-rc01"
 coilCompose = "3.0.0-rc01"
 json = "20240303"
-kotlin = "1.9.0"
+kotlin = "1.9.22"
 ktfmt = "0.17.0"
 
 
@@ -16,7 +16,7 @@ composeViewModel = "2.7.0"
 
 sonar = "4.4.1.3373"
 gms = "4.4.2"
-hilt = "2.44"
+hilt = "2.48"
 
 
 # UI Compose
@@ -80,7 +80,8 @@ fragmentKtx = "1.8.2"
 kotlinxSerializationJson = "1.6.2"
 androidxCoreKtx = "1.6.1"
 
-hilt-navigation-compose = "1.0.0"
+hilt-navigation-compose = "1.2.0"
+kotlin-coroutines = "1.9.0"
 
 
 [libraries]
@@ -131,7 +132,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 kaspresso = { module = "com.kaspersky.android-components:kaspresso", version.ref = "kaspresso" }
 kaspresso-allure-support = { module = "com.kaspersky.android-components:kaspresso-allure-support", version.ref = "kaspressoAllureSupport" }
 kaspresso-compose-support = { module = "com.kaspersky.android-components:kaspresso-compose-support", version.ref = "kaspressoComposeSupport" }
-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
@@ -149,7 +150,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "androidxCoreKtx" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 kapt = { group = "org.jetbrains.kotlin", name = "kotlin-kapt", version.ref = "kotlin" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
