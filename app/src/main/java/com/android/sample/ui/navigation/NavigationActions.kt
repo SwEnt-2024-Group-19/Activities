@@ -3,6 +3,7 @@ package com.android.sample.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -44,13 +45,19 @@ object TopLevelDestinations {
           route = Route.ADD_ACTIVITY,
           icon = Icons.Outlined.AddCircleOutline,
           textId = "Add Activity")
+    val MAP =
+        TopLevelDestination(
+            route = Route.MAP,
+            icon = Icons.Outlined.Map,
+            textId = "Map")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(
         TopLevelDestinations.OVERVIEW,
+        TopLevelDestinations.MAP,
         TopLevelDestinations.ADD_ACTIVITY,
-        TopLevelDestinations.PROFILE)
+        TopLevelDestinations.PROFILE,)
 
 open class NavigationActions(
     private val navController: NavHostController,
