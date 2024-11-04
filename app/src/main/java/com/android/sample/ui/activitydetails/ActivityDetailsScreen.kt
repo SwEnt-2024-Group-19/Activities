@@ -98,11 +98,28 @@ fun ActivityDetailsScreen(
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
     val deleteComment: (Comment) -> Unit = { commentToDelete ->
-        comments = comments.filter { it.uid != commentToDelete.uid }
+        // Filter out the main comment and any replies associated with it
+        val newComments = comments.filter {it.uid != commentToDelete.uid}
+        if (newComments.size < comments.size) {
+            comments = newComments
+        } else {
+            // Filter out the reply from the main comment
+            val newReplies = comments.map { comment ->
+                if (comment.replies.any { it.uid == commentToDelete.uid }) {
+                    comment.copy(replies = comment.replies.filter { it.uid != commentToDelete.uid })
+                } else {
+                    comment
+                }
+            }
+            comments = newReplies
+        }
+
+        // Update the activity with the modified comments list
         listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
     }
 
-  Scaffold(
+
+    Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
             title = { Text("Activity Details", color = Color.White) },
@@ -395,7 +412,7 @@ fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit, onD
     Text(text = comment.timestamp.toDate().toString(), style = MaterialTheme.typography.bodySmall)
 
 
-      Button(
+      Row{Button(
           onClick = { onDeleteComment(comment) }, // Call onDeleteComment
           modifier = Modifier.padding(top = 4.dp)
       ) {
@@ -406,7 +423,7 @@ fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit, onD
     Button(
         onClick = { showReplyField = !showReplyField }, modifier = Modifier.padding(top = 4.dp)) {
           Text(if (showReplyField) "Cancel" else "Reply")
-        }
+        }}
 
     // Conditionally show the reply input field
     if (showReplyField) {
