@@ -1,5 +1,8 @@
 package com.android.sample
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -41,7 +46,11 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
+    if (!hasRequiredPermissions(applicationContext)) {
+      ActivityCompat.requestPermissions(
+        this, CAMERAX_PERMISSIONS, 0
+      )
+    }
     auth = FirebaseAuth.getInstance()
     auth.currentUser?.let { auth.signOut() }
 
@@ -54,6 +63,13 @@ class MainActivity : ComponentActivity() {
           }
     }
   }
+
+  fun hasRequiredPermissions(context: Context): Boolean {
+    return CAMERAX_PERMISSIONS.all {
+      ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+  }
+  private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 }
 
 @Composable
