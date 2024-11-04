@@ -47,9 +47,7 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     if (!hasRequiredPermissions(applicationContext)) {
-      ActivityCompat.requestPermissions(
-        this, CAMERAX_PERMISSIONS, 0
-      )
+      ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
     }
     auth = FirebaseAuth.getInstance()
     auth.currentUser?.let { auth.signOut() }
@@ -69,6 +67,7 @@ class MainActivity : ComponentActivity() {
       ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }
   }
+
   private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 }
 
