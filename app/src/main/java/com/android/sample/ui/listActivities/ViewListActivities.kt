@@ -15,8 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -44,6 +49,8 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -56,6 +63,7 @@ import java.util.Locale
 fun ListActivitiesScreen(
     viewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
+    profileViewModel: ProfileViewModel,
     modifier: Modifier = Modifier
 ) {
   val uiState by viewModel.uiState.collectAsState()
@@ -64,14 +72,16 @@ fun ListActivitiesScreen(
   val all = "ALL"
   val typesToString = types.map { it.name }
   val options = listOf(all) + typesToString
+  val profile = profileViewModel.userState.collectAsState().value
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
       topBar = {
         Box(
             modifier =
-                Modifier.height(35.dp)
-                    .testTag("segmentedButtonRow")) { // Set the desired height here
+            Modifier
+                .height(35.dp)
+                .testTag("segmentedButtonRow")) { // Set the desired height here
               SingleChoiceSegmentedButtonRow {
                 options.forEachIndexed { index, label ->
                   SegmentedButton(
@@ -92,7 +102,9 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
-        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
+        Box(modifier = modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
               var activitiesList =
@@ -106,28 +118,34 @@ fun ListActivitiesScreen(
                   Text(
                       text = "There is no activity yet.",
                       modifier =
-                          Modifier.padding(8.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
+                      Modifier
+                          .padding(8.dp)
+                          .align(Alignment.Center)
+                          .testTag("emptyActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
                 } else {
                   Text(
                       text = "There is no activity of this type yet.",
                       modifier =
-                          Modifier.padding(8.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
+                      Modifier
+                          .padding(8.dp)
+                          .align(Alignment.Center)
+                          .testTag("emptyActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
                 }
               } else {
 
                 LazyColumn(
-                    modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .padding(horizontal = 5.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
 
                       items(activitiesList) { activity ->
-                        ActivityCard(activity = activity, navigationActions, viewModel)
+                        ActivityCard(activity = activity, navigationActions, viewModel,profileViewModel,profile)
                       }
                     }
               }
@@ -145,29 +163,38 @@ fun ListActivitiesScreen(
 fun ActivityCard(
     activity: Activity,
     navigationActions: NavigationActions,
-    listActivitiesViewModel: ListActivitiesViewModel
+    listActivitiesViewModel: ListActivitiesViewModel,
+    profileViewModel: ProfileViewModel,
+    profile: User?
 ) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
+    var isLiked by remember { mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false) }
+
   Card(
       modifier =
-          Modifier.fillMaxWidth()
-              .testTag("activityCard")
-              .clip(RoundedCornerShape(16.dp))
-              .clickable {
-                listActivitiesViewModel.selectActivity(activity)
-                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-              },
+      Modifier
+          .fillMaxWidth()
+          .testTag("activityCard")
+          .clip(RoundedCornerShape(16.dp))
+          .clickable {
+              listActivitiesViewModel.selectActivity(activity)
+              navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+          },
       elevation = CardDefaults.cardElevation(8.dp)) {
         Column {
           // Box for overlaying the title on the image
-          Box(modifier = Modifier.fillMaxWidth().height(180.dp)) {
+          Box(modifier = Modifier
+              .fillMaxWidth()
+              .height(180.dp)) {
             // Display the activity image
             Image(
                 painter = painterResource(R.drawable.foot),
                 contentDescription = activity.title,
-                modifier = Modifier.fillMaxWidth().height(180.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
                 contentScale = ContentScale.Crop)
 
             // Display the activity name on top of the image
@@ -179,22 +206,55 @@ fun ActivityCard(
                         color = Color.White // Title color set to black
                         ),
                 modifier =
-                    Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("titleActivity"))
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+                    .testTag("titleActivity"))
           }
 
           Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                // Display the date
+                Text(
+                    text = formattedDate,
+                    style =
+                    MaterialTheme.typography.bodySmall.copy(
+                        color = Color.Gray, // Light gray color for the date
+                        fontStyle = FontStyle.Italic
+                    ),
+                    modifier = Modifier.weight(1f) // Takes up remaining space
+                )
 
-          // Display the date
-          Text(
-              text = formattedDate,
-              style =
-                  MaterialTheme.typography.bodySmall.copy(
-                      color = Color.Gray, // Light gray color for the date
-                      fontStyle = FontStyle.Italic),
-              modifier = Modifier.padding(horizontal = 16.dp))
+                if (profile != null) {
+                    IconButton(
+                        onClick = {
+                            isLiked = !isLiked
+                            if (isLiked) {
+                                profileViewModel.addLikedActivity(profile.id, activity.uid)
+                            } else {
+                                profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                            }
+                        },
+
+                        ) {
+                        Icon(
+                            imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = if (isLiked) "Liked" else "Not Liked",
+                            tint = if (isLiked) Color.Black else Color.Gray
+                        )
+                    }
+                }
+            }
 
           Row(
-              modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(horizontal = 16.dp)
+                  .fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
@@ -205,12 +265,15 @@ fun ActivityCard(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
                     modifier = Modifier.weight(1f) // Takes up remaining space
                     )
+
                 Text(
                     text = "${activity.placesLeft}/${activity.maxPlaces}",
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold, color = Color.Gray, fontSize = 16.sp),
-                    modifier = Modifier.align(Alignment.CenterVertically).padding(end = 16.dp))
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 16.dp))
               }
 
           Spacer(modifier = Modifier.height(4.dp))

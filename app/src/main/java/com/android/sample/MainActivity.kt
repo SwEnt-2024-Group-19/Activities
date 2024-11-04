@@ -84,7 +84,7 @@ fun ActivitiesApp(uid: String) {
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) {
-        ListActivitiesScreen(listActivitiesViewModel, navigationActions)
+        ListActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(listActivitiesViewModel, navigationActions)

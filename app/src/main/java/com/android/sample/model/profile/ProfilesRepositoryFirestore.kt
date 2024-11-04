@@ -38,13 +38,16 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null
       val activities =
           (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null
+        val likedActivities =
+          (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>() ?: return null
       User(
           id = id,
           name = name,
           surname = surname,
           interests = interests,
           activities = activities,
-          photo = photo)
+          photo = photo,
+          likedActivities=likedActivities)
     } catch (e: Exception) {
       Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null
@@ -72,7 +75,49 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
         }
   }
 
-  override fun addProfileToDatabase(
+    override fun addLikedActivity(
+        userId: String,
+        activityId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection("profiles")
+            .document(userId)
+            .update("likedActivities", FieldValue.arrayUnion(activityId))
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    task.exception?.let { e ->
+                        Log.e("ProfilesRepository", "Error adding activity to profile", e)
+                        onFailure(e)
+                    }
+                }
+            }
+
+    }
+    override fun removeLikedActivity(
+        userId: String,
+        activityId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection("profiles")
+            .document(userId)
+            .update("likedActivities", FieldValue.arrayRemove(activityId))
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    task.exception?.let { e ->
+                        Log.e("ProfilesRepository", "Error adding activity to profile", e)
+                        onFailure(e)
+                    }
+                }
+            }
+    }
+
+    override fun addProfileToDatabase(
       userProfile: User,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
