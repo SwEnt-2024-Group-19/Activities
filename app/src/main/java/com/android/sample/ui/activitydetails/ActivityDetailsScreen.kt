@@ -375,83 +375,114 @@ fun CommentSection(
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit
 ) {
-  val newCommentText = remember { mutableStateOf("") }
+    val newCommentText = remember { mutableStateOf("") }
 
-  Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-    Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
+    Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
-    comments.forEach { comment -> CommentItem(profileId, comment, onReplyComment, onDeleteComment) }
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    // Input field for new comments
-    OutlinedTextField(
-        value = newCommentText.value,
-        onValueChange = { newCommentText.value = it },
-        label = { Text("Add a comment") },
-        modifier = Modifier.fillMaxWidth())
-
-    Button(
-        onClick = {
-          onAddComment(newCommentText.value)
-          newCommentText.value = ""
-        },
-        modifier = Modifier.padding(top = 8.dp)) {
-          Text("Post Comment")
+        // Display all comments
+        comments.forEach { comment ->
+            CommentItem(profileId, comment, onReplyComment, onDeleteComment)
         }
-  }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (profileId == "anonymous") {
+            // Message for users who are not logged in
+            Text(
+                text = "You need to be logged in to add or reply to comments.",
+                modifier = Modifier.padding(4.dp)
+            )
+        } else {
+            // Input field for new comments if the user is logged in
+            OutlinedTextField(
+                value = newCommentText.value,
+                onValueChange = { newCommentText.value = it },
+                label = { Text("Add a comment") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = {
+                    onAddComment(newCommentText.value)
+                    newCommentText.value = ""
+                },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text("Post Comment")
+            }
+        }
+    }
 }
 
 @Composable
-fun CommentItem(profileId: String, comment: Comment, onReplyComment: (String, Comment) -> Unit, onDeleteComment: (Comment) -> Unit) {
-  var showReplyField by remember { mutableStateOf(false) }
-  var replyText by remember { mutableStateOf("") }
+fun CommentItem(
+    profileId: String,
+    comment: Comment,
+    onReplyComment: (String, Comment) -> Unit,
+    onDeleteComment: (Comment) -> Unit
+) {
+    var showReplyField by remember { mutableStateOf(false) }
+    var replyText by remember { mutableStateOf("") }
 
-  Column(modifier = Modifier.padding(8.dp)) {
-    Text(
-        text = "${comment.userName}: ${comment.content}",
-        style = MaterialTheme.typography.bodyMedium)
-    Text(text = comment.timestamp.toDate().toString(), style = MaterialTheme.typography.bodySmall)
+    Column(modifier = Modifier.padding(8.dp)) {
+        Text(
+            text = "${comment.userName}: ${comment.content}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = comment.timestamp.toDate().toString(),
+            style = MaterialTheme.typography.bodySmall
+        )
+        if (profileId != "anonymous") {
+            Row {
+                if (comment.userId == profileId) {
+                    Button(
+                        onClick = { onDeleteComment(comment) },
+                        modifier = Modifier.padding(top = 4.dp, end = 8.dp)
+                    ) {
+                        Text("Delete")
+                    }
+                }
+
+                // Toggle button to show/hide the reply input field
+                Button(
+                    onClick = { showReplyField = !showReplyField },
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text(if (showReplyField) "Cancel" else "Reply")
+                }
+
+            }
+
+            // Conditionally show the reply input field if the user is logged in
+            if (showReplyField) {
+                OutlinedTextField(
+                    value = replyText,
+                    onValueChange = { replyText = it },
+                    label = { Text("Reply") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Button(
+                    onClick = {
+                        onReplyComment(replyText, comment)
+                        replyText = ""
+                        showReplyField = false
+                    },
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Text("Post Reply")
+                }
+            }
+        }
 
 
-      Row {
-          if (comment.userId == profileId) {
-              Button(
-                  onClick = { onDeleteComment(comment) }, // Call onDeleteComment
-                  modifier = Modifier.padding(top = 4.dp, end = 8.dp)
-              ) {
-                  Text("Delete")
-              }
-          }
-
-        // Toggle button to show/hide the reply input field
-        Button(
-            onClick = { showReplyField = !showReplyField }, modifier = Modifier.padding(top = 4.dp)) {
-              Text(if (showReplyField) "Cancel" else "Reply")
-            }}
-
-    // Conditionally show the reply input field
-    if (showReplyField) {
-      OutlinedTextField(
-          value = replyText,
-          onValueChange = { replyText = it },
-          label = { Text("Reply") },
-          modifier = Modifier.fillMaxWidth())
-
-      Button(
-          onClick = {
-            onReplyComment(replyText, comment)
-            replyText = ""
-            showReplyField = false
-          },
-          modifier = Modifier.padding(top = 4.dp)) {
-            Text("Post Reply")
-          }
+        // Show replies indented
+        comment.replies.forEach { reply ->
+            Box(modifier = Modifier.padding(start = 16.dp)) {
+                CommentItem(profileId, reply, onReplyComment, onDeleteComment)
+            }
+        }
     }
-
-    // Show replies indented
-    comment.replies.forEach { reply ->
-      Box(modifier = Modifier.padding(start = 16.dp)) { CommentItem(profileId, reply, onReplyComment, onDeleteComment) }
-    }
-  }
 }
