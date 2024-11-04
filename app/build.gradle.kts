@@ -18,6 +18,15 @@ android {
     namespace = "com.android.sample"
     compileSdk = 34
 
+    // Load the API key from local.properties
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
+    val mapsApiKey: String = System.getenv("MAPS_API_KEY") ?: localProperties.getProperty("MAPS_API_KEY") ?: ""
+
     defaultConfig {
         applicationId = "com.android.sample"
         minSdk = 28
@@ -29,7 +38,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
+
 
     buildTypes {
         release {
@@ -45,12 +58,7 @@ android {
             enableAndroidTestCoverage = true
         }
     }
-    // Load the API key from local.properties
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localProperties.load(FileInputStream(localPropertiesFile))
-    }
+
     signingConfigs {
         create("release") {
             // Resolve the keystore path safely
@@ -66,6 +74,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -177,23 +186,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material)
 
-    //----
-
-    // JUnit for unit testing
-    testImplementation("junit:junit:4.13.2")
-
-    // MockK for mocking
-    testImplementation("io.mockk:mockk:1.13.2") // Or replace with Mockito if preferred:
-    // testImplementation("org.mockito:mockito-core:5.5.0")
-
-    // Coroutines Test for testing coroutines
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-
-    // AndroidX Core Testing library for LiveData and ViewModel testing (optional)
-    testImplementation("androidx.arch.core:core-testing:2.1.0")
-
-
-    //----
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -221,6 +213,7 @@ dependencies {
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
+    testImplementation("io.mockk:mockk:1.12.0")
     testImplementation(libs.json)
 
     // Test UI

@@ -28,6 +28,7 @@ import com.android.sample.ui.authentication.ChooseAccountScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
 import com.android.sample.ui.listActivities.ListActivitiesScreen
+import com.android.sample.ui.map.MapScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
@@ -100,6 +101,10 @@ fun ActivitiesApp(uid: String, startDestination: String) {
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
+    }
+
+    navigation(startDestination = Screen.MAP, route = Route.MAP) {
+      composable(Screen.MAP) { MapScreen(navigationActions) }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
