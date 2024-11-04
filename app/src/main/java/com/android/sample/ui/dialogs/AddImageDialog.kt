@@ -70,7 +70,7 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.background(Color.Transparent)) {
                   Text(
-                      text = "Choose from gallery",
+                      text = "Take pictures with camera",
                       style = TextStyle(color = Color.Black, fontSize = 16.sp))
                   Spacer(modifier = Modifier.width(8.dp))
                   Icon(Icons.Filled.PhotoCamera, contentDescription = "Choose from gallery")
