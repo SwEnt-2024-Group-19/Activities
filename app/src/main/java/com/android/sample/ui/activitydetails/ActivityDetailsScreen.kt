@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -215,6 +216,41 @@ fun ActivityDetailsScreen(
                         modifier = Modifier.testTag("durationText"))
                   }
               Spacer(modifier = Modifier.height(32.dp))
+
+              // Participants section
+              Text(
+                  text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
+                  style = MaterialTheme.typography.bodyLarge,
+                  modifier = Modifier.padding(bottom = 8.dp))
+
+              // List of participants
+              Column {
+                activity?.participants?.forEach { participant ->
+                  Row(
+                      verticalAlignment = Alignment.CenterVertically,
+                      modifier = Modifier.padding(vertical = 4.dp)) {
+                        // Placeholder for participant picture
+                        Box(
+                            modifier =
+                                Modifier.size(40.dp)
+                                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                                    .padding(8.dp)) {
+                              Text(
+                                  text = "P", // Placeholder for profile picture
+                                  color = Color.White,
+                                  modifier = Modifier.align(Alignment.Center))
+                            }
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        // Participant name
+                        Text(
+                            text = participant.name, // Display the participant's name
+                            style = MaterialTheme.typography.bodyMedium)
+                      }
+                }
+              }
+
+              Spacer(modifier = Modifier.height(16.dp))
 
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
