@@ -335,6 +335,7 @@ fun ActivityDetailsScreen(
                     }
               }
               CommentSection(
+                  profileId = profile?.id ?: "anonymous",
                   comments = comments,
                   onAddComment = { content ->
                     val newComment =
@@ -368,6 +369,7 @@ fun ActivityDetailsScreen(
 
 @Composable
 fun CommentSection(
+    profileId: String,
     comments: List<Comment>,
     onAddComment: (String) -> Unit,
     onReplyComment: (String, Comment) -> Unit,
@@ -378,7 +380,7 @@ fun CommentSection(
   Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
-    comments.forEach { comment -> CommentItem(comment, onReplyComment, onDeleteComment) }
+    comments.forEach { comment -> CommentItem(profileId, comment, onReplyComment, onDeleteComment) }
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -401,7 +403,7 @@ fun CommentSection(
 }
 
 @Composable
-fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit, onDeleteComment: (Comment) -> Unit) {
+fun CommentItem(profileId: String, comment: Comment, onReplyComment: (String, Comment) -> Unit, onDeleteComment: (Comment) -> Unit) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
 
@@ -412,18 +414,21 @@ fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit, onD
     Text(text = comment.timestamp.toDate().toString(), style = MaterialTheme.typography.bodySmall)
 
 
-      Row{Button(
-          onClick = { onDeleteComment(comment) }, // Call onDeleteComment
-          modifier = Modifier.padding(top = 4.dp)
-      ) {
-          Text("Delete")
-      }
+      Row {
+          if (comment.userId == profileId) {
+              Button(
+                  onClick = { onDeleteComment(comment) }, // Call onDeleteComment
+                  modifier = Modifier.padding(top = 4.dp, end = 8.dp)
+              ) {
+                  Text("Delete")
+              }
+          }
 
-    // Toggle button to show/hide the reply input field
-    Button(
-        onClick = { showReplyField = !showReplyField }, modifier = Modifier.padding(top = 4.dp)) {
-          Text(if (showReplyField) "Cancel" else "Reply")
-        }}
+        // Toggle button to show/hide the reply input field
+        Button(
+            onClick = { showReplyField = !showReplyField }, modifier = Modifier.padding(top = 4.dp)) {
+              Text(if (showReplyField) "Cancel" else "Reply")
+            }}
 
     // Conditionally show the reply input field
     if (showReplyField) {
@@ -446,7 +451,7 @@ fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit, onD
 
     // Show replies indented
     comment.replies.forEach { reply ->
-      Box(modifier = Modifier.padding(start = 16.dp)) { CommentItem(reply, onReplyComment, onDeleteComment) }
+      Box(modifier = Modifier.padding(start = 16.dp)) { CommentItem(profileId, reply, onReplyComment, onDeleteComment) }
     }
   }
 }
