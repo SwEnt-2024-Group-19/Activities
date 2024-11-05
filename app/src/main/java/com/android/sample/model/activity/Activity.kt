@@ -1,6 +1,5 @@
 package com.android.sample.model.activity
 
-import android.graphics.Bitmap
 import com.android.sample.ui.dialogs.SimpleUser
 import com.google.firebase.Timestamp
 
