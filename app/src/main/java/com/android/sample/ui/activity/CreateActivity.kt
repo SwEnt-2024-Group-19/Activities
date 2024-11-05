@@ -49,6 +49,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -66,16 +67,16 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-
+import dagger.hilt.android.AndroidEntryPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    profileViewModel: ProfileViewModel
 ) {
+    val locationViewModel: LocationViewModel = hiltViewModel()
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf("Select a type") }

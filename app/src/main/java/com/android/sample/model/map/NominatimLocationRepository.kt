@@ -46,7 +46,7 @@ class NominatimLocationRepository @Inject constructor(private val client: OkHttp
               .addQueryParameter("q", query)
               .addQueryParameter("format", "json")
               .build()
-      
+
       val request =
           Request.Builder()
               .url(url)

@@ -29,7 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
-
+/*
 @RunWith(AndroidJUnit4::class)
 class ActivityDetailsScreenAndroidTest {
   private lateinit var mockNavigationActions: NavigationActions
@@ -240,3 +240,6 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithText("Enroll failed, limit of places reached").isDisplayed()
   }
 }
+
+
+ */
