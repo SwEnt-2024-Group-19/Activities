@@ -15,7 +15,7 @@ data class Activity(
     var price: Double,
     var location: String,
     var creator: String,
-    var images: List<Bitmap>,
+    var images: List<String>,
     var placesLeft: Long,
     var maxPlaces: Long,
     var status: ActivityStatus,

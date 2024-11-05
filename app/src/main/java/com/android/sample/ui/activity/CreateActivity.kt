@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.drawable.Icon
 import android.icu.util.GregorianCalendar
+import android.util.Base64
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.outlined.AddCircle
@@ -54,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -83,6 +86,8 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import java.io.ByteArrayOutputStream
 
 private const val REQUEST_IMAGE_CAPTURE = 100
 
@@ -110,7 +115,6 @@ fun CreateActivityScreen(
   var isCamOpen by remember { mutableStateOf(false) }
   var startTime by remember { mutableStateOf("") }
   var duration by remember { mutableStateOf("") }
-  var carouselItems by remember { mutableStateOf(items) }
   var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
 
@@ -120,9 +124,13 @@ fun CreateActivityScreen(
   // Attendees
   val attendees_: List<SimpleUser> = listOf<SimpleUser>()
   var attendees: List<SimpleUser> by remember { mutableStateOf(attendees_) }
+    val items_ : List<Bitmap> = listOf<Bitmap>()
+    var items : List<Bitmap> by remember { mutableStateOf(items_) }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
+      modifier = Modifier
+          .fillMaxSize()
+          .testTag("createActivityScreen"),
       topBar = {
         TopAppBar(
             title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
@@ -130,14 +138,24 @@ fun CreateActivityScreen(
       },
       content = { paddingValues ->
         if (isCamOpen) {
-          Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+          Box(modifier = Modifier
+              .fillMaxSize()
+              .padding(paddingValues)) {
             CameraPreview(controller, Modifier.fillMaxSize())
             IconButton(
                 onClick = { isCamOpen = false }, modifier = Modifier.align(Alignment.TopEnd)) {
                   Icon(Icons.Default.ArrowBack, contentDescription = "Close camera")
                 }
             IconButton(
-                onClick = { takePhoto(controller, { bitmap -> items += bitmap }, context) },
+                onClick = {
+                  takePhoto(
+                      controller,
+                      { bitmap ->
+                        items += bitmap
+                        isCamOpen = false
+                      },
+                      context)
+                },
                 modifier = Modifier.align(Alignment.BottomCenter)) {
                   Icon(Icons.Default.PhotoCamera, contentDescription = "Take picture")
                 }
@@ -157,12 +175,13 @@ fun CreateActivityScreen(
         } else {
           Column(
               modifier =
-                  Modifier.padding(paddingValues)
-                      .fillMaxSize()
-                      .verticalScroll(scrollState)
-                      .testTag("activityCreateScreen"),
+              Modifier
+                  .padding(paddingValues)
+                  .fillMaxSize()
+                  .verticalScroll(scrollState)
+                  .testTag("activityCreateScreen"),
           ) {
-            Carousel({ showDialogImage = true })
+            Carousel({ showDialogImage = true }, items, {item -> items = items.filter { it != item }})
             if (showDialogImage) {
               AddImageDialog(
                   onDismiss = { showDialogImage = false },
@@ -178,7 +197,10 @@ fun CreateActivityScreen(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Title") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .testTag("inputTitleCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -187,7 +209,10 @@ fun CreateActivityScreen(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Description") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .testTag("inputDescriptionCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_activity_description))
                 },
@@ -198,7 +223,10 @@ fun CreateActivityScreen(
                 value = dueDate,
                 onValueChange = { dueDate = it },
                 label = { Text("Date") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDateCreate"),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .testTag("inputDateCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_date_activity_withFormat))
                 },
@@ -209,7 +237,9 @@ fun CreateActivityScreen(
                 value = startTime,
                 onValueChange = { startTime = it },
                 label = { Text("Time") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -218,7 +248,9 @@ fun CreateActivityScreen(
                 value = duration,
                 onValueChange = { duration = it },
                 label = { Text("Duration") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
             )
 
@@ -228,7 +260,10 @@ fun CreateActivityScreen(
                 value = price,
                 onValueChange = { price = it },
                 label = { Text("Price") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .testTag("inputPriceCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
             )
 
@@ -237,7 +272,10 @@ fun CreateActivityScreen(
                 value = placesMax,
                 onValueChange = { placesMax = it },
                 label = { Text("Total Places") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .testTag("inputPlacesCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_placesMax_activity))
                 },
@@ -247,7 +285,10 @@ fun CreateActivityScreen(
                 value = location,
                 onValueChange = { location = it },
                 label = { Text("Location") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .testTag("inputLocationCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_location_activity))
                 },
@@ -256,10 +297,11 @@ fun CreateActivityScreen(
 
             ExposedDropdownMenuBox(
                 modifier =
-                    Modifier.testTag("chooseTypeMenu")
-                        .align(Alignment.CenterHorizontally)
-                        .fillMaxWidth()
-                        .padding(8.dp),
+                Modifier
+                    .testTag("chooseTypeMenu")
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth()
+                    .padding(8.dp),
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }) {
                   OutlinedTextField(
@@ -271,14 +313,20 @@ fun CreateActivityScreen(
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth())
+                      modifier = Modifier
+                          .menuAnchor()
+                          .fillMaxWidth())
                   ExposedDropdownMenu(
                       expanded = expanded,
                       onDismissRequest = { expanded = false },
-                      modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                      modifier = Modifier
+                          .fillMaxWidth()
+                          .padding(8.dp)) {
                         types.forEach { selectionOption ->
                           DropdownMenuItem(
-                              modifier = Modifier.fillMaxWidth().padding(8.dp),
+                              modifier = Modifier
+                                  .fillMaxWidth()
+                                  .padding(8.dp),
                               text = { Text(selectionOption.name) },
                               onClick = {
                                 selectedOption = selectionOption.name
@@ -293,10 +341,11 @@ fun CreateActivityScreen(
             Button(
                 onClick = { showDialogUser = true },
                 modifier =
-                    Modifier.width(300.dp)
-                        .height(40.dp)
-                        .testTag("addAttendeeButton")
-                        .align(Alignment.CenterHorizontally),
+                Modifier
+                    .width(300.dp)
+                    .height(40.dp)
+                    .testTag("addAttendeeButton")
+                    .align(Alignment.CenterHorizontally),
             ) {
               Row(
                   horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -311,14 +360,18 @@ fun CreateActivityScreen(
             }
             if (attendees.isNotEmpty()) {
               LazyRow(
-                  modifier = Modifier.fillMaxHeight().height(85.dp).padding(8.dp),
+                  modifier = Modifier
+                      .fillMaxHeight()
+                      .height(85.dp)
+                      .padding(8.dp),
               ) {
                 items(attendees.size) { index ->
                   Card(
                       modifier =
-                          Modifier.padding(8.dp)
-                              .background(Color(0xFFFFFFFF))
-                              .testTag("attendeeRow${index}"),
+                      Modifier
+                          .padding(8.dp)
+                          .background(Color(0xFFFFFFFF))
+                          .testTag("attendeeRow${index}"),
                   ) {
                     Row {
                       Column(modifier = Modifier.padding(8.dp)) {
@@ -336,7 +389,10 @@ fun CreateActivityScreen(
                       IconButton(
                           onClick = { attendees = attendees.filter { it != attendees[index] } },
                           modifier =
-                              Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
+                          Modifier
+                              .width(40.dp)
+                              .height(40.dp)
+                              .testTag("removeAttendeeButton"),
                       ) {
                         Icon(
                             Icons.Filled.PersonRemove,
@@ -401,7 +457,7 @@ fun CreateActivityScreen(
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
                               location = location,
-                              images = items,
+                              images = items.map { bitmapToBase64(it) },
                               participants = attendees,
                               type = types.find { it.name == selectedOption } ?: types[0],
                               comments = listOf())
@@ -419,10 +475,11 @@ fun CreateActivityScreen(
                   }
                 },
                 modifier =
-                    Modifier.width(300.dp)
-                        .height(40.dp)
-                        .testTag("createButton")
-                        .align(Alignment.CenterHorizontally),
+                Modifier
+                    .width(300.dp)
+                    .height(40.dp)
+                    .testTag("createButton")
+                    .align(Alignment.CenterHorizontally),
             ) {
               Row(
                   horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -447,80 +504,125 @@ fun CreateActivityScreen(
       })
 }
 
-var items = listOf<Bitmap>()
+
 
 @Composable
-fun Carousel(openDialog: () -> Unit) {
-  Row(
-      modifier = Modifier.fillMaxWidth().height(135.dp).padding(8.dp),
-      verticalAlignment = Alignment.CenterVertically) {
+fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>,deleteImage: (Bitmap) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(135.dp)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         LazyRow(
-            modifier = Modifier.width(340.dp).height(135.dp),
+            modifier = Modifier
+                .width(340.dp)
+                .height(135.dp),
         ) {
-          items(items.size) { index ->
-            Card(
-                modifier =
-                    Modifier.padding(8.dp)
+            items(itemsList.size) { index ->
+                Card(
+                    modifier =
+                    Modifier
+                        .padding(8.dp)
                         .background(Color(0xFFFFFFFF))
                         .testTag("carouselItem${index}"),
-            ) {
-              Image(
-                  bitmap = items[index].asImageBitmap(),
-                  contentDescription = "Image",
-                  modifier = Modifier.size(100.dp))
+                ) {
+                    Image(
+                        bitmap = itemsList[index].asImageBitmap(),
+                        contentDescription = "Image",
+                        modifier = Modifier.size(100.dp)
+                    )
+                    IconButton(
+                        onClick = { deleteImage(itemsList[index]) },
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(40.dp)
+                            .align(Alignment.End)
+                            .testTag("removeImageButton"),
+                    ) {
+                        Icon(
+                            Icons.Filled.DeleteOutline,
+                            contentDescription = "remove image",
+                        )
+                    }
+                }
             }
-          }
         }
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.padding(16.dp).fillMaxHeight(), // Use size modifier for simplicity
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.End // Center the icon horizontally
-            ) {
-              FloatingActionButton(
-                  content = {
-                    Icon(
-                        imageVector = Icons.Outlined.AddCircle,
-                        contentDescription = "Add a new image")
-                  },
-                  onClick = openDialog,
-                  modifier = Modifier.size(50.dp).background(Color(0xFFFFFFFF)),
-              )
-              Spacer(modifier = Modifier.height(4.dp))
-              Text(
-                  text = "Add Image",
-                  color = Color(0xFF000000),
-                  style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 8.sp),
-              )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxHeight(), // Use size modifier for simplicity
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.End // Center the icon horizontally
+                ) {
+                    FloatingActionButton(
+                        content = {
+                            Icon(
+                                imageVector = Icons.Outlined.AddCircle,
+                                contentDescription = "Add a new image"
+                            )
+                        },
+                        onClick = openDialog,
+                        modifier = Modifier
+                            .size(50.dp)
+                            .background(Color(0xFFFFFFFF)),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Add Image",
+                        color = Color(0xFF000000),
+                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 8.sp),
+                    )
+                }
             }
+
+    }
+
+
+      fun takePhoto(
+          controller: LifecycleCameraController,
+          onPhotoTaken: (Bitmap) -> Unit,
+          applicationContext: Context
+      ) {
+          controller.takePicture(
+              ContextCompat.getMainExecutor(applicationContext),
+              object : ImageCapture.OnImageCapturedCallback() {
+                  override fun onCaptureSuccess(image: ImageProxy) {
+                      super.onCaptureSuccess(image)
+
+                      val matrix =
+                          Matrix().apply { postRotate(image.imageInfo.rotationDegrees.toFloat()) }
+                      val rotatedBitmap =
+                          Bitmap.createBitmap(
+                              image.toBitmap(),
+                              0,
+                              0,
+                              image.width,
+                              image.height,
+                              matrix,
+                              true
+                          )
+
+                      onPhotoTaken(rotatedBitmap)
+                  }
+
+                  override fun onError(exception: ImageCaptureException) {
+                      super.onError(exception)
+                      Toast.makeText(
+                          applicationContext,
+                          "Error taking picture: ${exception.message}",
+                          Toast.LENGTH_SHORT
+                      )
+                          .show()
+                  }
+              })
       }
-}
 
-fun takePhoto(
-    controller: LifecycleCameraController,
-    onPhotoTaken: (Bitmap) -> Unit,
-    applicationContext: Context
-) {
-  controller.takePicture(
-      ContextCompat.getMainExecutor(applicationContext),
-      object : ImageCapture.OnImageCapturedCallback() {
-        override fun onCaptureSuccess(image: ImageProxy) {
-          super.onCaptureSuccess(image)
-
-          val matrix = Matrix().apply { postRotate(image.imageInfo.rotationDegrees.toFloat()) }
-          val rotatedBitmap =
-              Bitmap.createBitmap(image.toBitmap(), 0, 0, image.width, image.height, matrix, true)
-
-          onPhotoTaken(rotatedBitmap)
-        }
-
-        override fun onError(exception: ImageCaptureException) {
-          super.onError(exception)
-          Toast.makeText(
-                  applicationContext,
-                  "Error taking picture: ${exception.message}",
-                  Toast.LENGTH_SHORT)
-              .show()
-        }
-      })
+fun bitmapToBase64(bitmap: Bitmap): String {
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 70, byteArrayOutputStream)
+    val byteArray = byteArrayOutputStream.toByteArray()
+    return Base64.encodeToString(byteArray, Base64.DEFAULT)
 }
