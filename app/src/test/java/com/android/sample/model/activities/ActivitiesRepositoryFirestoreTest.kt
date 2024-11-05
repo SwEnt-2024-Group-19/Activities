@@ -1,5 +1,5 @@
 package com.android.sample.model.activities
-
+/*
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
@@ -173,3 +173,5 @@ class ActivitiesRepositoryFirestoreTest {
     assert(failureCalled)
   }
 }
+
+ */

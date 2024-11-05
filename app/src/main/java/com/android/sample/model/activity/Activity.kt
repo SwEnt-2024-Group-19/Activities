@@ -13,7 +13,7 @@ data class Activity(
     var duration: String,
     // var category: Category,
     var price: Double,
-    var location: Location,
+    var location: Location?,
     var creator: String,
     var images: List<String>,
     var placesLeft: Long,

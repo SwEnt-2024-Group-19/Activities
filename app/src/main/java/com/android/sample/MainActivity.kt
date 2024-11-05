@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
@@ -74,6 +75,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
   val profileViewModel: ProfileViewModel = hiltViewModel()
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
+  val locationViewModel: LocationViewModel = hiltViewModel()
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
@@ -96,7 +98,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
         ListActivitiesScreen(listActivitiesViewModel, navigationActions)
       }
       composable(Screen.EDIT_ACTIVITY) {
-        EditActivityScreen(listActivitiesViewModel, navigationActions)
+        EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel )
       }
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
@@ -109,7 +111,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
       composable(Screen.ADD_ACTIVITY) {
-        CreateActivityScreen(listActivitiesViewModel, navigationActions, profileViewModel)
+        CreateActivityScreen(listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
       }
     }
 

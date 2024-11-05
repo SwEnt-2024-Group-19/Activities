@@ -38,25 +38,30 @@ class NominatimLocationRepository @Inject constructor(private val client: OkHttp
       onFailure: (Exception) -> Unit
   ) {
     // Using HttpUrl.Builder to properly construct the URL with query parameters.
-    val url =
-        HttpUrl.Builder()
-            .scheme("https")
-            .host("nominatim.openstreetmap.org")
-            .addPathSegment("search")
-            .addQueryParameter("q", query)
-            .addQueryParameter("format", "json")
-            .build()
-
-    // Create the request
-    val request = Request.Builder().url(url).build()
-    client
-        .newCall(request)
-        .enqueue(
-            object : Callback {
-              override fun onFailure(call: Call, e: IOException) {
-                Log.e("NominatimLocationRepository", "Failed to execute request", e)
-                onFailure(e)
-              }
+      val url =
+          HttpUrl.Builder()
+              .scheme("https")
+              .host("nominatim.openstreetmap.org")
+              .addPathSegment("search")
+              .addQueryParameter("q", query)
+              .addQueryParameter("format", "json")
+              .build()
+      
+      val request =
+          Request.Builder()
+              .url(url)
+              .header(
+                  "User-Agent", "Aptivities/1.0 (elvan@epfl.ch)") // Set a proper User-Agent
+              .header("Referer", "https://aptivities-epfl.com") // Optionally add a Referer
+              .build()
+      client
+          .newCall(request)
+          .enqueue(
+              object : Callback {
+                  override fun onFailure(call: Call, e: IOException) {
+                      Log.e("NominatimLocationRepository", "Failed to execute request", e)
+                      onFailure(e)
+                  }
 
               override fun onResponse(call: Call, response: Response) {
                 response.use {

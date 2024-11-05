@@ -79,7 +79,7 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       startTime = data["startTime"] as? String ?: "HH:mm",
                       duration = data["duration"] as? String ?: "HH:mm",
                       price = data["price"] as? Double ?: 0.0,
-                      location = data["location"] as? Location ?: Location(0.0, 0.0,"Unknown Location"),
+                      location = data["location"] as? Location ?: Location(0.0, 0.0,"No Location"), // Default value
                       creator = data["creator"] as? String ?: "Anonymous",
                       images = listOf(),
                       placesLeft = data["placesLeft"] as? Long ?: 0,
