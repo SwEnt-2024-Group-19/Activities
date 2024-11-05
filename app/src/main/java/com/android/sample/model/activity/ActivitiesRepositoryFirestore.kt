@@ -34,6 +34,7 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                 .map { document ->
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
+                    val images = data["images"] as? List<String> ?: listOf()
                   val participants =
                       (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
                         SimpleUser(
@@ -80,7 +81,7 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       price = data["price"] as? Double ?: 0.0,
                       location = data["location"] as? String ?: "Unknown Location",
                       creator = data["creator"] as? String ?: "Anonymous",
-                      images = listOf(),
+                      images = images,
                       placesLeft = data["placesLeft"] as? Long ?: 0,
                       maxPlaces = data["maxPlaces"] as? Long ?: 0,
                       status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
