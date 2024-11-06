@@ -2,44 +2,40 @@ package com.android.sample.model.map
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 
 @HiltViewModel
-class LocationViewModel @Inject constructor(private val repository: LocationRepository) :
-  ViewModel() {
+open class LocationViewModel @Inject constructor(private val repository: LocationRepository) :
+    ViewModel() {
   private val query_ = MutableStateFlow("")
-  val query: StateFlow<String> = query_
+  open val query: StateFlow<String> = query_
 
   private var locationSuggestions_ = MutableStateFlow(emptyList<Location>())
-  val locationSuggestions: StateFlow<List<Location>> = locationSuggestions_
+  open val locationSuggestions: StateFlow<List<Location>> = locationSuggestions_
 
   fun setQuery(query: String) {
     query_.value = query
 
     if (query.isNotEmpty()) {
       repository.search(
-        query,
-        onSuccess = { locations ->
-          locationSuggestions_.value = locations.distinct() // Filter out repetitive updates
-          println("Updated location suggestions: ${locationSuggestions_.value}") // Debugging line
-        },
-        onFailure = { throwable ->
-          locationSuggestions_.value = emptyList()
-          println("Failed to fetch suggestions, cleared list. Error: ${throwable.message}")
-          // or
-          Log.e(
-            "LocationSuggestions",
-            "Failed to fetch suggestions: ${throwable.message}",
-            throwable
-          )
-          // Include the error message in the log message for easier debugging
-        }
-      )
+          query,
+          onSuccess = { locations ->
+            locationSuggestions_.value = locations.distinct() // Filter out repetitive updates
+            println("Updated location suggestions: ${locationSuggestions_.value}") // Debugging line
+          },
+          onFailure = { throwable ->
+            locationSuggestions_.value = emptyList()
+            println("Failed to fetch suggestions, cleared list. Error: ${throwable.message}")
+            // or
+            Log.e(
+                "LocationSuggestions",
+                "Failed to fetch suggestions: ${throwable.message}",
+                throwable)
+            // Include the error message in the log message for easier debugging
+          })
     } else {
       locationSuggestions_.value = emptyList()
       println("Query is empty, cleared suggestions.") // Debugging line

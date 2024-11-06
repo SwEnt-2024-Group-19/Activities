@@ -1,30 +1,5 @@
 package com.android.sample.ui.activity
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextContains
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
-import androidx.compose.ui.test.performTextInput
-import com.android.sample.model.activity.ActivitiesRepository
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
-import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.ui.navigation.NavigationActions
-import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
-import java.util.GregorianCalendar
-import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 /*
 
 class EditActivityScreenTest {
@@ -191,4 +166,3 @@ class EditActivityScreenTest {
 
 
  */
-

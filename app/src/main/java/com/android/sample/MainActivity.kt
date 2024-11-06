@@ -98,7 +98,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
         ListActivitiesScreen(listActivitiesViewModel, navigationActions)
       }
       composable(Screen.EDIT_ACTIVITY) {
-        EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel )
+        EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel)
       }
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
@@ -111,7 +111,8 @@ fun ActivitiesApp(uid: String, startDestination: String) {
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
       composable(Screen.ADD_ACTIVITY) {
-        CreateActivityScreen(listActivitiesViewModel, navigationActions, profileViewModel,)
+        CreateActivityScreen(
+            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
       }
     }
 

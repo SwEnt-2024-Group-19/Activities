@@ -1,34 +1,8 @@
 package com.android.sample.ui.activityDetails
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextContains
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.isDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.sample.model.activity.ActivitiesRepositoryFirestore
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
-import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.profile.ProfileViewModel
-import com.android.sample.model.profile.User
-import com.android.sample.ui.activitydetails.ActivityDetailsScreen
-import com.android.sample.ui.navigation.NavigationActions
-import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
-import java.util.Calendar
-import java.util.GregorianCalendar
-import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.Mockito.*
+
+
 /*
 @RunWith(AndroidJUnit4::class)
 class ActivityDetailsScreenAndroidTest {

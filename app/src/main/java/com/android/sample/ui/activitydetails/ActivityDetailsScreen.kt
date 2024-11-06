@@ -189,9 +189,7 @@ fun ActivityDetailsScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                       Icon(Icons.Default.LocationOn, contentDescription = "Location")
                       Spacer(modifier = Modifier.width(4.dp))
-                      Text(
-                          text = location.name,
-                          modifier = Modifier.testTag("locationText"))
+                      Text(text = location.name, modifier = Modifier.testTag("locationText"))
                     }
                   }
               Spacer(modifier = Modifier.height(8.dp))

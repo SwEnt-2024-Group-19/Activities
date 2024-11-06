@@ -70,9 +70,8 @@ fun ListActivitiesScreen(
       topBar = {
         Box(
             modifier =
-            Modifier
-                .height(35.dp)
-                .testTag("segmentedButtonRow")) { // Set the desired height here
+                Modifier.height(35.dp)
+                    .testTag("segmentedButtonRow")) { // Set the desired height here
               SingleChoiceSegmentedButtonRow {
                 options.forEachIndexed { index, label ->
                   SegmentedButton(
@@ -93,9 +92,7 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
-        Box(modifier = modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
+        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
               var activitiesList =
@@ -109,28 +106,23 @@ fun ListActivitiesScreen(
                   Text(
                       text = "There is no activity yet.",
                       modifier =
-                      Modifier
-                          .padding(8.dp)
-                          .align(Alignment.Center)
-                          .testTag("emptyActivityPrompt"),
+                          Modifier.padding(8.dp)
+                              .align(Alignment.Center)
+                              .testTag("emptyActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
                 } else {
                   Text(
                       text = "There is no activity of this type yet.",
                       modifier =
-                      Modifier
-                          .padding(8.dp)
-                          .align(Alignment.Center)
-                          .testTag("emptyActivityPrompt"),
+                          Modifier.padding(8.dp)
+                              .align(Alignment.Center)
+                              .testTag("emptyActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
                 }
               } else {
 
                 LazyColumn(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize()
-                        .padding(16.dp),
+                    modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
 
@@ -160,27 +152,22 @@ fun ActivityCard(
 
   Card(
       modifier =
-      Modifier
-          .fillMaxWidth()
-          .testTag("activityCard")
-          .clip(RoundedCornerShape(16.dp))
-          .clickable {
-              listActivitiesViewModel.selectActivity(activity)
-              navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-          },
+          Modifier.fillMaxWidth()
+              .testTag("activityCard")
+              .clip(RoundedCornerShape(16.dp))
+              .clickable {
+                listActivitiesViewModel.selectActivity(activity)
+                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+              },
       elevation = CardDefaults.cardElevation(8.dp)) {
         Column {
           // Box for overlaying the title on the image
-          Box(modifier = Modifier
-              .fillMaxWidth()
-              .height(180.dp)) {
+          Box(modifier = Modifier.fillMaxWidth().height(180.dp)) {
             // Display the activity image
             Image(
                 painter = painterResource(R.drawable.foot),
                 contentDescription = activity.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
+                modifier = Modifier.fillMaxWidth().height(180.dp),
                 contentScale = ContentScale.Crop)
 
             // Display the activity name on top of the image
@@ -192,10 +179,7 @@ fun ActivityCard(
                         color = Color.White // Title color set to black
                         ),
                 modifier =
-                Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp)
-                    .testTag("titleActivity"))
+                    Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("titleActivity"))
           }
 
           Spacer(modifier = Modifier.height(8.dp))
@@ -210,9 +194,7 @@ fun ActivityCard(
               modifier = Modifier.padding(horizontal = 16.dp))
 
           Row(
-              modifier = Modifier
-                  .padding(horizontal = 16.dp, vertical = 4.dp)
-                  .fillMaxWidth(),
+              modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp).fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
@@ -228,9 +210,7 @@ fun ActivityCard(
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold, color = Color.Gray, fontSize = 16.sp),
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(end = 16.dp))
+                    modifier = Modifier.align(Alignment.CenterVertically).padding(end = 16.dp))
               }
 
           Spacer(modifier = Modifier.height(4.dp))
