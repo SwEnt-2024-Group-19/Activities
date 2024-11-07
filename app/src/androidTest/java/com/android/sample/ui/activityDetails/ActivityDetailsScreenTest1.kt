@@ -322,20 +322,21 @@ class ActivityDetailsScreenAndroidTest {
     // Assert that the reply is removed
     assert(comments.first().replies.none { it.uid == "reply-uid" })
   }
-    @Test
-    fun notLoggedInNoLikeButton(){
-        mockProfileViewModel = mock(ProfileViewModel::class.java)
-        val userStateFlow = MutableStateFlow<User?>(null)
-        `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
-        composeTestRule.setContent {
-            ActivityDetailsScreen(
-                listActivityViewModel = mockViewModel,
-                navigationActions = mockNavigationActions,
-                profileViewModel = mockProfileViewModel)
-        }
-        composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
+
+  @Test
+  fun notLoggedInNoLikeButton() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    val userStateFlow = MutableStateFlow<User?>(null)
+    `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
     }
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
+  }
 
   @Test
   fun replyToComment_displaysNewReplyInList() {
@@ -365,7 +366,6 @@ class ActivityDetailsScreenAndroidTest {
     // Assert that the new reply is added
     assert(comments.first().replies.any { it.content == "This is a reply" })
   }
-
 
   @Test
   fun changeIconWhenActivityIsLiked() {

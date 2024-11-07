@@ -163,9 +163,8 @@ fun ActivityDetailsScreen(
                         text = "Activity Image",
                         color = Color.White,
                         modifier = Modifier.align(Alignment.Center))
-                  LikeButton(profile, activity, profileViewModel)
-
-              }
+                    LikeButton(profile, activity, profileViewModel)
+                  }
 
               // Title
               Box(
@@ -496,33 +495,33 @@ fun CommentItem(
     }
   }
 }
+
 @Composable
 fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileViewModel) {
-    var isLiked by remember {
-        mutableStateOf(activity?.let { profile?.likedActivities?.contains(it.uid) } ?: false)
-    }
+  var isLiked by remember {
+    mutableStateOf(activity?.let { profile?.likedActivities?.contains(it.uid) } ?: false)
+  }
 
-    if (profile != null) {
-        IconButton(
-            modifier = Modifier.testTag("likeButton$isLiked"),
-            onClick = {
-                isLiked = !isLiked
-                if (isLiked) {
-                    if (activity != null) {
-                        profileViewModel.addLikedActivity(profile.id, activity.uid)
-                    }
-                } else {
-                    if (activity != null) {
-                        profileViewModel.removeLikedActivity(profile.id, activity.uid)
-                    }
-                }
-            },
-        ) {
-            Icon(
-                imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                contentDescription = if (isLiked) "Liked" else "Not Liked",
-                tint = if (isLiked) Color.Black else Color.LightGray)
-        }
+  if (profile != null) {
+    IconButton(
+        modifier = Modifier.testTag("likeButton$isLiked"),
+        onClick = {
+          isLiked = !isLiked
+          if (isLiked) {
+            if (activity != null) {
+              profileViewModel.addLikedActivity(profile.id, activity.uid)
+            }
+          } else {
+            if (activity != null) {
+              profileViewModel.removeLikedActivity(profile.id, activity.uid)
+            }
+          }
+        },
+    ) {
+      Icon(
+          imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+          contentDescription = if (isLiked) "Liked" else "Not Liked",
+          tint = if (isLiked) Color.Black else Color.LightGray)
     }
+  }
 }
-
