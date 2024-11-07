@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
@@ -45,12 +46,13 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+  private val CAMERA_PERMISSION_REQUEST_CODE = 0
   private lateinit var auth: FirebaseAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    if (!hasRequiredPermissions(applicationContext)) {
-      ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
+    if (!hasCameraPermissions(applicationContext)) {
+      ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
     auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
@@ -70,7 +72,7 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  fun hasRequiredPermissions(context: Context): Boolean {
+  private fun hasCameraPermissions(context: Context): Boolean {
     return CAMERAX_PERMISSIONS.all {
       ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }
