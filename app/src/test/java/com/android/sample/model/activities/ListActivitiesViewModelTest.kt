@@ -5,6 +5,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.Location
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -23,12 +24,13 @@ class ListActivitiesViewModelTest {
   private lateinit var activitiesRepository: ActivitiesRepository
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
 
+  private val location = Location(46.519962, 6.633597, "EPFL")
   private val activity =
       Activity(
           title = "FOOTBALL",
           uid = "1",
           status = ActivityStatus.ACTIVE,
-          location = "",
+          location = location,
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",

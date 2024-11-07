@@ -46,7 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
@@ -62,8 +61,7 @@ import kotlin.math.min
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
-    listActivityViewModel: ListActivitiesViewModel =
-        viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel
 ) {
@@ -211,7 +209,7 @@ fun ActivityDetailsScreen(
                       Icon(Icons.Default.LocationOn, contentDescription = "Location")
                       Spacer(modifier = Modifier.width(4.dp))
                       Text(
-                          text = location ?: "not defined yet",
+                          text = location?.name ?: "No location",
                           modifier = Modifier.testTag("locationText"))
                     }
                   }
@@ -381,7 +379,14 @@ fun CommentSection(
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
     // Display all comments
-    comments.forEach { comment -> CommentItem(profileId, comment, onReplyComment, onDeleteComment) }
+    comments.forEach { comment ->
+      CommentItem(
+          profileId,
+          comment,
+          onReplyComment,
+          onDeleteComment,
+          allowReplies = true) // Set allowReplies to true for top-level comments
+    }
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -415,7 +420,8 @@ fun CommentItem(
     profileId: String,
     comment: Comment,
     onReplyComment: (String, Comment) -> Unit,
-    onDeleteComment: (Comment) -> Unit
+    onDeleteComment: (Comment) -> Unit,
+    allowReplies: Boolean = true
 ) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
@@ -440,40 +446,44 @@ fun CommentItem(
               }
         }
 
-        // Toggle button to show/hide the reply input field
-        Button(
-            onClick = { showReplyField = !showReplyField },
-            modifier =
-                Modifier.padding(top = 4.dp)
-                    .testTag("${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
-              Text(if (showReplyField) "Cancel" else "Reply")
-            }
+        if (allowReplies) {
+          // Toggle button to show/hide the reply input field
+          Button(
+              onClick = { showReplyField = !showReplyField },
+              modifier =
+                  Modifier.padding(top = 4.dp)
+                      .testTag(
+                          "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
+                Text(if (showReplyField) "Cancel" else "Reply")
+              }
+        }
+
+        // Conditionally show the reply input field if the user is logged in
+        if (showReplyField) {
+          OutlinedTextField(
+              value = replyText,
+              onValueChange = { replyText = it },
+              label = { Text("Reply") },
+              modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
+
+          Button(
+              onClick = {
+                onReplyComment(replyText, comment)
+                replyText = ""
+                showReplyField = false
+              },
+              modifier = Modifier.padding(top = 4.dp).testTag("postReplyButton_${comment.uid}")) {
+                Text("Post Reply")
+              }
+        }
       }
 
-      // Conditionally show the reply input field if the user is logged in
-      if (showReplyField) {
-        OutlinedTextField(
-            value = replyText,
-            onValueChange = { replyText = it },
-            label = { Text("Reply") },
-            modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
-
-        Button(
-            onClick = {
-              onReplyComment(replyText, comment)
-              replyText = ""
-              showReplyField = false
-            },
-            modifier = Modifier.padding(top = 4.dp).testTag("postReplyButton_${comment.uid}")) {
-              Text("Post Reply")
-            }
-      }
-    }
-
-    // Show replies indented
-    comment.replies.forEach { reply ->
-      Box(modifier = Modifier.padding(start = 16.dp)) {
-        CommentItem(profileId, reply, onReplyComment, onDeleteComment)
+      // Show replies for original comments, but do not allow replies on replies
+      comment.replies.forEach { reply ->
+        Box(modifier = Modifier.padding(start = 16.dp)) {
+          // Pass `allowReplies = false` for replies to prevent nesting
+          CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+        }
       }
     }
   }

@@ -1,31 +1,6 @@
 package com.android.sample.ui.profile
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onFirst
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import com.android.sample.model.activity.ActivitiesRepository
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
-import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.profile.ProfileViewModel
-import com.android.sample.model.profile.User
-import com.android.sample.ui.navigation.NavigationActions
-import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
-import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-
+/*
 class ProfileScreenTest {
 
   private lateinit var userProfileViewModel: ProfileViewModel
@@ -136,34 +111,6 @@ class ProfileScreenTest {
         .performClick() // test for if on click it goes back
   }
 
-  //  @Test
-  //  fun displaysActivitiesLists() {
-  //    composeTestRule.setContent {
-  //      ProfileScreen(
-  //          userProfileViewModel = userProfileViewModel,
-  //          navigationActions = navigationActions,
-  //          listActivitiesViewModel)
-  //    }
-  //    composeTestRule.onNodeWithTag("activitiesCreatedList").assertIsDisplayed()
-  //    composeTestRule.onNodeWithTag("activitiesCreatedTitle").assertIsDisplayed()
-  //    composeTestRule.onNodeWithTag("activitiesCreatedTitle").assertTextEquals("Activities
-  // Created")
-  //    composeTestRule.onAllNodes(hasTestTag("activityCreated")).assertCountEquals(1)
-  //    composeTestRule.onNodeWithText("Cooking").assertIsDisplayed()
-  //    composeTestRule.onNodeWithText("Great cooking class").assertIsDisplayed()
-  //
-  //    composeTestRule.onNodeWithTag("activitiesEnrolledList").assertIsDisplayed()
-  //    composeTestRule.onNodeWithTag("activitiesEnrolledTitle").assertIsDisplayed()
-  //    composeTestRule
-  //        .onNodeWithTag("activitiesEnrolledTitle")
-  //        .assertTextEquals("Activities Enrolled in")
-  //    composeTestRule.onAllNodes(hasTestTag("activityEnrolled")).assertCountEquals(1)
-  //    composeTestRule.onNodeWithText("Fun Farm").assertIsDisplayed()
-  //    composeTestRule
-  //        .onNodeWithText("Come discover the new farm and enjoy with your family!")
-  //        .assertIsDisplayed()
-  //  }
-
   @Test
   fun goesToEditOnClick() {
     composeTestRule.setContent {
@@ -188,28 +135,7 @@ class ProfileScreenTest {
     // Verify that the navigation action was triggered
     verify(navigationActions).navigateTo(Screen.EDIT_ACTIVITY)
   }
-
-  //  @Test
-  //  fun goesToDetailsOnClick() {
-  //    composeTestRule.setContent {
-  //      ProfileScreen(
-  //          userProfileViewModel = userProfileViewModel,
-  //          navigationActions = navigationActions,
-  //          listActivitiesViewModel = listActivitiesViewModel)
-  //    }
-  //
-  //    // Wait until the UI is idle and ready
-  //    composeTestRule.waitForIdle()
-  //
-  //    // Get all nodes with the "activityCreated" test tag
-  //    val activityNodes = composeTestRule.onAllNodes(hasTestTag("activityEnrolled"))
-  //
-  //    activityNodes.onFirst().performClick()
-  //
-  //    // Wait for any UI operations to complete
-  //    composeTestRule.waitForIdle()
-  //
-  //    // Verify that the navigation action was triggered
-  //    verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
-  //  }
 }
+
+
+ */

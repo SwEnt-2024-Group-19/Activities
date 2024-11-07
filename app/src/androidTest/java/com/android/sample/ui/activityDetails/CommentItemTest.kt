@@ -1,12 +1,13 @@
 package com.android.sample.ui.activityDetails
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.activity.Comment
 import com.android.sample.ui.activitydetails.CommentItem
@@ -147,32 +148,6 @@ class CommentItemTest {
   }
 
   @Test
-  fun replyIsPosted_whenReplyInputIsFilledAndPosted() {
-    var replyPosted = false
-    composeTestRule.setContent {
-      CommentItem(
-          profileId = testProfileId,
-          comment = testComment,
-          onReplyComment = { replyText, _ -> replyPosted = replyText.isNotBlank() },
-          onDeleteComment = {})
-    }
-
-    composeTestRule
-        .onNodeWithTag("ReplyButton_${testComment.uid}")
-        .performClick() // Use the test tag
-    composeTestRule
-        .onNodeWithTag("replyInputField_${testComment.uid}")
-        .assertIsDisplayed() // Also ensure to set a test tag for the input field
-    composeTestRule
-        .onNodeWithTag("replyInputField_${testComment.uid}")
-        .performTextInput("New reply")
-    composeTestRule
-        .onNodeWithTag("postReplyButton_${testComment.uid}")
-        .performClick() // Use the test tag
-    assert(replyPosted)
-  }
-
-  @Test
   fun repliesAreDisplayedCorrectly() {
     composeTestRule.setContent {
       CommentItem(
@@ -183,5 +158,48 @@ class CommentItemTest {
     }
 
     composeTestRule.onNodeWithText("John: This is a reply").assertIsDisplayed()
+  }
+
+  @Test
+  fun replyButton_isNotDisplayedForReplies() {
+    val replyComment = testComment.replies.first() // The reply to the original comment
+    composeTestRule.setContent {
+      CommentItem(
+          profileId = testProfileId,
+          comment = replyComment, // Pass in the reply comment
+          onReplyComment = { _, _ -> },
+          onDeleteComment = {},
+          allowReplies = false // Disable replies for this test
+          )
+    }
+
+    // Ensure that the reply button is not displayed for replies
+    composeTestRule.onNodeWithTag("ReplyButton_${replyComment.uid}").assertDoesNotExist()
+  }
+
+  @Test
+  fun replies_areCorrectlyNestedUnderComments() {
+    // Set the content with the comment that has a reply
+    composeTestRule.setContent {
+      CommentSection(
+          profileId = testProfileId,
+          comments = listOf(testComment), // Pass in the comment with its reply
+          onReplyComment = { _, _ -> },
+          onDeleteComment = {},
+          onAddComment = {})
+    }
+
+    // Ensure the original comment is displayed
+    composeTestRule.onNodeWithText("Amine: This is a comment").assertIsDisplayed()
+
+    // Ensure the reply is displayed
+    composeTestRule.onNodeWithText("John: This is a reply").assertIsDisplayed()
+
+    // Check that the reply is well nested, ensuring its indented and positioned under its origin
+    // comment
+    composeTestRule
+        .onNodeWithText("John: This is a reply")
+        .assertIsDisplayed()
+        .assertLeftPositionInRootIsEqualTo(40.dp)
   }
 }

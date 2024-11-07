@@ -17,7 +17,6 @@ import androidx.compose.ui.semantics.testTag
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -33,6 +32,7 @@ import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.authentication.ChooseAccountScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
+import com.android.sample.ui.listActivities.LikedActivitiesScreen
 import com.android.sample.ui.listActivities.ListActivitiesScreen
 import com.android.sample.ui.map.MapScreen
 import com.android.sample.ui.navigation.NavigationActions
@@ -105,12 +105,14 @@ fun ActivitiesApp(uid: String, startDestination: String) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  val listActivitiesViewModel: ListActivitiesViewModel =
-      viewModel(factory = ListActivitiesViewModel.Factory)
+  // val listActivitiesViewModel: ListActivitiesViewModel =
+  //  viewModel(factory = ListActivitiesViewModel.Factory)
   val profileViewModel: ProfileViewModel = hiltViewModel()
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
   val locationViewModel: LocationViewModel = hiltViewModel()
+
+  val listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel()
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
@@ -130,10 +132,10 @@ fun ActivitiesApp(uid: String, startDestination: String) {
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) {
-        ListActivitiesScreen(listActivitiesViewModel, navigationActions)
+        ListActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
       composable(Screen.EDIT_ACTIVITY) {
-        EditActivityScreen(listActivitiesViewModel, navigationActions)
+        EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel)
       }
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(listActivitiesViewModel, navigationActions, profileViewModel)
@@ -141,12 +143,15 @@ fun ActivitiesApp(uid: String, startDestination: String) {
     }
 
     navigation(startDestination = Screen.MAP, route = Route.MAP) {
-      composable(Screen.MAP) { MapScreen(navigationActions, locationViewModel) }
+      composable(Screen.MAP) {
+        MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+      }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
       composable(Screen.ADD_ACTIVITY) {
-        CreateActivityScreen(listActivitiesViewModel, navigationActions, profileViewModel)
+        CreateActivityScreen(
+            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
       }
     }
 
@@ -155,6 +160,11 @@ fun ActivitiesApp(uid: String, startDestination: String) {
         ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
       }
       composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
+    }
+    navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
+      composable(Screen.LIKED_ACTIVITIES) {
+        LikedActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
+      }
     }
   }
 }

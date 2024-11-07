@@ -14,8 +14,9 @@ constructor(
     private val repository: LocationRepository,
     private val permissionChecker: LocationPermissionChecker
 ) : ViewModel() {
+
   private val query_ = MutableStateFlow("")
-  val query: StateFlow<String> = query_
+  open val query: StateFlow<String> = query_
 
   private var locationSuggestions_ = MutableStateFlow(emptyList<Location>())
   val locationSuggestions: StateFlow<List<Location>> = locationSuggestions_
@@ -27,7 +28,25 @@ constructor(
     query_.value = query
 
     if (query.isNotEmpty()) {
-      repository.search(query, { locationSuggestions_.value = it }, {})
+      repository.search(
+          query,
+          onSuccess = { locations ->
+            locationSuggestions_.value = locations.distinct() // Filter out repetitive updates
+            println("Updated location suggestions: ${locationSuggestions_.value}") // Debugging line
+          },
+          onFailure = { throwable ->
+            locationSuggestions_.value = emptyList()
+            println("Failed to fetch suggestions, cleared list. Error: ${throwable.message}")
+            // or
+            Log.e(
+                "LocationSuggestions",
+                "Failed to fetch suggestions: ${throwable.message}",
+                throwable)
+            // Include the error message in the log message for easier debugging
+          })
+    } else {
+      locationSuggestions_.value = emptyList()
+      println("Query is empty, cleared suggestions.") // Debugging line
     }
   }
 

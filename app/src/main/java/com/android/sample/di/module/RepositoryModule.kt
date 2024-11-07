@@ -1,6 +1,8 @@
 package com.android.sample.di.module
 
 import android.content.Context
+import com.android.sample.model.activity.ActivitiesRepository
+import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInRepositoryFirebase
 import com.android.sample.model.map.LocationPermissionChecker
@@ -67,5 +69,13 @@ object RepositoryModule {
       fusedLocationProviderClient: FusedLocationProviderClient
   ): LocationRepository {
     return NominatimLocationRepository(client, fusedLocationProviderClient)
+  }
+
+  @Provides
+  @Singleton
+  fun provideActivitiesRepository(
+      firestoreActivitiesRepository: ActivitiesRepositoryFirestore
+  ): ActivitiesRepository {
+    return firestoreActivitiesRepository
   }
 }

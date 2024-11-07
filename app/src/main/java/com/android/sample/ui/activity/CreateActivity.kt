@@ -52,6 +52,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +74,8 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.camera.CameraPreview
 import com.android.sample.ui.dialogs.AddImageDialog
@@ -94,16 +97,16 @@ private const val REQUEST_IMAGE_CAPTURE = 100
 fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    locationViewModel: LocationViewModel
 ) {
-
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-  var location by remember { mutableStateOf("") }
+
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
@@ -116,6 +119,13 @@ fun CreateActivityScreen(
   var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
 
+  val locationQuery by locationViewModel.query.collectAsState()
+  var showDropdown by remember { mutableStateOf(false) }
+  //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+
+  var selectedLocation by remember { mutableStateOf<Location?>(null) }
   // Add scroll
   val scrollState = rememberScrollState()
 
@@ -256,15 +266,58 @@ fun CreateActivityScreen(
                 },
             )
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text("Location") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
-                placeholder = {
-                  Text(text = stringResource(id = R.string.request_location_activity))
-                },
-            )
+
+            // Location Input with dropdown using ExposedDropdownMenuBox
+            ExposedDropdownMenuBox(
+                expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
+            ) {
+              OutlinedTextField(
+                  value = locationQuery,
+                  onValueChange = {
+                    locationViewModel.setQuery(it)
+                    showDropdown = true // Show dropdown when user starts typing
+                  },
+                  label = { Text("Location") },
+                  placeholder = { Text("Enter an Address or Location") },
+                  modifier =
+                      Modifier.menuAnchor() // Anchor the dropdown to this text field
+                          .padding(8.dp)
+                          .fillMaxWidth()
+                          .testTag("inputLocationCreate"),
+                  singleLine = true)
+
+              // Dropdown menu for location suggestions
+              ExposedDropdownMenu(
+                  expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                  onDismissRequest = { showDropdown = false }) {
+                    locationSuggestions.filterNotNull().take(3).forEach { location ->
+                      DropdownMenuItem(
+                          text = {
+                            Text(
+                                text =
+                                    location.name.take(30) +
+                                        if (location.name.length > 30) "..."
+                                        else "", // Limit name length
+                                maxLines = 1 // Ensure name doesn't overflow
+                                )
+                          },
+                          onClick = {
+                            locationViewModel.setQuery(location.name)
+                            selectedLocation = location
+                            showDropdown = false // Close dropdown on selection
+                          },
+                          modifier = Modifier.padding(8.dp))
+                    }
+
+                    if (locationSuggestions.size > 3) {
+                      DropdownMenuItem(
+                          text = { Text("More...") },
+                          onClick = {},
+                          modifier = Modifier.padding(8.dp))
+                    }
+                  }
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             ExposedDropdownMenuBox(
@@ -413,7 +466,7 @@ fun CreateActivityScreen(
                               maxPlaces = placesMax.toLongOrNull() ?: 0,
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
-                              location = location,
+                              location = selectedLocation,
                               images = items.map { bitmapToBase64(it) },
                               participants = attendees,
                               type = types.find { it.name == selectedOption } ?: types[0],
