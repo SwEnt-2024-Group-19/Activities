@@ -1,6 +1,29 @@
 package com.android.sample.ui.listActivities
 
-/*
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import com.android.sample.model.activity.ActivitiesRepository
+import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.Location
+import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Route
+import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
+
 class OverviewScreenTest {
   private lateinit var activitiesRepository: ActivitiesRepository
   private lateinit var navigationActions: NavigationActions
@@ -12,7 +35,7 @@ class OverviewScreenTest {
           title = "Mountain Biking",
           description = "Exciting mountain biking experience.",
           date = Timestamp.now(),
-          location = "Hills",
+          location = Location(46.519962, 6.633597, "EPFL"),
           creator = "Chris",
           images = listOf(),
           price = 10.0,
@@ -60,7 +83,7 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("activityCard").assertExists()
     composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
     composeTestRule.onNodeWithText("Exciting mountain biking experience.").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Hills").assertIsDisplayed()
+    composeTestRule.onNodeWithText("EPFL").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("activityCard").performClick()
 
@@ -132,4 +155,4 @@ class OverviewScreenTest {
   }
 }
 
- */
+

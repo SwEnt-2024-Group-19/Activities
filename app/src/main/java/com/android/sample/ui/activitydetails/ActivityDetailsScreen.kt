@@ -75,7 +75,7 @@ fun ActivityDetailsScreen(
 
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
-  val location by remember { mutableStateOf(Location(0.0, 0.0, "No location")) }
+  val location by remember { mutableStateOf(activity?.location) }
   val price by remember { mutableStateOf(activity?.price) }
   val dueDate by remember {
     mutableStateOf(
@@ -189,7 +189,7 @@ fun ActivityDetailsScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                       Icon(Icons.Default.LocationOn, contentDescription = "Location")
                       Spacer(modifier = Modifier.width(4.dp))
-                      Text(text = location.name, modifier = Modifier.testTag("locationText"))
+                      Text(text = location?.name ?: "No location", modifier = Modifier.testTag("locationText"))
                     }
                   }
               Spacer(modifier = Modifier.height(8.dp))

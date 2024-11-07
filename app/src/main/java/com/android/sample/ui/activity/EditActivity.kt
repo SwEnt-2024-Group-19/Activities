@@ -255,7 +255,7 @@ fun EditActivityScreen(
                     modifier =
                         Modifier.menuAnchor() // Anchor the dropdown to this text field
                             .fillMaxWidth()
-                            .testTag("inputTodoLocation"),
+                            .testTag("inputLocationEdit"),
                     singleLine = true)
 
                 // Dropdown menu for location suggestions
