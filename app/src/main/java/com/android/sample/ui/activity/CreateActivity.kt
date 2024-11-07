@@ -73,7 +73,7 @@ fun CreateActivityScreen(
     profileViewModel: ProfileViewModel,
     locationViewModel: LocationViewModel
 ) {
-  // val locationViewModel: LocationViewModel = hiltViewModel()
+
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }

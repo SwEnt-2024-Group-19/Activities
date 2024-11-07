@@ -70,8 +70,7 @@ import java.util.GregorianCalendar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivityScreen(
-    listActivityViewModel: ListActivitiesViewModel =
-        viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel
 ) {

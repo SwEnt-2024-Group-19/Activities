@@ -1,5 +1,7 @@
 package com.android.sample.di.module
 
+import com.android.sample.model.activity.ActivitiesRepository
+import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInRepositoryFirebase
 import com.android.sample.model.map.LocationRepository
@@ -17,31 +19,39 @@ import okhttp3.OkHttpClient
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
-  @Provides
-  @Singleton
-  fun provideOkHttpClient(): OkHttpClient {
-    return OkHttpClient.Builder().build()
-  }
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder().build()
+    }
 
-  @Provides
-  @Singleton
-  fun provideSignInRepository(
-      signInRepositoryFirebase: SignInRepositoryFirebase
-  ): SignInRepository {
-    return signInRepositoryFirebase
-  }
+    @Provides
+    @Singleton
+    fun provideSignInRepository(
+        signInRepositoryFirebase: SignInRepositoryFirebase
+    ): SignInRepository {
+        return signInRepositoryFirebase
+    }
 
-  @Provides
-  @Singleton
-  fun provideProfilesRepository(
-      firestoreProfilesRepository: ProfilesRepositoryFirestore
-  ): ProfilesRepository {
-    return firestoreProfilesRepository
-  }
+    @Provides
+    @Singleton
+    fun provideProfilesRepository(
+        firestoreProfilesRepository: ProfilesRepositoryFirestore
+    ): ProfilesRepository {
+        return firestoreProfilesRepository
+    }
 
-  @Provides
-  @Singleton
-  fun provideLocationRepository(client: OkHttpClient): LocationRepository {
-    return NominatimLocationRepository(client)
-  }
+    @Provides
+    @Singleton
+    fun provideLocationRepository(client: OkHttpClient): LocationRepository {
+        return NominatimLocationRepository(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideActivitiesRepository(
+        firestoreActivitiesRepository: ActivitiesRepositoryFirestore
+    ): ActivitiesRepository {
+        return firestoreActivitiesRepository
+    }
 }

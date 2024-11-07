@@ -44,6 +44,8 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -56,7 +58,7 @@ import java.util.Locale
 fun ListActivitiesScreen(
     viewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
   val uiState by viewModel.uiState.collectAsState()
   var selectedFilter by remember { mutableStateOf("") }
@@ -64,6 +66,7 @@ fun ListActivitiesScreen(
   val all = "ALL"
   val typesToString = types.map { it.name }
   val options = listOf(all) + typesToString
+
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),

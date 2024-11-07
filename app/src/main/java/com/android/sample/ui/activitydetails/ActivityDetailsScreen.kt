@@ -63,8 +63,7 @@ import kotlin.math.min
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
-    listActivityViewModel: ListActivitiesViewModel =
-        viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel
 ) {

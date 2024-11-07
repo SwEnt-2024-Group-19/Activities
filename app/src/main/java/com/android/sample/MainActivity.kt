@@ -70,12 +70,13 @@ fun ActivitiesApp(uid: String, startDestination: String) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  val listActivitiesViewModel: ListActivitiesViewModel =
-      viewModel(factory = ListActivitiesViewModel.Factory)
+  //val listActivitiesViewModel: ListActivitiesViewModel =
+    //  viewModel(factory = ListActivitiesViewModel.Factory)
   val profileViewModel: ProfileViewModel = hiltViewModel()
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
   val locationViewModel: LocationViewModel = hiltViewModel()
+  val listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel()
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }

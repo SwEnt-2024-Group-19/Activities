@@ -6,8 +6,9 @@ import com.android.sample.ui.dialogs.SimpleUser
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import javax.inject.Inject
 
-open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
+open class ActivitiesRepositoryFirestore@Inject constructor(private val db: FirebaseFirestore) : ActivitiesRepository {
 
   private val activitiesCollectionPath = "activities"
   private val TAG = "ActivitiesRepositoryFirestore"

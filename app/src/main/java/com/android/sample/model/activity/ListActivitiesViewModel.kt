@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-open class ListActivitiesViewModel(private val repository: ActivitiesRepository) : ViewModel() {
+@HiltViewModel
+open class ListActivitiesViewModel@Inject constructor(private val repository: ActivitiesRepository) : ViewModel() {
 
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
