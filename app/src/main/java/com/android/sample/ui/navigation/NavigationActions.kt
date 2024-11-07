@@ -60,8 +60,7 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.MAP,
         TopLevelDestinations.ADD_ACTIVITY,
         TopLevelDestinations.LIKED_ACTIVITIES,
-        TopLevelDestinations.PROFILE
-    )
+        TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
