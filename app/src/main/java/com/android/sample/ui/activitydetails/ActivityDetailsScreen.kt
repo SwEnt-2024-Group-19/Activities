@@ -66,8 +66,7 @@ import kotlin.math.min
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
-    listActivityViewModel: ListActivitiesViewModel =
-        viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel
 ) {
@@ -216,7 +215,7 @@ fun ActivityDetailsScreen(
                       Icon(Icons.Default.LocationOn, contentDescription = "Location")
                       Spacer(modifier = Modifier.width(4.dp))
                       Text(
-                          text = location ?: "not defined yet",
+                          text = location?.name ?: "No location",
                           modifier = Modifier.testTag("locationText"))
                     }
                   }

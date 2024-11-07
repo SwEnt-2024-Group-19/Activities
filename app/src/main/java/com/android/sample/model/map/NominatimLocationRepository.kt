@@ -47,8 +47,12 @@ class NominatimLocationRepository @Inject constructor(private val client: OkHttp
             .addQueryParameter("format", "json")
             .build()
 
-    // Create the request
-    val request = Request.Builder().url(url).build()
+    val request =
+        Request.Builder()
+            .url(url)
+            .header("User-Agent", "Aptivities/1.0 (elvan@epfl.ch)") // Set a proper User-Agent
+            .header("Referer", "https://aptivities-epfl.com") // Optionally add a Referer
+            .build()
     client
         .newCall(request)
         .enqueue(
