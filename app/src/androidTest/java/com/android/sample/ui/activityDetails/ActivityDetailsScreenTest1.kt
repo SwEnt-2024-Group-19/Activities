@@ -9,11 +9,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -238,5 +240,89 @@ class ActivityDetailsScreenAndroidTest {
 
     composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithText("Enroll failed, limit of places reached").isDisplayed()
+  }
+
+  @Test
+  fun deleteMainComment_removesMainCommentSuccessfully() {
+    // Set initial comments with a main comment
+    val comments =
+        listOf(
+            activity.comments
+                .firstOrNull()
+                ?.copy(uid = "main-comment-uid", content = "Main comment") ?: return)
+
+    // Set up the ActivityDetailsScreen with mock data
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
+
+    // Simulate the deletion of the main comment
+    composeTestRule.onNodeWithTag("DeleteButton_main-comment-uid").performClick()
+
+    // Assert that the main comment is removed
+    assert(comments.none { it.uid == "main-comment-uid" })
+  }
+
+  @Test
+  fun deleteReply_removesReplyFromMainComment() {
+    // Set initial comments with replies
+    val comments =
+        listOf(
+            activity.comments
+                .firstOrNull()
+                ?.copy(
+                    uid = "main-comment-uid",
+                    replies =
+                        listOf(
+                            Comment(
+                                uid = "reply-uid",
+                                userId = "user-reply",
+                                userName = "John",
+                                content = "This is a reply",
+                                timestamp = Timestamp.now()))) ?: return)
+
+    // Set up the ActivityDetailsScreen with mock data
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
+
+    // Simulate the deletion of the reply
+    composeTestRule.onNodeWithTag("DeleteButton_reply-uid").performClick()
+
+    // Assert that the reply is removed
+    assert(comments.first().replies.none { it.uid == "reply-uid" })
+  }
+
+  @Test
+  fun replyToComment_displaysNewReplyInList() {
+    val comments =
+        listOf(
+            activity.comments
+                .firstOrNull()
+                ?.copy(uid = "main-comment-uid", content = "Main comment", replies = listOf())
+                ?: return)
+
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
+
+    // Simulate replying to the main comment
+    composeTestRule.onNodeWithTag("ReplyButton_main-comment-uid").performClick()
+    composeTestRule
+        .onNodeWithTag("ReplyInputField_main-comment-uid")
+        .performTextInput("This is a reply")
+    composeTestRule.onNodeWithTag("PostReplyButton_main-comment-uid").performClick()
+
+    // Assert that the new reply is added
+    assert(comments.first().replies.any { it.content == "This is a reply" })
   }
 }
