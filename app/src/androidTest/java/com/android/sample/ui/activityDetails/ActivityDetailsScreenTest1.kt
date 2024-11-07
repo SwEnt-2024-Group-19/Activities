@@ -17,6 +17,7 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
@@ -30,7 +31,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
 class ActivityDetailsScreenAndroidTest {
@@ -78,8 +81,8 @@ class ActivityDetailsScreenAndroidTest {
             maxPlaces = 10,
             creator = "Creator",
             status = ActivityStatus.ACTIVE,
-            location = "Sample Location",
-            images = listOf(),
+            location = Location(46.519962, 6.633597, "EPFL"),
+            images = listOf("1"),
             participants = listOf(),
             duration = "02:00",
             startTime = "10:00",
@@ -146,7 +149,7 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("titleText").assertTextContains("Sample Activity")
     composeTestRule.onNodeWithTag("descriptionText").assertTextContains("Sample Description")
     composeTestRule.onNodeWithTag("priceText").assertTextContains("10.0 CHF")
-    composeTestRule.onNodeWithTag("locationText").assertTextContains("Sample Location")
+    composeTestRule.onNodeWithTag("locationText").assertTextContains("EPFL")
     composeTestRule.onNodeWithTag("scheduleText").assertTextContains("3/11/2025 at 10:00")
     composeTestRule.onNodeWithTag("durationText").assertTextContains("02:00")
   }

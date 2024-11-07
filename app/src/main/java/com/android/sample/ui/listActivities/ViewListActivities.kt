@@ -249,7 +249,7 @@ fun ActivityCard(
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
                 Text(
-                    text = activity.location,
+                    text = activity.location?.name ?: "No location",
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontStyle = FontStyle.Italic, color = Color.Gray),

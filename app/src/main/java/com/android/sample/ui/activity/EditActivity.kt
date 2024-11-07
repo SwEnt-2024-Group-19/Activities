@@ -53,12 +53,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.camera.base64ToBitmap
+import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationViewModel
+import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.camera.base64ToBitmap
 import com.android.sample.model.camera.bitmapToBase64
 import com.android.sample.ui.camera.CameraScreen
@@ -76,9 +81,9 @@ import java.util.GregorianCalendar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivityScreen(
-    listActivityViewModel: ListActivitiesViewModel =
-        viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
+    locationViewModel: LocationViewModel
 ) {
   val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
@@ -88,7 +93,7 @@ fun EditActivityScreen(
   var title by remember { mutableStateOf(activity?.title ?: "") }
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
-  var location by remember { mutableStateOf(activity?.location ?: "") }
+  var selectedLocation by remember { mutableStateOf(Location(0.0, 0.0, "No location")) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
@@ -100,6 +105,12 @@ fun EditActivityScreen(
     LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
   }
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
+
+  val locationQuery by locationViewModel.query.collectAsState()
+  var showDropdown by remember { mutableStateOf(false) }
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+
   val _items_: List<String> = activity?.images ?: listOf()
   val items_: List<Bitmap> =
       _items_.map { base64ToBitmap(it) ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) }
@@ -226,56 +237,100 @@ fun EditActivityScreen(
                 placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = maxPlaces,
-                onValueChange = { maxPlaces = it },
-                label = { Text("Total Places") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
-                placeholder = {
-                  Text(text = stringResource(id = R.string.request_placesMax_activity))
-                },
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            ExposedDropdownMenuBox(
-                modifier = Modifier.testTag("chooseTypeMenu").fillMaxWidth().padding(8.dp),
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }) {
-                  OutlinedTextField(
-                      readOnly = true,
-                      value = selectedOption,
-                      onValueChange = {},
-                      label = { Text("Activity Type") },
-                      trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                      },
-                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth())
-                  ExposedDropdownMenu(
-                      expanded = expanded,
-                      onDismissRequest = { expanded = false },
-                      modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                        types.forEach { selectionOption ->
-                          DropdownMenuItem(
-                              modifier = Modifier.fillMaxWidth().padding(8.dp),
-                              text = { Text(selectionOption.name) },
-                              onClick = {
-                                selectedOption = selectionOption.name
-                                expanded = false
-                              })
-                        }
+          Spacer(modifier = Modifier.height(8.dp))
+          OutlinedTextField(
+              value = maxPlaces,
+              onValueChange = { maxPlaces = it },
+              label = { Text("Total Places") },
+              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesLeftEdit"),
+              placeholder = {
+                Text(text = stringResource(id = R.string.request_placesMax_activity))
+              },
+          )
+          Spacer(modifier = Modifier.height(8.dp))
+          ExposedDropdownMenuBox(
+              modifier = Modifier.testTag("chooseTypeMenu").fillMaxWidth().padding(8.dp),
+              expanded = expanded,
+              onExpandedChange = { expanded = !expanded }) {
+                OutlinedTextField(
+                    readOnly = true,
+                    value = selectedOption,
+                    onValueChange = {},
+                    label = { Text("Activity Type") },
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.menuAnchor().fillMaxWidth())
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                      types.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            modifier = Modifier.fillMaxWidth().padding(8.dp),
+                            text = { Text(selectionOption.name) },
+                            onClick = {
+                              selectedOption = selectionOption.name
+                              expanded = false
+                            })
                       }
-                }
+                    }
+              }
+          Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text("Location") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationEdit"),
-                placeholder = {
-                  Text(text = stringResource(id = R.string.request_location_activity))
-                },
-            )
+          // Location Input with dropdown using ExposedDropdownMenuBox
+          ExposedDropdownMenuBox(
+              expanded = showDropdown && locationSuggestions.isNotEmpty(),
+              onExpandedChange = { showDropdown = it } // Toggle dropdown visibility
+              ) {
+                OutlinedTextField(
+                    value = locationQuery,
+                    onValueChange = {
+                      locationViewModel.setQuery(it)
+                      showDropdown = true // Show dropdown when user starts typing
+                    },
+                    label = { Text("Location") },
+                    placeholder = { Text("Enter an Address or Location") },
+                    modifier =
+                        Modifier.menuAnchor() // Anchor the dropdown to this text field
+                            .fillMaxWidth()
+                            .testTag("inputLocationEdit"),
+                    singleLine = true)
+
+                // Dropdown menu for location suggestions
+                // Another approach using DropdownMenu is in EditToDo.kt
+                ExposedDropdownMenu(
+                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                    onDismissRequest = { showDropdown = false }) {
+                      locationSuggestions.filterNotNull().take(3).forEach { location ->
+                        DropdownMenuItem(
+                            text = {
+                              Text(
+                                  text =
+                                      location.name.take(30) +
+                                          if (location.name.length > 30) "..."
+                                          else "", // Limit name length
+                                  maxLines = 1 // Ensure name doesn't overflow
+                                  )
+                            },
+                            onClick = {
+                              locationViewModel.setQuery(location.name)
+                              selectedLocation = location
+                              showDropdown = false // Close dropdown on selection
+                            },
+                            modifier = Modifier.padding(8.dp))
+                      }
+
+                      if (locationSuggestions.size > 3) {
+                        DropdownMenuItem(
+                            text = { Text("More...") },
+                            onClick = { /* Optionally show more results */},
+                            modifier = Modifier.padding(8.dp))
+                      }
+                    }
+              }
+          Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = { showDialog = true },
@@ -370,24 +425,24 @@ fun EditActivityScreen(
                           0,
                           0)
 
-                      val updatedActivity =
-                          Activity(
-                              uid = activity?.uid ?: "",
-                              title = title,
-                              description = description,
-                              date = Timestamp(calendar.time),
-                              startTime = startTime ?: "",
-                              duration = duration ?: "",
-                              price = price.toDouble(),
-                              placesLeft = attendees.size.toLong(),
-                              maxPlaces = maxPlaces.toLongOrNull() ?: 0,
-                              creator = creator,
-                              status = ActivityStatus.ACTIVE,
-                              location = location,
-                              images = items.map { bitmapToBase64(it) },
-                              type = types.find { it.name == selectedOption } ?: types[0],
-                              participants = attendees,
-                              comments = activity?.comments ?: listOf())
+                    val updatedActivity =
+                        Activity(
+                            uid = activity?.uid ?: "",
+                            title = title,
+                            description = description,
+                            date = Timestamp(calendar.time),
+                            startTime = startTime ?: "",
+                            duration = duration ?: "",
+                            price = price.toDouble(),
+                            placesLeft = attendees.size.toLong(),
+                            maxPlaces = maxPlaces.toLongOrNull() ?: 0,
+                            creator = creator,
+                            status = ActivityStatus.ACTIVE,
+                            location = selectedLocation,
+                            images = listOf(),
+                            type = types.find { it.name == selectedOption } ?: types[0],
+                            participants = attendees,
+                            comments = activity?.comments ?: listOf())
 
                       listActivityViewModel.updateActivity(updatedActivity)
                       navigationActions.navigateTo(Screen.OVERVIEW)
