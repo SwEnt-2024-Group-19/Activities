@@ -28,27 +28,27 @@ fun ImagePicker(onImagePicked: (Uri?) -> Unit, buttonText: String = "Select Imag
 
 @Composable
 fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val painter =
-        rememberAsyncImagePainter(
-            model =
-            ImageRequest.Builder(context)
-                .apply {
+  val context = LocalContext.current
+  val painter =
+      rememberAsyncImagePainter(
+          model =
+              ImageRequest.Builder(context)
+                  .apply {
                     // Only parse the URI and set it if the URL is not null and not empty
                     if (!url.isNullOrEmpty()) {
-                        data(Uri.parse(url))
+                      data(Uri.parse(url))
                     } else {
-                        data(null) // Handle null or empty string by not attempting to load anything
+                      data(null) // Handle null or empty string by not attempting to load anything
                     }
                     crossfade(true)
-                }
-                .build())
+                  }
+                  .build())
 
-    Image(
-        painter = painter,
-        contentDescription = "Profile Image",
-        modifier = modifier,
-        contentScale = ContentScale.Crop)
+  Image(
+      painter = painter,
+      contentDescription = "Profile Image",
+      modifier = modifier,
+      contentScale = ContentScale.Crop)
 }
 /*
 
