@@ -66,7 +66,6 @@ fun ListActivitiesScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
     modifier: Modifier = Modifier
-
 ) {
   val uiState by viewModel.uiState.collectAsState()
   var selectedIndex by remember { mutableIntStateOf(0) }
