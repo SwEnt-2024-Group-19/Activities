@@ -1,6 +1,7 @@
 package com.android.sample.ui.activitydetails
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,24 +49,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.android.sample.R
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.android.sample.ui.profile.ProfileImage
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.UUID
 import kotlin.math.min
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import com.android.sample.R
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -253,39 +252,36 @@ fun ActivityDetailsScreen(
                   modifier = Modifier.padding(bottom = 8.dp))
 
               // List of participants
-              Column {
+              Column(modifier = Modifier.testTag("participants")) {
                 activity?.participants?.forEach { participant ->
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
-                      modifier = Modifier.padding(vertical = 4.dp)
-                          .clickable {
-                              if(participant.name!=profile?.name) {
-                                  navigationActions.navigateTo(Screen.PROFILE)
-                              }
-                      }) {
+                      modifier =
+                          Modifier.padding(vertical = 4.dp).testTag(participant.name).clickable {
+                            if (participant.name != profile?.name) {
+                              navigationActions.navigateTo(Screen.PROFILE)
+                            }
+                          }) {
                         // Placeholder for participant picture
-                      if(participant.name!=profile?.name) {
+                        if (participant.name != profile?.name) {
                           Box(
-                              modifier = Modifier
-                                  .size(40.dp)
-                                  .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                  .padding(8.dp)
-                          ) {
-                              Image(
-                                  painter = painterResource(id = R.drawable.default_profile_image),
-                                  contentDescription = "Participant Image",
-                                  modifier = Modifier
-                                      .fillMaxSize()
-                                      .clip(RoundedCornerShape(8.dp))
-                              )
-
-                          }
-                      }else {
+                              modifier =
+                                  Modifier.size(40.dp)
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                                      .padding(8.dp)) {
+                                Image(
+                                    painter =
+                                        painterResource(id = R.drawable.default_profile_image),
+                                    contentDescription = "Participant Image",
+                                    modifier =
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
+                              }
+                        } else {
                           // Profile Picture
                           ProfileImage(
                               url = profile.photo,
                               modifier = Modifier.size(40.dp).clip(CircleShape))
-                      }
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
 
                         // Participant name
@@ -314,7 +310,8 @@ fun ActivityDetailsScreen(
                             val theActivity =
                                 activity.copy(
                                     placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
-                                    participants = activity.participants +
+                                    participants =
+                                        activity.participants +
                                             SimpleUser(profile.name, profile.surname, 0))
                             listActivityViewModel.updateActivity(theActivity)
                             profileViewModel.addActivity(profile.id, theActivity.uid)

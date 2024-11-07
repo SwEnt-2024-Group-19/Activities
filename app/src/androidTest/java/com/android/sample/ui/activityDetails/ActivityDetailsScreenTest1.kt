@@ -21,6 +21,7 @@ import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
+import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -83,7 +84,8 @@ class ActivityDetailsScreenAndroidTest {
             status = ActivityStatus.ACTIVE,
             location = Location(46.519962, 6.633597, "EPFL"),
             images = listOf("1"),
-            participants = listOf(),
+            participants =
+                listOf(SimpleUser("123", "Amine", 19), SimpleUser("Creator", "John", 20)),
             duration = "02:00",
             startTime = "10:00",
             type = ActivityType.INDIVIDUAL,
@@ -327,5 +329,23 @@ class ActivityDetailsScreenAndroidTest {
 
     // Assert that the new reply is added
     assert(comments.first().replies.any { it.content == "This is a reply" })
+  }
+
+  @Test
+  fun participantsList_isDisplayedCorrectly() {
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
+
+    // Check if the participants list is displayed
+    composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
+
+    // Check if each participant's name is displayed
+    activity.participants.forEach { participant ->
+      composeTestRule.onNodeWithText(participant.name).assertIsDisplayed()
+    }
   }
 }

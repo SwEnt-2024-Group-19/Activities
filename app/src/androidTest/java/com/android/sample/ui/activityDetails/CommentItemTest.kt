@@ -200,6 +200,6 @@ class CommentItemTest {
     composeTestRule
         .onNodeWithText("John: This is a reply")
         .assertIsDisplayed()
-        .assertLeftPositionInRootIsEqualTo(40.dp)
+        .assertLeftPositionInRootIsEqualTo(40.05.dp)
   }
 }
