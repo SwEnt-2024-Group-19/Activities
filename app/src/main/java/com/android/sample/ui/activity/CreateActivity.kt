@@ -194,7 +194,7 @@ fun CreateActivityScreen(
           // Location Input with dropdown using ExposedDropdownMenuBox
           ExposedDropdownMenuBox(
               expanded = showDropdown && locationSuggestions.isNotEmpty(),
-              onExpandedChange = { showDropdown = it } // Toggle dropdown visibility
+              onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
               ) {
                 OutlinedTextField(
                     value = locationQuery,
@@ -237,7 +237,7 @@ fun CreateActivityScreen(
                       if (locationSuggestions.size > 3) {
                         DropdownMenuItem(
                             text = { Text("More...") },
-                            onClick = { /* Optionally show more results */},
+                            onClick = {},
                             modifier = Modifier.padding(8.dp))
                       }
                     }

@@ -55,8 +55,7 @@ fun MapScreen(
                                 position =
                                     LatLng(item.location!!.latitude, item.location!!.longitude)),
                         title = item.title,
-                        snippet = item.description,
-                        contentDescription = "marker_${item.uid}")
+                        snippet = item.description,)
                   }
             }
       },

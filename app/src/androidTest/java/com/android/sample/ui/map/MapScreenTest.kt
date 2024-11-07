@@ -88,25 +88,5 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
   }
-  /*
-      @Test
-  fun testAtLeastOneMarkerIsDisplayed() {
-      // Set the uiState to a list of activities with locations
-      val activities = listOf(
-          activity, activity2
-      )
-
-          val successState = ListActivitiesViewModel.ActivitiesUiState.Success(activities)
-          val stateFlow = MutableStateFlow(successState)
-          Mockito.doReturn(stateFlow).`when`(listActivitiesViewModel).uiState
-
-          // Wait until at least one marker is displayed
-          composeTestRule.onAllNodesWithContentDescription("marker_${activity.uid}").fetchSemanticsNodes().isNotEmpty()
-
-      composeTestRule.onNodeWithContentDescription("marker_${activity.uid}").assertIsDisplayed()
-  }
-
-
-   */
 
 }
