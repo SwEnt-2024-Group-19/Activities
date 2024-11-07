@@ -145,7 +145,8 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                               surname = surname,
                               interests = newListInterests,
                               activities = profile.activities,
-                              photo = photo))
+                              photo = photo,
+                              likedActivities = profile.likedActivities))
                       navigationActions.goBack()
                     } catch (_: NumberFormatException) {}
                   },

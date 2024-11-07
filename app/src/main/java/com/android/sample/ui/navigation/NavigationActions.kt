@@ -3,6 +3,7 @@ package com.android.sample.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -14,6 +15,7 @@ object Route {
   const val OVERVIEW = "Overview"
   const val PROFILE = "Profile"
   const val ADD_ACTIVITY = "AddActivity"
+  const val LIKED_ACTIVITIES = "LikedActivities"
   const val MAP = "Map"
   const val CHOOSE_ACCOUNT = "ChooseAccount"
 }
@@ -28,6 +30,7 @@ object Screen {
   const val ACTIVITY_DETAILS = "ActivityDetails Screen"
   const val EDIT_PROFILE = "EditProfile Screen"
   const val CREATE_PROFILE = "CreateProfile Screen"
+  const val LIKED_ACTIVITIES = "LikedActivities Screen"
   const val MAP = "Map Screen"
   const val CHOOSE_ACCOUNT = "ChooseAccount Screen"
 }
@@ -45,6 +48,9 @@ object TopLevelDestinations {
           route = Route.ADD_ACTIVITY,
           icon = Icons.Outlined.AddCircleOutline,
           textId = "Add Activity")
+  val LIKED_ACTIVITIES =
+      TopLevelDestination(
+          route = Route.LIKED_ACTIVITIES, icon = Icons.Outlined.FavoriteBorder, textId = "Liked")
   val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Map, textId = "Map")
 }
 
@@ -53,8 +59,8 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.OVERVIEW,
         TopLevelDestinations.MAP,
         TopLevelDestinations.ADD_ACTIVITY,
-        TopLevelDestinations.PROFILE,
-    )
+        TopLevelDestinations.LIKED_ACTIVITIES,
+        TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
