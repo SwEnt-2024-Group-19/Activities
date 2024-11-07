@@ -53,10 +53,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.android.sample.R
+import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
+import com.android.sample.ui.ProfileImage
+import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -311,7 +316,8 @@ fun ActivityDetailsScreen(
                                     placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
                                     participants =
                                         activity.participants +
-                                            SimpleUser(profile.name, profile.surname, 0))
+                                            SimpleUser(profile.name, profile.surname, 0)
+                                )
                             listActivityViewModel.updateActivity(theActivity)
                             profileViewModel.addActivity(profile.id, theActivity.uid)
                             Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
