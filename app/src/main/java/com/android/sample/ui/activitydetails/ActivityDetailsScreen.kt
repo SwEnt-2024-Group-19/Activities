@@ -354,7 +354,12 @@ fun CommentSection(
   Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
-    comments.forEach { comment -> CommentItem(comment, onReplyComment) }
+    comments.forEach { comment ->
+      CommentItem(
+          comment,
+          onReplyComment,
+          allowReplies = true) // Set allowReplies to true for top-level comments
+    }
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -377,7 +382,11 @@ fun CommentSection(
 }
 
 @Composable
-fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit) {
+fun CommentItem(
+    comment: Comment,
+    onReplyComment: (String, Comment) -> Unit,
+    allowReplies: Boolean
+) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
 
@@ -387,34 +396,39 @@ fun CommentItem(comment: Comment, onReplyComment: (String, Comment) -> Unit) {
         style = MaterialTheme.typography.bodyMedium)
     Text(text = comment.timestamp.toDate().toString(), style = MaterialTheme.typography.bodySmall)
 
-    // Toggle button to show/hide the reply input field
-    Button(
-        onClick = { showReplyField = !showReplyField }, modifier = Modifier.padding(top = 4.dp)) {
-          Text(if (showReplyField) "Cancel" else "Reply")
-        }
-
-    // Conditionally show the reply input field
-    if (showReplyField) {
-      OutlinedTextField(
-          value = replyText,
-          onValueChange = { replyText = it },
-          label = { Text("Reply") },
-          modifier = Modifier.fillMaxWidth())
-
+    // Toggle button to show/hide the reply input field (only for original comments)
+    if (allowReplies) {
       Button(
-          onClick = {
-            onReplyComment(replyText, comment)
-            replyText = ""
-            showReplyField = false
-          },
-          modifier = Modifier.padding(top = 4.dp)) {
-            Text("Post Reply")
+          onClick = { showReplyField = !showReplyField }, modifier = Modifier.padding(top = 4.dp)) {
+            Text(if (showReplyField) "Cancel" else "Reply")
           }
+
+      // Conditionally show the reply input field
+      if (showReplyField) {
+        OutlinedTextField(
+            value = replyText,
+            onValueChange = { replyText = it },
+            label = { Text("Reply") },
+            modifier = Modifier.fillMaxWidth())
+
+        Button(
+            onClick = {
+              onReplyComment(replyText, comment)
+              replyText = ""
+              showReplyField = false
+            },
+            modifier = Modifier.padding(top = 4.dp)) {
+              Text("Post Reply")
+            }
+      }
     }
 
-    // Show replies indented
+    // Show replies for original comments, but do not allow replies on replies
     comment.replies.forEach { reply ->
-      Box(modifier = Modifier.padding(start = 16.dp)) { CommentItem(reply, onReplyComment) }
+      Box(modifier = Modifier.padding(start = 16.dp)) {
+        // Pass `allowReplies = false` for replies to prevent nesting
+        CommentItem(reply, onReplyComment, allowReplies = false)
+      }
     }
   }
 }
