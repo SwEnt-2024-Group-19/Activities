@@ -19,39 +19,39 @@ import okhttp3.OkHttpClient
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
-    }
+  @Provides
+  @Singleton
+  fun provideOkHttpClient(): OkHttpClient {
+    return OkHttpClient.Builder().build()
+  }
 
-    @Provides
-    @Singleton
-    fun provideSignInRepository(
-        signInRepositoryFirebase: SignInRepositoryFirebase
-    ): SignInRepository {
-        return signInRepositoryFirebase
-    }
+  @Provides
+  @Singleton
+  fun provideSignInRepository(
+      signInRepositoryFirebase: SignInRepositoryFirebase
+  ): SignInRepository {
+    return signInRepositoryFirebase
+  }
 
-    @Provides
-    @Singleton
-    fun provideProfilesRepository(
-        firestoreProfilesRepository: ProfilesRepositoryFirestore
-    ): ProfilesRepository {
-        return firestoreProfilesRepository
-    }
+  @Provides
+  @Singleton
+  fun provideProfilesRepository(
+      firestoreProfilesRepository: ProfilesRepositoryFirestore
+  ): ProfilesRepository {
+    return firestoreProfilesRepository
+  }
 
-    @Provides
-    @Singleton
-    fun provideLocationRepository(client: OkHttpClient): LocationRepository {
-        return NominatimLocationRepository(client)
-    }
+  @Provides
+  @Singleton
+  fun provideLocationRepository(client: OkHttpClient): LocationRepository {
+    return NominatimLocationRepository(client)
+  }
 
-    @Provides
-    @Singleton
-    fun provideActivitiesRepository(
-        firestoreActivitiesRepository: ActivitiesRepositoryFirestore
-    ): ActivitiesRepository {
-        return firestoreActivitiesRepository
-    }
+  @Provides
+  @Singleton
+  fun provideActivitiesRepository(
+      firestoreActivitiesRepository: ActivitiesRepositoryFirestore
+  ): ActivitiesRepository {
+    return firestoreActivitiesRepository
+  }
 }

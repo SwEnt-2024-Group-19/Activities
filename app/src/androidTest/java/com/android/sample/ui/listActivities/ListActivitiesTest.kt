@@ -154,5 +154,3 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
   }
 }
-
-

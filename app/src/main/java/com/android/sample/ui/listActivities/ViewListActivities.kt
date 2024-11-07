@@ -44,8 +44,6 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
-import com.android.sample.model.map.Location
-import com.android.sample.model.map.LocationViewModel
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -66,7 +64,6 @@ fun ListActivitiesScreen(
   val all = "ALL"
   val typesToString = types.map { it.name }
   val options = listOf(all) + typesToString
-
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -152,7 +149,6 @@ fun ActivityCard(
 ) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
-
 
   Card(
       modifier =

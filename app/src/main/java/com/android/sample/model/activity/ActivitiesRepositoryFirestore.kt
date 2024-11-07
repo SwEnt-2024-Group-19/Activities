@@ -8,7 +8,8 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
 
-open class ActivitiesRepositoryFirestore@Inject constructor(private val db: FirebaseFirestore) : ActivitiesRepository {
+open class ActivitiesRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
+    ActivitiesRepository {
 
   private val activitiesCollectionPath = "activities"
   private val TAG = "ActivitiesRepositoryFirestore"
@@ -73,14 +74,14 @@ open class ActivitiesRepositoryFirestore@Inject constructor(private val db: Fire
                                 } ?: emptyList())
                       } ?: emptyList()
 
-                    val locationData = data["location"] as? Map<String, Any>
-                    val location = locationData?.let {
+                  val locationData = data["location"] as? Map<String, Any>
+                  val location =
+                      locationData?.let {
                         Location(
                             latitude = it["latitude"] as? Double ?: 0.0,
                             longitude = it["longitude"] as? Double ?: 0.0,
-                            name = it["name"] as? String ?: "No Location"
-                        )
-                    } ?: Location(0.0, 0.0, "No Location")
+                            name = it["name"] as? String ?: "No Location")
+                      } ?: Location(0.0, 0.0, "No Location")
 
                   Activity(
                       uid = document.id,

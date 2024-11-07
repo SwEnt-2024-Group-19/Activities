@@ -78,16 +78,14 @@ class CreateActivityScreenTest {
     mockViewModel = Mockito.mock(ListActivitiesViewModel::class.java)
     mockLocationRepository = Mockito.mock(LocationRepository::class.java)
 
-    `when`(mockLocationRepository.search(any(), any(), any())).then {
-        invocation ->
-        val onSuccess = invocation.arguments[1] as (List<Location>) -> Unit
-        onSuccess(locationList)
+    `when`(mockLocationRepository.search(any(), any(), any())).then { invocation ->
+      val onSuccess = invocation.arguments[1] as (List<Location>) -> Unit
+      onSuccess(locationList)
     }
-      
+
     mockLocationViewModel = LocationViewModel(mockLocationRepository)
 
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ADD_ACTIVITY)
-
   }
 
   private fun setUpComposeContent() {

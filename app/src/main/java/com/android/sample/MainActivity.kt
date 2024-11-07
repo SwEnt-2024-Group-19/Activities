@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -70,8 +69,8 @@ fun ActivitiesApp(uid: String, startDestination: String) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  //val listActivitiesViewModel: ListActivitiesViewModel =
-    //  viewModel(factory = ListActivitiesViewModel.Factory)
+  // val listActivitiesViewModel: ListActivitiesViewModel =
+  //  viewModel(factory = ListActivitiesViewModel.Factory)
   val profileViewModel: ProfileViewModel = hiltViewModel()
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
@@ -107,7 +106,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
     }
 
     navigation(startDestination = Screen.MAP, route = Route.MAP) {
-      composable(Screen.MAP) { MapScreen(navigationActions) }
+      composable(Screen.MAP) { MapScreen(listActivitiesViewModel, navigationActions) }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
