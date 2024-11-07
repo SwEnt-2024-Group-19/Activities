@@ -383,8 +383,10 @@ fun CommentSection(
     // Display all comments
     comments.forEach { comment ->
       CommentItem(
+          profileId,
           comment,
           onReplyComment,
+          onDeleteComment,
           allowReplies = true) // Set allowReplies to true for top-level comments
     }
 
@@ -421,7 +423,7 @@ fun CommentItem(
     comment: Comment,
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
-    allowReplies: Boolean
+    allowReplies: Boolean = true
 ) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
@@ -446,45 +448,45 @@ fun CommentItem(
               }
         }
 
-      if (allowReplies) {
-        // Toggle button to show/hide the reply input field
-        Button(
-            onClick = { showReplyField = !showReplyField },
-            modifier =
-                Modifier.padding(top = 4.dp)
-                    .testTag("${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
-              Text(if (showReplyField) "Cancel" else "Reply")
-            }
+        if (allowReplies) {
+          // Toggle button to show/hide the reply input field
+          Button(
+              onClick = { showReplyField = !showReplyField },
+              modifier =
+                  Modifier.padding(top = 4.dp)
+                      .testTag(
+                          "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
+                Text(if (showReplyField) "Cancel" else "Reply")
+              }
+        }
+
+        // Conditionally show the reply input field if the user is logged in
+        if (showReplyField) {
+          OutlinedTextField(
+              value = replyText,
+              onValueChange = { replyText = it },
+              label = { Text("Reply") },
+              modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
+
+          Button(
+              onClick = {
+                onReplyComment(replyText, comment)
+                replyText = ""
+                showReplyField = false
+              },
+              modifier = Modifier.padding(top = 4.dp).testTag("postReplyButton_${comment.uid}")) {
+                Text("Post Reply")
+              }
+        }
       }
 
-
-      // Conditionally show the reply input field if the user is logged in
-      if (showReplyField) {
-        OutlinedTextField(
-            value = replyText,
-            onValueChange = { replyText = it },
-            label = { Text("Reply") },
-            modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
-
-        Button(
-            onClick = {
-              onReplyComment(replyText, comment)
-              replyText = ""
-              showReplyField = false
-            },
-            modifier = Modifier.padding(top = 4.dp).testTag("postReplyButton_${comment.uid}")) {
-              Text("Post Reply")
-            }
-      }
-    }
-
-    // Show replies for original comments, but do not allow replies on replies
-    comment.replies.forEach { reply ->
-      Box(modifier = Modifier.padding(start = 16.dp)) {
+      // Show replies for original comments, but do not allow replies on replies
+      comment.replies.forEach { reply ->
+        Box(modifier = Modifier.padding(start = 16.dp)) {
           // Pass `allowReplies = false` for replies to prevent nesting
           CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+        }
       }
-    }
     }
   }
 }
