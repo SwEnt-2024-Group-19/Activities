@@ -72,6 +72,16 @@ open class ActivitiesRepositoryFirestore@Inject constructor(private val db: Fire
                                   )
                                 } ?: emptyList())
                       } ?: emptyList()
+
+                    val locationData = data["location"] as? Map<String, Any>
+                    val location = locationData?.let {
+                        Location(
+                            latitude = it["latitude"] as? Double ?: 0.0,
+                            longitude = it["longitude"] as? Double ?: 0.0,
+                            name = it["name"] as? String ?: "No Location"
+                        )
+                    } ?: Location(0.0, 0.0, "No Location")
+
                   Activity(
                       uid = document.id,
                       title = data["title"] as? String ?: "No Title",
@@ -80,9 +90,7 @@ open class ActivitiesRepositoryFirestore@Inject constructor(private val db: Fire
                       startTime = data["startTime"] as? String ?: "HH:mm",
                       duration = data["duration"] as? String ?: "HH:mm",
                       price = data["price"] as? Double ?: 0.0,
-                      location =
-                          data["location"] as? Location
-                              ?: Location(0.0, 0.0, "No Location"), // Default value
+                      location = location, // Default value
                       creator = data["creator"] as? String ?: "Anonymous",
                       images = listOf(),
                       placesLeft = data["placesLeft"] as? Long ?: 0,

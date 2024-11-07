@@ -153,6 +153,7 @@ fun ActivityCard(
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
+
   Card(
       modifier =
           Modifier.fillMaxWidth()
