@@ -68,7 +68,7 @@ class ProfileCreationTest {
 
     composeTestRule.onNodeWithTag("surnameTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("newInterestInput").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("photoTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
@@ -76,10 +76,9 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Android")
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 
-    composeTestRule
-        .onNodeWithTag("photoTextField")
-        .performTextInput("https://example.com/photo.jpg")
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
 
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
     // composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
     composeTestRule
         .onNodeWithTag("profileCreationScrollColumn")
