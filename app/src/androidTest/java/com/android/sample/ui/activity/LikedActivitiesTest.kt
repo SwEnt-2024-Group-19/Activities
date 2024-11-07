@@ -10,6 +10,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -43,7 +44,7 @@ class LikedActivitiesTest {
           title = "Mountain Biking",
           description = "Exciting mountain biking experience.",
           date = Timestamp.now(),
-          location = "Hills",
+          location = Location(46.519962, 6.633597, "EPFL"),
           creator = "Chris",
           images = listOf(),
           price = 10.0,
@@ -131,7 +132,7 @@ class LikedActivitiesTest {
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
     composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
     composeTestRule.onNodeWithText("Exciting mountain biking experience.").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Hills").assertIsDisplayed()
+    composeTestRule.onNodeWithText("EPFL").assertIsDisplayed()
     composeTestRule.onNodeWithText("8/15").assertIsDisplayed()
   }
 
@@ -150,7 +151,7 @@ class LikedActivitiesTest {
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
     composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
     composeTestRule.onNodeWithText("Exciting mountain biking experience.").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Hills").assertIsDisplayed()
+    composeTestRule.onNodeWithText("EPFL").assertIsDisplayed()
     composeTestRule.onNodeWithText("8/15").assertIsDisplayed()
   }
 

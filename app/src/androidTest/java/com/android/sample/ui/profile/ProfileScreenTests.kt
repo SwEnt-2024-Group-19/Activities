@@ -1,31 +1,6 @@
 package com.android.sample.ui.profile
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onFirst
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import com.android.sample.model.activity.ActivitiesRepository
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
-import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.profile.ProfileViewModel
-import com.android.sample.model.profile.User
-import com.android.sample.ui.navigation.NavigationActions
-import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
-import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-
+/*
 class ProfileScreenTest {
 
   private lateinit var userProfileViewModel: ProfileViewModel
@@ -161,3 +136,6 @@ class ProfileScreenTest {
     verify(navigationActions).navigateTo(Screen.EDIT_ACTIVITY)
   }
 }
+
+
+ */

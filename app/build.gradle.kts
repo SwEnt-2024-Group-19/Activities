@@ -199,7 +199,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     // MockK for mocking
-    testImplementation("io.mockk:mockk:1.13.2") // Or replace with Mockito if preferred:
+    testImplementation("io.mockk:mockk:1.13.2")
+    androidTestImplementation("io.mockk:mockk-android:1.13.2")
+    // Or replace with Mockito if preferred:
     // testImplementation("org.mockito:mockito-core:5.5.0")
 
 
@@ -246,7 +248,7 @@ dependencies {
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
-    testImplementation("io.mockk:mockk:1.12.0")
+    //testImplementation("io.mockk:mockk:1.12.0")
     testImplementation(libs.json)
 
     // Test UI

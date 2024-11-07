@@ -3,6 +3,7 @@ package com.android.sample.model.profile
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.map.Location
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
@@ -36,7 +37,7 @@ class ProfilesRepositoryFirestoreTest {
           title = "FOOTBALL",
           uid = "1",
           status = ActivityStatus.ACTIVE,
-          location = "",
+          location = Location(46.519962, 6.633597, "EPFL"),
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",

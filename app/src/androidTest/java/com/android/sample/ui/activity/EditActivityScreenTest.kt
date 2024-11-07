@@ -14,6 +14,9 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationRepository
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -22,14 +25,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
 
 class EditActivityScreenTest {
   private lateinit var activitiesRepository: ActivitiesRepository
+  private lateinit var mockLocationRepository: LocationRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
+  private lateinit var mockLocationViewModel: LocationViewModel
+
+  private val location = Location(46.519962, 6.633597, "EPFL")
+  private val location2 = Location(46.5, 6.6, "Lausanne")
+  private val locationList = listOf(location, location2)
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -40,7 +51,7 @@ class EditActivityScreenTest {
           "Do something",
           creator = "John Doe",
           date = Timestamp(GregorianCalendar(2024, 8, 5).time),
-          location = "EPFL",
+          location = location,
           status = ActivityStatus.ACTIVE,
           participants = listOf(),
           price = 10.0,
@@ -56,13 +67,23 @@ class EditActivityScreenTest {
     activitiesRepository = mock(ActivitiesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listActivitiesViewModel = mock(ListActivitiesViewModel::class.java)
+    mockLocationRepository = Mockito.mock(LocationRepository::class.java)
+    mockLocationViewModel = LocationViewModel(mockLocationRepository)
+
     `when`(listActivitiesViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
     `when`(navigationActions.currentRoute()).thenReturn(Screen.EDIT_ACTIVITY)
+
+    `when`(mockLocationRepository.search(any(), any(), any())).then { invocation ->
+      val onSuccess = invocation.arguments[1] as (List<Location>) -> Unit
+      onSuccess(locationList)
+    }
   }
 
   @Test
   fun displayAllComponents() {
-    composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputTitleEdit"))
@@ -93,7 +114,9 @@ class EditActivityScreenTest {
 
   @Test
   fun inputsHaveInitialValue() {
-    composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
 
     composeTestRule.waitForIdle()
     composeTestRule
@@ -112,7 +135,9 @@ class EditActivityScreenTest {
 
   @Test
   fun saveButtonSavesActivity() {
-    composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputTitleEdit"))
@@ -129,7 +154,9 @@ class EditActivityScreenTest {
 
   @Test
   fun goBackButtonNavigatesBack() {
-    composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
 
     composeTestRule.onNodeWithTag("goBackButton").performClick()
     verify(navigationActions).goBack()
@@ -137,7 +164,9 @@ class EditActivityScreenTest {
 
   @Test
   fun inputFieldsUpdateViewModel() {
-    composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputTitleEdit"))
@@ -158,7 +187,9 @@ class EditActivityScreenTest {
 
   @Test
   fun addAttendeeButton_opensAddUserDialog() {
-    composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("addAttendeeButton"))
@@ -168,7 +199,9 @@ class EditActivityScreenTest {
 
   @Test
   fun simpleUserIsDisplayed() {
-    composeTestRule.setContent { EditActivityScreen(listActivitiesViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("addAttendeeButton"))
