@@ -59,6 +59,7 @@ class LikedActivitiesTest {
 
   @Before
   fun setUp() {
+
     activitiesRepository = mock(ActivitiesRepository::class.java)
     profilesRepository = mock(ProfilesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
