@@ -14,7 +14,7 @@ object Route {
   const val OVERVIEW = "Overview"
   const val PROFILE = "Profile"
   const val ADD_ACTIVITY = "AddActivity"
-  const val LIKED_ACTIVITIES="LikedActivities"
+  const val LIKED_ACTIVITIES = "LikedActivities"
 }
 
 object Screen {
@@ -27,7 +27,7 @@ object Screen {
   const val ACTIVITY_DETAILS = "ActivityDetails Screen"
   const val EDIT_PROFILE = "EditProfile Screen"
   const val CREATE_PROFILE = "CreateProfile Screen"
-  const val LIKED_ACTIVITIES="LikedActivities Screen"
+  const val LIKED_ACTIVITIES = "LikedActivities Screen"
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
@@ -43,7 +43,9 @@ object TopLevelDestinations {
           route = Route.ADD_ACTIVITY,
           icon = Icons.Outlined.AddCircleOutline,
           textId = "Add Activity")
-  val LIKED_ACTIVITIES=TopLevelDestination(route = Route.LIKED_ACTIVITIES,icon=Icons.Outlined.FavoriteBorder, textId="Liked")
+  val LIKED_ACTIVITIES =
+      TopLevelDestination(
+          route = Route.LIKED_ACTIVITIES, icon = Icons.Outlined.FavoriteBorder, textId = "Liked")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
@@ -51,8 +53,7 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.OVERVIEW,
         TopLevelDestinations.ADD_ACTIVITY,
         TopLevelDestinations.PROFILE,
-        TopLevelDestinations.LIKED_ACTIVITIES
-    )
+        TopLevelDestinations.LIKED_ACTIVITIES)
 
 open class NavigationActions(
     private val navController: NavHostController,
