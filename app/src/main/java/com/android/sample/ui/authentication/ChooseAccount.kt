@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.android.sample.ui.profile.ProfileImage
 
 @Composable
 fun ChooseAccountScreen(
