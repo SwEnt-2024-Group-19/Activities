@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -30,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.ui.ImagePicker
+import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -63,6 +67,10 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                     .wrapContentWidth(Alignment.CenterHorizontally)
                     .testTag("profileCreationTitle"))
 
+        ProfileImage(
+            url = photo,
+            modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+        ImagePicker(onImagePicked = { photo = it.toString() }, buttonText = "Add Profile Picture")
         Spacer(modifier = Modifier.padding(48.dp))
         OutlinedTextField(
             value = name,
@@ -114,24 +122,6 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
               Text("Add")
             }
 
-        /*OutlinedTextField(
-            value = interests,
-            onValueChange = { interests = it },
-            label = { Text("Interests (comma-separated)") },
-            modifier = Modifier.testTag("interestsTextField"))
-        Spacer(modifier = Modifier.padding(8.dp))*/
-        /*OutlinedTextField(
-            value = activities,
-            onValueChange = { activities = it },
-            label = { Text("Activities (comma-separated)") },
-            modifier = Modifier.testTag("activitiesTextField"))
-        Spacer(modifier = Modifier.padding(8.dp))*/
-
-        OutlinedTextField(
-            value = photo,
-            onValueChange = { photo = it },
-            label = { Text("Photo URL") },
-            modifier = Modifier.testTag("photoTextField"))
         Spacer(modifier = Modifier.padding(8.dp))
         Button(
             onClick = {
@@ -142,7 +132,8 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                       surname = surname,
                       interests = newListInterests,
                       activities = emptyList(),
-                      photo = photo)
+                      photo = photo,
+                      likedActivities = emptyList())
               viewModel.createUserProfile(
                   userProfile = userProfile,
                   onSuccess = {

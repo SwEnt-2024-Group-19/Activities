@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,18 +44,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.android.sample.R
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -70,14 +69,12 @@ fun ProfileScreen(
 ) {
 
   val profileState = userProfileViewModel.userState.collectAsState()
-
   when (val profile = profileState.value) {
     null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
-    else ->
-        ProfileContent(
-            user = profile,
-            navigationActions,
-            listActivitiesViewModel) // Proceed with showing profile content
+    else -> {
+      ProfileContent(user = profile, navigationActions, listActivitiesViewModel)
+    }
+  // Proceed with showing profile content
   }
 }
 
@@ -129,7 +126,7 @@ fun ProfileContent(
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
   var showMenu by remember { mutableStateOf(false) } // To control the visibility of the menu
-
+  Log.d("ProfileScreen", "User photo: ${user.photo}")
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
       bottomBar = {
@@ -351,27 +348,6 @@ fun ActivityEnrolledBox(
           }
     }
   }
-}
-
-@Composable
-fun ProfileImage(url: String?, modifier: Modifier = Modifier) {
-  val painter =
-      rememberAsyncImagePainter(
-          ImageRequest.Builder(LocalContext.current)
-              .data(
-                  data = url // URL of the image
-                  )
-              .apply(
-                  block =
-                      fun ImageRequest.Builder.() {
-                        crossfade(true)
-                      })
-              .build())
-  Image(
-      painter = painter,
-      contentDescription = "Profile Image",
-      modifier = modifier,
-      contentScale = ContentScale.Crop)
 }
 
 @Composable

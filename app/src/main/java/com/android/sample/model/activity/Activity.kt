@@ -1,5 +1,6 @@
 package com.android.sample.model.activity
 
+import com.android.sample.model.map.Location
 import com.android.sample.ui.dialogs.SimpleUser
 import com.google.firebase.Timestamp
 
@@ -12,7 +13,7 @@ data class Activity(
     var duration: String,
     // var category: Category,
     var price: Double,
-    var location: String,
+    var location: Location?,
     var creator: String,
     var images: List<String>,
     var placesLeft: Long,

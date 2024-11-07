@@ -1,29 +1,29 @@
 package com.android.sample.model.activity
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-open class ListActivitiesViewModel(private val repository: ActivitiesRepository) : ViewModel() {
+@HiltViewModel
+open class ListActivitiesViewModel
+@Inject
+constructor(
+    private val repository: ActivitiesRepository,
+) : ViewModel() {
 
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
-  val uiState: StateFlow<ActivitiesUiState> = _uiState
+  open val uiState: StateFlow<ActivitiesUiState> = _uiState
 
   init {
-    repository.init {
-      // if (FirebaseAuth.getInstance().currentUser != null) {
-      viewModelScope.launch { getActivities() }
-      // }
-    }
+    repository.init { viewModelScope.launch { getActivities() } }
   }
 
   fun getNewUid(): String {
@@ -63,15 +63,5 @@ open class ListActivitiesViewModel(private val repository: ActivitiesRepository)
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
     data class Error(val exception: Exception) : ActivitiesUiState()
-  }
-
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ListActivitiesViewModel(ActivitiesRepositoryFirestore(Firebase.firestore)) as T
-          }
-        }
   }
 }
