@@ -1,11 +1,12 @@
 package com.android.sample.model.activities
-/*
+
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.map.Location
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -44,7 +45,7 @@ class ActivitiesRepositoryFirestoreTest {
           title = "FOOTBALL",
           uid = "1",
           status = ActivityStatus.ACTIVE,
-          location = "",
+          location = Location(46.519962, 6.633597, "EPFL"),
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",
@@ -173,5 +174,3 @@ class ActivitiesRepositoryFirestoreTest {
     assert(failureCalled)
   }
 }
-
- */

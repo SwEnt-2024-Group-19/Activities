@@ -20,7 +20,7 @@ constructor(
   open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
-  val uiState: StateFlow<ActivitiesUiState> = _uiState
+  open val uiState: StateFlow<ActivitiesUiState> = _uiState
 
   init {
     repository.init { viewModelScope.launch { getActivities() } }

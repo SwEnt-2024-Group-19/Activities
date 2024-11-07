@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.map.Location
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -40,7 +41,7 @@ class ProfileViewModelTest {
           title = "FOOTBALL",
           uid = "1",
           status = ActivityStatus.ACTIVE,
-          location = "",
+          location = Location(46.519962, 6.633597, "EPFL"),
           date = Timestamp.now(),
           creator = "me",
           description = "Do something",

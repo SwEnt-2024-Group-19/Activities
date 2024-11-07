@@ -26,7 +26,7 @@ fun MapScreen(
 
   Scaffold(
       content = { pd ->
-        val defaultLocation = LatLng(37.7749, -122.4194) // San Francisco
+        val defaultLocation = LatLng(46.519962, 6.633597) // EPFL
         val firstToDoLocation =
             try {
               val loc =
@@ -41,6 +41,7 @@ fun MapScreen(
         val cameraPositionState = rememberCameraPositionState {
           position = CameraPosition.fromLatLngZoom(firstToDoLocation, 10f)
         }
+
         GoogleMap(
             modifier = Modifier.fillMaxSize().padding(pd).testTag("mapScreen"),
             cameraPositionState = cameraPositionState) {
@@ -55,7 +56,7 @@ fun MapScreen(
                                     LatLng(item.location!!.latitude, item.location!!.longitude)),
                         title = item.title,
                         snippet = item.description,
-                    )
+                        contentDescription = "marker_${item.uid}")
                   }
             }
       },
@@ -65,5 +66,4 @@ fun MapScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.MAP)
       })
-    
 }
