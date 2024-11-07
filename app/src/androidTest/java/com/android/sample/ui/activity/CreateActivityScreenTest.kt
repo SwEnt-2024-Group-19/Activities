@@ -141,9 +141,19 @@ class CreateActivityScreenTest {
     composeTestRule.setContent {
       CreateActivityScreen(mockViewModel, mockNavigationActions, mockProfileViewModel)
     }
+
+    // Wait for the UI to finish rendering
+    composeTestRule.waitForIdle()
+
+    // Ensure the button is displayed
+    // composeTestRule.onNodeWithTag("createButton").assertIsDisplayed()
+
+    // Scroll to the button to ensure it's in view
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("createButton"))
+
+    // Assert that the button is not enabled
     composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
