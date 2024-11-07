@@ -169,6 +169,7 @@ fun ActivityDetailsScreen(
                         text = "Activity Image",
                         color = Color.White,
                         modifier = Modifier.align(Alignment.Center))
+                    LikeButton(profile, activity, profileViewModel)
                   }
 
               // Title
@@ -316,8 +317,7 @@ fun ActivityDetailsScreen(
                                     placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
                                     participants =
                                         activity.participants +
-                                            SimpleUser(profile.name, profile.surname, 0)
-                                )
+                                            SimpleUser(profile.name, profile.surname, 0))
                             listActivityViewModel.updateActivity(theActivity)
                             profileViewModel.addActivity(profile.id, theActivity.uid)
                             Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
