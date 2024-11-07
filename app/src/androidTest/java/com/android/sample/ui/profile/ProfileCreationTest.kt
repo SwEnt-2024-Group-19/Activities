@@ -2,6 +2,7 @@ package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -68,7 +69,7 @@ class ProfileCreationTest {
 
     composeTestRule.onNodeWithTag("surnameTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("newInterestInput").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("photoTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
@@ -77,15 +78,19 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 
     composeTestRule
-        .onNodeWithTag("photoTextField")
-        .performTextInput("https://example.com/photo.jpg")
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("profilePicture"))
 
-    // composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").isDisplayed()
+
     composeTestRule
         .onNodeWithTag("profileCreationScrollColumn")
         .performScrollToNode(hasTestTag("createProfileButton"))
 
-    composeTestRule.onNodeWithTag("createProfileButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("createProfileButton").performClick()
   }
 
   @Test

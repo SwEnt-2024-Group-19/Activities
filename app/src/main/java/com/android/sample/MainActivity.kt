@@ -32,6 +32,7 @@ import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.authentication.ChooseAccountScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
+import com.android.sample.ui.listActivities.LikedActivitiesScreen
 import com.android.sample.ui.listActivities.ListActivitiesScreen
 import com.android.sample.ui.map.MapScreen
 import com.android.sample.ui.navigation.NavigationActions
@@ -108,7 +109,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) {
-        ListActivitiesScreen(listActivitiesViewModel, navigationActions)
+        ListActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
       }
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(listActivitiesViewModel, navigationActions)
@@ -133,6 +134,11 @@ fun ActivitiesApp(uid: String, startDestination: String) {
         ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
       }
       composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
+    }
+    navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
+      composable(Screen.LIKED_ACTIVITIES) {
+        LikedActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
+      }
     }
   }
 }
