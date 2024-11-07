@@ -396,7 +396,8 @@ fun CommentSection(
           value = newCommentText.value,
           onValueChange = { newCommentText.value = it },
           label = { Text("Add a comment") },
-          modifier = Modifier.fillMaxWidth())
+          modifier = Modifier.fillMaxWidth().testTag("AddCommentButton")
+      )
 
       Button(
           onClick = {
