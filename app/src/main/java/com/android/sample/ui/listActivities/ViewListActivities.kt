@@ -127,8 +127,9 @@ fun ListActivitiesScreen(
                       // Use LazyColumn to efficiently display the list of activities
 
                       items(activitiesList) { activity ->
-                        ActivityCard(activity = activity, navigationActions, viewModel)
-                      }
+                          if(activity.participants.size<activity.maxPlaces){
+                              ActivityCard(activity = activity, navigationActions, viewModel)
+                          }                      }
                     }
               }
             }

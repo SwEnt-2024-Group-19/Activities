@@ -51,6 +51,7 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -289,7 +290,9 @@ fun ActivityDetailsScreen(
                           } else {
                             val theActivity =
                                 activity.copy(
-                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
+                                    participants = activity.participants +
+                                            SimpleUser(profile.name, profile.surname, 0))
                             listActivityViewModel.updateActivity(theActivity)
                             profileViewModel.addActivity(profile.id, theActivity.uid)
                             Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
