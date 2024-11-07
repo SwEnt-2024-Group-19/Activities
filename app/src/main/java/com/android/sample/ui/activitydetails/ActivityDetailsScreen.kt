@@ -3,6 +3,7 @@ package com.android.sample.ui.activitydetails
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -42,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -54,11 +57,16 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.profile.ProfileImage
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.UUID
 import kotlin.math.min
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.android.sample.R
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -251,18 +259,35 @@ fun ActivityDetailsScreen(
                 activity?.participants?.forEach { participant ->
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
-                      modifier = Modifier.padding(vertical = 4.dp)) {
+                      modifier = Modifier.padding(vertical = 4.dp)
+                          .clickable {
+                              if(participant.name!=profile?.name) {
+                                  navigationActions.navigateTo(Screen.PROFILE)
+                              }
+                      }) {
                         // Placeholder for participant picture
-                        Box(
-                            modifier =
-                                Modifier.size(40.dp)
-                                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                    .padding(8.dp)) {
-                              Text(
-                                  text = "P", // Placeholder for profile picture
-                                  color = Color.White,
-                                  modifier = Modifier.align(Alignment.Center))
-                            }
+                      if(participant.name!=profile?.name) {
+                          Box(
+                              modifier = Modifier
+                                  .size(40.dp)
+                                  .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                                  .padding(8.dp)
+                          ) {
+                              Image(
+                                  painter = painterResource(id = R.drawable.default_profile_image),
+                                  contentDescription = "Participant Image",
+                                  modifier = Modifier
+                                      .fillMaxSize()
+                                      .clip(RoundedCornerShape(8.dp))
+                              )
+
+                          }
+                      }else {
+                          // Profile Picture
+                          ProfileImage(
+                              url = profile.photo,
+                              modifier = Modifier.size(40.dp).clip(CircleShape))
+                      }
                         Spacer(modifier = Modifier.width(8.dp))
 
                         // Participant name

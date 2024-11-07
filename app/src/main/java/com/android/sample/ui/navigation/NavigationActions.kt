@@ -30,6 +30,10 @@ object Screen {
   const val CREATE_PROFILE = "CreateProfile Screen"
   const val MAP = "Map Screen"
   const val CHOOSE_ACCOUNT = "ChooseAccount Screen"
+    const val PARTICIPANT_PROFILE = "Participant profile Screen"
+
+
+
 }
 
 data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
