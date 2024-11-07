@@ -9,18 +9,21 @@ interface ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   )
+
   fun addLikedActivity(
       userId: String,
       activityId: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   )
+
   fun removeLikedActivity(
       userId: String,
       activityId: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   )
+
   fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   fun addProfileToDatabase(userProfile: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)

@@ -54,13 +54,15 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onSuccess = { fetchUserData(userId) },
         onFailure = {})
   }
+
   fun addLikedActivity(userId: String, activityId: String) {
     repository.addLikedActivity(
         userId = userId,
         activityId = activityId,
         onSuccess = { fetchUserData(userId) },
         onFailure = {})
-    }
+  }
+
   fun removeLikedActivity(userId: String, activityId: String) {
     repository.removeLikedActivity(
         userId = userId,
@@ -68,7 +70,6 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onSuccess = { fetchUserData(userId) },
         onFailure = {})
   }
-
 
   fun updateProfile(user: User) {
     repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
