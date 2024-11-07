@@ -24,17 +24,15 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.GregorianCalendar
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-
 
 class CreateActivityScreenTest {
 
@@ -50,7 +48,7 @@ class CreateActivityScreenTest {
   private val location = Location(46.519962, 6.633597, "EPFL")
   private val location2 = Location(46.5, 6.6, "Lausanne")
   private val locationList = listOf(location, location2)
-    private val locationListFlow = MutableStateFlow(listOf(location, location2))
+  private val locationListFlow = MutableStateFlow(listOf(location, location2))
 
   private val activity =
       Activity(
@@ -83,7 +81,6 @@ class CreateActivityScreenTest {
     }
 
     mockLocationViewModel = LocationViewModel(mockLocationRepository)
-
 
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ADD_ACTIVITY)
   }
@@ -173,8 +170,7 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("inputLocationCreate").assertIsDisplayed()
   }
 
-
-    @Test
+  @Test
   fun createButton_isDisabledInitially() {
     composeTestRule.setContent {
       CreateActivityScreen(
@@ -318,7 +314,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithText(types[1].name).assertIsDisplayed()
     composeTestRule.onNodeWithText(types[2].name).assertIsDisplayed()
   }
-
 
   @Test
   fun createActivityScreen_selectsDropdownOption1() {

@@ -255,70 +255,70 @@ fun CreateActivityScreen(
                 placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
             )
 
-          Spacer(modifier = Modifier.height(8.dp))
-          OutlinedTextField(
-              value = placesMax,
-              onValueChange = { placesMax = it },
-              label = { Text("Total Places") },
-              modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
-              placeholder = {
-                Text(text = stringResource(id = R.string.request_placesMax_activity))
-              },
-          )
-          Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = placesMax,
+                onValueChange = { placesMax = it },
+                label = { Text("Total Places") },
+                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPlacesCreate"),
+                placeholder = {
+                  Text(text = stringResource(id = R.string.request_placesMax_activity))
+                },
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
-          // Location Input with dropdown using ExposedDropdownMenuBox
-          ExposedDropdownMenuBox(
-              expanded = showDropdown && locationSuggestions.isNotEmpty(),
-              onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
-              ) {
-                OutlinedTextField(
-                    value = locationQuery,
-                    onValueChange = {
-                      locationViewModel.setQuery(it)
-                      showDropdown = true // Show dropdown when user starts typing
-                    },
-                    label = { Text("Location") },
-                    placeholder = { Text("Enter an Address or Location") },
-                    modifier =
-                        Modifier.menuAnchor() // Anchor the dropdown to this text field
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                            .testTag("inputLocationCreate"),
-                    singleLine = true)
+            // Location Input with dropdown using ExposedDropdownMenuBox
+            ExposedDropdownMenuBox(
+                expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
+            ) {
+              OutlinedTextField(
+                  value = locationQuery,
+                  onValueChange = {
+                    locationViewModel.setQuery(it)
+                    showDropdown = true // Show dropdown when user starts typing
+                  },
+                  label = { Text("Location") },
+                  placeholder = { Text("Enter an Address or Location") },
+                  modifier =
+                      Modifier.menuAnchor() // Anchor the dropdown to this text field
+                          .padding(8.dp)
+                          .fillMaxWidth()
+                          .testTag("inputLocationCreate"),
+                  singleLine = true)
 
-                // Dropdown menu for location suggestions
-                ExposedDropdownMenu(
-                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                    onDismissRequest = { showDropdown = false }) {
-                      locationSuggestions.filterNotNull().take(3).forEach { location ->
-                        DropdownMenuItem(
-                            text = {
-                              Text(
-                                  text =
-                                      location.name.take(30) +
-                                          if (location.name.length > 30) "..."
-                                          else "", // Limit name length
-                                  maxLines = 1 // Ensure name doesn't overflow
-                                  )
-                            },
-                            onClick = {
-                              locationViewModel.setQuery(location.name)
-                              selectedLocation = location
-                              showDropdown = false // Close dropdown on selection
-                            },
-                            modifier = Modifier.padding(8.dp))
-                      }
-
-                      if (locationSuggestions.size > 3) {
-                        DropdownMenuItem(
-                            text = { Text("More...") },
-                            onClick = {},
-                            modifier = Modifier.padding(8.dp))
-                      }
+              // Dropdown menu for location suggestions
+              ExposedDropdownMenu(
+                  expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                  onDismissRequest = { showDropdown = false }) {
+                    locationSuggestions.filterNotNull().take(3).forEach { location ->
+                      DropdownMenuItem(
+                          text = {
+                            Text(
+                                text =
+                                    location.name.take(30) +
+                                        if (location.name.length > 30) "..."
+                                        else "", // Limit name length
+                                maxLines = 1 // Ensure name doesn't overflow
+                                )
+                          },
+                          onClick = {
+                            locationViewModel.setQuery(location.name)
+                            selectedLocation = location
+                            showDropdown = false // Close dropdown on selection
+                          },
+                          modifier = Modifier.padding(8.dp))
                     }
-              }
-          Spacer(modifier = Modifier.height(8.dp))
+
+                    if (locationSuggestions.size > 3) {
+                      DropdownMenuItem(
+                          text = { Text("More...") },
+                          onClick = {},
+                          modifier = Modifier.padding(8.dp))
+                    }
+                  }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
 
             ExposedDropdownMenuBox(
                 modifier =
@@ -415,94 +415,96 @@ fun CreateActivityScreen(
               }
             }
 
-          if (showDialogUser) {
-            AddUserDialog(
-                onDismiss = { showDialogUser = false },
-                onAddUser = { user -> attendees = attendees + user },
-            )
-          }
-          Spacer(modifier = Modifier.height(32.dp))
-          Button(
-              enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
-              onClick = {
-                val timeFormat = startTime.split(":")
-                if (timeFormat.size != 2) {
-                  Toast.makeText(context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
-                      .show()
-                }
-                val durationFormat = duration.split(":")
-                if (durationFormat.size != 2) {
-                  Toast.makeText(
-                          context, "Invalid format, duration must be HH:MM.", Toast.LENGTH_SHORT)
-                      .show()
-                }
-                val calendar = GregorianCalendar()
-                val parts = dueDate.split("/")
-                if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
-                  attendees +=
-                      SimpleUser(
-                          profileViewModel.userState.value?.name ?: "",
-                          profileViewModel.userState.value?.surname ?: "",
-                          0)
-                  try {
-                    calendar.set(
-                        parts[2].toInt(),
-                        parts[1].toInt() - 1, // Months are 0-based
-                        parts[0].toInt(),
-                        0,
-                        0,
-                        0)
-                    val activity =
-                        Activity(
-                            uid = listActivityViewModel.getNewUid(),
-                            title = title,
-                            description = description,
-                            date = Timestamp(calendar.time),
-                            startTime = startTime,
-                            duration = duration,
-                            price = price.toDouble(),
-                            placesLeft = attendees.size.toLong(),
-                            maxPlaces = placesMax.toLongOrNull() ?: 0,
-                            creator = creator,
-                            status = ActivityStatus.ACTIVE,
-                            location = selectedLocation,
-                            images =  items.map { bitmapToBase64(it) },
-                            participants = attendees,
-                            type = types.find { it.name == selectedOption } ?: types[0],
-                            comments = listOf())
-                    listActivityViewModel.addActivity(activity)
-                    profileViewModel.addActivity(creator, activity.uid)
-                    navigationActions.navigateTo(Screen.OVERVIEW)
-                  } catch (_: NumberFormatException) {
-                    println("There is an error")
-                  }
-                }
-                if (parts.size != 3) {
-                  Toast.makeText(
-                          context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
-                      .show()
-                }
-              },
-              modifier =
-                  Modifier.width(300.dp)
-                      .height(40.dp)
-                      .testTag("createButton")
-                      .align(Alignment.CenterHorizontally),
-          ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-              Icon(
-                  Icons.Filled.Add,
-                  contentDescription = "add a new activity",
+            if (showDialogUser) {
+              AddUserDialog(
+                  onDismiss = { showDialogUser = false },
+                  onAddUser = { user -> attendees = attendees + user },
               )
-              Text(text = stringResource(id = R.string.button_create_activity))
             }
+            Spacer(modifier = Modifier.height(32.dp))
+            Button(
+                enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
+                onClick = {
+                  val timeFormat = startTime.split(":")
+                  if (timeFormat.size != 2) {
+                    Toast.makeText(
+                            context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
+                        .show()
+                  }
+                  val durationFormat = duration.split(":")
+                  if (durationFormat.size != 2) {
+                    Toast.makeText(
+                            context, "Invalid format, duration must be HH:MM.", Toast.LENGTH_SHORT)
+                        .show()
+                  }
+                  val calendar = GregorianCalendar()
+                  val parts = dueDate.split("/")
+                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
+                    attendees +=
+                        SimpleUser(
+                            profileViewModel.userState.value?.name ?: "",
+                            profileViewModel.userState.value?.surname ?: "",
+                            0)
+                    try {
+                      calendar.set(
+                          parts[2].toInt(),
+                          parts[1].toInt() - 1, // Months are 0-based
+                          parts[0].toInt(),
+                          0,
+                          0,
+                          0)
+                      val activity =
+                          Activity(
+                              uid = listActivityViewModel.getNewUid(),
+                              title = title,
+                              description = description,
+                              date = Timestamp(calendar.time),
+                              startTime = startTime,
+                              duration = duration,
+                              price = price.toDouble(),
+                              placesLeft = attendees.size.toLong(),
+                              maxPlaces = placesMax.toLongOrNull() ?: 0,
+                              creator = creator,
+                              status = ActivityStatus.ACTIVE,
+                              location = selectedLocation,
+                              images = items.map { bitmapToBase64(it) },
+                              participants = attendees,
+                              type = types.find { it.name == selectedOption } ?: types[0],
+                              comments = listOf())
+                      listActivityViewModel.addActivity(activity)
+                      profileViewModel.addActivity(creator, activity.uid)
+                      navigationActions.navigateTo(Screen.OVERVIEW)
+                    } catch (_: NumberFormatException) {
+                      println("There is an error")
+                    }
+                  }
+                  if (parts.size != 3) {
+                    Toast.makeText(
+                            context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
+                        .show()
+                  }
+                },
+                modifier =
+                    Modifier.width(300.dp)
+                        .height(40.dp)
+                        .testTag("createButton")
+                        .align(Alignment.CenterHorizontally),
+            ) {
+              Row(
+                  horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                  verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = "add a new activity",
+                )
+                Text(text = stringResource(id = R.string.button_create_activity))
+              }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
           }
-          Spacer(modifier = Modifier.height(16.dp))
         }
-      }},
+      },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
@@ -510,7 +512,6 @@ fun CreateActivityScreen(
             selectedItem = Route.ADD_ACTIVITY)
       })
 }
-
 
 @Composable
 fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitmap) -> Unit) {
@@ -607,5 +608,3 @@ fun bitmapToBase64(bitmap: Bitmap): String {
   val byteArray = byteArrayOutputStream.toByteArray()
   return Base64.encodeToString(byteArray, Base64.DEFAULT)
 }
-
-

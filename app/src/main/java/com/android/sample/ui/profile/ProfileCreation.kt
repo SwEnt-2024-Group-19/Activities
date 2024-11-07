@@ -142,7 +142,8 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                       surname = surname,
                       interests = newListInterests,
                       activities = emptyList(),
-                      photo = photo)
+                      photo = photo,
+                      likedActivities = emptyList())
               viewModel.createUserProfile(
                   userProfile = userProfile,
                   onSuccess = {

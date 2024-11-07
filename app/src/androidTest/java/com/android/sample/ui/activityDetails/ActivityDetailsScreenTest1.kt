@@ -149,7 +149,7 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("titleText").assertTextContains("Sample Activity")
     composeTestRule.onNodeWithTag("descriptionText").assertTextContains("Sample Description")
     composeTestRule.onNodeWithTag("priceText").assertTextContains("10.0 CHF")
-    composeTestRule.onNodeWithTag("locationText").assertTextContains("Sample Location")
+    composeTestRule.onNodeWithTag("locationText").assertTextContains("EPFL")
     composeTestRule.onNodeWithTag("scheduleText").assertTextContains("3/11/2025 at 10:00")
     composeTestRule.onNodeWithTag("durationText").assertTextContains("02:00")
   }

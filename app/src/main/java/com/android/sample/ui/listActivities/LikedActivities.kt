@@ -18,20 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.activity.types
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -61,41 +57,18 @@ import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
-fun ListActivitiesScreen(
+fun LikedActivitiesScreen(
     viewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
     modifier: Modifier = Modifier
-
 ) {
   val uiState by viewModel.uiState.collectAsState()
-  var selectedIndex by remember { mutableIntStateOf(0) }
-  val all = "ALL"
-  val typesToString = types.map { it.name }
-  val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
+  val allActivities = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
 
   Scaffold(
-      modifier = modifier.testTag("listActivitiesScreen"),
-      topBar = {
-        Box(
-            modifier =
-                Modifier.height(35.dp)
-                    .testTag("segmentedButtonRow")) { // Set the desired height here
-              SingleChoiceSegmentedButtonRow {
-                options.forEachIndexed { index, label ->
-                  SegmentedButton(
-                      modifier = Modifier.testTag("segmentedButton$label"),
-                      shape =
-                          SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                      onClick = { selectedIndex = index },
-                      selected = index == selectedIndex) {
-                        Text(label)
-                      }
-                }
-              }
-            }
-      },
+      modifier = modifier.testTag("likedActivitiesScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
@@ -103,52 +76,52 @@ fun ListActivitiesScreen(
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
         Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
+          val likedActivitiesList by remember { mutableStateOf(profile?.likedActivities) }
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-              var activitiesList =
-                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              if (selectedIndex != 0) {
-
-                activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
+              if (profile == null) {
+                Text(
+                    text = "You are not logged in, Login or Register to see your liked activities",
+                    modifier =
+                        Modifier.padding(8.dp)
+                            .align(Alignment.Center)
+                            .testTag("notConnectedPrompt"),
+                    color = MaterialTheme.colorScheme.onSurface)
+                Button(
+                    onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                    modifier = Modifier.testTag("signInButton")) {
+                      Text("Go to Sign In Page")
+                    }
               }
-              if (activitiesList.isEmpty()) {
-                if (selectedIndex == 0) {
+              if (likedActivitiesList != null) {
+                if (likedActivitiesList!!.isEmpty()) {
                   Text(
-                      text = "There is no activity yet.",
+                      text = "There is no liked activity yet.",
                       modifier =
                           Modifier.padding(8.dp)
                               .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
+                              .testTag("emptyLikedActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
                 } else {
-                  Text(
-                      text = "There is no activity of this type yet.",
+
+                  LazyColumn(
                       modifier =
-                          Modifier.padding(8.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
-                      color = MaterialTheme.colorScheme.onSurface)
-                }
-              } else {
-
-                LazyColumn(
-                    modifier =
-                        Modifier.padding(paddingValues)
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .padding(horizontal = 5.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                      // Use LazyColumn to efficiently display the list of activities
-
-                      items(activitiesList) { activity ->
-                        ActivityCard(
-                            activity = activity,
-                            navigationActions,
-                            viewModel,
-                            profileViewModel,
-                            profile)
+                          Modifier.padding(paddingValues)
+                              .fillMaxSize()
+                              .padding(16.dp)
+                              .padding(horizontal = 5.dp),
+                      verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        items(likedActivitiesList!!) { activityId ->
+                          ActivityCard2(
+                              activityId = activityId,
+                              navigationActions,
+                              viewModel,
+                              profileViewModel,
+                              profile,
+                              allActivities)
+                        }
                       }
-                    }
+                }
               }
             }
             is ListActivitiesViewModel.ActivitiesUiState.Error -> {
@@ -161,13 +134,17 @@ fun ListActivitiesScreen(
 }
 
 @Composable
-fun ActivityCard(
-    activity: Activity,
+fun ActivityCard2(
+    activityId: String,
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
     profileViewModel: ProfileViewModel,
-    profile: User?
+    profile: User?,
+    allActivities: List<Activity>,
 ) {
+
+  val activity = allActivities.filter { act -> act.uid == activityId }[0]
+
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
@@ -203,8 +180,7 @@ fun ActivityCard(
                         fontWeight = FontWeight.Bold,
                         color = Color.White // Title color set to black
                         ),
-                modifier =
-                    Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("titleActivity"))
+                modifier = Modifier.align(Alignment.BottomStart).padding(16.dp))
           }
 
           Spacer(modifier = Modifier.height(8.dp))
@@ -224,6 +200,7 @@ fun ActivityCard(
 
                 if (profile != null) {
                   IconButton(
+                      modifier = Modifier.testTag("favoriteIcon$isLiked"),
                       onClick = {
                         isLiked = !isLiked
                         if (isLiked) {
@@ -232,14 +209,12 @@ fun ActivityCard(
                           profileViewModel.removeLikedActivity(profile.id, activity.uid)
                         }
                       },
-                      modifier = Modifier.testTag("likeButton$isLiked"),
                   ) {
                     Icon(
                         imageVector =
                             if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color.Black else Color.Gray,
-                    )
+                        tint = if (isLiked) Color.Black else Color.Gray)
                   }
                 }
               }
@@ -250,7 +225,7 @@ fun ActivityCard(
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
                 Text(
-                    text = activity.location?.name ?: "No location",
+                    text = activity.location,
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
