@@ -57,6 +57,8 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithText("Amine").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputProfileSurname").assertIsDisplayed()
     composeTestRule.onNodeWithText("A")
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
   }
 
   @Test
@@ -67,13 +69,4 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
     composeTestRule.onNodeWithTag("interestsList").assertIsDisplayed()
   }
-  /*
-  @Test
-  fun testSaveButtonFunctionality() {
-    composeTestRule.setContent {
-      EditProfileScreen(profileViewModel, navigationActions)
-    }
-    composeTestRule.onNodeWithTag("profileSaveButton").performClick()
-    verify(navigationActions).navigateTo(PROFILE)
-  }*/
 }
