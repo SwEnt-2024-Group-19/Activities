@@ -1,5 +1,6 @@
 package com.android.sample.model.map
 
+import com.google.android.gms.location.FusedLocationProviderClient
 import java.io.IOException
 import okhttp3.Call
 import okhttp3.Callback
@@ -22,6 +23,7 @@ import org.mockito.kotlin.any
 class NominatimLocationRepositoryTest {
 
   @Mock private lateinit var mockClient: OkHttpClient
+  @Mock private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
   @Mock private lateinit var mockCall: Call
 
   private lateinit var locationRepository: NominatimLocationRepository
@@ -29,7 +31,7 @@ class NominatimLocationRepositoryTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    locationRepository = NominatimLocationRepository(mockClient)
+    locationRepository = NominatimLocationRepository(mockClient, fusedLocationProviderClient)
   }
 
   @Test

@@ -18,10 +18,11 @@ class LocationViewModelTest {
 
   private lateinit var viewModel: LocationViewModel
   private val mockRepository: LocationRepository = mockk(relaxed = true)
+  private val mockPermissionChecker: LocationPermissionChecker = mockk(relaxed = true)
 
   @Before
   fun setup() {
-    viewModel = LocationViewModel(mockRepository)
+    viewModel = LocationViewModel(mockRepository, mockPermissionChecker)
   }
 
   @Test
