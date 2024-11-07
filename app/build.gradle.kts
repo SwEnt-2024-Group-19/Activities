@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
     alias(libs.plugins.sonar)
-    alias(libs.plugins.kapt)
+    id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("jacoco")
 }
@@ -18,6 +18,15 @@ android {
     namespace = "com.android.sample"
     compileSdk = 34
 
+    // Load the API key from local.properties
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+
+    val mapsApiKey: String = System.getenv("MAPS_API_KEY") ?: localProperties.getProperty("MAPS_API_KEY") ?: ""
+
     defaultConfig {
         applicationId = "com.android.sample"
         minSdk = 28
@@ -25,11 +34,15 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.android.sample.CustomTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
+
 
     buildTypes {
         release {
@@ -45,12 +58,7 @@ android {
             enableAndroidTestCoverage = true
         }
     }
-    // Load the API key from local.properties
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localProperties.load(FileInputStream(localPropertiesFile))
-    }
+
     signingConfigs {
         create("release") {
             // Resolve the keystore path safely
@@ -66,10 +74,11 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 
     compileOptions {
@@ -186,14 +195,14 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.2") // Or replace with Mockito if preferred:
     // testImplementation("org.mockito:mockito-core:5.5.0")
 
-    // Coroutines Test for testing coroutines
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
 
     // AndroidX Core Testing library for LiveData and ViewModel testing (optional)
     testImplementation("androidx.arch.core:core-testing:2.1.0")
 
 
     //----
+
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -213,6 +222,15 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
 
+    //CameraX
+    val cameraxVersion = "1.3.0-rc01"
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+
+    implementation("androidx.camera:camera-view:$cameraxVersion")
+    implementation("androidx.camera:camera-extensions:$cameraxVersion")
+
     // Networking with OkHttp
     implementation(libs.okhttp)
 
@@ -221,6 +239,7 @@ dependencies {
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
+    testImplementation("io.mockk:mockk:1.12.0")
     testImplementation(libs.json)
 
     // Test UI
@@ -279,11 +298,14 @@ dependencies {
     // ----------       Robolectric     ------------
     testImplementation(libs.robolectric)
 
+    // ----------       Hilt     ------------
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    kapt(libs.hilt.android.compiler)
+    kaptTest(libs.hilt.android.compiler)
+    testImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(libs.hilt.android.testing)
-    kaptAndroidTest(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
 
 }
@@ -331,4 +353,3 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
     })
 }
-

@@ -64,6 +64,10 @@ constructor(
     }
   }
 
+  fun signOut() {
+    signInRepository.signOut()
+  }
+
   companion object {
     fun Factory(): ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {

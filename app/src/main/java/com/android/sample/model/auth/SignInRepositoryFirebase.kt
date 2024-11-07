@@ -51,4 +51,8 @@ constructor(private val auth: FirebaseAuth, private val profilesRepository: Prof
           Log.e("SignInRepository", "Error checking user profile: ${it.message}")
         })
   }
+
+  override fun signOut() {
+    auth.signOut()
+  }
 }
