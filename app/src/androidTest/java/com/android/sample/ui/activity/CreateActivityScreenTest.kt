@@ -51,7 +51,7 @@ class CreateActivityScreenTest {
           price = 10.0,
           placesLeft = 10,
           maxPlaces = 20,
-          images = listOf("image1", "image2"),
+          images = listOf(),
           type = ActivityType.PRO,
           startTime = "09:30",
           duration = "00:30")

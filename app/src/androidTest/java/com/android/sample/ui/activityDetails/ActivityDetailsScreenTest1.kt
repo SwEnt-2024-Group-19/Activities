@@ -79,7 +79,7 @@ class ActivityDetailsScreenAndroidTest {
             creator = "Creator",
             status = ActivityStatus.ACTIVE,
             location = "Sample Location",
-            images = listOf("1"),
+            images = listOf(),
             participants = listOf(),
             duration = "02:00",
             startTime = "10:00",
