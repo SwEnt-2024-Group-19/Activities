@@ -54,11 +54,13 @@ fun MapScreen(navigationActions: NavigationActions, locationViewModel: LocationV
               cameraPositionState = cameraPositionState) {
                 currentLocation?.let {
                   Marker(
-                      state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
-                      title = it.name,
-                      snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                      icon =
-                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                          state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
+                          title = it.name,
+                          snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
+                          icon =
+                              BitmapDescriptorFactory.defaultMarker(
+                                  BitmapDescriptorFactory.HUE_BLUE))
+                      .apply {}
                 }
               }
 
