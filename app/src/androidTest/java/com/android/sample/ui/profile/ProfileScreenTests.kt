@@ -160,5 +160,4 @@ class ProfileScreenTest {
     // Verify that the navigation action was triggered
     verify(navigationActions).navigateTo(Screen.EDIT_ACTIVITY)
   }
-
 }
