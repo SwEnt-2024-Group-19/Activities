@@ -65,7 +65,7 @@ class CreateActivityScreenTest {
           price = 10.0,
           placesLeft = 10,
           maxPlaces = 20,
-          images = listOf("image1", "image2"),
+          images = listOf(),
           type = ActivityType.PRO,
           startTime = "09:30",
           duration = "00:30")
@@ -180,9 +180,19 @@ class CreateActivityScreenTest {
       CreateActivityScreen(
           mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
     }
+
+    // Wait for the UI to finish rendering
+    composeTestRule.waitForIdle()
+
+    // Ensure the button is displayed
+    // composeTestRule.onNodeWithTag("createButton").assertIsDisplayed()
+
+    // Scroll to the button to ensure it's in view
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("createButton"))
+
+    // Assert that the button is not enabled
     composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
