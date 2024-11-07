@@ -6,6 +6,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -15,7 +16,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
 @Composable
-fun MapScreen(navigationActions: NavigationActions) {
+fun MapScreen(navigationActions: NavigationActions, locationViewModel: LocationViewModel) {
 
   Scaffold(
       content = { pd ->

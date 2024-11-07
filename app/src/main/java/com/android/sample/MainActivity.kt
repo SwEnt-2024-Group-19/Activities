@@ -110,6 +110,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
   val profileViewModel: ProfileViewModel = hiltViewModel()
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
+  val locationViewModel: LocationViewModel = hiltViewModel()
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
@@ -140,7 +141,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
     }
 
     navigation(startDestination = Screen.MAP, route = Route.MAP) {
-      composable(Screen.MAP) { MapScreen(navigationActions) }
+      composable(Screen.MAP) { MapScreen(navigationActions, locationViewModel) }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
