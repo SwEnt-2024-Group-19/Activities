@@ -384,6 +384,9 @@ class ActivityDetailsScreenAndroidTest {
     }
 
     // Check if the participants list is displayed
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("participants"))
     composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
 
     // Check if each participant's name is displayed
