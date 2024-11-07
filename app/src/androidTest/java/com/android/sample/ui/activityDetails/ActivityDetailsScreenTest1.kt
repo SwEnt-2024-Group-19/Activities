@@ -1,6 +1,7 @@
 package com.android.sample.ui.activityDetails
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isDisplayed
@@ -19,8 +20,10 @@ import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
+import com.android.sample.ui.activitydetails.LikeButton
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -45,14 +48,14 @@ class ActivityDetailsScreenAndroidTest {
   private lateinit var mockProfileViewModel: ProfileViewModel
   private lateinit var testUser: User
   private lateinit var mockFirebaseRepository: ActivitiesRepositoryFirestore
+  private lateinit var mockRepository: ProfilesRepository
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
     mockFirebaseRepository = mock(ActivitiesRepositoryFirestore::class.java)
-
-    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    mockRepository = mock(ProfilesRepository::class.java)
 
     mockNavigationActions = mock(NavigationActions::class.java)
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ACTIVITY_DETAILS)
@@ -65,9 +68,6 @@ class ActivityDetailsScreenAndroidTest {
             photo = "",
             interests = listOf("Cycling", "Reading"),
             activities = listOf("Football"))
-
-    val userStateFlow = MutableStateFlow(testUser)
-    `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
 
     mockViewModel = mock(ListActivitiesViewModel::class.java)
     activity =
@@ -94,6 +94,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun activityComponents_areDisplayed() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -107,10 +109,13 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("price&&location").assertIsDisplayed()
     composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
     composeTestRule.onNodeWithTag("duration").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
   }
 
   @Test
   fun enrollButtonIsDisplayedWhenActivityIsActive() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -125,6 +130,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun enrollButtonIsNotDisplayedWhenActivityIsFinished() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     activity = activity.copy(status = ActivityStatus.FINISHED)
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
     composeTestRule.setContent {
@@ -139,6 +146,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun activityDetailsAreDisplayedCorrectly() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -156,6 +165,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun goBackButtonNavigatesBack() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -169,6 +180,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun enrollButton_displays_whenUserLoggedIn() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -185,6 +198,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun editButton_displaysForActiveActivity_whenUserIsTheCreator() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     val activity1 = activity.copy(creator = "123")
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity1))
 
@@ -205,6 +220,9 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun loginRegisterButton_displays_whenUserIsNotLoggedIn() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+
     // Set the user state to null to simulate the user not being logged in
     val userStateFlow = MutableStateFlow<User?>(null)
     `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
@@ -226,6 +244,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun enrollFailureToast_displays_whenPlacesAreFull() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     // Set placesLeft equal to maxPlaces to simulate full capacity
     activity = activity.copy(placesLeft = activity.maxPlaces)
     val activityStateFlow = MutableStateFlow(activity)
@@ -247,6 +267,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun deleteMainComment_removesMainCommentSuccessfully() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     // Set initial comments with a main comment
     val comments =
         listOf(
@@ -271,6 +293,8 @@ class ActivityDetailsScreenAndroidTest {
 
   @Test
   fun deleteReply_removesReplyFromMainComment() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     // Set initial comments with replies
     val comments =
         listOf(
@@ -303,7 +327,24 @@ class ActivityDetailsScreenAndroidTest {
   }
 
   @Test
+  fun notLoggedInNoLikeButton() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    val userStateFlow = MutableStateFlow<User?>(null)
+    `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
+  }
+
+  @Test
   fun replyToComment_displaysNewReplyInList() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     val comments =
         listOf(
             activity.comments
@@ -327,5 +368,24 @@ class ActivityDetailsScreenAndroidTest {
 
     // Assert that the new reply is added
     assert(comments.first().replies.any { it.content == "This is a reply" })
+  }
+
+  @Test
+  fun changeIconWhenActivityIsLiked() {
+    mockProfileViewModel = ProfileViewModel(mockRepository)
+
+    composeTestRule.setContent { LikeButton(testUser, activity, mockProfileViewModel) }
+
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+
+    // Click on the like button
+    composeTestRule.onNodeWithTag("likeButtonfalse").performClick()
+
+    // Verify that the like button is toggled
+    composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("likeButtontrue").performClick()
+
+    // Verify that the like button is toggled
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
   }
 }
