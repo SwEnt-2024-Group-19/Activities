@@ -143,4 +143,36 @@ class ProfileViewModelTest {
     // Verify that onError callback is triggered with the correct exception
     verify(onError).invoke(eq(exception))
   }
+
+  @Test
+  fun addLikedActivity() {
+    // Set up user with the activity in likedActivities
+    val user =
+        User(
+            id = "1",
+            name = "John",
+            surname = "Doe",
+            photo = "urlToPhoto",
+            interests = listOf("Reading", "Hiking"),
+            activities = emptyList(),
+            likedActivities = emptyList())
+    profileViewModel.addLikedActivity(user.id, activity.uid)
+    verify(profilesRepository).addLikedActivity(eq(user.id), eq(activity.uid), any(), any())
+  }
+
+  @Test
+  fun removeLikedActivity() {
+    // Set up user with the activity in likedActivities
+    val user =
+        User(
+            id = "1",
+            name = "John",
+            surname = "Doe",
+            photo = "urlToPhoto",
+            interests = listOf("Reading", "Hiking"),
+            activities = emptyList(),
+            likedActivities = listOf(activity.uid))
+    profileViewModel.removeLikedActivity(user.id, activity.uid)
+    verify(profilesRepository).removeLikedActivity(eq(user.id), eq(activity.uid), any(), any())
+  }
 }
