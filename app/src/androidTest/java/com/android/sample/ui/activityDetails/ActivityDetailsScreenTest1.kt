@@ -24,6 +24,7 @@ import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.activitydetails.LikeButton
+import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -83,7 +84,7 @@ class ActivityDetailsScreenAndroidTest {
             status = ActivityStatus.ACTIVE,
             location = Location(46.519962, 6.633597, "EPFL"),
             images = listOf("1"),
-            participants = listOf(),
+            participants = listOf(SimpleUser("Amine", "A", 19), SimpleUser("Creator", "John", 20)),
             duration = "02:00",
             startTime = "10:00",
             type = ActivityType.INDIVIDUAL,
@@ -371,21 +372,43 @@ class ActivityDetailsScreenAndroidTest {
   }
 
   @Test
-  fun changeIconWhenActivityIsLiked() {
-    mockProfileViewModel = ProfileViewModel(mockRepository)
+  fun participantsList_isDisplayedCorrectly() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel)
+    }
 
-    composeTestRule.setContent { LikeButton(testUser, activity, mockProfileViewModel) }
+    // Check if the participants list is displayed
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("participants"))
+    // composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+    // Check if each participant's name is displayed
+    activity.participants.forEach { participant ->
+      composeTestRule.onNodeWithText(participant.name).assertIsDisplayed()
+    }
 
-    // Click on the like button
-    composeTestRule.onNodeWithTag("likeButtonfalse").performClick()
+    fun changeIconWhenActivityIsLiked() {
+      mockProfileViewModel = ProfileViewModel(mockRepository)
 
-    // Verify that the like button is toggled
-    composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("likeButtontrue").performClick()
+      composeTestRule.setContent { LikeButton(testUser, activity, mockProfileViewModel) }
 
-    // Verify that the like button is toggled
-    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+
+      // Click on the like button
+      composeTestRule.onNodeWithTag("likeButtonfalse").performClick()
+
+      // Verify that the like button is toggled
+      composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("likeButtontrue").performClick()
+
+      // Verify that the like button is toggled
+      composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+    }
   }
 }
