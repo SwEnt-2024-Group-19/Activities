@@ -8,13 +8,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
-open class LocationViewModel @Inject constructor(private val repository: LocationRepository) :
-    ViewModel() {
+open class LocationViewModel
+@Inject
+constructor(
+    private val repository: LocationRepository,
+    private val permissionChecker: LocationPermissionChecker
+) : ViewModel() {
+
   private val query_ = MutableStateFlow("")
   open val query: StateFlow<String> = query_
 
   private var locationSuggestions_ = MutableStateFlow(emptyList<Location>())
-  open val locationSuggestions: StateFlow<List<Location>> = locationSuggestions_
+  val locationSuggestions: StateFlow<List<Location>> = locationSuggestions_
+
+  private val _currentLocation = MutableStateFlow<Location?>(null)
+  val currentLocation: StateFlow<Location?> = _currentLocation
 
   fun setQuery(query: String) {
     query_.value = query
@@ -39,6 +47,17 @@ open class LocationViewModel @Inject constructor(private val repository: Locatio
     } else {
       locationSuggestions_.value = emptyList()
       println("Query is empty, cleared suggestions.") // Debugging line
+    }
+  }
+
+  fun fetchCurrentLocation() {
+    if (permissionChecker.hasLocationPermission()) {
+      repository.getCurrentLocation(
+          onSuccess = { _currentLocation.value = it },
+          onFailure = { Log.e("LocationViewModel", "Failed to get location", it) })
+    } else {
+      Log.e("LocationViewModel", "Location permission not granted")
+      // Handle the permission denial as appropriate
     }
   }
 }

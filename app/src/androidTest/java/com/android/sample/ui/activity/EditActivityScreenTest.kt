@@ -1,5 +1,6 @@
 package com.android.sample.ui.activity
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -9,12 +10,14 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.ui.navigation.NavigationActions
@@ -37,6 +40,7 @@ class EditActivityScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var mockLocationViewModel: LocationViewModel
+  private lateinit var mockPermissionChecker: LocationPermissionChecker
 
   private val location = Location(46.519962, 6.633597, "EPFL")
   private val location2 = Location(46.5, 6.6, "Lausanne")
@@ -64,11 +68,13 @@ class EditActivityScreenTest {
 
   @Before
   fun setUp() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
     activitiesRepository = mock(ActivitiesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listActivitiesViewModel = mock(ListActivitiesViewModel::class.java)
     mockLocationRepository = Mockito.mock(LocationRepository::class.java)
-    mockLocationViewModel = LocationViewModel(mockLocationRepository)
+    mockPermissionChecker = LocationPermissionChecker(context)
+    mockLocationViewModel = LocationViewModel(mockLocationRepository, mockPermissionChecker)
 
     `when`(listActivitiesViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
     `when`(navigationActions.currentRoute()).thenReturn(Screen.EDIT_ACTIVITY)

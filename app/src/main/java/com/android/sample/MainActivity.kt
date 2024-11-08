@@ -46,12 +46,21 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+  private val CAMERA_PERMISSION_REQUEST_CODE = 0
+  private val LOCATION_PERMISSION_REQUEST_CODE = 1
+
   private lateinit var auth: FirebaseAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    if (!hasRequiredPermissions(applicationContext)) {
-      ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, 0)
+    if (!hasCameraPermissions(applicationContext)) {
+      ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
+    }
+    Log.d("MainActivity", "Checking location permissions")
+    if (!hasLocationPermissions(applicationContext)) {
+      Log.d("MainActivity", "Requesting location permissions")
+      ActivityCompat.requestPermissions(
+          this, LOCATION_PERMISSIONS, LOCATION_PERMISSION_REQUEST_CODE)
     }
     auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
@@ -71,12 +80,23 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  fun hasRequiredPermissions(context: Context): Boolean {
+  private fun hasCameraPermissions(context: Context): Boolean {
     return CAMERAX_PERMISSIONS.all {
       ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
     }
   }
 
+  private fun hasLocationPermissions(context: Context): Boolean {
+    return LOCATION_PERMISSIONS.all {
+      ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+  }
+
+  private val LOCATION_PERMISSIONS =
+      arrayOf(
+          Manifest.permission.ACCESS_FINE_LOCATION,
+          Manifest.permission.ACCESS_COARSE_LOCATION,
+      )
   private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 }
 
@@ -91,6 +111,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
   // need to add factory for SignInViewModel
   val authViewModel: SignInViewModel = hiltViewModel()
   val locationViewModel: LocationViewModel = hiltViewModel()
+
   val listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel()
 
   NavHost(navController = navController, startDestination = startDestination) {
@@ -122,7 +143,9 @@ fun ActivitiesApp(uid: String, startDestination: String) {
     }
 
     navigation(startDestination = Screen.MAP, route = Route.MAP) {
-      composable(Screen.MAP) { MapScreen(listActivitiesViewModel, navigationActions) }
+      composable(Screen.MAP) {
+        MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+      }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {

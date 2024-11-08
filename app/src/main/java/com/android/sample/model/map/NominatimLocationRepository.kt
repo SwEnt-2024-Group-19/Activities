@@ -1,6 +1,8 @@
 package com.android.sample.model.map
 
+import android.annotation.SuppressLint
 import android.util.Log
+import com.google.android.gms.location.FusedLocationProviderClient
 import java.io.IOException
 import javax.inject.Inject
 import okhttp3.Call
@@ -12,8 +14,12 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONException
 
-class NominatimLocationRepository @Inject constructor(private val client: OkHttpClient) :
-    LocationRepository {
+class NominatimLocationRepository
+@Inject
+constructor(
+    private val client: OkHttpClient,
+    private val fusedLocationClient: FusedLocationProviderClient
+) : LocationRepository {
 
   private fun parseBody(body: String): List<Location> {
     return try {
@@ -81,5 +87,15 @@ class NominatimLocationRepository @Inject constructor(private val client: OkHttp
                 }
               }
             })
+  }
+
+  @SuppressLint("MissingPermission")
+  override fun getCurrentLocation(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
+    fusedLocationClient.lastLocation
+        .addOnSuccessListener { location ->
+          location?.let { onSuccess(Location(it.latitude, it.longitude, "Current Location")) }
+              ?: onFailure(Exception("Location not available"))
+        }
+        .addOnFailureListener { onFailure(it) }
   }
 }

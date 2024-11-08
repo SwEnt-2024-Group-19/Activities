@@ -1,5 +1,6 @@
 package com.android.sample.ui.activity
 
+import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -11,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -18,6 +20,7 @@ import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
 import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -44,6 +47,7 @@ class CreateActivityScreenTest {
   private lateinit var mockViewModel: ListActivitiesViewModel
   private lateinit var mockLocationViewModel: LocationViewModel
   private val mockProfileViewModel = mockk<ProfileViewModel>()
+  private lateinit var mockPermissionChecker: LocationPermissionChecker
 
   private val location = Location(46.519962, 6.633597, "EPFL")
   private val location2 = Location(46.5, 6.6, "Lausanne")
@@ -70,17 +74,19 @@ class CreateActivityScreenTest {
 
   @Before
   fun setUp() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+
     mockRepository = Mockito.mock(ActivitiesRepository::class.java)
     mockNavigationActions = Mockito.mock(NavigationActions::class.java)
     mockViewModel = Mockito.mock(ListActivitiesViewModel::class.java)
     mockLocationRepository = Mockito.mock(LocationRepository::class.java)
-
+    mockPermissionChecker = LocationPermissionChecker(context)
     `when`(mockLocationRepository.search(any(), any(), any())).then { invocation ->
       val onSuccess = invocation.arguments[1] as (List<Location>) -> Unit
       onSuccess(locationList)
     }
 
-    mockLocationViewModel = LocationViewModel(mockLocationRepository)
+    mockLocationViewModel = LocationViewModel(mockLocationRepository, mockPermissionChecker)
 
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ADD_ACTIVITY)
   }
