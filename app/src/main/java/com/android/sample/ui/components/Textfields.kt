@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_TOP
 
@@ -94,7 +95,7 @@ fun TextFieldWithErrorState(
       Text(
           text = it,
           color = Color.Red,
-          fontSize = 12.sp,
+          fontSize = ERROR_TEXTFIELD_FONT_SIZE,
           modifier =
               Modifier.align(Alignment.Start)
                   .padding(start = ERROR_TEXTFIELD_PADDING_START, top = ERROR_TEXTFIELD_PADDING_TOP)
