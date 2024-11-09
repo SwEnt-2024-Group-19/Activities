@@ -132,10 +132,9 @@ fun ListActivitiesScreen(
 
                 LazyColumn(
                     modifier =
-                        Modifier.padding(paddingValues)
+                        Modifier
                             .fillMaxSize()
-                            .padding(16.dp)
-                            .padding(horizontal = 5.dp),
+                            .padding(horizontal=8.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
 
