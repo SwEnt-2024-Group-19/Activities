@@ -82,7 +82,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                     if (input.isBlank()) "Password cannot be empty" else null
                   },
                   externalError = passwordErrorState.value,
-                  errorTestTag = "PasswordError")
+                  errorTestTag = "PasswordErrorText")
 
               Spacer(modifier = Modifier.height(16.dp))
 
