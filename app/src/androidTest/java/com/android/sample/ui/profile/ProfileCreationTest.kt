@@ -108,6 +108,8 @@ class ProfileCreationTest {
     // Verify that the navigation action was called with the correct route
     // Simulate successful profile creation when called
     // composeTestRule.onNodeWithTag("createProfileButton").performScrollTo()
+    composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
+    composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
     composeTestRule
         .onNodeWithTag("profileCreationScrollColumn")
         .performScrollToNode(hasTestTag("createProfileButton"))
@@ -127,6 +129,8 @@ class ProfileCreationTest {
     }
 
     // Perform the click action
+    composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
+    composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
     composeTestRule
         .onNodeWithTag("profileCreationScrollColumn")
         .performScrollToNode(hasTestTag("createProfileButton"))

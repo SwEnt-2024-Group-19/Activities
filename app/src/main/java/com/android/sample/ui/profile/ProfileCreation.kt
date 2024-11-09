@@ -34,6 +34,7 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.ui.ImagePicker
 import com.android.sample.ui.ProfileImage
+import com.android.sample.ui.components.TextFieldWithErrorState
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -41,7 +42,9 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: NavigationActions) {
   var name by remember { mutableStateOf("") }
+  val nameErrorState = remember { mutableStateOf<String?>(null) }
   var surname by remember { mutableStateOf("") }
+  val surnameErrorState = remember { mutableStateOf<String?>(null) }
   var interests by remember { mutableStateOf(listOf<String>()) }
   // var activities by remember { mutableStateOf("") }
   var photo by remember { mutableStateOf("") }
@@ -72,18 +75,29 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
             modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
         ImagePicker(onImagePicked = { photo = it.toString() }, buttonText = "Add Profile Picture")
         Spacer(modifier = Modifier.padding(48.dp))
-        OutlinedTextField(
+        /*OutlinedTextField(
+        value = name,
+        onValueChange = { name = it },
+        label = { Text("Name") },
+        modifier = Modifier.testTag("nameTextField"))*/
+        TextFieldWithErrorState(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Name") },
-            modifier = Modifier.testTag("nameTextField"))
+            label = "Name",
+            validation = { input -> if (input.isBlank()) "Name cannot be empty" else null },
+            externalError = nameErrorState.value,
+            modifier = Modifier.testTag("nameTextField"),
+            errorTestTag = "nameError")
 
         Spacer(modifier = Modifier.padding(8.dp))
-        OutlinedTextField(
+        TextFieldWithErrorState(
             value = surname,
             onValueChange = { surname = it },
-            label = { Text("Surname") },
-            modifier = Modifier.testTag("surnameTextField"))
+            label = "Surname",
+            validation = { input -> if (input.isBlank()) "Surname cannot be empty" else null },
+            externalError = surnameErrorState.value,
+            modifier = Modifier.testTag("surnameTextField"),
+            errorTestTag = "surnameError")
         Spacer(modifier = Modifier.padding(8.dp))
 
         var newInterest by remember { mutableStateOf("") }
@@ -125,25 +139,30 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
         Spacer(modifier = Modifier.padding(8.dp))
         Button(
             onClick = {
-              val userProfile =
-                  User(
-                      id = uid,
-                      name = name,
-                      surname = surname,
-                      interests = newListInterests,
-                      activities = emptyList(),
-                      photo = photo,
-                      likedActivities = emptyList())
-              viewModel.createUserProfile(
-                  userProfile = userProfile,
-                  onSuccess = {
-                    Log.d("ProfileCreation", "Profile created successfully")
-                    viewModel.fetchUserData(uid)
-                    navigationActions.navigateTo(Screen.OVERVIEW)
-                  },
-                  onError = { error ->
-                    errorMessage = error.message // Display error message if profile creation fails,
-                  })
+              // Set errors if fields are empty
+              nameErrorState.value = if (name.isBlank()) "Name cannot be empty" else null
+              surnameErrorState.value = if (surname.isBlank()) "Surname cannot be empty" else null
+
+              // Proceed only if there are no errors
+              if (nameErrorState.value == null && surnameErrorState.value == null) {
+                val userProfile =
+                    User(
+                        id = uid,
+                        name = name,
+                        surname = surname,
+                        interests = interests,
+                        activities = emptyList(),
+                        photo = photo,
+                        likedActivities = emptyList())
+                viewModel.createUserProfile(
+                    userProfile = userProfile,
+                    onSuccess = {
+                      Log.d("ProfileCreation", "Profile created successfully")
+                      viewModel.fetchUserData(uid)
+                      navigationActions.navigateTo(Screen.OVERVIEW)
+                    },
+                    onError = { error -> errorMessage = error.message })
+              }
             },
             modifier = Modifier.testTag("createProfileButton")) {
               Text("Create Profile")
