@@ -1,5 +1,6 @@
 package com.android.sample.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -7,6 +8,11 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -14,6 +20,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
+import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_TOP
 
 @Composable
 fun PasswordTextField(
@@ -54,5 +62,43 @@ fun EmailTextField(
       modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"))
   emailError?.let {
     Text(text = it, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 16.dp))
+  }
+}
+
+@Composable
+fun TextFieldWithErrorState(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    validation: (String) -> String?,
+    externalError: String? = null,
+    errorTestTag: String
+) {
+  var internalError by remember { mutableStateOf<String?>(null) }
+
+  // Show external error if present, otherwise use internal error
+  val error = externalError ?: internalError
+
+  Column() {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { newValue ->
+          onValueChange(newValue)
+          internalError = validation(newValue)
+        },
+        label = { Text(label) },
+        isError = error != null,
+        modifier = modifier)
+    error?.let {
+      Text(
+          text = it,
+          color = Color.Red,
+          fontSize = 12.sp,
+          modifier =
+              Modifier.align(Alignment.Start)
+                  .padding(start = ERROR_TEXTFIELD_PADDING_START, top = ERROR_TEXTFIELD_PADDING_TOP)
+                  .testTag(errorTestTag))
+    }
   }
 }
