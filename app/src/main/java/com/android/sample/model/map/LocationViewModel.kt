@@ -32,7 +32,6 @@ constructor(
           query,
           onSuccess = { locations ->
             locationSuggestions_.value = locations.distinct() // Filter out repetitive updates
-            println("Updated location suggestions: ${locationSuggestions_.value}") // Debugging line
           },
           onFailure = { throwable ->
             locationSuggestions_.value = emptyList()
@@ -46,7 +45,6 @@ constructor(
           })
     } else {
       locationSuggestions_.value = emptyList()
-      println("Query is empty, cleared suggestions.") // Debugging line
     }
   }
 
