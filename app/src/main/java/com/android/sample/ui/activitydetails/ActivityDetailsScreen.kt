@@ -61,7 +61,6 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.ui.ProfileImage
-import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -317,7 +316,13 @@ fun ActivityDetailsScreen(
                                     placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
                                     participants =
                                         activity.participants +
-                                            SimpleUser(profile.name, profile.surname, 0))
+                                            User(
+                                                name = profile.name,
+                                                surname = profile.surname,
+                                                id = profile.id,
+                                                photo = profile.photo,
+                                                interests = profile.interests,
+                                                activities = profile.activities))
                             listActivityViewModel.updateActivity(theActivity)
                             profileViewModel.addActivity(profile.id, theActivity.uid)
                             Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()

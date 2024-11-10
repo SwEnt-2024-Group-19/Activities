@@ -92,7 +92,7 @@ fun EditActivityScreen(
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
-  var attendees by remember { mutableStateOf(activity?.participants ?: listOf()) }
+  var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration) }
   var expanded by remember { mutableStateOf(false) }
@@ -362,11 +362,6 @@ fun EditActivityScreen(
                         Text(
                             text = "${attendees[index].name} ${attendees[index].surname}",
                             modifier = Modifier.testTag("attendeeName${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
-                        Text(
-                            text = "Age: ${attendees[index].age}",
-                            modifier = Modifier.testTag("attendeeAge${index}"),
                             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                         )
                       }
