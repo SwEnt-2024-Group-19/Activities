@@ -50,23 +50,24 @@ class OverviewScreenTest {
           type = ActivityType.PRO,
           placesLeft = 8,
           maxPlaces = 15,
-          participants = listOf(
-            User(
-              id = "1",
-              name = "Amine",
-              surname = "A",
-              interests = listOf("Cycling"),
-              activities = listOf(),
-              photo = "",
-              likedActivities = listOf("1")),
-            User(
-              id = "2",
-              name = "John",
-              surname = "Doe",
-              interests = listOf("Reading"),
-              activities = listOf(),
-              photo = "",
-              likedActivities = listOf("1"))),
+          participants =
+              listOf(
+                  User(
+                      id = "1",
+                      name = "Amine",
+                      surname = "A",
+                      interests = listOf("Cycling"),
+                      activities = listOf(),
+                      photo = "",
+                      likedActivities = listOf("1")),
+                  User(
+                      id = "2",
+                      name = "John",
+                      surname = "Doe",
+                      interests = listOf("Reading"),
+                      activities = listOf(),
+                      photo = "",
+                      likedActivities = listOf("1"))),
           duration = "2 hours",
           startTime = "10:00")
 

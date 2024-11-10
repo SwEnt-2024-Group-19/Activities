@@ -30,7 +30,16 @@ class AddUserDialogTest {
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(userAdded == User(id = "", name = "John", surname = "Doe", interests = listOf(), activities = listOf(), photo = null, likedActivities = listOf()))
+    assert(
+        userAdded ==
+            User(
+                id = "",
+                name = "John",
+                surname = "Doe",
+                interests = listOf(),
+                activities = listOf(),
+                photo = null,
+                likedActivities = listOf()))
   }
 
   @Test
@@ -50,7 +59,16 @@ class AddUserDialogTest {
 
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(userAdded == User(id = "", name = "", surname = "", interests = listOf(), activities = listOf(), photo = null, likedActivities = listOf()))
+    assert(
+        userAdded ==
+            User(
+                id = "",
+                name = "",
+                surname = "",
+                interests = listOf(),
+                activities = listOf(),
+                photo = null,
+                likedActivities = listOf()))
   }
 
   @Test
@@ -62,6 +80,15 @@ class AddUserDialogTest {
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(userAdded == User(id = "", name = "John", surname = "Doe", interests = listOf(), activities = listOf(), photo = null, likedActivities = listOf()))
+    assert(
+        userAdded ==
+            User(
+                id = "",
+                name = "John",
+                surname = "Doe",
+                interests = listOf(),
+                activities = listOf(),
+                photo = null,
+                likedActivities = listOf()))
   }
 }
