@@ -215,14 +215,11 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("addUserDialog").assertExists()
     composeTestRule.onNodeWithTag("nameTextFieldUser").assertIsDisplayed()
     composeTestRule.onNodeWithTag("surnameTextFieldUser").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("ageTextFieldUser").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addUserButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
-    composeTestRule.onNodeWithTag("ageTextFieldUser").performTextInput("25")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     // composeTestRule.onNodeWithTag("attendeeRow0").assertIsDisplayed()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
-    composeTestRule.onNodeWithTag("attendeeAge0").assertTextEquals("Age: 25")
   }
 }

@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import com.android.sample.model.profile.User
 import org.junit.Rule
 import org.junit.Test
 
@@ -17,21 +18,19 @@ class AddUserDialogTest {
 
     composeTestRule.onNodeWithTag("nameTextFieldUser").assertExists()
     composeTestRule.onNodeWithTag("surnameTextFieldUser").assertExists()
-    composeTestRule.onNodeWithTag("ageTextFieldUser").assertExists()
     composeTestRule.onNodeWithTag("addUserButton").assertExists()
   }
 
   @Test
   fun addUserDialogAddsUserOnButtonClick() {
-    var userAdded: SimpleUser? = null
+    var userAdded: User? = null
     composeTestRule.setContent { AddUserDialog(onDismiss = {}, onAddUser = { userAdded = it }) }
 
     composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
-    composeTestRule.onNodeWithTag("ageTextFieldUser").performTextInput("30")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(userAdded == SimpleUser("John", "Doe", 30))
+    assert(userAdded == User(id = "", name = "John", surname = "Doe", interests = listOf(), activities = listOf(), photo = null, likedActivities = listOf()))
   }
 
   @Test
@@ -46,24 +45,23 @@ class AddUserDialogTest {
 
   @Test
   fun addUserDialogHandlesEmptyFields() {
-    var userAdded: SimpleUser? = null
+    var userAdded: User? = null
     composeTestRule.setContent { AddUserDialog(onDismiss = {}, onAddUser = { userAdded = it }) }
 
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(userAdded == SimpleUser("", "", 0))
+    assert(userAdded == User(id = "", name = "", surname = "", interests = listOf(), activities = listOf(), photo = null, likedActivities = listOf()))
   }
 
   @Test
   fun addUserDialogHandlesInvalidAge() {
-    var userAdded: SimpleUser? = null
+    var userAdded: User? = null
     composeTestRule.setContent { AddUserDialog(onDismiss = {}, onAddUser = { userAdded = it }) }
 
     composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
-    composeTestRule.onNodeWithTag("ageTextFieldUser").performTextInput("invalid")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(userAdded == SimpleUser("John", "Doe", 0))
+    assert(userAdded == User(id = "", name = "John", surname = "Doe", interests = listOf(), activities = listOf(), photo = null, likedActivities = listOf()))
   }
 }
