@@ -29,6 +29,7 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         fetchUserData(currentUser.uid)
       } else {
         Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
+        clearUserData()
       }
     }
   }
@@ -38,6 +39,10 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         userId,
         onSuccess = { userState_.value = it },
         onFailure = { Log.e("error", " not fetching") })
+  }
+
+  fun clearUserData() {
+    userState_.value = null
   }
 
   fun createUserProfile(userProfile: User, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
