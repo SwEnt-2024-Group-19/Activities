@@ -1,6 +1,5 @@
 package com.android.sample.ui.profile
 
-
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
@@ -27,8 +26,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-
-
 
 class ProfileScreenTest {
 
@@ -165,6 +162,3 @@ class ProfileScreenTest {
     verify(navigationActions).navigateTo(Screen.EDIT_ACTIVITY)
   }
 }
-
-
-
