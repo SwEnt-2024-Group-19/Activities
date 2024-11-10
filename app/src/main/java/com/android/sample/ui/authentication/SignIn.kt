@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.ui.components.EmailTextField
-import com.android.sample.ui.components.PasswordTextField
+import com.android.sample.ui.components.TextFieldWithErrorState
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -42,7 +42,6 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
   val passwordState = remember { mutableStateOf("") }
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
   val token = stringResource(R.string.default_web_client_id)
-  val isPasswordVisible = remember { mutableStateOf(false) }
   val onAuthSuccess = { Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show() }
 
   val onAuthError = { errorMessage: String ->
@@ -74,43 +73,32 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                   emailError = null)
               Spacer(modifier = Modifier.height(16.dp))
 
-              // Password Input
-              PasswordTextField(
-                  password = passwordState.value,
-                  onPasswordChange = { passwordState.value = it },
-                  isPasswordVisible = isPasswordVisible.value,
-                  onPasswordVisibilityChange = {
-                    isPasswordVisible.value = !isPasswordVisible.value
+              TextFieldWithErrorState(
+                  value = passwordState.value,
+                  onValueChange = { passwordState.value = it },
+                  label = "Password",
+                  modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"),
+                  validation = { input ->
+                    if (input.isBlank()) "Password cannot be empty" else null
                   },
-              )
-
-              // Password Error
-              passwordErrorState.value?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    fontSize = 12.sp,
-                    modifier =
-                        Modifier.align(Alignment.Start)
-                            .padding(start = 40.dp)
-                            .testTag("PasswordErrorText"))
-              }
+                  externalError = passwordErrorState.value,
+                  errorTestTag = "PasswordErrorText")
 
               Spacer(modifier = Modifier.height(16.dp))
 
               // Sign-In Button
               Button(
                   onClick = {
-                    when {
-                      passwordState.value.isEmpty() ->
-                          passwordErrorState.value = "Password cannot be empty"
-                      else ->
-                          viewModel.signInWithEmailAndPassword(
-                              emailState.value,
-                              passwordState.value,
-                              onAuthSuccess,
-                              onAuthError,
-                              navigationActions)
+                    if (passwordState.value.isEmpty()) {
+                      passwordErrorState.value = "Password cannot be empty" // Set external error
+                    } else {
+                      passwordErrorState.value = null // Clear external error if password is valid
+                      viewModel.signInWithEmailAndPassword(
+                          emailState.value,
+                          passwordState.value,
+                          onAuthSuccess,
+                          onAuthError,
+                          navigationActions)
                     }
                     Log.d("SignInScreen", "Sign in with email/password")
                   },
