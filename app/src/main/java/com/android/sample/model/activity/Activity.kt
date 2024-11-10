@@ -1,7 +1,7 @@
 package com.android.sample.model.activity
 
 import com.android.sample.model.map.Location
-import com.android.sample.ui.dialogs.SimpleUser
+import com.android.sample.model.profile.User
 import com.google.firebase.Timestamp
 
 data class Activity(
@@ -20,7 +20,7 @@ data class Activity(
     var maxPlaces: Long,
     var status: ActivityStatus,
     val type: ActivityType,
-    var participants: List<SimpleUser>,
+    var participants: List<User>,
     var comments: List<Comment> = emptyList()
 )
 

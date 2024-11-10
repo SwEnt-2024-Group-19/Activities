@@ -24,7 +24,6 @@ import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.activitydetails.LikeButton
-import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -84,7 +83,24 @@ class ActivityDetailsScreenAndroidTest {
             status = ActivityStatus.ACTIVE,
             location = Location(46.519962, 6.633597, "EPFL"),
             images = listOf("1"),
-            participants = listOf(SimpleUser("Amine", "A", 19), SimpleUser("Creator", "John", 20)),
+            participants =
+                listOf(
+                    User(
+                        id = "1",
+                        name = "Amine",
+                        surname = "A",
+                        interests = listOf("Cycling"),
+                        activities = listOf(),
+                        photo = "",
+                        likedActivities = listOf("1")),
+                    User(
+                        id = "2",
+                        name = "John",
+                        surname = "Doe",
+                        interests = listOf("Reading"),
+                        activities = listOf(),
+                        photo = "",
+                        likedActivities = listOf("1"))),
             duration = "02:00",
             startTime = "10:00",
             type = ActivityType.INDIVIDUAL,
