@@ -28,7 +28,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
-import com.android.sample.ui.components.TextFieldWithErrorState
+import com.android.sample.ui.components.EmailTextField
+import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
@@ -70,29 +71,23 @@ fun SignUpScreen(navigationActions: NavigationActions) {
           }
           item {
             // Email field
-            TextFieldWithErrorState(
-                value = emailState.value,
-                onValueChange = { emailState.value = it },
-                label = "Email",
-                modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"),
-                validation = { input ->
-                  if (!isValidEmail(input)) "Please enter a valid email address" else null
+            EmailTextField(
+                email = emailState.value,
+                onEmailChange = {
+                  emailState.value = it
+                  emailErrorState.value = if (it.isBlank()) "Email cannot be empty" else null
                 },
-                externalError = emailErrorState.value,
-                errorTestTag = "EmailErrorText",
-            )
+                emailError = emailErrorState.value)
             Spacer(modifier = Modifier.height(16.dp))
           }
           item {
             // Password field
-            TextFieldWithErrorState(
-                value = passwordState.value,
-                onValueChange = { passwordState.value = it },
-                label = "Password",
-                modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"),
-                validation = { input -> if (input.isBlank()) "Password cannot be empty" else null },
-                externalError = passwordErrorState.value,
-                errorTestTag = "PasswordErrorText",
+            PasswordTextField(
+                password = passwordState.value,
+                onPasswordChange = { passwordState.value = it },
+                isPasswordVisible = isPasswordVisible.value,
+                onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+                passwordError = passwordErrorState.value,
             )
             Spacer(modifier = Modifier.height(16.dp))
           }

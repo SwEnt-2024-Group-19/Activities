@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.ui.components.EmailTextField
-import com.android.sample.ui.components.TextFieldWithErrorState
+import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -43,8 +43,9 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
   val passwordState = remember { mutableStateOf("") }
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
   val token = stringResource(R.string.default_web_client_id)
+  val isPasswordVisible = remember { mutableStateOf(false) }
   val onAuthSuccess = { Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show() }
-
+  val emailErrorState = remember { mutableStateOf<String?>(null) }
   val onAuthError = { errorMessage: String ->
     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
   }
@@ -74,20 +75,23 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             // Email Input
             EmailTextField(
                 email = emailState.value,
-                onEmailChange = { emailState.value = it },
-                emailError = null)
+                onEmailChange = {
+                  emailState.value = it
+                  emailErrorState.value =
+                      if (!isValidEmail(it)) "Please enter a valid address: example@mail.xx "
+                      else null
+                },
+                emailError = emailErrorState.value)
             Spacer(modifier = Modifier.height(16.dp))
           }
 
           item {
-            TextFieldWithErrorState(
-                value = passwordState.value,
-                onValueChange = { passwordState.value = it },
-                label = "Password",
-                modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"),
-                validation = { input -> if (input.isBlank()) "Password cannot be empty" else null },
-                externalError = passwordErrorState.value,
-                errorTestTag = "PasswordErrorText")
+            PasswordTextField(
+                password = passwordState.value,
+                onPasswordChange = { passwordState.value = it },
+                isPasswordVisible = isPasswordVisible.value,
+                onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+                passwordError = passwordErrorState.value)
             Spacer(modifier = Modifier.height(16.dp))
           }
 
@@ -95,16 +99,22 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             // Sign-In Button
             Button(
                 onClick = {
-                  if (passwordState.value.isEmpty()) {
-                    passwordErrorState.value = "Password cannot be empty" // Set external error
-                  } else {
-                    passwordErrorState.value = null // Clear external error if password is valid
-                    viewModel.signInWithEmailAndPassword(
-                        emailState.value,
-                        passwordState.value,
-                        onAuthSuccess,
-                        onAuthError,
-                        navigationActions)
+                  when {
+                    !isValidEmail(emailState.value) -> {
+                      emailErrorState.value = "Please enter a valid address: example@mail.xx"
+                    }
+                    passwordState.value.isEmpty() -> {
+                      passwordErrorState.value = "Password cannot be empty" // Set external error
+                    }
+                    else -> {
+                      passwordErrorState.value = null // Clear external error if password is valid
+                      viewModel.signInWithEmailAndPassword(
+                          emailState.value,
+                          passwordState.value,
+                          onAuthSuccess,
+                          onAuthError,
+                          navigationActions)
+                    }
                   }
                   Log.d("SignInScreen", "Sign in with email/password")
                 },
