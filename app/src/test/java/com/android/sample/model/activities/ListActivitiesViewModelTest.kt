@@ -13,12 +13,15 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class ListActivitiesViewModelTest {
 
   private lateinit var activitiesRepository: ActivitiesRepository
@@ -38,10 +41,11 @@ class ListActivitiesViewModelTest {
           maxPlaces = 0,
           participants = listOf(),
           images = listOf(),
+          price = 0.0,
+          startTime = "09:30",
           duration = "00:30",
-          startTime = "09:00",
           type = ActivityType.PRO,
-          price = 0.0)
+      )
 
   @Before
   fun setUp() {
@@ -147,5 +151,49 @@ class ListActivitiesViewModelTest {
     listActivitiesViewModel.selectActivity(activity)
     val selected = listActivitiesViewModel.selectedActivity.first()
     assertThat(selected, `is`(activity))
+  }
+
+  @Test
+  fun getActivities_onSuccess() {
+    val activities = listOf(activity)
+    `when`(activitiesRepository.getActivities(any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(List<Activity>) -> Unit>(0)
+      onSuccess(activities)
+    }
+
+    runBlocking {
+      listActivitiesViewModel.getActivities()
+      val uiState = listActivitiesViewModel.uiState.first()
+      assertThat(uiState, `is`(ListActivitiesViewModel.ActivitiesUiState.Success(activities)))
+    }
+  }
+
+  @Test
+  fun getActivities_onFailure() {
+    val exception = Exception("Error")
+    `when`(activitiesRepository.getActivities(any(), any())).thenAnswer {
+      val onFailure = it.getArgument<(Exception) -> Unit>(1)
+      onFailure(exception)
+    }
+
+    runBlocking {
+      listActivitiesViewModel.getActivities()
+      val uiState = listActivitiesViewModel.uiState.first()
+      assertThat(uiState, `is`(ListActivitiesViewModel.ActivitiesUiState.Error(exception)))
+    }
+  }
+
+  @Test
+  fun activitiesUiState_Success() {
+    val activities = listOf(activity)
+    val successState = ListActivitiesViewModel.ActivitiesUiState.Success(activities)
+    assertThat(successState.activities, `is`(activities))
+  }
+
+  @Test
+  fun activitiesUiState_Error() {
+    val exception = Exception("Error")
+    val errorState = ListActivitiesViewModel.ActivitiesUiState.Error(exception)
+    assertThat(errorState.exception, `is`(exception))
   }
 }

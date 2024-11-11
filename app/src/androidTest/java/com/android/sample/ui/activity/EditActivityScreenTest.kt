@@ -12,18 +12,15 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepository
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.resources.dummydata.activity
+import com.android.sample.resources.dummydata.locationList
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
-import java.util.GregorianCalendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -42,29 +39,7 @@ class EditActivityScreenTest {
   private lateinit var mockLocationViewModel: LocationViewModel
   private lateinit var mockPermissionChecker: LocationPermissionChecker
 
-  private val location = Location(46.519962, 6.633597, "EPFL")
-  private val location2 = Location(46.5, 6.6, "Lausanne")
-  private val locationList = listOf(location, location2)
-
   @get:Rule val composeTestRule = createComposeRule()
-
-  private val activity =
-      Activity(
-          "1",
-          "First Activity",
-          "Do something",
-          creator = "John Doe",
-          date = Timestamp(GregorianCalendar(2024, 8, 5).time),
-          location = location,
-          status = ActivityStatus.ACTIVE,
-          participants = listOf(),
-          price = 10.0,
-          placesLeft = 10,
-          maxPlaces = 20,
-          images = listOf(),
-          type = ActivityType.PRO,
-          startTime = "09:30",
-          duration = "00:30")
 
   @Before
   fun setUp() {
@@ -219,7 +194,6 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
-    // composeTestRule.onNodeWithTag("attendeeRow0").assertIsDisplayed()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
   }
 }
