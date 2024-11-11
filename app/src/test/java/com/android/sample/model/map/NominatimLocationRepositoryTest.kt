@@ -1,40 +1,52 @@
 package com.android.sample.model.map
 
+import android.location.Location as AndroidLocation
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import java.io.IOException
-import okhttp3.Call
-import okhttp3.Callback
+import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Protocol
-import okhttp3.Request
-import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.doAnswer
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.whenever
 
 class NominatimLocationRepositoryTest {
 
   @Mock private lateinit var mockClient: OkHttpClient
+  @Mock private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
   @Mock private lateinit var mockCall: Call
+  @Mock private lateinit var mockLocationTask: Task<AndroidLocation>
 
   private lateinit var locationRepository: NominatimLocationRepository
 
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    locationRepository = NominatimLocationRepository(mockClient)
+    locationRepository = NominatimLocationRepository(mockClient, fusedLocationProviderClient)
+
+    // Ensure that addOnSuccessListener and addOnFailureListener return the same mockLocationTask
+    // instance
+    whenever(mockLocationTask.addOnSuccessListener(any<OnSuccessListener<AndroidLocation>>()))
+        .thenReturn(mockLocationTask)
+    whenever(mockLocationTask.addOnFailureListener(any<OnFailureListener>()))
+        .thenReturn(mockLocationTask)
+
+    // Mock the lastLocation task to return the mockLocationTask
+    whenever(fusedLocationProviderClient.lastLocation).thenReturn(mockLocationTask)
   }
 
   @Test
   fun `search should return locations on successful response`() {
-
     // Given
     val query = "Central Park"
     val mockResponseBody =
@@ -45,17 +57,15 @@ class NominatimLocationRepositoryTest {
         """
             .trimIndent()
     val mockResponse = createMockResponse(mockResponseBody, 200)
-    print("test123")
 
-    `when`(mockClient.newCall(any<Request>())).thenReturn(mockCall)
-    print("test125")
+    whenever(mockClient.newCall(any<Request>())).thenReturn(mockCall)
     doAnswer { invocation ->
-          (invocation.arguments[0] as Callback).onResponse(mockCall, mockResponse)
+          val callback = invocation.arguments[0] as Callback
+          callback.onResponse(mockCall, mockResponse)
           null
         }
         .`when`(mockCall)
         .enqueue(any())
-    print("test124")
 
     // When
     var result: List<Location>? = null
@@ -77,9 +87,10 @@ class NominatimLocationRepositoryTest {
     val query = "invalid query"
     val exception = IOException("Network error")
 
-    `when`(mockClient.newCall(any())).thenReturn(mockCall)
+    whenever(mockClient.newCall(any())).thenReturn(mockCall)
     doAnswer { invocation ->
-          (invocation.arguments[0] as Callback).onFailure(mockCall, exception)
+          val callback = invocation.arguments[0] as Callback
+          callback.onFailure(mockCall, exception)
           null
         }
         .`when`(mockCall)
@@ -100,11 +111,12 @@ class NominatimLocationRepositoryTest {
   fun `search should call onFailure for unsuccessful response`() {
     // Given
     val query = "invalid query"
-    val mockResponse = createMockResponse("Not Found", 404) // Simulating a 404 response
+    val mockResponse = createMockResponse("Not Found", 404)
 
-    `when`(mockClient.newCall(any())).thenReturn(mockCall)
+    whenever(mockClient.newCall(any())).thenReturn(mockCall)
     doAnswer { invocation ->
-          (invocation.arguments[0] as Callback).onResponse(mockCall, mockResponse)
+          val callback = invocation.arguments[0] as Callback
+          callback.onResponse(mockCall, mockResponse)
           null
         }
         .`when`(mockCall)
@@ -124,6 +136,35 @@ class NominatimLocationRepositoryTest {
     assertTrue(failureCalled)
   }
 
+  @Test
+  fun `getCurrentLocation should call onFailure when location retrieval fails`() {
+    // Given
+    val exception = Exception("Location error")
+    whenever(fusedLocationProviderClient.lastLocation).thenReturn(mockLocationTask)
+    doAnswer { invocation ->
+          val failureListener = invocation.getArgument<OnFailureListener>(0)
+          failureListener.onFailure(exception) // Simulate an error
+          null
+        }
+        .`when`(mockLocationTask)
+        .addOnFailureListener(any())
+
+    var failureCalled = false
+    var capturedException: Exception? = null
+
+    // When
+    locationRepository.getCurrentLocation(
+        onSuccess = { throw AssertionError("Success callback should not be called") },
+        onFailure = { ex ->
+          failureCalled = true
+          capturedException = ex
+        })
+
+    // Then
+    assertTrue(failureCalled)
+    assertEquals(exception, capturedException)
+  }
+
   private fun createMockResponse(body: String?, code: Int): Response {
     return Response.Builder()
         .code(code)
@@ -132,5 +173,9 @@ class NominatimLocationRepositoryTest {
         .request(Request.Builder().url("https://nominatim.openstreetmap.org").build())
         .body(body?.toResponseBody("application/json".toMediaTypeOrNull()))
         .build()
+  }
+
+  private fun AndroidLocation.toCustomLocation(): com.android.sample.model.map.Location {
+    return com.android.sample.model.map.Location(latitude, longitude, "Mocked Location")
   }
 }

@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.ui.ImagePicker
+import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,12 +80,8 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                   url = photo,
                   modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
-              OutlinedTextField(
-                  value = photo.toString(),
-                  onValueChange = { photo = it },
-                  label = { Text("Photo URL") },
-                  placeholder = { Text("Your photo URL") },
-                  modifier = Modifier.fillMaxWidth().testTag("inputProfilePhoto"))
+              ImagePicker(
+                  onImagePicked = { photo = it.toString() }, buttonText = "Modify Profile Picture")
 
               OutlinedTextField(
                   value = name,
@@ -147,7 +145,8 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                               surname = surname,
                               interests = newListInterests,
                               activities = profile.activities,
-                              photo = photo))
+                              photo = photo,
+                              likedActivities = profile.likedActivities))
                       navigationActions.goBack()
                     } catch (_: NumberFormatException) {}
                   },

@@ -142,14 +142,21 @@ sonar {
         property("sonar.projectName", "Android-Sample")
         property("sonar.organization", "gabrielfleischer")
         property("sonar.host.url", "https://sonarcloud.io")
-        // Comma-separated paths to the various directories containing the *.xml JUnit report files. Each path may be absolute or relative to the project base directory.
-        property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugunitTest/")
-        // Paths to xml files with Android Lint issues. If the main flavor is changed, this file will have to be changed too.
+
+        // Comma-separated paths to the various directories containing the *.xml JUnit report files.
+        property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/testDebugUnitTest/")
+
+        // Paths to xml files with Android Lint issues.
         property("sonar.androidLint.reportPaths", "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml")
+
         // Paths to JaCoCo XML coverage report files.
         property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
+        // Set Sonar to focus on line coverage as the primary metric.
+        property("sonar.coverage.mode", "line")
     }
 }
+
 
 // When a library is used both by robolectric and connected tests, use this function
 fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
@@ -192,7 +199,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     // MockK for mocking
-    testImplementation("io.mockk:mockk:1.13.2") // Or replace with Mockito if preferred:
+    testImplementation("io.mockk:mockk:1.13.2")
+    androidTestImplementation("io.mockk:mockk-android:1.13.2")
+    // Or replace with Mockito if preferred:
     // testImplementation("org.mockito:mockito-core:5.5.0")
 
 
@@ -214,6 +223,7 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
     implementation(libs.play.services.auth)
+    implementation(libs.play.services.location)
 
     // Firebase
     implementation(libs.firebase.database.ktx)
@@ -239,7 +249,7 @@ dependencies {
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
-    testImplementation("io.mockk:mockk:1.12.0")
+    //testImplementation("io.mockk:mockk:1.12.0")
     testImplementation(libs.json)
 
     // Test UI
@@ -306,7 +316,6 @@ dependencies {
     kaptAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(libs.hilt.android.testing)
     implementation(libs.hilt.navigation.compose)
-
 
 }
 

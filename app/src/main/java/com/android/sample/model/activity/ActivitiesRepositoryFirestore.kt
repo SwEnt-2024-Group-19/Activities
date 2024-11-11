@@ -1,12 +1,15 @@
 package com.android.sample.model.activity
 
 import android.util.Log
-import com.android.sample.ui.dialogs.SimpleUser
+import com.android.sample.model.map.Location
+import com.android.sample.model.profile.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import javax.inject.Inject
 
-open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : ActivitiesRepository {
+open class ActivitiesRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
+    ActivitiesRepository {
 
   private val activitiesCollectionPath = "activities"
   private val TAG = "ActivitiesRepositoryFirestore"
@@ -37,10 +40,16 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                   val images = data["images"] as? List<String> ?: listOf()
                   val participants =
                       (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
-                        SimpleUser(
+                        User(
                             name = participantData["name"] as? String ?: "No Name",
                             surname = participantData["surname"] as? String ?: "No Surname",
-                            age = participantData["age"] as? Int ?: 0)
+                            id = participantData["id"] as? String ?: "No ID",
+                            interests = (participantData["interests"] as? List<String>) ?: listOf(),
+                            activities =
+                                (participantData["activities"] as? List<String>) ?: listOf(),
+                            photo = participantData["photo"] as? String,
+                            likedActivities =
+                                (participantData["likedActivities"] as? List<String>) ?: listOf())
                       } ?: listOf()
                   val activityType =
                       data["type"]?.let {
@@ -71,6 +80,16 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                                   )
                                 } ?: emptyList())
                       } ?: emptyList()
+
+                  val locationData = data["location"] as? Map<String, Any>
+                  val location =
+                      locationData?.let {
+                        Location(
+                            latitude = it["latitude"] as? Double ?: 0.0,
+                            longitude = it["longitude"] as? Double ?: 0.0,
+                            name = it["name"] as? String ?: "No Location")
+                      } ?: Location(0.0, 0.0, "No Location")
+
                   Activity(
                       uid = document.id,
                       title = data["title"] as? String ?: "No Title",
@@ -79,7 +98,7 @@ open class ActivitiesRepositoryFirestore(private val db: FirebaseFirestore) : Ac
                       startTime = data["startTime"] as? String ?: "HH:mm",
                       duration = data["duration"] as? String ?: "HH:mm",
                       price = data["price"] as? Double ?: 0.0,
-                      location = data["location"] as? String ?: "Unknown Location",
+                      location = location, // Default value
                       creator = data["creator"] as? String ?: "Anonymous",
                       images = images,
                       placesLeft = data["placesLeft"] as? Long ?: 0,

@@ -1,22 +1,12 @@
 package com.android.sample.ui.activity
 
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Matrix
-import android.graphics.drawable.Icon
 import android.icu.util.GregorianCalendar
-import android.util.Base64
 import android.widget.Toast
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,19 +22,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Cameraswitch
-import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.PersonRemove
-import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -52,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -67,17 +51,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.camera.bitmapToBase64
+import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
-import com.android.sample.ui.camera.CameraPreview
+import com.android.sample.model.profile.User
+import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
-import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -85,25 +72,22 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import java.io.ByteArrayOutputStream
-
-private const val REQUEST_IMAGE_CAPTURE = 100
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    locationViewModel: LocationViewModel
 ) {
-
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-  var location by remember { mutableStateOf("") }
+
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
@@ -116,12 +100,19 @@ fun CreateActivityScreen(
   var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
 
+  val locationQuery by locationViewModel.query.collectAsState()
+  var showDropdown by remember { mutableStateOf(false) }
+  //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+
+  var selectedLocation by remember { mutableStateOf<Location?>(null) }
   // Add scroll
   val scrollState = rememberScrollState()
 
   // Attendees
-  val attendees_: List<SimpleUser> = listOf<SimpleUser>()
-  var attendees: List<SimpleUser> by remember { mutableStateOf(attendees_) }
+  val attendees_: List<User> = listOf<User>()
+  var attendees: List<User> by remember { mutableStateOf(attendees_) }
   val items_: List<Bitmap> = listOf<Bitmap>()
   var items: List<Bitmap> by remember { mutableStateOf(items_) }
 
@@ -134,38 +125,12 @@ fun CreateActivityScreen(
       },
       content = { paddingValues ->
         if (isCamOpen) {
-          Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            CameraPreview(controller, Modifier.fillMaxSize())
-            IconButton(
-                onClick = { isCamOpen = false }, modifier = Modifier.align(Alignment.TopEnd)) {
-                  Icon(Icons.Default.ArrowBack, contentDescription = "Close camera")
-                }
-            IconButton(
-                onClick = {
-                  takePhoto(
-                      controller,
-                      { bitmap ->
-                        items += bitmap
-                        isCamOpen = false
-                      },
-                      context)
-                },
-                modifier = Modifier.align(Alignment.BottomCenter)) {
-                  Icon(Icons.Default.PhotoCamera, contentDescription = "Take picture")
-                }
-            IconButton(
-                onClick = {
-                  controller.cameraSelector =
-                      if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                        CameraSelector.DEFAULT_FRONT_CAMERA
-                      } else {
-                        CameraSelector.DEFAULT_BACK_CAMERA
-                      }
-                },
-                modifier = Modifier.align(Alignment.BottomEnd)) {
-                  Icon(Icons.Default.Cameraswitch, contentDescription = "Switch camera")
-                }
-          }
+          CameraScreen(
+              paddingValues = paddingValues,
+              controller = controller,
+              context = context,
+              isCamOpen = { isCamOpen = false },
+              addElem = { bitmap -> items = listOf(bitmap) })
         } else {
           Column(
               modifier =
@@ -193,6 +158,7 @@ fun CreateActivityScreen(
                 label = { Text("Title") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -203,8 +169,7 @@ fun CreateActivityScreen(
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_activity_description))
-                },
-            )
+                })
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
@@ -215,6 +180,7 @@ fun CreateActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_date_activity_withFormat))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -224,6 +190,7 @@ fun CreateActivityScreen(
                 label = { Text("Time") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -233,6 +200,7 @@ fun CreateActivityScreen(
                 label = { Text("Duration") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -243,6 +211,7 @@ fun CreateActivityScreen(
                 label = { Text("Price") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -254,17 +223,61 @@ fun CreateActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_placesMax_activity))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text("Location") },
-                modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputLocationCreate"),
-                placeholder = {
-                  Text(text = stringResource(id = R.string.request_location_activity))
-                },
-            )
+
+            // Location Input with dropdown using ExposedDropdownMenuBox
+            ExposedDropdownMenuBox(
+                expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
+            ) {
+              OutlinedTextField(
+                  value = locationQuery,
+                  onValueChange = {
+                    locationViewModel.setQuery(it)
+                    showDropdown = true // Show dropdown when user starts typing
+                  },
+                  label = { Text("Location") },
+                  placeholder = { Text("Enter an Address or Location") },
+                  modifier =
+                      Modifier.menuAnchor() // Anchor the dropdown to this text field
+                          .padding(8.dp)
+                          .fillMaxWidth()
+                          .testTag("inputLocationCreate"),
+                  singleLine = true)
+
+              // Dropdown menu for location suggestions
+              ExposedDropdownMenu(
+                  expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                  onDismissRequest = { showDropdown = false }) {
+                    locationSuggestions.filterNotNull().take(3).forEach { location ->
+                      DropdownMenuItem(
+                          text = {
+                            Text(
+                                text =
+                                    location.name.take(30) +
+                                        if (location.name.length > 30) "..."
+                                        else "", // Limit name length
+                                maxLines = 1 // Ensure name doesn't overflow
+                                )
+                          },
+                          onClick = {
+                            locationViewModel.setQuery(location.name)
+                            selectedLocation = location
+                            showDropdown = false // Close dropdown on selection
+                          },
+                          modifier = Modifier.padding(8.dp))
+                    }
+
+                    if (locationSuggestions.size > 3) {
+                      DropdownMenuItem(
+                          text = { Text("More...") },
+                          onClick = {},
+                          modifier = Modifier.padding(8.dp))
+                    }
+                  }
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
             ExposedDropdownMenuBox(
@@ -340,11 +353,6 @@ fun CreateActivityScreen(
                             modifier = Modifier.testTag("attendeeName${index}"),
                             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                         )
-                        Text(
-                            text = "Age: ${attendees[index].age}",
-                            modifier = Modifier.testTag("attendeeAge${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
                       }
                       IconButton(
                           onClick = { attendees = attendees.filter { it != attendees[index] } },
@@ -387,11 +395,7 @@ fun CreateActivityScreen(
                   val calendar = GregorianCalendar()
                   val parts = dueDate.split("/")
                   if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
-                    attendees +=
-                        SimpleUser(
-                            profileViewModel.userState.value?.name ?: "",
-                            profileViewModel.userState.value?.surname ?: "",
-                            0)
+                    attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(
                           parts[2].toInt(),
@@ -413,7 +417,7 @@ fun CreateActivityScreen(
                               maxPlaces = placesMax.toLongOrNull() ?: 0,
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
-                              location = location,
+                              location = selectedLocation,
                               images = items.map { bitmapToBase64(it) },
                               participants = attendees,
                               type = types.find { it.name == selectedOption } ?: types[0],
@@ -458,100 +462,4 @@ fun CreateActivityScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.ADD_ACTIVITY)
       })
-}
-
-@Composable
-fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitmap) -> Unit) {
-  Row(
-      modifier = Modifier.fillMaxWidth().height(135.dp).padding(8.dp),
-      verticalAlignment = Alignment.CenterVertically) {
-        LazyRow(
-            modifier = Modifier.width(340.dp).height(135.dp),
-        ) {
-          items(itemsList.size) { index ->
-            Card(
-                modifier =
-                    Modifier.padding(8.dp)
-                        .background(Color(0xFFFFFFFF))
-                        .testTag("carouselItem${index}"),
-            ) {
-              Image(
-                  bitmap = itemsList[index].asImageBitmap(),
-                  contentDescription = "Image",
-                  modifier = Modifier.size(100.dp))
-              IconButton(
-                  onClick = { deleteImage(itemsList[index]) },
-                  modifier =
-                      Modifier.width(40.dp)
-                          .height(40.dp)
-                          .align(Alignment.End)
-                          .testTag("removeImageButton"),
-              ) {
-                Icon(
-                    Icons.Filled.DeleteOutline,
-                    contentDescription = "remove image",
-                )
-              }
-            }
-          }
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.padding(16.dp).fillMaxHeight(), // Use size modifier for simplicity
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.End // Center the icon horizontally
-            ) {
-              FloatingActionButton(
-                  content = {
-                    Icon(
-                        imageVector = Icons.Outlined.AddCircle,
-                        contentDescription = "Add a new image")
-                  },
-                  onClick = openDialog,
-                  modifier = Modifier.size(50.dp).background(Color(0xFFFFFFFF)),
-              )
-              Spacer(modifier = Modifier.height(4.dp))
-              Text(
-                  text = "Add Image",
-                  color = Color(0xFF000000),
-                  style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 8.sp),
-              )
-            }
-      }
-}
-
-fun takePhoto(
-    controller: LifecycleCameraController,
-    onPhotoTaken: (Bitmap) -> Unit,
-    applicationContext: Context
-) {
-  controller.takePicture(
-      ContextCompat.getMainExecutor(applicationContext),
-      object : ImageCapture.OnImageCapturedCallback() {
-        override fun onCaptureSuccess(image: ImageProxy) {
-          super.onCaptureSuccess(image)
-
-          val matrix = Matrix().apply { postRotate(image.imageInfo.rotationDegrees.toFloat()) }
-          val rotatedBitmap =
-              Bitmap.createBitmap(image.toBitmap(), 0, 0, image.width, image.height, matrix, true)
-
-          onPhotoTaken(rotatedBitmap)
-        }
-
-        override fun onError(exception: ImageCaptureException) {
-          super.onError(exception)
-          Toast.makeText(
-                  applicationContext,
-                  "Error taking picture: ${exception.message}",
-                  Toast.LENGTH_SHORT)
-              .show()
-        }
-      })
-}
-
-fun bitmapToBase64(bitmap: Bitmap): String {
-  val byteArrayOutputStream = ByteArrayOutputStream()
-  bitmap.compress(Bitmap.CompressFormat.PNG, 70, byteArrayOutputStream)
-  val byteArray = byteArrayOutputStream.toByteArray()
-  return Base64.encodeToString(byteArray, Base64.DEFAULT)
 }

@@ -29,6 +29,7 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         fetchUserData(currentUser.uid)
       } else {
         Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
+        clearUserData()
       }
     }
   }
@@ -40,6 +41,10 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = { Log.e("error", " not fetching") })
   }
 
+  fun clearUserData() {
+    userState_.value = null
+  }
+
   fun createUserProfile(userProfile: User, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
     repository.addProfileToDatabase(
         userProfile = userProfile,
@@ -49,6 +54,22 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
 
   fun addActivity(userId: String, activityId: String) {
     repository.addActivity(
+        userId = userId,
+        activityId = activityId,
+        onSuccess = { fetchUserData(userId) },
+        onFailure = {})
+  }
+
+  fun addLikedActivity(userId: String, activityId: String) {
+    repository.addLikedActivity(
+        userId = userId,
+        activityId = activityId,
+        onSuccess = { fetchUserData(userId) },
+        onFailure = {})
+  }
+
+  fun removeLikedActivity(userId: String, activityId: String) {
+    repository.removeLikedActivity(
         userId = userId,
         activityId = activityId,
         onSuccess = { fetchUserData(userId) },

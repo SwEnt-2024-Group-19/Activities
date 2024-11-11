@@ -1,8 +1,10 @@
 package com.android.sample.ui.activitydetails
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -23,6 +26,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -42,15 +47,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.sample.R
+import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
+import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -62,8 +72,7 @@ import kotlin.math.min
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
-    listActivityViewModel: ListActivitiesViewModel =
-        viewModel(factory = ListActivitiesViewModel.Factory),
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel
 ) {
@@ -159,6 +168,7 @@ fun ActivityDetailsScreen(
                         text = "Activity Image",
                         color = Color.White,
                         modifier = Modifier.align(Alignment.Center))
+                    LikeButton(profile, activity, profileViewModel)
                   }
 
               // Title
@@ -211,7 +221,7 @@ fun ActivityDetailsScreen(
                       Icon(Icons.Default.LocationOn, contentDescription = "Location")
                       Spacer(modifier = Modifier.width(4.dp))
                       Text(
-                          text = location ?: "not defined yet",
+                          text = location?.name ?: "No location",
                           modifier = Modifier.testTag("locationText"))
                     }
                   }
@@ -246,22 +256,36 @@ fun ActivityDetailsScreen(
                   modifier = Modifier.padding(bottom = 8.dp))
 
               // List of participants
-              Column {
+              Column(modifier = Modifier.testTag("participants")) {
                 activity?.participants?.forEach { participant ->
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
-                      modifier = Modifier.padding(vertical = 4.dp)) {
-                        // Placeholder for participant picture
-                        Box(
-                            modifier =
-                                Modifier.size(40.dp)
-                                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                    .padding(8.dp)) {
-                              Text(
-                                  text = "P", // Placeholder for profile picture
-                                  color = Color.White,
-                                  modifier = Modifier.align(Alignment.Center))
+                      modifier =
+                          Modifier.padding(vertical = 4.dp).testTag(participant.name).clickable {
+                            if (participant.name != profile?.name) {
+                              navigationActions.navigateTo(Screen.PROFILE)
                             }
+                          }) {
+                        // Placeholder for participant picture
+                        if (participant.name != profile?.name) {
+                          Box(
+                              modifier =
+                                  Modifier.size(40.dp)
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                                      .padding(8.dp)) {
+                                Image(
+                                    painter =
+                                        painterResource(id = R.drawable.default_profile_image),
+                                    contentDescription = "Participant Image",
+                                    modifier =
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
+                              }
+                        } else {
+                          // Profile Picture
+                          ProfileImage(
+                              url = profile.photo,
+                              modifier = Modifier.size(40.dp).clip(CircleShape))
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
 
                         // Participant name
@@ -289,7 +313,16 @@ fun ActivityDetailsScreen(
                           } else {
                             val theActivity =
                                 activity.copy(
-                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0))
+                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
+                                    participants =
+                                        activity.participants +
+                                            User(
+                                                name = profile.name,
+                                                surname = profile.surname,
+                                                id = profile.id,
+                                                photo = profile.photo,
+                                                interests = profile.interests,
+                                                activities = profile.activities))
                             listActivityViewModel.updateActivity(theActivity)
                             profileViewModel.addActivity(profile.id, theActivity.uid)
                             Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
@@ -381,7 +414,14 @@ fun CommentSection(
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
     // Display all comments
-    comments.forEach { comment -> CommentItem(profileId, comment, onReplyComment, onDeleteComment) }
+    comments.forEach { comment ->
+      CommentItem(
+          profileId,
+          comment,
+          onReplyComment,
+          onDeleteComment,
+          allowReplies = true) // Set allowReplies to true for top-level comments
+    }
 
     Spacer(modifier = Modifier.height(8.dp))
 
@@ -415,7 +455,8 @@ fun CommentItem(
     profileId: String,
     comment: Comment,
     onReplyComment: (String, Comment) -> Unit,
-    onDeleteComment: (Comment) -> Unit
+    onDeleteComment: (Comment) -> Unit,
+    allowReplies: Boolean = true
 ) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
@@ -440,41 +481,75 @@ fun CommentItem(
               }
         }
 
-        // Toggle button to show/hide the reply input field
-        Button(
-            onClick = { showReplyField = !showReplyField },
-            modifier =
-                Modifier.padding(top = 4.dp)
-                    .testTag("${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
-              Text(if (showReplyField) "Cancel" else "Reply")
-            }
+        if (allowReplies) {
+          // Toggle button to show/hide the reply input field
+          Button(
+              onClick = { showReplyField = !showReplyField },
+              modifier =
+                  Modifier.padding(top = 4.dp)
+                      .testTag(
+                          "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
+                Text(if (showReplyField) "Cancel" else "Reply")
+              }
+        }
+
+        // Conditionally show the reply input field if the user is logged in
+        if (showReplyField) {
+          OutlinedTextField(
+              value = replyText,
+              onValueChange = { replyText = it },
+              label = { Text("Reply") },
+              modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
+
+          Button(
+              onClick = {
+                onReplyComment(replyText, comment)
+                replyText = ""
+                showReplyField = false
+              },
+              modifier = Modifier.padding(top = 4.dp).testTag("postReplyButton_${comment.uid}")) {
+                Text("Post Reply")
+              }
+        }
       }
 
-      // Conditionally show the reply input field if the user is logged in
-      if (showReplyField) {
-        OutlinedTextField(
-            value = replyText,
-            onValueChange = { replyText = it },
-            label = { Text("Reply") },
-            modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
-
-        Button(
-            onClick = {
-              onReplyComment(replyText, comment)
-              replyText = ""
-              showReplyField = false
-            },
-            modifier = Modifier.padding(top = 4.dp).testTag("postReplyButton_${comment.uid}")) {
-              Text("Post Reply")
-            }
+      // Show replies for original comments, but do not allow replies on replies
+      comment.replies.forEach { reply ->
+        Box(modifier = Modifier.padding(start = 16.dp)) {
+          // Pass `allowReplies = false` for replies to prevent nesting
+          CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+        }
       }
     }
+  }
+}
 
-    // Show replies indented
-    comment.replies.forEach { reply ->
-      Box(modifier = Modifier.padding(start = 16.dp)) {
-        CommentItem(profileId, reply, onReplyComment, onDeleteComment)
-      }
+@Composable
+fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileViewModel) {
+  var isLiked by remember {
+    mutableStateOf(activity?.let { profile?.likedActivities?.contains(it.uid) } ?: false)
+  }
+
+  if (profile != null) {
+    IconButton(
+        modifier = Modifier.testTag("likeButton$isLiked"),
+        onClick = {
+          isLiked = !isLiked
+          if (isLiked) {
+            if (activity != null) {
+              profileViewModel.addLikedActivity(profile.id, activity.uid)
+            }
+          } else {
+            if (activity != null) {
+              profileViewModel.removeLikedActivity(profile.id, activity.uid)
+            }
+          }
+        },
+    ) {
+      Icon(
+          imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+          contentDescription = if (isLiked) "Liked" else "Not Liked",
+          tint = if (isLiked) Color.Black else Color.LightGray)
     }
   }
 }
