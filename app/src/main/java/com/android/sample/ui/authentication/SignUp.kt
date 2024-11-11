@@ -22,15 +22,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
-import com.android.sample.ui.components.EmailTextField
-import com.android.sample.ui.components.PasswordTextField
+import com.android.sample.ui.components.TextFieldWithErrorState
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
@@ -68,57 +66,36 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
                 contentDescription = "App Logo",
                 modifier = Modifier.size(110.dp))
+            Spacer(modifier = Modifier.height(48.dp))
           }
-          item { Spacer(modifier = Modifier.height(48.dp)) }
           item {
             // Email field
-            EmailTextField(
-                email = emailState.value,
-                onEmailChange = {
-                  emailState.value = it
-                  emailErrorState.value = null // Clear error when user starts typing
+            TextFieldWithErrorState(
+                value = emailState.value,
+                onValueChange = { emailState.value = it },
+                label = "Email",
+                modifier = Modifier.fillMaxWidth(0.8f).testTag("EmailTextField"),
+                validation = { input ->
+                  if (!isValidEmail(input)) "Please enter a valid email address" else null
                 },
-                emailError = emailErrorState.value)
+                externalError = emailErrorState.value,
+                errorTestTag = "EmailErrorText",
+            )
+            Spacer(modifier = Modifier.height(16.dp))
           }
-          // Display email error message below the email field
-          if (emailErrorState.value != null) {
-            item {
-              Text(
-                  text = emailErrorState.value ?: "",
-                  color = Color.Red,
-                  fontSize = 12.sp,
-                  modifier =
-                      Modifier.align(Alignment.Start)
-                          .padding(start = 40.dp, top = 4.dp)
-                          .testTag("EmailErrorText"))
-            }
-          }
-          item { Spacer(modifier = Modifier.height(16.dp)) }
           item {
             // Password field
-            PasswordTextField(
-                password = passwordState.value,
-                onPasswordChange = {
-                  passwordState.value = it
-                  passwordErrorState.value = null // Clear error when user starts typing
-                },
-                isPasswordVisible = isPasswordVisible.value,
-                onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value })
+            TextFieldWithErrorState(
+                value = passwordState.value,
+                onValueChange = { passwordState.value = it },
+                label = "Password",
+                modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"),
+                validation = { input -> if (input.isBlank()) "Password cannot be empty" else null },
+                externalError = passwordErrorState.value,
+                errorTestTag = "PasswordErrorText",
+            )
+            Spacer(modifier = Modifier.height(16.dp))
           }
-          // Display password error message below the password field
-          if (passwordErrorState.value != null) {
-            item {
-              Text(
-                  text = passwordErrorState.value ?: "",
-                  color = Color.Red,
-                  fontSize = 12.sp,
-                  modifier =
-                      Modifier.align(Alignment.Start)
-                          .padding(start = 40.dp, top = 4.dp)
-                          .testTag("PasswordErrorText"))
-            }
-          }
-          item { Spacer(modifier = Modifier.height(16.dp)) }
           item {
             // Sign up button
             Button(
@@ -150,8 +127,8 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignUpButton")) {
                   Text("Sign up with Email", fontSize = 16.sp)
                 }
+            Spacer(modifier = Modifier.height(16.dp))
           }
-          item { Spacer(modifier = Modifier.height(16.dp)) }
           item {
             // If user already has an account, navigate to the sign in screen
             TextButton(
