@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
       Surface(
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
-            ActivitiesApp(auth.currentUser?.uid ?: "", startDestination)
+            ActivitiesApp(startDestination)
           }
     }
   }
@@ -101,18 +101,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ActivitiesApp(uid: String, startDestination: String) {
+fun ActivitiesApp(startDestination: String) {
+
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
-  // val listActivitiesViewModel: ListActivitiesViewModel =
-  //  viewModel(factory = ListActivitiesViewModel.Factory)
-  val profileViewModel: ProfileViewModel = hiltViewModel()
-  // need to add factory for SignInViewModel
-  val authViewModel: SignInViewModel = hiltViewModel()
-  val locationViewModel: LocationViewModel = hiltViewModel()
-
-  val listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel()
+  val authViewModel = hiltViewModel<SignInViewModel>()
+  val profileViewModel = hiltViewModel<ProfileViewModel>()
+  val listActivitiesViewModel = hiltViewModel<ListActivitiesViewModel>()
+  val locationViewModel = hiltViewModel<LocationViewModel>()
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
@@ -161,6 +158,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
       }
       composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
     }
+
     navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
       composable(Screen.LIKED_ACTIVITIES) {
         LikedActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
