@@ -326,8 +326,9 @@ fun ActivityEnrolledBox(
                   .padding(8.dp)
                   .clip(RoundedCornerShape(16.dp))
                   .clickable {
-                      listActivitiesViewModel.selectActivity(thisActivity)
-                      navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
+                    listActivitiesViewModel.selectActivity(thisActivity)
+                    navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+                  },
           verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = R.drawable.foot),
