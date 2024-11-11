@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -55,82 +56,91 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       content = { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(padding).testTag("SignInScreenColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-              // App Logo
-              Image(
-                  painter = painterResource(id = R.drawable.aptivity_logo),
-                  contentDescription = "App Logo",
-                  modifier = Modifier.size(110.dp).testTag("AppLogo"))
-              Spacer(modifier = Modifier.height(48.dp))
+            verticalArrangement = Arrangement.Center,
+        ) {
+          item {
+            // App Logo
+            Image(
+                painter = painterResource(id = R.drawable.aptivity_logo),
+                contentDescription = "App Logo",
+                modifier = Modifier.size(110.dp).testTag("AppLogo"))
+            Spacer(modifier = Modifier.height(48.dp))
+          }
 
-              // Email Input
-              EmailTextField(
-                  email = emailState.value,
-                  onEmailChange = { emailState.value = it },
-                  emailError = null)
-              Spacer(modifier = Modifier.height(16.dp))
+          item {
+            // Email Input
+            EmailTextField(
+                email = emailState.value,
+                onEmailChange = { emailState.value = it },
+                emailError = null)
+            Spacer(modifier = Modifier.height(16.dp))
+          }
 
-              TextFieldWithErrorState(
-                  value = passwordState.value,
-                  onValueChange = { passwordState.value = it },
-                  label = "Password",
-                  modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"),
-                  validation = { input ->
-                    if (input.isBlank()) "Password cannot be empty" else null
-                  },
-                  externalError = passwordErrorState.value,
-                  errorTestTag = "PasswordErrorText")
+          item {
+            TextFieldWithErrorState(
+                value = passwordState.value,
+                onValueChange = { passwordState.value = it },
+                label = "Password",
+                modifier = Modifier.fillMaxWidth(0.8f).testTag("PasswordTextField"),
+                validation = { input -> if (input.isBlank()) "Password cannot be empty" else null },
+                externalError = passwordErrorState.value,
+                errorTestTag = "PasswordErrorText")
+            Spacer(modifier = Modifier.height(16.dp))
+          }
 
-              Spacer(modifier = Modifier.height(16.dp))
-
-              // Sign-In Button
-              Button(
-                  onClick = {
-                    if (passwordState.value.isEmpty()) {
-                      passwordErrorState.value = "Password cannot be empty" // Set external error
-                    } else {
-                      passwordErrorState.value = null // Clear external error if password is valid
-                      viewModel.signInWithEmailAndPassword(
-                          emailState.value,
-                          passwordState.value,
-                          onAuthSuccess,
-                          onAuthError,
-                          navigationActions)
-                    }
-                    Log.d("SignInScreen", "Sign in with email/password")
-                  },
-                  modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignInButton")) {
-                    Text("Sign in with Email", fontSize = 16.sp)
+          item {
+            // Sign-In Button
+            Button(
+                onClick = {
+                  if (passwordState.value.isEmpty()) {
+                    passwordErrorState.value = "Password cannot be empty" // Set external error
+                  } else {
+                    passwordErrorState.value = null // Clear external error if password is valid
+                    viewModel.signInWithEmailAndPassword(
+                        emailState.value,
+                        passwordState.value,
+                        onAuthSuccess,
+                        onAuthError,
+                        navigationActions)
                   }
+                  Log.d("SignInScreen", "Sign in with email/password")
+                },
+                modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignInButton")) {
+                  Text("Sign in with Email", fontSize = 16.sp)
+                }
+            Spacer(modifier = Modifier.height(16.dp))
+          }
 
-              Spacer(modifier = Modifier.height(16.dp))
+          item {
+            // Google Sign-In Button
+            GoogleSignInButton(
+                onSignInClick = {
+                  googleSignInLauncher.launch(rememberGoogleSignInIntent(context, token))
+                })
+            Spacer(modifier = Modifier.height(16.dp))
+          }
 
-              // Google Sign-In Button
-              GoogleSignInButton(
-                  onSignInClick = {
-                    googleSignInLauncher.launch(rememberGoogleSignInIntent(context, token))
-                  })
+          item {
+            // If user already has an account, navigate to the sign-in screen
+            TextButton(
+                onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignUpButton")) {
+                  Text("No account yet?", fontSize = 16.sp)
+                }
+          }
 
-              Spacer(modifier = Modifier.height(16.dp))
-
-              // If user already has an account, navigate to the sign in screen
-              TextButton(
-                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                  modifier =
-                      Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignUpButton")) {
-                    Text("No account yet?", fontSize = 16.sp)
-                  }
-
-              // Continue as guest
-              TextButton(
-                  onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
-                  modifier = Modifier.testTag("ContinueAsGuestButton")) {
-                    Text("Continue as Guest")
-                  }
-            }
+          item {
+            // Continue as guest
+            TextButton(
+                onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
+                modifier = Modifier.testTag("ContinueAsGuestButton")) {
+                  Text("Continue as Guest")
+                }
+          }
+        }
       })
 }
 
