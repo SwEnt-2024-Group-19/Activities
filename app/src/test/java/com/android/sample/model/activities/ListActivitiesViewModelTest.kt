@@ -2,11 +2,9 @@ package com.android.sample.model.activities
 
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
-import com.google.firebase.Timestamp
+import com.android.sample.resources.dummydata.activityBiking
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -28,24 +26,7 @@ class ListActivitiesViewModelTest {
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
 
   private val location = Location(46.519962, 6.633597, "EPFL")
-  private val activity =
-      Activity(
-          title = "FOOTBALL",
-          uid = "1",
-          status = ActivityStatus.ACTIVE,
-          location = location,
-          date = Timestamp.now(),
-          creator = "me",
-          description = "Do something",
-          placesLeft = 0,
-          maxPlaces = 0,
-          participants = listOf(),
-          images = listOf(),
-          price = 0.0,
-          startTime = "09:30",
-          duration = "00:30",
-          type = ActivityType.PRO,
-      )
+  private val activity = activityBiking
 
   @Before
   fun setUp() {
@@ -55,8 +36,8 @@ class ListActivitiesViewModelTest {
 
   @Test
   fun getNewUid() {
-    `when`(activitiesRepository.getNewUid()).thenReturn("uid")
-    assertThat(listActivitiesViewModel.getNewUid(), `is`("uid"))
+    `when`(activitiesRepository.getNewUid()).thenReturn("1")
+    assertThat(listActivitiesViewModel.getNewUid(), `is`("1"))
   }
 
   @Test

@@ -211,3 +211,7 @@ val userWithActivities =
         interests = listOf("Cycling", "Reading"),
         activities = listOf(),
         likedActivities = listOf(activityBiking.uid))
+
+const val email = "test@example.com"
+const val idToken = "testGoogleIdToken"
+val uid = "testUid"

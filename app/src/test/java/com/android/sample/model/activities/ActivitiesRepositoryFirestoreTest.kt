@@ -3,13 +3,9 @@ package com.android.sample.model.activities
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
-import com.android.sample.model.map.Location
+import com.android.sample.resources.dummydata.activityBiking
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -40,24 +36,7 @@ class ActivitiesRepositoryFirestoreTest {
 
   private lateinit var activitiesRepositoryFirestore: ActivitiesRepositoryFirestore
 
-  private val activity =
-      Activity(
-          title = "FOOTBALL",
-          uid = "1",
-          status = ActivityStatus.ACTIVE,
-          location = Location(46.519962, 6.633597, "EPFL"),
-          date = Timestamp.now(),
-          creator = "me",
-          description = "Do something",
-          placesLeft = 5,
-          maxPlaces = 10,
-          participants = listOf(),
-          images = listOf(),
-          price = 0.0,
-          startTime = "09:30",
-          duration = "00:30",
-          type = ActivityType.PRO,
-      )
+  private val activity = activityBiking
 
   @Before
   fun setUp() {
