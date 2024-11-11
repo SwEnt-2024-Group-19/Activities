@@ -6,13 +6,13 @@ import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -56,101 +55,83 @@ fun SignUpScreen(navigationActions: NavigationActions) {
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       content = { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(padding).testTag("SignUpScreenColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
           // App Logo Image
-          Image(
-              painter = painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
-              contentDescription = "App Logo",
-              modifier = Modifier.size(110.dp))
-          Spacer(modifier = Modifier.height(48.dp))
-
-          // Email field
-          EmailTextField(
-              email = emailState.value,
-              onEmailChange = {
-                emailState.value = it
-                emailErrorState.value = null // Clear error when user starts typing
-              },
-              emailError = emailErrorState.value)
-
-          // Display email error message below the email field
-          if (emailErrorState.value != null) {
-            Text(
-                text = emailErrorState.value ?: "",
-                color = Color.Red,
-                fontSize = 12.sp,
-                modifier =
-                    Modifier.align(Alignment.Start)
-                        .padding(start = 40.dp, top = 4.dp)
-                        .testTag("EmailErrorText"))
+          item {
+            Image(
+                painter =
+                    painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
+                contentDescription = "App Logo",
+                modifier = Modifier.size(110.dp))
+            Spacer(modifier = Modifier.height(48.dp))
           }
-
-          Spacer(modifier = Modifier.height(16.dp))
-          // Password field
-          PasswordTextField(
-              password = passwordState.value,
-              onPasswordChange = {
-                passwordState.value = it
-                passwordErrorState.value = null // Clear error when user starts typing
-              },
-              isPasswordVisible = isPasswordVisible.value,
-              onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value })
-          // Display password error message below the password field
-          if (passwordErrorState.value != null) {
-            Text(
-                text = passwordErrorState.value ?: "",
-                color = Color.Red,
-                fontSize = 12.sp,
-                modifier =
-                    Modifier.align(Alignment.Start)
-                        .padding(start = 40.dp, top = 4.dp)
-                        .testTag("PasswordErrorText"))
+          item {
+            // Email field
+            EmailTextField(
+                email = emailState.value,
+                onEmailChange = {
+                  emailState.value = it
+                  emailErrorState.value = if (it.isBlank()) "Email cannot be empty" else null
+                },
+                emailError = emailErrorState.value)
+            Spacer(modifier = Modifier.height(16.dp))
           }
-
-          Spacer(modifier = Modifier.height(16.dp))
-
-          // Sign up button
-          Button(
-              onClick = {
-                when {
-                  !isValidEmail(emailState.value) -> {
-                    emailErrorState.value =
-                        "Please enter a valid email address" // Set the error message if email is
-                    // invalid
+          item {
+            // Password field
+            PasswordTextField(
+                password = passwordState.value,
+                onPasswordChange = { passwordState.value = it },
+                isPasswordVisible = isPasswordVisible.value,
+                onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+                passwordError = passwordErrorState.value,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+          }
+          item {
+            // Sign up button
+            Button(
+                onClick = {
+                  when {
+                    !isValidEmail(emailState.value) -> {
+                      emailErrorState.value =
+                          "Please enter a valid email address" // Set the error message if email is
+                      // invalid
+                    }
+                    passwordState.value.isEmpty() -> {
+                      passwordErrorState.value =
+                          "Password cannot be empty" // Set the error message if password is empty
+                    }
+                    passwordState.value.length < 6 -> {
+                      passwordErrorState.value =
+                          "Password must be at least 6 characters long" // Set the error message for
+                      // short passwords
+                    }
+                    else -> {
+                      createUserWithEmailAndPassword(
+                          emailState.value,
+                          passwordState.value,
+                          context,
+                          onSuccess = { navigationActions.navigateTo(Screen.CREATE_PROFILE) })
+                    }
                   }
-                  passwordState.value.isEmpty() -> {
-                    passwordErrorState.value =
-                        "Password cannot be empty" // Set the error message if password is empty
-                  }
-                  passwordState.value.length < 6 -> {
-                    passwordErrorState.value =
-                        "Password must be at least 6 characters long" // Set the error message for
-                    // short passwords
-                  }
-                  else -> {
-                    createUserWithEmailAndPassword(
-                        emailState.value,
-                        passwordState.value,
-                        context,
-                        onSuccess = { navigationActions.navigateTo(Screen.CREATE_PROFILE) })
-                  }
+                },
+                modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignUpButton")) {
+                  Text("Sign up with Email", fontSize = 16.sp)
                 }
-              },
-              modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignUpButton")) {
-                Text("Sign up with Email", fontSize = 16.sp)
-              }
-          Spacer(modifier = Modifier.height(16.dp))
-
-          // If user already has an account, navigate to the sign in screen
-          TextButton(
-              onClick = { navigationActions.navigateTo(Screen.AUTH) },
-              modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignInButton")) {
-                Text("Already an account?", fontSize = 16.sp)
-              }
+            Spacer(modifier = Modifier.height(16.dp))
+          }
+          item {
+            // If user already has an account, navigate to the sign in screen
+            TextButton(
+                onClick = { navigationActions.navigateTo(Screen.AUTH) },
+                modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignInButton")) {
+                  Text("Already an account?", fontSize = 16.sp)
+                }
+          }
         }
       })
 }
