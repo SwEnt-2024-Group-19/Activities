@@ -157,7 +157,9 @@ fun CreateActivityScreen(
                 onValueChange = { title = it },
                 label = { Text("Title") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
-                placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
+                placeholder = { Text(text = stringResource(id = R.string.request_activity_title))
+                              },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -168,7 +170,7 @@ fun CreateActivityScreen(
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_activity_description))
-                },
+                }
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -180,6 +182,7 @@ fun CreateActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_date_activity_withFormat))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -189,6 +192,7 @@ fun CreateActivityScreen(
                 label = { Text("Time") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -198,6 +202,7 @@ fun CreateActivityScreen(
                 label = { Text("Duration") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -208,6 +213,7 @@ fun CreateActivityScreen(
                 label = { Text("Price") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -219,6 +225,7 @@ fun CreateActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_placesMax_activity))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
