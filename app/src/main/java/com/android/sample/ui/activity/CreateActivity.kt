@@ -157,8 +157,7 @@ fun CreateActivityScreen(
                 onValueChange = { title = it },
                 label = { Text("Title") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
-                placeholder = { Text(text = stringResource(id = R.string.request_activity_title))
-                              },
+                placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -170,8 +169,7 @@ fun CreateActivityScreen(
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_activity_description))
-                }
-            )
+                })
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
