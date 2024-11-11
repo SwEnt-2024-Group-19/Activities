@@ -72,7 +72,8 @@ fun ProfileScreen(
   when (val profile = profileState.value) {
     null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
     else -> {
-      ProfileContent(user = profile, navigationActions, listActivitiesViewModel)
+      ProfileContent(
+          user = profile, navigationActions, listActivitiesViewModel, userProfileViewModel)
     }
   // Proceed with showing profile content
   }
@@ -123,7 +124,8 @@ fun LoadingScreen(navigationActions: NavigationActions) {
 fun ProfileContent(
     user: User,
     navigationActions: NavigationActions,
-    listActivitiesViewModel: ListActivitiesViewModel
+    listActivitiesViewModel: ListActivitiesViewModel,
+    userProfileViewModel: ProfileViewModel
 ) {
   var showMenu by remember { mutableStateOf(false) } // To control the visibility of the menu
   Log.d("ProfileScreen", "User photo: ${user.photo}")
@@ -159,18 +161,12 @@ fun ProfileContent(
                     text = { Text("Logout") },
                     onClick = {
                       showMenu = false
+                      userProfileViewModel.clearUserData()
                       Firebase.auth.signOut()
                       navigationActions.navigateTo(Screen.AUTH)
                       // Handle logout action
                     },
                     enabled = Firebase.auth.currentUser?.isAnonymous == false)
-
-                DropdownMenuItem(
-                    text = { Text("General Terms") },
-                    onClick = {
-                      showMenu = false
-                      // Handle general terms action
-                    })
               }
             })
       },

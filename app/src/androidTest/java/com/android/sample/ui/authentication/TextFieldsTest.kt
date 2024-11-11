@@ -21,7 +21,8 @@ class TextFieldsTest {
           password = password,
           onPasswordChange = {},
           isPasswordVisible = isPasswordVisible.value,
-          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value })
+          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+          passwordError = null)
     }
 
     // Check that the trailing icon shows "Show password", indicating the password is masked
@@ -38,7 +39,8 @@ class TextFieldsTest {
           password = password,
           onPasswordChange = {},
           isPasswordVisible = isPasswordVisible.value,
-          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value })
+          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+          passwordError = null)
     }
 
     composeTestRule.onNodeWithText("Password").assertExists()

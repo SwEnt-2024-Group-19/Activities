@@ -92,7 +92,7 @@ fun EditActivityScreen(
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
-  var attendees by remember { mutableStateOf(activity?.participants ?: listOf()) }
+  var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration) }
   var expanded by remember { mutableStateOf(false) }
@@ -182,6 +182,7 @@ fun EditActivityScreen(
                 label = { Text("Title") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleEdit"),
                 placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -202,6 +203,7 @@ fun EditActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_date_activity_withFormat))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -211,6 +213,7 @@ fun EditActivityScreen(
                 label = { Text("Time") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -220,6 +223,7 @@ fun EditActivityScreen(
                 label = { Text("Duration") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -230,6 +234,7 @@ fun EditActivityScreen(
                 label = { Text("Price") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceEdit"),
                 placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -241,6 +246,7 @@ fun EditActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_placesMax_activity))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
             ExposedDropdownMenuBox(
@@ -362,11 +368,6 @@ fun EditActivityScreen(
                         Text(
                             text = "${attendees[index].name} ${attendees[index].surname}",
                             modifier = Modifier.testTag("attendeeName${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
-                        Text(
-                            text = "Age: ${attendees[index].age}",
-                            modifier = Modifier.testTag("attendeeAge${index}"),
                             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                         )
                       }

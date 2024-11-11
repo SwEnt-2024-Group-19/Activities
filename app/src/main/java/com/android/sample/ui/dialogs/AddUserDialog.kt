@@ -22,15 +22,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-
-data class SimpleUser(
-    val name: String,
-    val surname: String,
-    val age: Int,
-)
+import com.android.sample.model.profile.User
 
 @Composable
-fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (SimpleUser) -> Unit) {
+fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
   Dialog(
       onDismissRequest = onDismiss,
       properties =
@@ -49,7 +44,6 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (SimpleUser) -> Unit) {
         ) {
           var name by remember { mutableStateOf("") }
           var surname by remember { mutableStateOf("") }
-          var age by remember { mutableStateOf("") }
 
           OutlinedTextField(
               modifier = Modifier.testTag("nameTextFieldUser"),
@@ -64,23 +58,20 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (SimpleUser) -> Unit) {
               onValueChange = { surname = it },
               label = { Text("Surname") },
           )
-          OutlinedTextField(
-              modifier = Modifier.testTag("ageTextFieldUser"),
-              value = age,
-              onValueChange = { age = it },
-              label = { Text("Age") },
-          )
           Spacer(modifier = Modifier.height(16.dp))
           Button(
               modifier = Modifier.testTag("addUserButton"),
               onClick = {
-                val userAge =
-                    try {
-                      age.toInt()
-                    } catch (e: NumberFormatException) {
-                      0
-                    }
-                onAddUser(SimpleUser(name, surname, userAge))
+                onAddUser(
+                    User(
+                        name = name,
+                        surname = surname,
+                        id = "",
+                        interests = listOf(),
+                        activities = listOf(),
+                        photo = null,
+                        likedActivities = listOf(),
+                    ))
                 onDismiss()
               }) {
                 Text("Add user")

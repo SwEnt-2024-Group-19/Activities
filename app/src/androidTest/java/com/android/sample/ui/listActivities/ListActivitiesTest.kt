@@ -15,7 +15,6 @@ import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
-import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
@@ -51,7 +50,24 @@ class OverviewScreenTest {
           type = ActivityType.PRO,
           placesLeft = 8,
           maxPlaces = 15,
-          participants = listOf(SimpleUser("1", "Amine", 15), SimpleUser("2", "John", 14)),
+          participants =
+              listOf(
+                  User(
+                      id = "1",
+                      name = "Amine",
+                      surname = "A",
+                      interests = listOf("Cycling"),
+                      activities = listOf(),
+                      photo = "",
+                      likedActivities = listOf("1")),
+                  User(
+                      id = "2",
+                      name = "John",
+                      surname = "Doe",
+                      interests = listOf("Reading"),
+                      activities = listOf(),
+                      photo = "",
+                      likedActivities = listOf("1"))),
           duration = "2 hours",
           startTime = "10:00")
 

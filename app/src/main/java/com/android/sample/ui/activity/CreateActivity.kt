@@ -60,11 +60,11 @@ import com.android.sample.model.camera.bitmapToBase64
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
-import com.android.sample.ui.dialogs.SimpleUser
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -111,8 +111,8 @@ fun CreateActivityScreen(
   val scrollState = rememberScrollState()
 
   // Attendees
-  val attendees_: List<SimpleUser> = listOf<SimpleUser>()
-  var attendees: List<SimpleUser> by remember { mutableStateOf(attendees_) }
+  val attendees_: List<User> = listOf<User>()
+  var attendees: List<User> by remember { mutableStateOf(attendees_) }
   val items_: List<Bitmap> = listOf<Bitmap>()
   var items: List<Bitmap> by remember { mutableStateOf(items_) }
 
@@ -158,6 +158,7 @@ fun CreateActivityScreen(
                 label = { Text("Title") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputTitleCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -168,8 +169,7 @@ fun CreateActivityScreen(
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_activity_description))
-                },
-            )
+                })
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
@@ -180,6 +180,7 @@ fun CreateActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_date_activity_withFormat))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -189,6 +190,7 @@ fun CreateActivityScreen(
                 label = { Text("Time") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -198,6 +200,7 @@ fun CreateActivityScreen(
                 label = { Text("Duration") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -208,6 +211,7 @@ fun CreateActivityScreen(
                 label = { Text("Price") },
                 modifier = Modifier.padding(8.dp).fillMaxWidth().testTag("inputPriceCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
+                singleLine = true,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -219,6 +223,7 @@ fun CreateActivityScreen(
                 placeholder = {
                   Text(text = stringResource(id = R.string.request_placesMax_activity))
                 },
+                singleLine = true,
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -348,11 +353,6 @@ fun CreateActivityScreen(
                             modifier = Modifier.testTag("attendeeName${index}"),
                             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
                         )
-                        Text(
-                            text = "Age: ${attendees[index].age}",
-                            modifier = Modifier.testTag("attendeeAge${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
                       }
                       IconButton(
                           onClick = { attendees = attendees.filter { it != attendees[index] } },
@@ -395,11 +395,7 @@ fun CreateActivityScreen(
                   val calendar = GregorianCalendar()
                   val parts = dueDate.split("/")
                   if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
-                    attendees +=
-                        SimpleUser(
-                            profileViewModel.userState.value?.name ?: "",
-                            profileViewModel.userState.value?.surname ?: "",
-                            0)
+                    attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(
                           parts[2].toInt(),
