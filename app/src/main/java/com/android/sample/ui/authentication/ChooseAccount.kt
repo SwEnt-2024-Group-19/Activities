@@ -68,15 +68,18 @@ fun ChooseAccountScreen(
         // Continue as Text (Clickable)
         item {
           Text(
-              text = "Continue as ${userProfile?.name}",
+              text = "Switch Account",
               fontSize = 16.sp,
               color = Color.Blue,
               fontWeight = FontWeight.SemiBold,
               textDecoration = TextDecoration.Underline,
               modifier =
                   Modifier.padding(vertical = 8.dp)
-                      .clickable { navigationActions.navigateTo(Screen.OVERVIEW) }
-                      .testTag("continueText"))
+                      .clickable {
+                        signInViewModel.signOut()
+                        navigationActions.navigateTo(Screen.AUTH)
+                      }
+                      .testTag("switchAccountButton"))
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -84,17 +87,14 @@ fun ChooseAccountScreen(
         // Switch Account Button
         item {
           Button(
-              onClick = {
-                signInViewModel.signOut()
-                navigationActions.navigateTo(Screen.AUTH)
-              },
+              onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
               modifier =
                   Modifier.fillMaxWidth(0.8f)
                       .height(48.dp)
                       .clip(RoundedCornerShape(12.dp))
-                      .testTag("switchAccountButton")) {
+                      .testTag("continueText")) {
                 Text(
-                    text = "Switch Account",
+                    text = "Continue as ${userProfile?.name}",
                     fontSize = 16.sp,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
