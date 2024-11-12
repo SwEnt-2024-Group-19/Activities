@@ -6,20 +6,17 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.android.sample.model.activity.ActivitiesRepository
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
-import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.activity
+import com.android.sample.resources.dummydata.activityBiking
+import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.listActivities.ActivityCard2
 import com.android.sample.ui.listActivities.LikedActivitiesScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -36,25 +33,6 @@ class LikedActivitiesTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var viewModel: ListActivitiesViewModel
   private lateinit var profileViewModel: ProfileViewModel
-  private lateinit var testUser: User
-
-  private val testActivity =
-      Activity(
-          uid = "1",
-          title = "Mountain Biking",
-          description = "Exciting mountain biking experience.",
-          date = Timestamp.now(),
-          location = Location(46.519962, 6.633597, "EPFL"),
-          creator = "Chris",
-          images = listOf(),
-          price = 10.0,
-          status = ActivityStatus.ACTIVE,
-          type = ActivityType.PRO,
-          placesLeft = 8,
-          maxPlaces = 15,
-          participants = listOf(),
-          duration = "2 hours",
-          startTime = "10:00")
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -66,15 +44,6 @@ class LikedActivitiesTest {
     navigationActions = mock(NavigationActions::class.java)
     viewModel = ListActivitiesViewModel(activitiesRepository)
 
-    testUser =
-        User(
-            id = "Rola",
-            name = "Amine",
-            surname = "A",
-            photo = "",
-            interests = listOf("Cycling", "Reading"),
-            activities = listOf(),
-            likedActivities = listOf(testActivity.uid))
     // val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)
 
@@ -106,8 +75,8 @@ class LikedActivitiesTest {
   fun whenNoLikedActivities_thenDisplaysEmptyMessage() {
     profileViewModel = mock(ProfileViewModel::class.java)
     // Set liked activities to empty to simulate no liked activities
-    testUser = testUser.copy(likedActivities = emptyList())
-    whenever(profileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    val emptyTestUser = testUser.copy(likedActivities = emptyList())
+    whenever(profileViewModel.userState).thenReturn(MutableStateFlow(emptyTestUser))
 
     composeTestRule.setContent {
       LikedActivitiesScreen(viewModel, navigationActions, profileViewModel)
@@ -122,12 +91,12 @@ class LikedActivitiesTest {
     profileViewModel = mock(ProfileViewModel::class.java)
     composeTestRule.setContent {
       ActivityCard2(
-          activityId = testActivity.uid,
+          activityId = activityBiking.uid,
           navigationActions = navigationActions,
           listActivitiesViewModel = viewModel,
           profileViewModel = profileViewModel,
           profile = testUser,
-          allActivities = listOf(testActivity))
+          allActivities = listOf(activityBiking))
     }
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
     composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
@@ -141,12 +110,12 @@ class LikedActivitiesTest {
     profileViewModel = mock(ProfileViewModel::class.java)
     composeTestRule.setContent {
       ActivityCard2(
-          activityId = testActivity.uid,
+          activityId = activityBiking.uid,
           navigationActions = navigationActions,
           listActivitiesViewModel = viewModel,
           profileViewModel = profileViewModel,
           profile = testUser,
-          allActivities = listOf(testActivity))
+          allActivities = listOf(activityBiking))
     }
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
     composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
@@ -161,12 +130,12 @@ class LikedActivitiesTest {
     profileViewModel = ProfileViewModel(profilesRepository)
     composeTestRule.setContent {
       ActivityCard2(
-          activityId = testActivity.uid,
+          activityId = activityBiking.uid,
           navigationActions = navigationActions,
           listActivitiesViewModel = viewModel,
           profileViewModel = profileViewModel,
           profile = testUser,
-          allActivities = listOf(testActivity))
+          allActivities = listOf(activityBiking))
     }
 
     // Verify initial state is liked
@@ -190,12 +159,12 @@ class LikedActivitiesTest {
     profileViewModel = ProfileViewModel(profilesRepository)
     composeTestRule.setContent {
       ActivityCard2(
-          activityId = testActivity.uid,
+          activityId = activity.uid,
           navigationActions = navigationActions,
           listActivitiesViewModel = viewModel,
           profileViewModel = profileViewModel,
           profile = testUser,
-          allActivities = listOf(testActivity))
+          allActivities = listOf(activity))
     }
     composeTestRule.onNodeWithTag("activityCard").performClick()
     verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)

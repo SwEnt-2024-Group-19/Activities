@@ -3,6 +3,7 @@ package com.android.sample.ui.authentication
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.android.sample.resources.dummydata.password
 import com.android.sample.ui.components.PasswordTextField
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +32,6 @@ class TextFieldsTest {
 
   @Test
   fun testPasswordVisibilityToggle() {
-    val password = "testPassword"
     val isPasswordVisible = mutableStateOf(false)
 
     composeTestRule.setContent {

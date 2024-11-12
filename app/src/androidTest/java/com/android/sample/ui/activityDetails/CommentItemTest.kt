@@ -9,12 +9,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.sample.model.activity.Comment
+import com.android.sample.resources.dummydata.testComment
+import com.android.sample.resources.dummydata.timestamp
 import com.android.sample.ui.activitydetails.CommentItem
 import com.android.sample.ui.activitydetails.CommentSection
-import com.google.firebase.Timestamp
-import java.util.UUID
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,28 +21,7 @@ import org.junit.runner.RunWith
 class CommentItemTest {
   @get:Rule val composeTestRule = createComposeRule()
 
-  private lateinit var testComment: Comment
   private val testProfileId = "123"
-  val timestamp = Timestamp.now()
-
-  @Before
-  fun setUp() {
-    testComment =
-        Comment(
-            uid = UUID.randomUUID().toString(),
-            userId = "123",
-            userName = "Amine",
-            content = "This is a comment",
-            timestamp = timestamp,
-            replies =
-                listOf(
-                    Comment(
-                        uid = UUID.randomUUID().toString(),
-                        userId = "124",
-                        userName = "John",
-                        content = "This is a reply",
-                        timestamp = timestamp)))
-  }
 
   @Test
   fun commentItem_displaysCommentCorrectly() {

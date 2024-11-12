@@ -3,6 +3,10 @@ package com.android.sample.model.auth
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.profile.ProfilesRepositoryFirestore
 import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.email
+import com.android.sample.resources.dummydata.idToken
+import com.android.sample.resources.dummydata.password
+import com.android.sample.resources.dummydata.uid
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.tasks.Tasks
@@ -48,8 +52,6 @@ class SignInRepositoryFirebaseTest {
   @Test
   fun `signInWithEmail should return AuthResult on success`() = runBlocking {
     // Given
-    val email = "test@example.com"
-    val password = "password123"
     val mockAuthResult = mock(AuthResult::class.java)
 
     // Mock the Task<AuthResult> returned by signInWithEmailAndPassword
@@ -67,8 +69,6 @@ class SignInRepositoryFirebaseTest {
   @Test(expected = Exception::class)
   fun `signInWithEmail should throw exception on failure`(): Unit = runBlocking {
     // Given
-    val email = "test@example.com"
-    val password = "password123"
 
     // Mock the Task<AuthResult> to return an exception
     val mockTask = Tasks.forException<AuthResult>(Exception("Firebase sign-in failed"))
@@ -111,7 +111,6 @@ class SignInRepositoryFirebaseTest {
   @Test(expected = Exception::class)
   fun `signInWithGoogle should throw exception on failure`(): Unit = runBlocking {
     // Given
-    val idToken = "testGoogleIdToken"
 
     // Create the mock credential
     val mockCredential = GoogleAuthProvider.getCredential(idToken, null)
@@ -139,7 +138,6 @@ class SignInRepositoryFirebaseTest {
   @Test
   fun `checkUserProfile should navigate to create profile if user profile is not found`() =
       runTest {
-        val uid = "testUid"
         // Mock getUser to return null (no profile found)
         `when`(profilesRepository.getUser(anyOrNull(), anyOrNull(), anyOrNull())).thenAnswer {
           println("Simulating getUser callback with null profile")
@@ -158,7 +156,6 @@ class SignInRepositoryFirebaseTest {
 
   @Test
   fun `checkUserProfile should navigate to overview if user profile is found`() = runTest {
-    val uid = "testUid"
     val mockUserProfile = mock(User::class.java)
 
     // Mock getUser to return a user profile
@@ -177,7 +174,6 @@ class SignInRepositoryFirebaseTest {
 
   @Test
   fun `checkUserProfile should call onAuthError if getUser fails`() = runTest {
-    val uid = "testUid"
     // Mock getUser to throw an exception
     `when`(profilesRepository.getUser(eq(uid), anyOrNull(), anyOrNull())).thenAnswer { invocation ->
       val onFailure = invocation.arguments[2] as (Exception) -> Unit
