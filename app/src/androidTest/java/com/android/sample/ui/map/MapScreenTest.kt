@@ -7,17 +7,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.model.activity.ActivitiesRepository
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.resources.dummydata.activity
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -63,24 +59,6 @@ class MapScreenTest {
       MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
     }
   }
-
-  private val activity =
-      Activity(
-          uid = "1",
-          title = "Mountain Biking",
-          description = "Exciting mountain biking experience.",
-          date = Timestamp.now(),
-          location = Location(46.519962, 6.633597, "EPFL"),
-          creator = "Chris",
-          images = listOf(),
-          price = 10.0,
-          status = ActivityStatus.ACTIVE,
-          type = ActivityType.PRO,
-          placesLeft = 8,
-          maxPlaces = 15,
-          participants = listOf(),
-          duration = "2 hours",
-          startTime = "10:00")
 
   @Test
   fun testMapScreenIsDisplayed() {
