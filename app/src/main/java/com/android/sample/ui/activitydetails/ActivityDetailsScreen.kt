@@ -203,6 +203,7 @@ fun ActivityDetailsScreen(
 
               Spacer(modifier = Modifier.height(8.dp))
 
+              // price
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.testTag("price")) {
@@ -215,6 +216,7 @@ fun ActivityDetailsScreen(
 
               Spacer(modifier = Modifier.height(8.dp))
 
+              // location
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.testTag("location")) {
