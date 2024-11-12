@@ -64,42 +64,41 @@ fun ChooseAccountScreen(
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
-
-        // Continue as Text (Clickable)
+        // Continue Button
         item {
-          Text(
-              text = "Continue as ${userProfile?.name}",
-              fontSize = 16.sp,
-              color = Color.Blue,
-              fontWeight = FontWeight.SemiBold,
-              textDecoration = TextDecoration.Underline,
+          Button(
+              onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
               modifier =
-                  Modifier.padding(vertical = 8.dp)
-                      .clickable { navigationActions.navigateTo(Screen.OVERVIEW) }
-                      .testTag("continueText"))
+                  Modifier.fillMaxWidth(0.8f)
+                      .height(48.dp)
+                      .clip(RoundedCornerShape(12.dp))
+                      .testTag("continueText")) {
+                Text(
+                    text = "Continue as ${userProfile?.name}",
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(vertical = 8.dp))
+              }
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
 
         // Switch Account Button
         item {
-          Button(
-              onClick = {
-                signInViewModel.signOut()
-                navigationActions.navigateTo(Screen.AUTH)
-              },
+          Text(
+              text = "Switch Account",
+              fontSize = 16.sp,
+              color = Color.Blue,
+              fontWeight = FontWeight.SemiBold,
+              textDecoration = TextDecoration.Underline,
               modifier =
-                  Modifier.fillMaxWidth(0.8f)
-                      .height(48.dp)
-                      .clip(RoundedCornerShape(12.dp))
-                      .testTag("switchAccountButton")) {
-                Text(
-                    text = "Switch Account",
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(vertical = 8.dp))
-              }
+                  Modifier.padding(vertical = 8.dp)
+                      .clickable {
+                        signInViewModel.signOut()
+                        navigationActions.navigateTo(Screen.AUTH)
+                      }
+                      .testTag("switchAccountButton"))
         }
       }
 }
