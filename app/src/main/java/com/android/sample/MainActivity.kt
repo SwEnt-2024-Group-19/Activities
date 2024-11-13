@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
       Surface(
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
-            ActivitiesApp(startDestination)
+            NavGraph(startDestination)
           }
     }
   }
@@ -101,15 +102,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ActivitiesApp(startDestination: String) {
-
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-
-  val authViewModel = hiltViewModel<SignInViewModel>()
-  val profileViewModel = hiltViewModel<ProfileViewModel>()
-  val listActivitiesViewModel = hiltViewModel<ListActivitiesViewModel>()
-  val locationViewModel = hiltViewModel<LocationViewModel>()
+fun NavGraph(
+  startDestination: String,
+  navController: NavHostController = rememberNavController(),
+  navigationActions: NavigationActions = NavigationActions(navController),
+  authViewModel: SignInViewModel = hiltViewModel<SignInViewModel>(),
+  profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>(),
+  listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel<ListActivitiesViewModel>(),
+  locationViewModel: LocationViewModel = hiltViewModel<LocationViewModel>(),
+  ) {
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
