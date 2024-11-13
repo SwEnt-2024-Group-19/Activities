@@ -303,19 +303,19 @@ fun fetchActivityImageUrls(
     onSuccess: (List<String>) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    val firestore = FirebaseFirestore.getInstance()
+  val firestore = FirebaseFirestore.getInstance()
 
-    firestore
-        .collection("activities")
-        .document(activityId)
-        .get()
-        .addOnSuccessListener { document ->
-            if (document != null && document.contains("images")) {
-                val imageUrls = document["images"] as? List<String> ?: emptyList()
-                onSuccess(imageUrls) // Return the list of URLs
-            } else {
-                onSuccess(emptyList()) // Return empty list if no images found
-            }
+  firestore
+      .collection("activities")
+      .document(activityId)
+      .get()
+      .addOnSuccessListener { document ->
+        if (document != null && document.contains("images")) {
+          val imageUrls = document["images"] as? List<String> ?: emptyList()
+          onSuccess(imageUrls) // Return the list of URLs
+        } else {
+          onSuccess(emptyList()) // Return empty list if no images found
         }
-        .addOnFailureListener { exception -> onFailure(exception) }
+      }
+      .addOnFailureListener { exception -> onFailure(exception) }
 }
