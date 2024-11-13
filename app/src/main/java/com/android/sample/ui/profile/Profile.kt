@@ -184,7 +184,7 @@ fun ProfileContent(
 
                 // Profile Picture
                 ProfileImage(
-                    url = user.photo,
+                    userId = user.id,
                     modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
                 // User Name and Surname
