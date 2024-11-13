@@ -42,32 +42,32 @@ class ActivityFlowTest {
           android.Manifest.permission.ACCESS_COARSE_LOCATION,
           android.Manifest.permission.CAMERA)
 
-    @Before
-    fun setUp() {
-        hiltRule.inject()
-    }
+  @Before
+  fun setUp() {
+    hiltRule.inject()
+  }
 
-    @Test
-    fun aGuestTriesToLookAtAnActivity() {
-        // Opens the app as a guest
-        composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
+  @Test
+  fun aGuestTriesToLookAtAnActivity() {
+    // Opens the app as a guest
+    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
 
-        // Checks that is not connected in profile
-        composeTestRule.onNodeWithTag("Profile").performClick()
-        composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
+    // Checks that is not connected in profile
+    composeTestRule.onNodeWithTag("Profile").performClick()
+    composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
 
-        // Goes back to the main screen and tries to filter activities
-        composeTestRule.onNodeWithTag("Overview").performClick()
-        composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
-        composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
-        composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    // Goes back to the main screen and tries to filter activities
+    composeTestRule.onNodeWithTag("Overview").performClick()
+    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
 
-        // Opens the activity details
-        composeTestRule.onNodeWithTag("activityCard").performClick()
-        composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("notLoggedInText").assertIsDisplayed()
-    }
+    // Opens the activity details
+    composeTestRule.onNodeWithTag("activityCard").performClick()
+    composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("notLoggedInText").assertIsDisplayed()
+  }
 }

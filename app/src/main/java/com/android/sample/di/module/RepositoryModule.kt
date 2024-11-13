@@ -57,9 +57,7 @@ object RepositoryModule {
 
   @Provides
   @Singleton
-  fun provideLocationPermissionChecker(
-      @ApplicationContext context: Context
-  ): PermissionChecker {
+  fun provideLocationPermissionChecker(@ApplicationContext context: Context): PermissionChecker {
     return LocationPermissionChecker(context)
   }
 

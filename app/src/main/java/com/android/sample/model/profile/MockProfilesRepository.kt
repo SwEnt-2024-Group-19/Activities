@@ -46,19 +46,19 @@ class MockProfilesRepository : ProfilesRepository {
   }
 
   override fun addLikedActivity(
-    userId: String,
-    activityId: String,
-    onSuccess: () -> Unit,
-    onFailure: (Exception) -> Unit
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
     TODO("Not yet implemented")
   }
 
   override fun removeLikedActivity(
-    userId: String,
-    activityId: String,
-    onSuccess: () -> Unit,
-    onFailure: (Exception) -> Unit
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
     TODO("Not yet implemented")
   }

@@ -103,14 +103,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NavGraph(
-  startDestination: String,
-  navController: NavHostController = rememberNavController(),
-  navigationActions: NavigationActions = NavigationActions(navController),
-  authViewModel: SignInViewModel = hiltViewModel<SignInViewModel>(),
-  profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>(),
-  listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel<ListActivitiesViewModel>(),
-  locationViewModel: LocationViewModel = hiltViewModel<LocationViewModel>(),
-  ) {
+    startDestination: String,
+    navController: NavHostController = rememberNavController(),
+    navigationActions: NavigationActions = NavigationActions(navController),
+    authViewModel: SignInViewModel = hiltViewModel<SignInViewModel>(),
+    profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>(),
+    listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel<ListActivitiesViewModel>(),
+    locationViewModel: LocationViewModel = hiltViewModel<LocationViewModel>(),
+) {
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
