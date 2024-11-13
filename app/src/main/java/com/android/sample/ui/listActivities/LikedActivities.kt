@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -80,17 +81,23 @@ fun LikedActivitiesScreen(
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
               if (profile == null) {
-                Text(
-                    text = "You are not logged in, Login or Register to see your liked activities",
-                    modifier =
-                        Modifier.padding(8.dp)
-                            .align(Alignment.Center)
-                            .testTag("notConnectedPrompt"),
-                    color = MaterialTheme.colorScheme.onSurface)
-                Button(
-                    onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                    modifier = Modifier.testTag("signInButton")) {
-                      Text("Go to Sign In Page")
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.align(Alignment.Center)) {
+                      Text(
+                          text =
+                              "You are not logged in. Login or Register to see your liked activities.",
+                          modifier = Modifier.padding(bottom = 16.dp).testTag("notConnectedPrompt"),
+                          color = MaterialTheme.colorScheme.onSurface,
+                          style = MaterialTheme.typography.bodyMedium,
+                          textAlign = TextAlign.Center)
+                      Button(
+                          onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                          modifier = Modifier.testTag("signInButton"),
+                      ) {
+                        Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
+                      }
                     }
               }
               if (likedActivitiesList != null) {
