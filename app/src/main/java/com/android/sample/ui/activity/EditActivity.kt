@@ -71,7 +71,6 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.android.sample.ui.updateActivityImages
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
