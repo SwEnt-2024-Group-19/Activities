@@ -51,22 +51,28 @@ class ActivityFlowTest {
   fun aGuestTriesToLookAtAnActivity() {
     // Opens the app as a guest
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
+    composeTestRule.waitForIdle()
 
     // Checks that is not connected in profile
     composeTestRule.onNodeWithTag("Profile").performClick()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
 
     // Goes back to the main screen and tries to filter activities
     composeTestRule.onNodeWithTag("Overview").performClick()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
     composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
     composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
 
     // Opens the activity details
     composeTestRule.onNodeWithTag("activityCard").performClick()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notLoggedInText").assertIsDisplayed()
   }
