@@ -381,7 +381,9 @@ fun CreateActivityScreen(
                 enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
                 onClick = {
                   val timeFormat = startTime.split(":")
-                  if (timeFormat.size != 2) {
+                  val timePattern = Regex("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")
+
+                  if (timeFormat.size != 2 || !timePattern.matches(startTime)) {
                     Toast.makeText(
                             context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
                         .show()
@@ -394,7 +396,10 @@ fun CreateActivityScreen(
                   }
                   val calendar = GregorianCalendar()
                   val parts = dueDate.split("/")
-                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
+                  if (parts.size == 3 &&
+                      timeFormat.size == 2 &&
+                      durationFormat.size == 2 &&
+                      timePattern.matches(startTime)) {
                     attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(
