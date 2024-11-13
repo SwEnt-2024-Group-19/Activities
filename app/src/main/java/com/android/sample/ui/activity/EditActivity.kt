@@ -456,7 +456,6 @@ fun EditActivityScreen(
                               type = types.find { it.name == selectedOption } ?: types[0],
                               participants = attendees,
                               comments = activity?.comments ?: listOf())
-
                       listActivityViewModel.updateActivity(updatedActivity)
                       navigationActions.navigateTo(Screen.OVERVIEW)
                     } catch (_: Exception) {}
