@@ -75,7 +75,8 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("image").assertIsDisplayed()
     composeTestRule.onNodeWithTag("title").assertIsDisplayed()
     composeTestRule.onNodeWithTag("description").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("price&&location").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("price").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("location").assertIsDisplayed()
     composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
     composeTestRule.onNodeWithTag("duration").assertIsDisplayed()
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
@@ -129,7 +130,7 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("priceText").assertTextContains("10.0 CHF")
     composeTestRule.onNodeWithTag("locationText").assertTextContains("EPFL")
     composeTestRule.onNodeWithTag("scheduleText").assertTextContains("3/11/2025 at 10:00")
-    composeTestRule.onNodeWithTag("durationText").assertTextContains("02:00")
+    composeTestRule.onNodeWithTag("durationText").assertTextContains("Event length: 02:00")
   }
 
   @Test
