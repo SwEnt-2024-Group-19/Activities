@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -97,8 +96,8 @@ fun LikedActivitiesScreen(
                           onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
                           modifier = Modifier.testTag("signInButton"),
                       ) {
-                            Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
-                          }
+                        Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
+                      }
                     }
               }
               if (likedActivitiesList != null) {
