@@ -396,7 +396,10 @@ fun CreateActivityScreen(
                   }
                   val calendar = GregorianCalendar()
                   val parts = dueDate.split("/")
-                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2 && timePattern.matches(startTime)) {
+                  if (parts.size == 3 &&
+                      timeFormat.size == 2 &&
+                      durationFormat.size == 2 &&
+                      timePattern.matches(startTime)) {
                     attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(
