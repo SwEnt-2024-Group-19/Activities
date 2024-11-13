@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -40,6 +41,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,17 +60,18 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
-import com.android.sample.model.camera.base64ToBitmap
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.ui.ActivityImageCarousel
+import com.android.sample.ui.GalleryScreen
 import com.android.sample.ui.camera.CameraScreen
-import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.updateActivityImages
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
@@ -106,10 +109,11 @@ fun EditActivityScreen(
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-  val _items_: List<String> = activity?.images ?: listOf()
-  val items_: List<Bitmap> =
-      _items_.map { base64ToBitmap(it) ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) }
-  var items: List<Bitmap> by remember { mutableStateOf(items_) }
+  var items by remember { mutableStateOf(activity?.images ?: listOf()) }
+  var isGalleryOpen by remember { mutableStateOf(false) }
+  var selectedImages = remember { mutableStateListOf<Bitmap>() }
+
+  // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -145,13 +149,36 @@ fun EditActivityScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
+        if (showDialogImage) {
+          AddImageDialog(
+              onDismiss = { showDialogImage = false },
+              onGalleryClick = {
+                showDialogImage = false
+                isGalleryOpen = true
+              },
+              onCameraClick = {
+                showDialogImage = false
+                isCamOpen = true
+              })
+        }
+        if (isGalleryOpen) {
+          GalleryScreen(
+              isGalleryOpen = { isGalleryOpen = false },
+              addImage = { bitmap -> selectedImages.add(bitmap) },
+              context = context)
+        }
         if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
-              controller = controller,
+              controller =
+                  remember {
+                    LifecycleCameraController(context).apply {
+                      setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+                    }
+                  },
               context = context,
               isCamOpen = { isCamOpen = false },
-              addElem = { bitmap -> items = listOf(bitmap) })
+              addElem = { bitmap -> selectedImages.add(bitmap) })
         } else {
           Column(
               modifier =
@@ -161,20 +188,12 @@ fun EditActivityScreen(
                       .verticalScroll(rememberScrollState())
                       .testTag("activityEditScreen"),
           ) {
-            if (showDialogImage) {
-              AddImageDialog(
-                  onDismiss = { showDialogImage = false },
-                  onGalleryClick = {},
-                  onCameraClick = {
-                    isCamOpen = true
-                    showDialogImage = false
-                  },
-              )
-            }
-            Carousel(
-                { showDialogImage = true },
-                items,
-                { bitmap -> items = items.filter { it != bitmap } })
+            ActivityImageCarousel(
+                activityId = activity?.uid ?: "",
+                onFailure = { exception ->
+                  Log.e("EditActivityScreen", "Failed to fetch images: ${exception.message}")
+                },
+            )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = title,
@@ -420,7 +439,6 @@ fun EditActivityScreen(
                           0,
                           0,
                           0)
-
                       val updatedActivity =
                           Activity(
                               uid = activity?.uid ?: "",
@@ -435,7 +453,7 @@ fun EditActivityScreen(
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
                               location = selectedLocation,
-                              images = listOf(),
+                              images = items,
                               type = types.find { it.name == selectedOption } ?: types[0],
                               participants = attendees,
                               comments = activity?.comments ?: listOf())
