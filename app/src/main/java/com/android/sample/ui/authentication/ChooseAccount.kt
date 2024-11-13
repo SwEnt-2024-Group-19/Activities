@@ -58,9 +58,11 @@ fun ChooseAccountScreen(
 
         // Profile Image
         item {
-          ProfileImage(
-              url = userProfile?.photo,
-              modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+          userProfile?.id?.let {
+            ProfileImage(
+                userId = it,
+                modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+          }
         }
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
