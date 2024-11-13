@@ -2,8 +2,19 @@ package com.android.sample.model.profile
 
 class MockProfilesRepository : ProfilesRepository {
 
-  private val userProfiles = mutableMapOf<String, User>()
-  private val userActivities = mutableMapOf<String, MutableList<String>>()
+  private val userProfiles =
+      mutableMapOf<String, User>(
+          "u1" to
+              User(
+                  id = "u1",
+                  name = "Alice",
+                  surname = "Smith",
+                  interests = listOf("Hiking", "Cycling"),
+                  activities = listOf("a1", "a2"),
+                  photo = null,
+                  likedActivities = listOf("a1")))
+  private val activitiesList =
+      mutableMapOf<String, MutableList<String>>("u1" to mutableListOf("a1", "a2"))
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     try {
@@ -24,7 +35,7 @@ class MockProfilesRepository : ProfilesRepository {
     try {
       // Add activity to user's activity list
       if (userProfiles.containsKey(userId)) {
-        userActivities.computeIfAbsent(userId) { mutableListOf() }.add(activityId)
+        activitiesList.computeIfAbsent(userId) { mutableListOf() }.add(activityId)
         onSuccess()
       } else {
         throw Exception("User not found")
