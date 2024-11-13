@@ -3,6 +3,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.resources.dummydata.email
+import com.android.sample.resources.dummydata.idToken
+import com.android.sample.resources.dummydata.password
+import com.android.sample.resources.dummydata.uid
 import com.android.sample.ui.navigation.NavigationActions
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.AuthResult
@@ -59,8 +63,6 @@ class SignInViewModelTest {
   @Test
   fun `signInWithEmail should call repository`() = runTest {
     // Given
-    val email = "test@example.com"
-    val password = "password123"
 
     // When
     signInViewModel.signInWithEmailAndPassword(
@@ -75,16 +77,14 @@ class SignInViewModelTest {
   @Test
   fun `signInWithGoogle should call repository`() = runTest {
     // Given
-    val googleIdToken = "testGoogleIdToken"
 
     // When
-    signInViewModel.handleGoogleSignInResult(
-        googleIdToken, {}, {}, mock(NavigationActions::class.java))
+    signInViewModel.handleGoogleSignInResult(idToken, {}, {}, mock(NavigationActions::class.java))
 
     advanceUntilIdle()
     // Then
 
-    verify(signInRepository).signInWithGoogle(eq(googleIdToken))
+    verify(signInRepository).signInWithGoogle(eq(idToken))
   }
 
   @Test
@@ -119,24 +119,22 @@ class SignInViewModelTest {
   @Test
   fun `handleGoogleSignInResult should call checkUserProfile on successful sign-in`() = runTest {
     // Given
-    val googleIdToken = "testGoogleIdToken"
     val onAuthSuccess = mock<() -> Unit>()
     val onAuthError = mock<(String) -> Unit>()
     val navigationActions = mock(NavigationActions::class.java)
 
     // Mock the FirebaseUser and AuthResult
     val mockUser = mock(FirebaseUser::class.java)
-    `when`(mockUser.uid).thenReturn("testUid")
+    `when`(mockUser.uid).thenReturn(uid)
 
     val mockAuthResult = mock(AuthResult::class.java)
     `when`(mockAuthResult.user).thenReturn(mockUser)
 
     // Mock the repository to return the AuthResult with non-null user
-    `when`(signInRepository.signInWithGoogle(eq(googleIdToken))).thenReturn(mockAuthResult)
+    `when`(signInRepository.signInWithGoogle(eq(idToken))).thenReturn(mockAuthResult)
 
     // When
-    signInViewModel.handleGoogleSignInResult(
-        googleIdToken, onAuthSuccess, onAuthError, navigationActions)
+    signInViewModel.handleGoogleSignInResult(idToken, onAuthSuccess, onAuthError, navigationActions)
 
     // Advance coroutine
     advanceUntilIdle()
@@ -144,39 +142,35 @@ class SignInViewModelTest {
     // Then
     verify(signInRepository)
         .checkUserProfile(eq("testUid"), eq(navigationActions), eq(onAuthSuccess), eq(onAuthError))
-    verify(signInRepository).signInWithGoogle(eq(googleIdToken)) // Ensure repository was called
+    verify(signInRepository).signInWithGoogle(eq(idToken)) // Ensure repository was called
   }
 
   @Test
   fun `handleGoogleSignInResult should call onAuthError when sign-in fails`() = runTest {
     // Given
-    val googleIdToken = "testGoogleIdToken"
     val onAuthSuccess = mock<() -> Unit>()
     val onAuthError = mock<(String) -> Unit>()
     val navigationActions = mock(NavigationActions::class.java)
 
     // Mock the repository to throw an exception
-    `when`(signInRepository.signInWithGoogle(eq(googleIdToken)))
+    `when`(signInRepository.signInWithGoogle(eq(idToken)))
         .thenThrow(RuntimeException("Sign-in error"))
 
     // When
-    signInViewModel.handleGoogleSignInResult(
-        googleIdToken, onAuthSuccess, onAuthError, navigationActions)
+    signInViewModel.handleGoogleSignInResult(idToken, onAuthSuccess, onAuthError, navigationActions)
 
     // Advance coroutine
     advanceUntilIdle()
 
     // Then
     verify(onAuthError).invoke("Google Sign-in failed: Sign-in error")
-    verify(signInRepository).signInWithGoogle(eq(googleIdToken)) // Ensure repository was called
+    verify(signInRepository).signInWithGoogle(eq(idToken)) // Ensure repository was called
   }
 
   @Test
   fun `signInWithEmailAndPassword should call checkUserProfile with null UID and invoke onAuthError`() =
       runTest {
         // Given
-        val email = "test@example.com"
-        val password = "password123"
         val onAuthError = mock<(String) -> Unit>()
         val navigationActions = mock(NavigationActions::class.java)
 
@@ -212,15 +206,14 @@ class SignInViewModelTest {
   fun `signInWithEmailAndPassword should call checkUserProfile when authResult user is not null`() =
       runTest {
         // Given
-        val email = "test@example.com"
-        val password = "password123"
+
         val onAuthSuccess = mock<() -> Unit>()
         val onAuthError = mock<(String) -> Unit>()
         val navigationActions = mock(NavigationActions::class.java)
 
         // Mock the AuthResult with a non-null user and UID
         val mockUser = mock(FirebaseUser::class.java)
-        `when`(mockUser.uid).thenReturn("testUid")
+        `when`(mockUser.uid).thenReturn(uid)
         val mockAuthResult = mock(AuthResult::class.java)
         `when`(mockAuthResult.user).thenReturn(mockUser)
 
@@ -236,8 +229,7 @@ class SignInViewModelTest {
 
         // Then
         verify(signInRepository)
-            .checkUserProfile(
-                eq("testUid"), eq(navigationActions), eq(onAuthSuccess), eq(onAuthError))
+            .checkUserProfile(eq(uid), eq(navigationActions), eq(onAuthSuccess), eq(onAuthError))
         verify(signInRepository)
             .signInWithEmail(eq(email), eq(password)) // Ensure repository was called
   }
