@@ -8,6 +8,7 @@ import com.android.sample.model.auth.SignInRepositoryFirebase
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.NominatimLocationRepository
+import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.ProfilesRepositoryFirestore
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -58,7 +59,7 @@ object RepositoryModule {
   @Singleton
   fun provideLocationPermissionChecker(
       @ApplicationContext context: Context
-  ): LocationPermissionChecker {
+  ): PermissionChecker {
     return LocationPermissionChecker(context)
   }
 
