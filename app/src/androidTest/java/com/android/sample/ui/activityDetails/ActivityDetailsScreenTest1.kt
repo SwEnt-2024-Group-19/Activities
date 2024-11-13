@@ -13,22 +13,19 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
-import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.activityWithParticipants
+import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.activitydetails.LikeButton
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import java.util.Calendar
-import java.util.GregorianCalendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -43,10 +40,8 @@ class ActivityDetailsScreenAndroidTest {
   private lateinit var mockNavigationActions: NavigationActions
 
   private lateinit var mockViewModel: ListActivitiesViewModel
-  private lateinit var activity: Activity
 
   private lateinit var mockProfileViewModel: ProfileViewModel
-  private lateinit var testUser: User
   private lateinit var mockFirebaseRepository: ActivitiesRepositoryFirestore
   private lateinit var mockRepository: ProfilesRepository
 
@@ -60,52 +55,9 @@ class ActivityDetailsScreenAndroidTest {
     mockNavigationActions = mock(NavigationActions::class.java)
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ACTIVITY_DETAILS)
 
-    testUser =
-        User(
-            id = "123",
-            name = "Amine",
-            surname = "A",
-            photo = "",
-            interests = listOf("Cycling", "Reading"),
-            activities = listOf("Football"))
-
     mockViewModel = mock(ListActivitiesViewModel::class.java)
-    activity =
-        Activity(
-            uid = "123",
-            title = "Sample Activity",
-            description = "Sample Description",
-            date = Timestamp(GregorianCalendar(2025, Calendar.NOVEMBER, 3).time),
-            price = 10.0,
-            placesLeft = 5,
-            maxPlaces = 10,
-            creator = "Creator",
-            status = ActivityStatus.ACTIVE,
-            location = Location(46.519962, 6.633597, "EPFL"),
-            images = listOf("1"),
-            participants =
-                listOf(
-                    User(
-                        id = "1",
-                        name = "Amine",
-                        surname = "A",
-                        interests = listOf("Cycling"),
-                        activities = listOf(),
-                        photo = "",
-                        likedActivities = listOf("1")),
-                    User(
-                        id = "2",
-                        name = "John",
-                        surname = "Doe",
-                        interests = listOf("Reading"),
-                        activities = listOf(),
-                        photo = "",
-                        likedActivities = listOf("1"))),
-            duration = "02:00",
-            startTime = "10:00",
-            type = ActivityType.INDIVIDUAL,
-            comments = listOf())
-    val activityStateFlow = MutableStateFlow(activity)
+
+    val activityStateFlow = MutableStateFlow(activityWithParticipants)
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
   }
 
@@ -123,7 +75,8 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("image").assertIsDisplayed()
     composeTestRule.onNodeWithTag("title").assertIsDisplayed()
     composeTestRule.onNodeWithTag("description").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("price&&location").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("price").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("location").assertIsDisplayed()
     composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
     composeTestRule.onNodeWithTag("duration").assertIsDisplayed()
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
@@ -149,8 +102,8 @@ class ActivityDetailsScreenAndroidTest {
   fun enrollButtonIsNotDisplayedWhenActivityIsFinished() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    activity = activity.copy(status = ActivityStatus.FINISHED)
-    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
+    val activityFinished = activityWithParticipants.copy(status = ActivityStatus.FINISHED)
+    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activityFinished))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -177,7 +130,7 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("priceText").assertTextContains("10.0 CHF")
     composeTestRule.onNodeWithTag("locationText").assertTextContains("EPFL")
     composeTestRule.onNodeWithTag("scheduleText").assertTextContains("3/11/2025 at 10:00")
-    composeTestRule.onNodeWithTag("durationText").assertTextContains("02:00")
+    composeTestRule.onNodeWithTag("durationText").assertTextContains("Event length: 02:00")
   }
 
   @Test
@@ -216,8 +169,8 @@ class ActivityDetailsScreenAndroidTest {
   @Test
   fun editButton_displaysForActiveActivity_whenUserIsTheCreator() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    val activity1 = activity.copy(creator = "123")
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "123")))
+    val activity1 = activityWithParticipants.copy(creator = "123")
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity1))
 
     composeTestRule.setContent {
@@ -264,8 +217,9 @@ class ActivityDetailsScreenAndroidTest {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     // Set placesLeft equal to maxPlaces to simulate full capacity
-    activity = activity.copy(placesLeft = activity.maxPlaces)
-    val activityStateFlow = MutableStateFlow(activity)
+    val activityWithMaxParticipants =
+        activityWithParticipants.copy(placesLeft = activityWithParticipants.maxPlaces)
+    val activityStateFlow = MutableStateFlow(activityWithMaxParticipants)
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
 
     composeTestRule.setContent {
@@ -289,7 +243,7 @@ class ActivityDetailsScreenAndroidTest {
     // Set initial comments with a main comment
     val comments =
         listOf(
-            activity.comments
+            activityWithParticipants.comments
                 .firstOrNull()
                 ?.copy(uid = "main-comment-uid", content = "Main comment") ?: return)
 
@@ -315,7 +269,7 @@ class ActivityDetailsScreenAndroidTest {
     // Set initial comments with replies
     val comments =
         listOf(
-            activity.comments
+            activityWithParticipants.comments
                 .firstOrNull()
                 ?.copy(
                     uid = "main-comment-uid",
@@ -364,7 +318,7 @@ class ActivityDetailsScreenAndroidTest {
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     val comments =
         listOf(
-            activity.comments
+            activityWithParticipants.comments
                 .firstOrNull()
                 ?.copy(uid = "main-comment-uid", content = "Main comment", replies = listOf())
                 ?: return)
@@ -405,14 +359,16 @@ class ActivityDetailsScreenAndroidTest {
     // composeTestRule.onNodeWithTag("participants").assertIsDisplayed()
 
     // Check if each participant's name is displayed
-    activity.participants.forEach { participant ->
+    activityWithParticipants.participants.forEach { participant ->
       composeTestRule.onNodeWithText(participant.name).assertIsDisplayed()
     }
 
     fun changeIconWhenActivityIsLiked() {
       mockProfileViewModel = ProfileViewModel(mockRepository)
 
-      composeTestRule.setContent { LikeButton(testUser, activity, mockProfileViewModel) }
+      composeTestRule.setContent {
+        LikeButton(testUser, activityWithParticipants, mockProfileViewModel)
+      }
 
       composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
 

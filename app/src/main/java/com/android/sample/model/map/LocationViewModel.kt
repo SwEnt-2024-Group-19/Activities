@@ -15,38 +15,33 @@ constructor(
     private val permissionChecker: LocationPermissionChecker
 ) : ViewModel() {
 
-  private val query_ = MutableStateFlow("")
-  open val query: StateFlow<String> = query_
+  private val _query = MutableStateFlow("")
+  open val query: StateFlow<String> = _query
 
-  private var locationSuggestions_ = MutableStateFlow(emptyList<Location>())
-  val locationSuggestions: StateFlow<List<Location>> = locationSuggestions_
+  private var _locationSuggestions = MutableStateFlow(emptyList<Location>())
+  val locationSuggestions: StateFlow<List<Location>> = _locationSuggestions
 
   private val _currentLocation = MutableStateFlow<Location?>(null)
   val currentLocation: StateFlow<Location?> = _currentLocation
 
   fun setQuery(query: String) {
-    query_.value = query
+    _query.value = query
 
     if (query.isNotEmpty()) {
       repository.search(
           query,
           onSuccess = { locations ->
-            locationSuggestions_.value = locations.distinct() // Filter out repetitive updates
-            println("Updated location suggestions: ${locationSuggestions_.value}") // Debugging line
+            _locationSuggestions.value = locations.distinct() // Filter out repetitive updates
           },
           onFailure = { throwable ->
-            locationSuggestions_.value = emptyList()
-            println("Failed to fetch suggestions, cleared list. Error: ${throwable.message}")
-            // or
+            _locationSuggestions.value = emptyList()
             Log.e(
                 "LocationSuggestions",
                 "Failed to fetch suggestions: ${throwable.message}",
                 throwable)
-            // Include the error message in the log message for easier debugging
           })
     } else {
-      locationSuggestions_.value = emptyList()
-      println("Query is empty, cleared suggestions.") // Debugging line
+      _locationSuggestions.value = emptyList()
     }
   }
 

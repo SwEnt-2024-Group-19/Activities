@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,12 +23,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -204,27 +203,29 @@ fun ActivityDetailsScreen(
                   }
 
               Spacer(modifier = Modifier.height(8.dp))
-              // Price and Distance Row
+
+              // price
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceBetween,
-                  modifier = Modifier.fillMaxWidth().testTag("price&&location")) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                      Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                      Spacer(modifier = Modifier.width(4.dp))
-                      Text(
-                          text =
-                              if (price != null) "${price.toString()} CHF" else "not defined yet",
-                          modifier = Modifier.testTag("priceText"))
-                    }
+                  modifier = Modifier.testTag("price")) {
+                    Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (price != null) "${price.toString()} CHF" else "not defined yet",
+                        modifier = Modifier.testTag("priceText"))
+                  }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                      Icon(Icons.Default.LocationOn, contentDescription = "Location")
-                      Spacer(modifier = Modifier.width(4.dp))
-                      Text(
-                          text = location?.name ?: "No location",
-                          modifier = Modifier.testTag("locationText"))
-                    }
+              Spacer(modifier = Modifier.height(8.dp))
+
+              // location
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.testTag("location")) {
+                    Icon(Icons.Default.LocationOn, contentDescription = "Location")
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = location?.name ?: "No location",
+                        modifier = Modifier.testTag("locationText"))
                   }
               Spacer(modifier = Modifier.height(8.dp))
 
@@ -238,14 +239,16 @@ fun ActivityDetailsScreen(
                         text = if (startTime != null) "$dueDate at $startTime" else dueDate,
                         modifier = Modifier.testTag("scheduleText"))
                   }
+
+              Spacer(modifier = Modifier.height(8.dp))
               // duration
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.testTag("duration")) {
-                    Icon(Icons.Default.AccessTime, contentDescription = "duration")
+                    Icon(Icons.Default.Timelapse, contentDescription = "duration")
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = duration ?: "not defined yet",
+                        text = "Event length: ${duration ?: "not defined yet"}",
                         modifier = Modifier.testTag("durationText"))
                   }
               Spacer(modifier = Modifier.height(32.dp))

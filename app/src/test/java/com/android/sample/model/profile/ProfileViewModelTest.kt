@@ -1,12 +1,9 @@
 package com.android.sample.model.profile
 
 import androidx.test.core.app.ApplicationProvider
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
-import com.android.sample.model.map.Location
+import com.android.sample.resources.dummydata.activity
+import com.android.sample.resources.dummydata.testUser
 import com.google.firebase.FirebaseApp
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.junit.Before
@@ -27,33 +24,6 @@ class ProfileViewModelTest {
   private lateinit var profilesRepository: ProfilesRepositoryFirestore
   private lateinit var firebaseFirestore: FirebaseFirestore
 
-  private val user =
-      User(
-          id = "1",
-          name = "John",
-          surname = "Doe",
-          photo = "urlToPhoto",
-          interests = listOf("Reading", "Hiking"),
-          activities = listOf("Activity1", "Activity2"))
-
-  private val activity =
-      Activity(
-          title = "FOOTBALL",
-          uid = "1",
-          status = ActivityStatus.ACTIVE,
-          location = Location(46.519962, 6.633597, "EPFL"),
-          date = Timestamp.now(),
-          creator = "me",
-          description = "Do something",
-          placesLeft = 0,
-          maxPlaces = 0,
-          participants = listOf(),
-          images = listOf(),
-          duration = "00:30",
-          startTime = "09:00",
-          type = ActivityType.PRO,
-          price = 0.0)
-
   @Before
   fun setUp() {
 
@@ -68,13 +38,13 @@ class ProfileViewModelTest {
 
   @Test
   fun getActivitiesCallsRepository() {
-    profileViewModel.fetchUserData(user.id)
+    profileViewModel.fetchUserData(testUser.id)
     verify(profilesRepository).getUser(any(), any(), any())
   }
 
   @Test
   fun addActivitiesCallsRepository() {
-    profileViewModel.addActivity(activity.uid, user.id)
+    profileViewModel.addActivity(activity.uid, testUser.id)
     verify(profilesRepository).addActivity(eq(activity.uid), any(), any(), any())
   }
 
@@ -86,17 +56,17 @@ class ProfileViewModelTest {
     // Assuming `getUser` is called with three parameters: userId, onSuccess, onFailure
     // Using `eq` for specific values and `any` for generics where the actual instance doesn't
     // matter for the test
-    profileViewModel.fetchUserData(user.id)
+    profileViewModel.fetchUserData(testUser.id)
 
     // Correct the usage by ensuring all parameters use matchers:
-    verify(profilesRepository).getUser(eq(user.id), any(), any())
+    verify(profilesRepository).getUser(eq(testUser.id), any(), any())
   }
 
   @Test
   fun updateActivitiesCallsRepository() {
     // This should be an operation that triggers updateProfile
-    profileViewModel.updateProfile(user)
-    verify(profilesRepository).updateProfile(eq(user), any(), any())
+    profileViewModel.updateProfile(testUser)
+    verify(profilesRepository).updateProfile(eq(testUser), any(), any())
   }
 
   @Test
@@ -104,10 +74,10 @@ class ProfileViewModelTest {
     val onSuccess = mock<() -> Unit>()
     val onError = mock<(Exception) -> Unit>()
 
-    profileViewModel.createUserProfile(user, onSuccess, onError)
+    profileViewModel.createUserProfile(testUser, onSuccess, onError)
 
     // Verify that the repository's addProfileToDatabase method is called with the correct user
-    verify(profilesRepository).addProfileToDatabase(eq(user), any(), any())
+    verify(profilesRepository).addProfileToDatabase(eq(testUser), any(), any())
   }
 
   @Test
@@ -116,12 +86,12 @@ class ProfileViewModelTest {
     val onError = mock<(Exception) -> Unit>()
 
     // Configure the repository mock to trigger the onSuccess callback
-    `when`(profilesRepository.addProfileToDatabase(eq(user), any(), any())).thenAnswer {
+    `when`(profilesRepository.addProfileToDatabase(eq(testUser), any(), any())).thenAnswer {
       val successCallback = it.getArgument<() -> Unit>(1)
       successCallback()
     }
 
-    profileViewModel.createUserProfile(user, onSuccess, onError)
+    profileViewModel.createUserProfile(testUser, onSuccess, onError)
 
     // Verify that onSuccess callback is triggered
     verify(onSuccess).invoke()
@@ -134,12 +104,12 @@ class ProfileViewModelTest {
     val exception = Exception("Database error")
 
     // Configure the repository mock to trigger the onError callback
-    `when`(profilesRepository.addProfileToDatabase(eq(user), any(), any())).thenAnswer {
+    `when`(profilesRepository.addProfileToDatabase(eq(testUser), any(), any())).thenAnswer {
       val errorCallback = it.getArgument<(Exception) -> Unit>(2)
       errorCallback(exception)
     }
 
-    profileViewModel.createUserProfile(user, onSuccess, onError)
+    profileViewModel.createUserProfile(testUser, onSuccess, onError)
 
     // Verify that onError callback is triggered with the correct exception
     verify(onError).invoke(eq(exception))
@@ -148,32 +118,15 @@ class ProfileViewModelTest {
   @Test
   fun addLikedActivity() {
     // Set up user with the activity in likedActivities
-    val user =
-        User(
-            id = "1",
-            name = "John",
-            surname = "Doe",
-            photo = "urlToPhoto",
-            interests = listOf("Reading", "Hiking"),
-            activities = emptyList(),
-            likedActivities = emptyList())
-    profileViewModel.addLikedActivity(user.id, activity.uid)
-    verify(profilesRepository).addLikedActivity(eq(user.id), eq(activity.uid), any(), any())
+
+    profileViewModel.addLikedActivity(testUser.id, activity.uid)
+    verify(profilesRepository).addLikedActivity(eq(testUser.id), eq(activity.uid), any(), any())
   }
 
   @Test
   fun removeLikedActivity() {
     // Set up user with the activity in likedActivities
-    val user =
-        User(
-            id = "1",
-            name = "John",
-            surname = "Doe",
-            photo = "urlToPhoto",
-            interests = listOf("Reading", "Hiking"),
-            activities = emptyList(),
-            likedActivities = listOf(activity.uid))
-    profileViewModel.removeLikedActivity(user.id, activity.uid)
-    verify(profilesRepository).removeLikedActivity(eq(user.id), eq(activity.uid), any(), any())
+    profileViewModel.removeLikedActivity(testUser.id, activity.uid)
+    verify(profilesRepository).removeLikedActivity(eq(testUser.id), eq(activity.uid), any(), any())
   }
 }

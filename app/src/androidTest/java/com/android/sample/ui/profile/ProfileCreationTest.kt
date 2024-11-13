@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.testUserId
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -33,9 +34,6 @@ class ProfileCreationTest {
   // private val mockProfilesRepository: ProfilesRepository = mock()
   @get:Rule val composeTestRule = createComposeRule()
 
-  // Define a test user ID
-  private val testUserId = "testUser123"
-
   @Before
   fun setUp() {
     navigationActions = mock(NavigationActions::class.java)
@@ -46,7 +44,7 @@ class ProfileCreationTest {
     val mockFirebaseAuth = mock(FirebaseAuth::class.java)
     val mockFirebaseUser = mock(FirebaseUser::class.java)
     `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
-    `when`(mockFirebaseUser.uid).thenReturn("testUser123")
+    `when`(mockFirebaseUser.uid).thenReturn(testUserId)
 
     profileViewModel = ProfileViewModel(repository = mockProfilesRepository)
 

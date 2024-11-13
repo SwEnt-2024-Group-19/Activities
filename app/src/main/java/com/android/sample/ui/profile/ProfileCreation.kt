@@ -172,7 +172,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                         id = uid,
                         name = name,
                         surname = surname,
-                        interests = interests,
+                        interests = newListInterests,
                         activities = emptyList(),
                         photo = photo,
                         likedActivities = emptyList())
