@@ -1,5 +1,8 @@
 package com.android.sample.ui.profile
 
+import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +48,8 @@ import com.android.sample.model.profile.User
 import com.android.sample.ui.ImagePicker
 import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.uploadProfilePicture
+import com.android.sample.ui.uriToBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +62,9 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
   var surname by remember { mutableStateOf(profile.surname) }
   var interests by remember { mutableStateOf(profile.interests) }
   var photo by remember { mutableStateOf(profile.photo) }
+  var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+  var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+  val context = LocalContext.current
 
   Scaffold(
       modifier = Modifier.testTag("editProfileScreen"),
@@ -77,11 +86,18 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)) {
               ProfileImage(
-                  url = photo,
+                  userId = profile.id,
                   modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
               ImagePicker(
-                  onImagePicked = { photo = it.toString() }, buttonText = "Modify Profile Picture")
+                  onImagePicked = { uri ->
+                    selectedImageUri = uri
+                    uri?.let {
+                      // Convert URI to Bitmap
+                      selectedBitmap = uriToBitmap(it, context)
+                    }
+                  },
+                  buttonText = "Modify Profile Picture")
 
               OutlinedTextField(
                   value = name,
@@ -137,6 +153,19 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
 
               Button(
                   onClick = {
+                    selectedBitmap?.let { bitmap ->
+                      uploadProfilePicture(
+                          profile.id,
+                          bitmap,
+                          onSuccess = { url ->
+                            photo = url // Update photo URL in profile
+                          },
+                          onFailure = { error ->
+                            Log.e(
+                                "EditProfileScreen",
+                                "Failed to upload profile picture: ${error.message}")
+                          })
+                    }
                     try {
                       profileViewModel.updateProfile(
                           User(
