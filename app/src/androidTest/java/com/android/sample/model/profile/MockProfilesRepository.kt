@@ -12,7 +12,8 @@ class MockProfilesRepository : ProfilesRepository {
                   interests = listOf("Hiking", "Cycling"),
                   activities = listOf("a1", "a2"),
                   photo = null,
-                  likedActivities = listOf("a1")))
+                  likedActivities = listOf("a1"))
+      )
   private val activitiesList =
       mutableMapOf<String, MutableList<String>>("u1" to mutableListOf("a1", "a2"))
 

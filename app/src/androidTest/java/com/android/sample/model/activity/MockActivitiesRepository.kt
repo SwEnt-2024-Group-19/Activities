@@ -23,7 +23,8 @@ class MockActivitiesRepository : ActivitiesRepository {
               status = ActivityStatus.ACTIVE,
               type = ActivityType.PRO,
               participants = listOf(),
-              comments = listOf()))
+              comments = listOf())
+      )
   private var currentId = 0
 
   override fun getNewUid(): String {
