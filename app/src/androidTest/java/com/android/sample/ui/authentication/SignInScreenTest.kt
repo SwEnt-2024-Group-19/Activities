@@ -2,9 +2,11 @@ package com.android.sample.ui.authentication
 
 import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
@@ -49,36 +51,65 @@ class SignInScreenTest {
 
   @Test
   fun allElementsAreDisplayed() {
-    // Set the SignInScreen as the content to test
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("EmailTextField"))
     composeTestRule.onNodeWithTag("EmailTextField").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("PasswordTextField"))
     composeTestRule.onNodeWithTag("PasswordTextField").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("SignInButton"))
     composeTestRule.onNodeWithTag("SignInButton").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("GoogleSignInButton"))
     composeTestRule.onNodeWithTag("GoogleSignInButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("SignInScreenColumn").performScrollToNode(hasTestTag("AppLogo"))
     composeTestRule.onNodeWithTag("AppLogo").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("ContinueAsGuestButton"))
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("GoToSignUpButton"))
     composeTestRule.onNodeWithTag("GoToSignUpButton").assertIsDisplayed()
   }
 
   @Test
   fun wrongPassword() {
-    // Set the SignInScreen as the content to test
-
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("EmailTextField"))
     composeTestRule.onNodeWithTag("EmailTextField").performTextInput("achraf@hakimi.ma")
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("PasswordTextField"))
     composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("")
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("SignInButton"))
     composeTestRule.onNodeWithTag("SignInButton").performClick()
     composeTestRule.onNodeWithTag("PasswordErrorText").assertIsDisplayed()
   }
 
   @Test
   fun testContinueAsGuestButton() {
-
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("ContinueAsGuestButton"))
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
     verify(navigationActions).navigateTo(Screen.OVERVIEW)
   }
 
   @Test
   fun testGoToSignUpButton() {
-
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("GoToSignUpButton"))
     composeTestRule.onNodeWithTag("GoToSignUpButton").performClick()
     verify(navigationActions).navigateTo(Screen.SIGN_UP)
   }
@@ -111,6 +142,9 @@ class SignInScreenTest {
   @Test
   fun googleSignInReturnsValidActivityResult() {
     Intents.init()
+    composeTestRule
+        .onNodeWithTag("SignInScreenColumn")
+        .performScrollToNode(hasTestTag("GoogleSignInButton"))
     composeTestRule.onNodeWithTag("GoogleSignInButton").performClick()
 
     // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)

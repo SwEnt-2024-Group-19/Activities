@@ -1,12 +1,8 @@
 package com.android.sample.model.profile
 
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
-import com.android.sample.model.map.Location
+import com.android.sample.resources.dummydata.testUser
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -32,33 +28,6 @@ class ProfilesRepositoryFirestoreTest {
 
   private lateinit var profileRepositoryFirestore: ProfilesRepositoryFirestore
 
-  private val activity =
-      Activity(
-          title = "FOOTBALL",
-          uid = "1",
-          status = ActivityStatus.ACTIVE,
-          location = Location(46.519962, 6.633597, "EPFL"),
-          date = Timestamp.now(),
-          creator = "me",
-          description = "Do something",
-          placesLeft = 0,
-          maxPlaces = 0,
-          participants = listOf(),
-          images = listOf(),
-          duration = "00:30",
-          startTime = "09:00",
-          type = ActivityType.PRO,
-          price = 0.0)
-
-  private val user =
-      User(
-          id = "1",
-          name = "John",
-          surname = "Doe",
-          photo = "urlToPhoto",
-          interests = listOf("Reading", "Hiking"),
-          activities = listOf("Activity1", "Activity2"))
-
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
@@ -76,15 +45,7 @@ class ProfilesRepositoryFirestoreTest {
   fun getUser_callsDocumentss() {
     `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
-    `when`(mockDocumentSnapshot.toObject(User::class.java))
-        .thenReturn(
-            User(
-                id = "1",
-                name = "John",
-                surname = "Doe",
-                interests = listOf("Reading", "Hiking"),
-                activities = listOf("Activity1", "Activity2"),
-                photo = "urlToPhoto"))
+    `when`(mockDocumentSnapshot.toObject(User::class.java)).thenReturn(testUser)
 
     profileRepositoryFirestore.getUser(
         "1", onSuccess = {}, onFailure = { fail("Failure callback should not be called") })
@@ -94,29 +55,21 @@ class ProfilesRepositoryFirestoreTest {
 
   @Test
   fun updateProfile_shouldCallFirestoreCollection() {
-    val user =
-        User(
-            id = "1",
-            name = "John",
-            surname = "Doe",
-            interests = listOf("Reading", "Hiking"),
-            activities = listOf("Activity1", "Activity2"),
-            photo = "urlToPhoto")
 
-    `when`(mockDocumentReference.set(user)).thenReturn(Tasks.forResult(null))
+    `when`(mockDocumentReference.set(testUser)).thenReturn(Tasks.forResult(null))
 
-    profileRepositoryFirestore.updateProfile(user, onSuccess = {}, onFailure = {})
+    profileRepositoryFirestore.updateProfile(testUser, onSuccess = {}, onFailure = {})
 
-    verify(mockDocumentReference).set(user)
+    verify(mockDocumentReference).set(testUser)
   }
 
   @Test
   fun updateProfile_shouldCallFirestoreCollectionn() {
     val mockTaskVoid: Task<Void> = Tasks.forResult(null)
-    `when`(mockDocumentReference.set(user)).thenReturn(mockTaskVoid)
+    `when`(mockDocumentReference.set(testUser)).thenReturn(mockTaskVoid)
 
-    profileRepositoryFirestore.updateProfile(user, onSuccess = {}, onFailure = {})
+    profileRepositoryFirestore.updateProfile(testUser, onSuccess = {}, onFailure = {})
 
-    verify(mockDocumentReference).set(user)
+    verify(mockDocumentReference).set(testUser)
   }
 }

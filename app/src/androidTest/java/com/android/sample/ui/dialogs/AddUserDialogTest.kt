@@ -5,6 +5,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.emptyUser
+import com.android.sample.resources.dummydata.simpleUser
 import org.junit.Rule
 import org.junit.Test
 
@@ -30,16 +32,7 @@ class AddUserDialogTest {
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(
-        userAdded ==
-            User(
-                id = "",
-                name = "John",
-                surname = "Doe",
-                interests = listOf(),
-                activities = listOf(),
-                photo = null,
-                likedActivities = listOf()))
+    assert(userAdded == simpleUser)
   }
 
   @Test
@@ -59,16 +52,7 @@ class AddUserDialogTest {
 
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(
-        userAdded ==
-            User(
-                id = "",
-                name = "",
-                surname = "",
-                interests = listOf(),
-                activities = listOf(),
-                photo = null,
-                likedActivities = listOf()))
+    assert(userAdded == emptyUser)
   }
 
   @Test
@@ -80,15 +64,6 @@ class AddUserDialogTest {
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
 
-    assert(
-        userAdded ==
-            User(
-                id = "",
-                name = "John",
-                surname = "Doe",
-                interests = listOf(),
-                activities = listOf(),
-                photo = null,
-                likedActivities = listOf()))
+    assert(userAdded == simpleUser)
   }
 }

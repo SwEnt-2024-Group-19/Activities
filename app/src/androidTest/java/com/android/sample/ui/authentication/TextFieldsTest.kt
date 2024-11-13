@@ -3,6 +3,7 @@ package com.android.sample.ui.authentication
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.android.sample.resources.dummydata.password
 import com.android.sample.ui.components.PasswordTextField
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +22,8 @@ class TextFieldsTest {
           password = password,
           onPasswordChange = {},
           isPasswordVisible = isPasswordVisible.value,
-          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value })
+          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+          passwordError = null)
     }
 
     // Check that the trailing icon shows "Show password", indicating the password is masked
@@ -30,7 +32,6 @@ class TextFieldsTest {
 
   @Test
   fun testPasswordVisibilityToggle() {
-    val password = "testPassword"
     val isPasswordVisible = mutableStateOf(false)
 
     composeTestRule.setContent {
@@ -38,7 +39,8 @@ class TextFieldsTest {
           password = password,
           onPasswordChange = {},
           isPasswordVisible = isPasswordVisible.value,
-          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value })
+          onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+          passwordError = null)
     }
 
     composeTestRule.onNodeWithText("Password").assertExists()

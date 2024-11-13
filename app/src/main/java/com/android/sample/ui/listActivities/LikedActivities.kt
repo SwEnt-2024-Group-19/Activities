@@ -143,7 +143,11 @@ fun ActivityCard2(
     allActivities: List<Activity>,
 ) {
 
-  val activity = allActivities.filter { act -> act.uid == activityId }[0]
+  val activity = allActivities.find { act -> act.uid == activityId }
+  if (activity == null) {
+    profileViewModel.removeLikedActivity(profile!!.id, activityId)
+    return
+  }
 
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())

@@ -8,7 +8,7 @@ import androidx.compose.ui.test.performClick
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.profile.ProfileViewModel
-import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.userProfile
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,14 +40,6 @@ class ChooseAccountScreenTest {
   @Test
   fun allElementsAreDisplayed() {
     // Setup a default mock user profile
-    val userProfile =
-        User(
-            name = "John Doe",
-            photo = "https://example.com/photo.jpg",
-            interests = listOf(),
-            surname = "Doe",
-            id = "123",
-            activities = listOf())
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
     // Set the content once for this test
@@ -66,14 +58,6 @@ class ChooseAccountScreenTest {
   @Test
   fun displaysGreetingTextAndProfileImage_whenUserProfileIsNotNull() {
     // Setup the mock user profile with a non-null user
-    val userProfile =
-        User(
-            name = "John Doe",
-            photo = "https://example.com/photo.jpg",
-            interests = listOf(),
-            surname = "Doe",
-            id = "123",
-            activities = listOf())
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
     // Set the content once for this test
@@ -103,14 +87,7 @@ class ChooseAccountScreenTest {
   @Test
   fun clickableContinueText_navigatesToOverview() {
     // Setup a default mock user profile
-    val userProfile =
-        User(
-            name = "John Doe",
-            photo = "https://example.com/photo.jpg",
-            interests = listOf(),
-            surname = "Doe",
-            id = "123",
-            activities = listOf())
+
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
     // Set the content once for this test
@@ -127,14 +104,7 @@ class ChooseAccountScreenTest {
   @Test
   fun displaysPlaceholder_whenProfileImageUrlIsEmpty() {
     // Setup the mock user profile with an empty photo URL
-    val userProfile =
-        User(
-            name = "John Doe",
-            photo = "",
-            interests = listOf(),
-            surname = "Doe",
-            id = "123",
-            activities = listOf())
+
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
     // Set the content once for this test
