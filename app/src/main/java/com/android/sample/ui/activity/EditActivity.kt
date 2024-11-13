@@ -398,7 +398,10 @@ fun EditActivityScreen(
                 enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
                 onClick = {
                   val timeFormat = startTime?.split(":") ?: listOf()
-                  if (timeFormat.size != 2) {
+                    val timePattern = Regex("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")
+
+                    if (timeFormat.size != 2 || !startTime?.let { timePattern.matches(it) }!!) {
+
                     Toast.makeText(
                             context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
                         .show()
@@ -411,7 +414,11 @@ fun EditActivityScreen(
                   }
                   val calendar = GregorianCalendar()
                   val parts = dueDate.split("/")
-                  if (parts.size == 3) {
+                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2 && startTime?.let {
+                          timePattern.matches(
+                              it
+                          )
+                      } == true) {
                     try {
                       calendar.set(
                           parts[2].toInt(),
