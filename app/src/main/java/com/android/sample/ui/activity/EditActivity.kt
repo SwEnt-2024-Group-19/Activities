@@ -190,13 +190,7 @@ fun EditActivityScreen(
                     isCamOpen = true
                   })
             }
-            //            ActivityImageCarousel(
-            //                activityId = activity?.uid ?: "",
-            //                onFailure = { exception ->
-            //                  Log.e("EditActivityScreen", "Failed to fetch images:
-            // ${exception.message}")
-            //                },
-            //            )
+
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = title,

@@ -167,11 +167,7 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
-                    // Optional: Add placeholder text in the center
-                    //                    ActivityImageCarousel(
-                    //                        activityId = activity?.uid ?: "",
-                    //                        onFailure = { Log.e("ActivityDetailsScreen", "Failed
-                    // to load image") })
+
                     LikeButton(profile, activity, profileViewModel)
                   }
 
