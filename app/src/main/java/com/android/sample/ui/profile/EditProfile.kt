@@ -154,7 +154,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
 
                 Button(
                     onClick = { showDialogImage = true },
-                    modifier = Modifier.testTag("uploadPictureButton")) {
+                    modifier = Modifier.testTag("uploadPicture")) {
                       Text("Modify Profile Picture")
                     }
 

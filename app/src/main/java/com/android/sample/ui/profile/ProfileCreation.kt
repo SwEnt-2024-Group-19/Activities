@@ -147,7 +147,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
 
           Button(
               onClick = { showDialogImage = true },
-              modifier = Modifier.testTag("uploadPictureButton")) {
+              modifier = Modifier.testTag("uploadPicture")) {
                 Text("Modify Profile Picture")
               }
           Spacer(modifier = Modifier.padding((2 * LARGE_PADDING).dp))
