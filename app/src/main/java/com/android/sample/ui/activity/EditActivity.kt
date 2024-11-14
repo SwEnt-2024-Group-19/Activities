@@ -113,7 +113,7 @@ fun EditActivityScreen(
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-  var items by remember { mutableStateOf(activity?.images ?: listOf()) }
+  //var items by remember { mutableStateOf(activity?.images ?: listOf()) }
   var isGalleryOpen by remember { mutableStateOf(false) }
   var selectedImages = remember { mutableStateListOf<Bitmap>() }
 
@@ -477,7 +477,7 @@ fun EditActivityScreen(
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
                               location = selectedLocation,
-                              images = items,
+                              images = activity?.images ?: listOf(),
                               type = types.find { it.name == selectedOption } ?: types[0],
                               participants = attendees,
                               comments = activity?.comments ?: listOf())

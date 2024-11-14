@@ -50,23 +50,6 @@ fun takePhoto(
       })
 }
 
-fun bitmapToBase64(bitmap: Bitmap): String {
-  val byteArrayOutputStream = ByteArrayOutputStream()
-  bitmap.compress(Bitmap.CompressFormat.PNG, 70, byteArrayOutputStream)
-  val byteArray = byteArrayOutputStream.toByteArray()
-  return Base64.encodeToString(byteArray, Base64.DEFAULT)
-}
-
-fun base64ToBitmap(encodedString: String): Bitmap? {
-  return try {
-    val decodedBytes = Base64.decode(encodedString, Base64.DEFAULT)
-    BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-  } catch (e: IllegalArgumentException) {
-    e.printStackTrace()
-    null
-  }
-}
-
 fun flipCamera(cameraSelector: CameraSelector): CameraSelector {
   if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA)
       return CameraSelector.DEFAULT_FRONT_CAMERA
@@ -157,55 +140,6 @@ fun uploadActivityImages(
           return@addOnFailureListener
         }
   }
-}
-
-fun updateActivityImages(
-    activityId: String,
-    existingImageUrls: List<String>,
-    bitmaps: List<Bitmap>, // This now includes potentially new and old bitmaps
-    onSuccess: (List<String>) -> Unit,
-    onFailure: (Exception) -> Unit
-) {
-  val storageRef = FirebaseStorage.getInstance().reference
-  val newImageUrls = mutableListOf<String>()
-  var uploadCount = bitmaps.size // We assume all bitmaps could potentially be new uploads
-
-  bitmaps.forEach { bitmap ->
-    val timestamp = System.currentTimeMillis()
-    val activityImageRef = storageRef.child("activities/$activityId/image_$timestamp.jpg")
-
-    val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
-    val data = baos.toByteArray()
-
-    activityImageRef
-        .putBytes(data)
-        .addOnSuccessListener {
-          activityImageRef.downloadUrl.addOnSuccessListener { uri ->
-            newImageUrls.add(uri.toString())
-            uploadCount--
-            if (uploadCount == 0) {
-              // Combine existing URLs with new URLs and remove duplicates
-              val finalUrls = (existingImageUrls + newImageUrls).distinct()
-              finalizeUpdate(activityId, finalUrls, onSuccess, onFailure)
-            }
-          }
-        }
-        .addOnFailureListener { onFailure(it) }
-  }
-}
-
-private fun finalizeUpdate(
-    activityId: String,
-    imageUrls: List<String>,
-    onSuccess: (List<String>) -> Unit,
-    onFailure: (Exception) -> Unit
-) {
-  val activityDocRef = FirebaseFirestore.getInstance().collection("activities").document(activityId)
-  activityDocRef
-      .update("images", imageUrls)
-      .addOnSuccessListener { onSuccess(imageUrls) }
-      .addOnFailureListener { onFailure(it) }
 }
 
 fun uriToBitmap(uri: Uri, context: Context): Bitmap? {
