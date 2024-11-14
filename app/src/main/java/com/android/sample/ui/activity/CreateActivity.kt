@@ -37,6 +37,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,7 +56,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
-import com.android.sample.model.camera.bitmapToBase64
+import com.android.sample.model.camera.uploadActivityImages
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -67,6 +68,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
+import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -99,6 +101,7 @@ fun CreateActivityScreen(
     LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
   }
   var isCamOpen by remember { mutableStateOf(false) }
+  var isGalleryOpen by remember { mutableStateOf(false) }
   var startTime by remember { mutableStateOf("") }
   var duration by remember { mutableStateOf("") }
   var showDialogUser by remember { mutableStateOf(false) }
@@ -117,9 +120,8 @@ fun CreateActivityScreen(
   // Attendees
   val attendees_: List<User> = listOf<User>()
   var attendees: List<User> by remember { mutableStateOf(attendees_) }
-  val items_: List<Bitmap> = listOf<Bitmap>()
-  var items: List<Bitmap> by remember { mutableStateOf(items_) }
-
+  var selectedImages = remember { mutableStateListOf<Bitmap>() }
+  var items = remember { mutableStateListOf<String>() }
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
       topBar = {
@@ -128,13 +130,30 @@ fun CreateActivityScreen(
         )
       },
       content = { paddingValues ->
+        if (showDialogImage) {
+          AddImageDialog(
+              onDismiss = { showDialogImage = false },
+              onGalleryClick = {
+                showDialogImage = false
+                isGalleryOpen = true
+              },
+              onCameraClick = {
+                showDialogImage = false
+                isCamOpen = true
+              })
+        }
         if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
-              controller = controller,
+              controller =
+                  remember {
+                    LifecycleCameraController(context).apply {
+                      setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+                    }
+                  },
               context = context,
               isCamOpen = { isCamOpen = false },
-              addElem = { bitmap -> items = listOf(bitmap) })
+              addElem = { bitmap -> selectedImages.add(bitmap) })
         } else {
           Column(
               modifier =
@@ -143,18 +162,28 @@ fun CreateActivityScreen(
                       .verticalScroll(scrollState)
                       .testTag("activityCreateScreen"),
           ) {
-            Carousel(
-                { showDialogImage = true }, items, { item -> items = items.filter { it != item } })
+            if (isGalleryOpen) {
+              GalleryScreen(
+                  isGalleryOpen = { isGalleryOpen = false },
+                  addImage = { bitmap -> selectedImages.add(bitmap) },
+                  context = context)
+            }
             if (showDialogImage) {
               AddImageDialog(
                   onDismiss = { showDialogImage = false },
-                  onGalleryClick = {},
-                  onCameraClick = {
-                    isCamOpen = true
+                  onGalleryClick = {
                     showDialogImage = false
+                    isGalleryOpen = true
                   },
-              )
+                  onCameraClick = {
+                    showDialogImage = false
+                    isCamOpen = true
+                  })
             }
+            Carousel(
+                openDialog = { showDialogImage = true },
+                itemsList = selectedImages,
+                deleteImage = { bitmap -> selectedImages.remove(bitmap) })
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedTextField(
                 value = title,
@@ -399,9 +428,7 @@ fun CreateActivityScreen(
                 enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
                 onClick = {
                   val timeFormat = startTime.split(":")
-                  val timePattern = Regex("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")
-
-                  if (timeFormat.size != 2 || !timePattern.matches(startTime)) {
+                  if (timeFormat.size != 2) {
                     Toast.makeText(
                             context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
                         .show()
@@ -414,10 +441,9 @@ fun CreateActivityScreen(
                   }
                   val calendar = GregorianCalendar()
                   val parts = dueDate.split("/")
-                  if (parts.size == 3 &&
-                      timeFormat.size == 2 &&
-                      durationFormat.size == 2 &&
-                      timePattern.matches(startTime)) {
+
+                  val activityId = listActivityViewModel.getNewUid()
+                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
                     attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(
@@ -427,9 +453,22 @@ fun CreateActivityScreen(
                           0,
                           0,
                           0)
+                      uploadActivityImages(
+                          activityId,
+                          selectedImages,
+                          onSuccess = { imageUrls ->
+                            items.addAll(imageUrls) // Store URLs in items to retrieve later
+                          },
+                          onFailure = { exception ->
+                            Toast.makeText(
+                                    context,
+                                    "Failed to upload images: ${exception.message}",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          })
                       val activity =
                           Activity(
-                              uid = listActivityViewModel.getNewUid(),
+                              uid = activityId,
                               title = title,
                               description = description,
                               date = Timestamp(calendar.time),
@@ -441,7 +480,7 @@ fun CreateActivityScreen(
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
                               location = selectedLocation,
-                              images = items.map { bitmapToBase64(it) },
+                              images = items,
                               participants = attendees,
                               type = types.find { it.name == selectedOption } ?: types[0],
                               comments = listOf())

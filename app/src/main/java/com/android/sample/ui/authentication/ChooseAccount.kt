@@ -32,7 +32,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
-import com.android.sample.ui.ProfileImage
+import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 
@@ -71,9 +71,11 @@ fun ChooseAccountScreen(
 
         // Profile Image
         item {
-          ProfileImage(
-              url = userProfile?.photo,
-              modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+          userProfile?.id?.let {
+            ProfileImage(
+                userId = it,
+                modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+          }
         }
 
         item { Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp)) }

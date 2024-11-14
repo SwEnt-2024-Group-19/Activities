@@ -40,6 +40,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,7 +59,6 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
-import com.android.sample.model.camera.base64ToBitmap
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -67,7 +67,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
 import com.android.sample.ui.camera.CameraScreen
-import com.android.sample.ui.camera.Carousel
+import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -111,10 +111,11 @@ fun EditActivityScreen(
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-  val _items_: List<String> = activity?.images ?: listOf()
-  val items_: List<Bitmap> =
-      _items_.map { base64ToBitmap(it) ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) }
-  var items: List<Bitmap> by remember { mutableStateOf(items_) }
+  // var items by remember { mutableStateOf(activity?.images ?: listOf()) }
+  var isGalleryOpen by remember { mutableStateOf(false) }
+  var selectedImages = remember { mutableStateListOf<Bitmap>() }
+
+  // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -150,13 +151,24 @@ fun EditActivityScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
+        if (isGalleryOpen) {
+          GalleryScreen(
+              isGalleryOpen = { isGalleryOpen = false },
+              addImage = { bitmap -> selectedImages.add(bitmap) },
+              context = context)
+        }
         if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
-              controller = controller,
+              controller =
+                  remember {
+                    LifecycleCameraController(context).apply {
+                      setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+                    }
+                  },
               context = context,
               isCamOpen = { isCamOpen = false },
-              addElem = { bitmap -> items = listOf(bitmap) })
+              addElem = { bitmap -> selectedImages.add(bitmap) })
         } else {
           Column(
               modifier =
@@ -169,18 +181,17 @@ fun EditActivityScreen(
             if (showDialogImage) {
               AddImageDialog(
                   onDismiss = { showDialogImage = false },
-                  onGalleryClick = {},
-                  onCameraClick = {
-                    isCamOpen = true
+                  onGalleryClick = {
                     showDialogImage = false
+                    isGalleryOpen = true
                   },
-              )
+                  onCameraClick = {
+                    showDialogImage = false
+                    isCamOpen = true
+                  })
             }
-            Carousel(
-                { showDialogImage = true },
-                items,
-                { bitmap -> items = items.filter { it != bitmap } })
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -459,11 +470,10 @@ fun EditActivityScreen(
                               creator = creator,
                               status = ActivityStatus.ACTIVE,
                               location = selectedLocation,
-                              images = listOf(),
+                              images = activity?.images ?: listOf(),
                               type = types.find { it.name == selectedOption } ?: types[0],
                               participants = attendees,
                               comments = activity?.comments ?: listOf())
-
                       listActivityViewModel.updateActivity(updatedActivity)
                       navigationActions.navigateTo(Screen.OVERVIEW)
                     } catch (_: Exception) {}
