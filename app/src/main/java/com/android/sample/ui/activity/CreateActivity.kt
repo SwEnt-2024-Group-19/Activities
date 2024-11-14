@@ -66,9 +66,9 @@ import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
+import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -162,24 +162,24 @@ fun CreateActivityScreen(
                       .verticalScroll(scrollState)
                       .testTag("activityCreateScreen"),
           ) {
-              if (isGalleryOpen) {
-                  GalleryScreen(
-                      isGalleryOpen = { isGalleryOpen = false },
-                      addImage = { bitmap -> selectedImages.add(bitmap) },
-                      context = context)
-              }
-              if (showDialogImage) {
-                  AddImageDialog(
-                      onDismiss = { showDialogImage = false },
-                      onGalleryClick = {
-                          showDialogImage = false
-                          isGalleryOpen = true
-                      },
-                      onCameraClick = {
-                          showDialogImage = false
-                          isCamOpen = true
-                      })
-              }
+            if (isGalleryOpen) {
+              GalleryScreen(
+                  isGalleryOpen = { isGalleryOpen = false },
+                  addImage = { bitmap -> selectedImages.add(bitmap) },
+                  context = context)
+            }
+            if (showDialogImage) {
+              AddImageDialog(
+                  onDismiss = { showDialogImage = false },
+                  onGalleryClick = {
+                    showDialogImage = false
+                    isGalleryOpen = true
+                  },
+                  onCameraClick = {
+                    showDialogImage = false
+                    isCamOpen = true
+                  })
+            }
             Carousel(
                 openDialog = { showDialogImage = true },
                 itemsList = selectedImages,

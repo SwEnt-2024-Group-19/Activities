@@ -182,7 +182,8 @@ fun ProfileContent(
                 // Profile Picture
                 ProfileImage(
                     userId = user.id,
-                    modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+                    modifier =
+                        Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
 
                 // User Name and Surname
                 Text(

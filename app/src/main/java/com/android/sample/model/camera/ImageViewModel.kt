@@ -79,30 +79,30 @@ fun uploadProfilePicture(
     onSuccess: (String) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    val storageRef = FirebaseStorage.getInstance().reference
-    val profilePicRef = storageRef.child("users/$userId/profile_picture.jpg")
+  val storageRef = FirebaseStorage.getInstance().reference
+  val profilePicRef = storageRef.child("users/$userId/profile_picture.jpg")
 
-    val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
-    val data = baos.toByteArray()
+  val baos = ByteArrayOutputStream()
+  bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
+  val data = baos.toByteArray()
 
-    profilePicRef
-        .putBytes(data)
-        .addOnSuccessListener {
-            profilePicRef.downloadUrl.addOnSuccessListener { uri ->
-                // Save the URL to Firestore
-                FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(userId)
-                    .update("photo", uri.toString())
-                    .addOnSuccessListener { onSuccess(uri.toString()) }
-                    .addOnFailureListener { e -> onFailure(e) }
-            }
+  profilePicRef
+      .putBytes(data)
+      .addOnSuccessListener {
+        profilePicRef.downloadUrl.addOnSuccessListener { uri ->
+          // Save the URL to Firestore
+          FirebaseFirestore.getInstance()
+              .collection("users")
+              .document(userId)
+              .update("photo", uri.toString())
+              .addOnSuccessListener { onSuccess(uri.toString()) }
+              .addOnFailureListener { e -> onFailure(e) }
         }
-        .addOnFailureListener { e ->
-            onFailure(e)
-            Log.e("uploadProfilePicture", "Failed to upload profile picture: ${e.message}")
-        }
+      }
+      .addOnFailureListener { e ->
+        onFailure(e)
+        Log.e("uploadProfilePicture", "Failed to upload profile picture: ${e.message}")
+      }
 }
 
 fun uploadActivityImages(
@@ -111,52 +111,52 @@ fun uploadActivityImages(
     onSuccess: (List<String>) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    val storageRef = FirebaseStorage.getInstance().reference
-    val uploadedImageUrls = mutableListOf<String>()
-    var uploadCount = 0
+  val storageRef = FirebaseStorage.getInstance().reference
+  val uploadedImageUrls = mutableListOf<String>()
+  var uploadCount = 0
 
-    // Loop through each bitmap to upload them individually
-    bitmaps.forEach { bitmap ->
-        val timestamp = System.currentTimeMillis()
-        val activityImageRef = storageRef.child("activities/$activityId/image_$timestamp.jpg")
+  // Loop through each bitmap to upload them individually
+  bitmaps.forEach { bitmap ->
+    val timestamp = System.currentTimeMillis()
+    val activityImageRef = storageRef.child("activities/$activityId/image_$timestamp.jpg")
 
-        // Convert Bitmap to ByteArray
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
-        val data = baos.toByteArray()
+    // Convert Bitmap to ByteArray
+    val baos = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
+    val data = baos.toByteArray()
 
-        // Upload the Bitmap data to Firebase Storage
-        activityImageRef
-            .putBytes(data)
-            .addOnSuccessListener {
-                // Get the download URL after successful upload
-                activityImageRef.downloadUrl
-                    .addOnSuccessListener { uri ->
-                        uploadedImageUrls.add(uri.toString()) // Add URL to the list
-                        uploadCount++
+    // Upload the Bitmap data to Firebase Storage
+    activityImageRef
+        .putBytes(data)
+        .addOnSuccessListener {
+          // Get the download URL after successful upload
+          activityImageRef.downloadUrl
+              .addOnSuccessListener { uri ->
+                uploadedImageUrls.add(uri.toString()) // Add URL to the list
+                uploadCount++
 
-                        // If all images have been uploaded, save URLs to Firestore
-                        if (uploadCount == bitmaps.size) {
-                            val activityDocRef =
-                                FirebaseFirestore.getInstance().collection("activities").document(activityId)
+                // If all images have been uploaded, save URLs to Firestore
+                if (uploadCount == bitmaps.size) {
+                  val activityDocRef =
+                      FirebaseFirestore.getInstance().collection("activities").document(activityId)
 
-                            // Store all URLs in the 'images' field of the activity document
-                            activityDocRef
-                                .update("images", FieldValue.arrayUnion(*uploadedImageUrls.toTypedArray()))
-                                .addOnSuccessListener { onSuccess(uploadedImageUrls) }
-                                .addOnFailureListener { e -> onFailure(e) }
-                        }
-                    }
-                    .addOnFailureListener { e ->
-                        onFailure(e)
-                        return@addOnFailureListener
-                    }
-            }
-            .addOnFailureListener { e ->
+                  // Store all URLs in the 'images' field of the activity document
+                  activityDocRef
+                      .update("images", FieldValue.arrayUnion(*uploadedImageUrls.toTypedArray()))
+                      .addOnSuccessListener { onSuccess(uploadedImageUrls) }
+                      .addOnFailureListener { e -> onFailure(e) }
+                }
+              }
+              .addOnFailureListener { e ->
                 onFailure(e)
                 return@addOnFailureListener
-            }
-    }
+              }
+        }
+        .addOnFailureListener { e ->
+          onFailure(e)
+          return@addOnFailureListener
+        }
+  }
 }
 
 fun updateActivityImages(
@@ -166,33 +166,33 @@ fun updateActivityImages(
     onSuccess: (List<String>) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    val storageRef = FirebaseStorage.getInstance().reference
-    val newImageUrls = mutableListOf<String>()
-    var uploadCount = bitmaps.size // We assume all bitmaps could potentially be new uploads
+  val storageRef = FirebaseStorage.getInstance().reference
+  val newImageUrls = mutableListOf<String>()
+  var uploadCount = bitmaps.size // We assume all bitmaps could potentially be new uploads
 
-    bitmaps.forEach { bitmap ->
-        val timestamp = System.currentTimeMillis()
-        val activityImageRef = storageRef.child("activities/$activityId/image_$timestamp.jpg")
+  bitmaps.forEach { bitmap ->
+    val timestamp = System.currentTimeMillis()
+    val activityImageRef = storageRef.child("activities/$activityId/image_$timestamp.jpg")
 
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
-        val data = baos.toByteArray()
+    val baos = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
+    val data = baos.toByteArray()
 
-        activityImageRef
-            .putBytes(data)
-            .addOnSuccessListener {
-                activityImageRef.downloadUrl.addOnSuccessListener { uri ->
-                    newImageUrls.add(uri.toString())
-                    uploadCount--
-                    if (uploadCount == 0) {
-                        // Combine existing URLs with new URLs and remove duplicates
-                        val finalUrls = (existingImageUrls + newImageUrls).distinct()
-                        finalizeUpdate(activityId, finalUrls, onSuccess, onFailure)
-                    }
-                }
+    activityImageRef
+        .putBytes(data)
+        .addOnSuccessListener {
+          activityImageRef.downloadUrl.addOnSuccessListener { uri ->
+            newImageUrls.add(uri.toString())
+            uploadCount--
+            if (uploadCount == 0) {
+              // Combine existing URLs with new URLs and remove duplicates
+              val finalUrls = (existingImageUrls + newImageUrls).distinct()
+              finalizeUpdate(activityId, finalUrls, onSuccess, onFailure)
             }
-            .addOnFailureListener { onFailure(it) }
-    }
+          }
+        }
+        .addOnFailureListener { onFailure(it) }
+  }
 }
 
 private fun finalizeUpdate(
@@ -201,20 +201,20 @@ private fun finalizeUpdate(
     onSuccess: (List<String>) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    val activityDocRef = FirebaseFirestore.getInstance().collection("activities").document(activityId)
-    activityDocRef
-        .update("images", imageUrls)
-        .addOnSuccessListener { onSuccess(imageUrls) }
-        .addOnFailureListener { onFailure(it) }
+  val activityDocRef = FirebaseFirestore.getInstance().collection("activities").document(activityId)
+  activityDocRef
+      .update("images", imageUrls)
+      .addOnSuccessListener { onSuccess(imageUrls) }
+      .addOnFailureListener { onFailure(it) }
 }
 
 fun uriToBitmap(uri: Uri, context: Context): Bitmap? {
-    return try {
-        MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-    } catch (e: IOException) {
-        e.printStackTrace()
-        null
-    }
+  return try {
+    MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+  } catch (e: IOException) {
+    e.printStackTrace()
+    null
+  }
 }
 
 fun fetchProfileImageUrl(
@@ -222,14 +222,14 @@ fun fetchProfileImageUrl(
     onSuccess: (String) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    val storageRef = FirebaseStorage.getInstance().reference
-    val profilePicRef = storageRef.child("users/$userId/profile_picture.jpg")
+  val storageRef = FirebaseStorage.getInstance().reference
+  val profilePicRef = storageRef.child("users/$userId/profile_picture.jpg")
 
-    profilePicRef.downloadUrl
-        .addOnSuccessListener { uri ->
-            onSuccess(uri.toString()) // Return the URL as a string
-        }
-        .addOnFailureListener { exception -> onFailure(exception) }
+  profilePicRef.downloadUrl
+      .addOnSuccessListener { uri ->
+        onSuccess(uri.toString()) // Return the URL as a string
+      }
+      .addOnFailureListener { exception -> onFailure(exception) }
 }
 
 // Firestore function to fetch URLs (same as before)
@@ -238,25 +238,25 @@ fun fetchActivityImageUrls(
     onSuccess: (List<String>) -> Unit,
     onFailure: (Exception) -> Unit
 ) {
-    val firestore = FirebaseFirestore.getInstance()
+  val firestore = FirebaseFirestore.getInstance()
 
-    firestore
-        .collection("activities")
-        .document(activityId)
-        .get()
-        .addOnSuccessListener { document ->
-            if (document != null && document.contains("images")) {
-                val imageUrls = document["images"] as? List<String> ?: emptyList()
-                onSuccess(imageUrls) // Return the list of URLs
-            } else {
-                onSuccess(emptyList()) // Return empty list if no images found
-            }
+  firestore
+      .collection("activities")
+      .document(activityId)
+      .get()
+      .addOnSuccessListener { document ->
+        if (document != null && document.contains("images")) {
+          val imageUrls = document["images"] as? List<String> ?: emptyList()
+          onSuccess(imageUrls) // Return the list of URLs
+        } else {
+          onSuccess(emptyList()) // Return empty list if no images found
         }
-        .addOnFailureListener { exception -> onFailure(exception) }
+      }
+      .addOnFailureListener { exception -> onFailure(exception) }
 }
 
 fun Bitmap.resize(reqWidth: Int, reqHeight: Int): Bitmap {
-    val ratio: Float = this.width.toFloat() / this.height.toFloat()
-    val height = (reqWidth / ratio).toInt()
-    return Bitmap.createScaledBitmap(this, reqWidth, height, true)
+  val ratio: Float = this.width.toFloat() / this.height.toFloat()
+  val height = (reqWidth / ratio).toInt()
+  return Bitmap.createScaledBitmap(this, reqWidth, height, true)
 }

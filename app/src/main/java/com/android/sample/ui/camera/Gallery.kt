@@ -3,7 +3,6 @@ package com.android.sample.ui.camera
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,11 +27,6 @@ import com.android.sample.model.camera.fetchProfileImageUrl
 import com.android.sample.model.camera.uriToBitmap
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.SMALL_PADDING
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import java.io.ByteArrayOutputStream
-import java.io.IOException
 
 @Composable
 fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context: Context) {
@@ -133,7 +127,10 @@ fun ActivityImageCarousel(activityId: String, onFailure: (Exception) -> Unit) {
                       model =
                           ImageRequest.Builder(LocalContext.current)
                               .data(imageUrl)
-                              .size(Size(IMAGE_SIZE, IMAGE_SIZE)) // Restrict Coil to load a 100x100 image
+                              .size(
+                                  Size(
+                                      IMAGE_SIZE,
+                                      IMAGE_SIZE)) // Restrict Coil to load a 100x100 image
                               .build()),
               contentDescription = "Selected Image",
               modifier = Modifier.size(IMAGE_SIZE.dp))
@@ -142,4 +139,3 @@ fun ActivityImageCarousel(activityId: String, onFailure: (Exception) -> Unit) {
     }
   }
 }
-

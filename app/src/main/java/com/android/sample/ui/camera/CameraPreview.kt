@@ -27,14 +27,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.android.sample.model.camera.resize
-import com.android.sample.resources.C.Tag.BLACK_COLOR
-import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
-import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_IMAGE_SIZE
-import com.android.sample.resources.C.Tag.MEDIUM_PADDING
-import com.android.sample.resources.C.Tag.SMALL_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
@@ -89,5 +84,3 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
     }
   }
 }
-
-
