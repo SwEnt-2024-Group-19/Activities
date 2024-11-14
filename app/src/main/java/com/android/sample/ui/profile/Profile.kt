@@ -53,6 +53,12 @@ import com.android.sample.R
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
+import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -166,8 +172,11 @@ fun ProfileContent(
             Modifier.fillMaxSize().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
               item {
-                Spacer(Modifier.height(16.dp))
-                Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
+                Spacer(Modifier.height(MEDIUM_PADDING.dp))
+                Text(
+                    text = "Profile",
+                    fontSize = TOP_TITLE_SIZE.sp,
+                    modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
 
                 // Profile Picture
                 ProfileImage(
@@ -177,21 +186,22 @@ fun ProfileContent(
                 // User Name and Surname
                 Text(
                     text = "${user.name} ${user.surname}",
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(top = 8.dp).testTag("userName"))
+                    fontSize = TITLE_FONTSIZE.sp,
+                    modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
               }
               item {
                 // Interests Section
                 Text(
                     text = "Interests",
-                    fontSize = 24.sp,
+                    fontSize = TITLE_FONTSIZE.sp,
                     modifier =
-                        Modifier.padding(start = 16.dp, top = 16.dp).testTag("interestsSection"))
+                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
+                            .testTag("interestsSection"))
               }
               item {
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)) {
+                    horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+                    contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
                       user.interests?.let { interests ->
                         items(interests.size) { index ->
                           InterestBox(interest = user.interests[index])
@@ -206,9 +216,9 @@ fun ProfileContent(
 
                 Text(
                     text = "Activities Created",
-                    fontSize = 24.sp,
+                    fontSize = TITLE_FONTSIZE.sp,
                     modifier =
-                        Modifier.padding(start = 16.dp, top = 16.dp)
+                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
                             .testTag("activitiesCreatedTitle"))
               }
 
@@ -225,13 +235,13 @@ fun ProfileContent(
               }
 
               item { // Activities Enrolled in
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
 
                 Text(
                     text = "Activities Enrolled in",
-                    fontSize = 24.sp,
+                    fontSize = TITLE_FONTSIZE.sp,
                     modifier =
-                        Modifier.padding(start = 16.dp, top = 16.dp)
+                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
                             .testTag("activitiesEnrolledTitle"))
               }
 
@@ -267,8 +277,8 @@ fun ActivityCreatedBox(
           modifier =
               Modifier.fillMaxWidth()
                   .testTag("activityCreated")
-                  .padding(8.dp)
-                  .clip(RoundedCornerShape(16.dp))
+                  .padding(STANDARD_PADDING.dp)
+                  .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
                   .clickable {
                     listActivitiesViewModel.selectActivity(thisActivity)
                     navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
@@ -278,15 +288,18 @@ fun ActivityCreatedBox(
                 painter = painterResource(id = R.drawable.foot),
                 contentDescription = "Activity Image",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(64.dp).padding(end = 16.dp))
+                modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
             Column(modifier = Modifier.weight(1f)) {
               Text(
                   text = thisActivity.title,
-                  fontSize = 18.sp,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color.Black)
-              Text(text = thisActivity.description, fontSize = 14.sp, color = Color.Gray)
+              Text(
+                  text = thisActivity.description,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  color = Color.Gray)
             }
           }
     }
@@ -310,8 +323,8 @@ fun ActivityEnrolledBox(
           modifier =
               Modifier.fillMaxWidth()
                   .testTag("activityEnrolled")
-                  .padding(8.dp)
-                  .clip(RoundedCornerShape(16.dp))
+                  .padding(STANDARD_PADDING.dp)
+                  .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
                   .clickable {
                     listActivitiesViewModel.selectActivity(thisActivity)
                     navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
@@ -321,15 +334,18 @@ fun ActivityEnrolledBox(
                 painter = painterResource(id = R.drawable.foot),
                 contentDescription = "Activity Image",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(64.dp).padding(end = 16.dp))
+                modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
             Column(modifier = Modifier.weight(1f)) {
               Text(
                   text = thisActivity.title,
-                  fontSize = 18.sp,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
                   fontWeight = FontWeight.Bold,
                   color = Color.Black)
-              Text(text = thisActivity.description, fontSize = 14.sp, color = Color.Gray)
+              Text(
+                  text = thisActivity.description,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  color = Color.Gray)
             }
           }
     }
@@ -340,10 +356,10 @@ fun ActivityEnrolledBox(
 fun InterestBox(interest: String) {
   Box(
       modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(8.dp))
-              .padding(horizontal = 12.dp, vertical = 8.dp)
+          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+              .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
               .testTag("$interest"),
       contentAlignment = Alignment.Center) {
-        Text(text = interest, fontSize = 18.sp, color = Color.Black)
+        Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
       }
 }
