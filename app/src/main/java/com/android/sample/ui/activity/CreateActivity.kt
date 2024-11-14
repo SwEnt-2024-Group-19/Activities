@@ -130,28 +130,26 @@ fun CreateActivityScreen(
         )
       },
       content = { paddingValues ->
-      if (creator == null) {
+        if (creator == null) {
           Column(
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.Center,
               modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-              Text(
-                  text =
-                  "You are not logged in. Login or Register to create activities.",
-                  modifier =
-                  Modifier.padding(bottom = MEDIUM_PADDING.dp)
-                      .testTag("notConnectedPrompt"),
-                  color = MaterialTheme.colorScheme.onSurface,
-                  style = MaterialTheme.typography.bodyMedium,
-                  textAlign = TextAlign.Center)
-              Button(
-                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                  modifier = Modifier.testTag("signInButton"),
-              ) {
+                Text(
+                    text = "You are not logged in. Login or Register to create activities.",
+                    modifier =
+                        Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("notConnectedPrompt"),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center)
+                Button(
+                    onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                    modifier = Modifier.testTag("signInButton"),
+                ) {
                   Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
+                }
               }
-          }
-      } else if (isCamOpen) {
+        } else if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
               controller = controller,

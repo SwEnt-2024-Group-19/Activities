@@ -83,6 +83,5 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("signInButton").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("SignInScreen").assertIsDisplayed()
-
   }
 }
