@@ -93,7 +93,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
                 passwordError = passwordErrorState.value,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
           item {
             // Sign up button
@@ -129,7 +129,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                         .testTag("SignUpButton")) {
                   Text("Sign up with Email", fontSize = 16.sp)
                 }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
           item {
             // If user already has an account, navigate to the sign in screen
