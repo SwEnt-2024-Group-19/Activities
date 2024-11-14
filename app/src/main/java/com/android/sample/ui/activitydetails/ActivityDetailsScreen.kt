@@ -1,6 +1,5 @@
 package com.android.sample.ui.activitydetails
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,7 +64,6 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.ui.camera.ActivityImageCarousel
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -170,9 +168,10 @@ fun ActivityDetailsScreen(
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
                     // Optional: Add placeholder text in the center
-                    ActivityImageCarousel(
-                        activityId = activity?.uid ?: "",
-                        onFailure = { Log.e("ActivityDetailsScreen", "Failed to load image") })
+                    //                    ActivityImageCarousel(
+                    //                        activityId = activity?.uid ?: "",
+                    //                        onFailure = { Log.e("ActivityDetailsScreen", "Failed
+                    // to load image") })
                     LikeButton(profile, activity, profileViewModel)
                   }
 

@@ -1,7 +1,6 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -67,7 +66,6 @@ import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
-import com.android.sample.ui.camera.ActivityImageCarousel
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.dialogs.AddImageDialog
@@ -113,7 +111,7 @@ fun EditActivityScreen(
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-  //var items by remember { mutableStateOf(activity?.images ?: listOf()) }
+  // var items by remember { mutableStateOf(activity?.images ?: listOf()) }
   var isGalleryOpen by remember { mutableStateOf(false) }
   var selectedImages = remember { mutableStateListOf<Bitmap>() }
 
@@ -192,12 +190,13 @@ fun EditActivityScreen(
                     isCamOpen = true
                   })
             }
-            ActivityImageCarousel(
-                activityId = activity?.uid ?: "",
-                onFailure = { exception ->
-                  Log.e("EditActivityScreen", "Failed to fetch images: ${exception.message}")
-                },
-            )
+            //            ActivityImageCarousel(
+            //                activityId = activity?.uid ?: "",
+            //                onFailure = { exception ->
+            //                  Log.e("EditActivityScreen", "Failed to fetch images:
+            // ${exception.message}")
+            //                },
+            //            )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = title,

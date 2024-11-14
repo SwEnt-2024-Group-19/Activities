@@ -47,7 +47,8 @@ fun CameraPreview(
           controller.bindToLifecycle(lifecycleOwner)
         }
       },
-      modifier = modifier.testTag("cameraPreview"),)
+      modifier = modifier.testTag("cameraPreview"),
+  )
 }
 
 @Composable
@@ -58,8 +59,10 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
           Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = "Add a new image")
         },
         onClick = openDialog,
-        modifier = Modifier.size(LARGE_BUTTON_HEIGHT.dp).background(Color(WHITE_COLOR))
-            .testTag("addImageButton"),
+        modifier =
+            Modifier.size(LARGE_BUTTON_HEIGHT.dp)
+                .background(Color(WHITE_COLOR))
+                .testTag("addImageButton"),
     )
     LazyRow {
       items(itemsList.size) { bitmap ->
