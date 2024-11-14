@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.profile.ProfileViewModel
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
@@ -80,7 +80,7 @@ fun ChooseAccountScreen(
               onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
               modifier =
                   Modifier.width(BUTTON_WIDTH.dp)
-                      .height(BUTTON_HEIGHT.dp)
+                      .height(LARGE_BUTTON_HEIGHT.dp)
                       .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
                       .testTag("continueText")) {
                 Text(

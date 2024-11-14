@@ -24,6 +24,8 @@ object C {
 
     const val BUTTON_HEIGHT = 40
 
+    const val LARGE_BUTTON_HEIGHT = 50
+
     const val MEDIUM_PADDING = 16
 
     const val LARGE_PADDING = 24
@@ -54,6 +56,6 @@ object C {
 
     const val TEXT_FONTSIZE = 12
 
-    const val WIDTH_FRACTION= 0.8f
+    const val WIDTH_FRACTION = 0.8f
   }
 }

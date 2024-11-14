@@ -126,7 +126,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                   }
                   Log.d("SignInScreen", "Sign in with email/password")
                 },
-                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION).height(BUTTON_HEIGHT.dp).testTag("SignInButton")) {
+                modifier =
+                    Modifier.fillMaxWidth(WIDTH_FRACTION)
+                        .height(BUTTON_HEIGHT.dp)
+                        .testTag("SignInButton")) {
                   Text("Sign in with Email", fontSize = SUBTITLE_FONTSIZE.sp)
                 }
             Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
@@ -145,7 +148,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             // If user already has an account, navigate to the sign-in screen
             TextButton(
                 onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION).height(BUTTON_HEIGHT.dp).testTag("GoToSignUpButton")) {
+                modifier =
+                    Modifier.fillMaxWidth(WIDTH_FRACTION)
+                        .height(BUTTON_HEIGHT.dp)
+                        .testTag("GoToSignUpButton")) {
                   Text("No account yet?", fontSize = SUBTITLE_FONTSIZE.sp)
                 }
           }
