@@ -142,13 +142,6 @@ fun CreateActivityScreen(
                 isCamOpen = true
               })
         }
-
-        if (isGalleryOpen) {
-          GalleryScreen(
-              isGalleryOpen = { isGalleryOpen = false },
-              addImage = { bitmap -> selectedImages.add(bitmap) },
-              context = context)
-        }
         if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
