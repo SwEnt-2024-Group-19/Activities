@@ -1,9 +1,11 @@
 package com.android.sample.ui.map
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.FloatingActionButton
@@ -54,15 +56,24 @@ fun MapScreen(
     position = CameraPosition.fromLatLngZoom(firstToDoLocation, 10f)
   }
 
+  // Activity result launcher to request permissions
+  val locationPermissionLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.RequestPermission(),
+          onResult = { isGranted ->
+            if (isGranted) {
+              locationViewModel.fetchCurrentLocation()
+            } else {
+              Log.d("MapScreen", "Location permission denied by the user.")
+            }
+          })
+
   LaunchedEffect(Unit) {
-    when (ContextCompat.checkSelfPermission(
-        context, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-      android.content.pm.PackageManager.PERMISSION_GRANTED -> {
-        locationViewModel.fetchCurrentLocation()
-      }
-      else -> {
-        Log.d("MapScreen", "No permission to access the location")
-      }
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+        PackageManager.PERMISSION_GRANTED) {
+      locationViewModel.fetchCurrentLocation()
+    } else {
+      locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
   }
 
@@ -87,17 +98,14 @@ fun MapScreen(
                     }
                 currentLocation?.let {
                   Marker(
-                          state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
-                          title = it.name,
-                          snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                          icon =
-                              BitmapDescriptorFactory.defaultMarker(
-                                  BitmapDescriptorFactory.HUE_BLUE))
-                      .apply {}
+                      state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
+                      title = it.name,
+                      snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
+                      icon =
+                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }
               }
 
-          // Floating Action Button positioned at the bottom right
           FloatingActionButton(
               modifier =
                   Modifier.align(Alignment.BottomStart)
