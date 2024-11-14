@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -47,13 +46,12 @@ class EditActivityScreenTest {
     activitiesRepository = mock(ActivitiesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listActivitiesViewModel = mock(ListActivitiesViewModel::class.java)
-    mockLocationRepository = Mockito.mock(LocationRepository::class.java)
+    mockLocationRepository = mock(LocationRepository::class.java)
     mockPermissionChecker = LocationPermissionChecker(context)
     mockLocationViewModel = LocationViewModel(mockLocationRepository, mockPermissionChecker)
 
     `when`(listActivitiesViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
     `when`(navigationActions.currentRoute()).thenReturn(Screen.EDIT_ACTIVITY)
-
     `when`(mockLocationRepository.search(any(), any(), any())).then { invocation ->
       val onSuccess = invocation.arguments[1] as (List<Location>) -> Unit
       onSuccess(locationList)
