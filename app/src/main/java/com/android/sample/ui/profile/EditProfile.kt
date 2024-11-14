@@ -3,6 +3,8 @@ package com.android.sample.ui.profile
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,8 +55,11 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ImagePicker
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.NavigationActions
 
 
@@ -68,10 +73,13 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
   var name by remember { mutableStateOf(profile.name) }
   var surname by remember { mutableStateOf(profile.surname) }
   var interests by remember { mutableStateOf(profile.interests) }
+    var isCamOpen by remember { mutableStateOf(false) }
+    var isGalleryOpen by remember { mutableStateOf(false) }
+    var showDialogImage by remember { mutableStateOf(false) }
   var photo by remember { mutableStateOf(profile.photo) }
-  var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-  var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
   val context = LocalContext.current
+    var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
 
   Scaffold(
       modifier = Modifier.testTag("editProfileScreen"),
@@ -89,6 +97,65 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
             })
       },
       content = { paddingValues ->
+          if (showDialogImage) {
+              AddImageDialog(
+                  onDismiss = { showDialogImage = false },
+                  onGalleryClick = {
+                      showDialogImage = false
+                      isGalleryOpen = true
+                  },
+                  onCameraClick = {
+                      showDialogImage = false
+                      isCamOpen = true
+                  })
+          }
+
+          if (isGalleryOpen) {
+              GalleryScreen(
+                  isGalleryOpen = { isGalleryOpen = false },
+                  addImage = { bitmap -> selectedImage=bitmap
+                             uploadProfilePicture(
+                                    profile.id,
+                                    bitmap,
+                                    onSuccess = { url ->
+                                        photo = url
+                                    },
+                                    onFailure = { error ->
+                                        Log.e(
+                                            "EditProfileScreen",
+                                            "Failed to upload profile picture: ${error.message}")
+                                    }
+                             )
+                             },
+                  context = context)
+          }
+          if (isCamOpen) {
+              CameraScreen(
+                  paddingValues = paddingValues,
+                  controller =
+                  remember {
+                      LifecycleCameraController(context).apply {
+                          setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+                      }
+                  },
+                  context = context,
+                  isCamOpen = { isCamOpen = false },
+                  addElem = { bitmap -> selectedImage=bitmap
+                             uploadProfilePicture(
+                                    profile.id,
+                                    bitmap,
+                                    onSuccess = { url ->
+                                        photo = url
+                                    },
+                                    onFailure = { error ->
+                                        Log.e(
+                                            "EditProfileScreen",
+                                            "Failed to upload profile picture: ${error.message}")
+                                    }
+                             )
+                             })
+          }
+          else{
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(MEDIUM_PADDING.dp),
             verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
@@ -96,15 +163,11 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                   userId = profile.id,
                   modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
 
-              ImagePicker(
-                  onImagePicked = { uri ->
-                    selectedImageUri = uri
-                    uri?.let {
-                      // Convert URI to Bitmap
-                      selectedBitmap = uriToBitmap(it, context)
-                    }
-                  },
-                  buttonText = "Modify Profile Picture")
+            Button(
+                onClick = { showDialogImage = true },
+                modifier = Modifier.testTag("uploadPictureButton")) {
+                Text("Modify Profile Picture")
+            }
 
               OutlinedTextField(
                   value = name,
@@ -161,7 +224,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
 
               Button(
                   onClick = {
-                    selectedBitmap?.let { bitmap ->
+                    selectedImage?.let { bitmap ->
                       uploadProfilePicture(
                           profile.id,
                           bitmap,
@@ -191,7 +254,9 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                     Text("Save", color = Color.White)
                   }
             }
-      })
+      }
+      }
+  )
 }
 
 @Composable

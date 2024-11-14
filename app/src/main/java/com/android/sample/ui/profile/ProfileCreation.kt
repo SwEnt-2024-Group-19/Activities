@@ -3,8 +3,11 @@ package com.android.sample.ui.profile
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -44,10 +47,13 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
+import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.GalleryScreen
 
 import com.android.sample.ui.camera.ImagePicker
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.TextFieldWithErrorState
+import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 
@@ -64,12 +70,73 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
   var errorMessage by remember { mutableStateOf<String?>(null) }
   var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
   var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
-
+    var isCamOpen by remember { mutableStateOf(false) }
+    var isGalleryOpen by remember { mutableStateOf(false) }
+    var showDialogUser by remember { mutableStateOf(false) }
+    var showDialogImage by remember { mutableStateOf(false) }
   val context = LocalContext.current
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
   val scrollState = rememberScrollState()
+    if (showDialogImage) {
+        AddImageDialog(
+            onDismiss = { showDialogImage = false },
+            onGalleryClick = {
+                showDialogImage = false
+                isGalleryOpen = true
+            },
+            onCameraClick = {
+                showDialogImage = false
+                isCamOpen = true
+            })
+    }
 
+    if (isGalleryOpen) {
+        GalleryScreen(
+            isGalleryOpen = { isGalleryOpen = false },
+            addImage = { bitmap -> selectedBitmap=bitmap
+                uploadProfilePicture(
+                    uid,
+                    bitmap,
+                    onSuccess = { url ->
+                        photo = url
+                    },
+                    onFailure = { error ->
+                        Log.e(
+                            "EditProfileScreen",
+                            "Failed to upload profile picture: ${error.message}")
+                    }
+                )
+            },
+            context = context)
+    }
+    if (isCamOpen) {
+        CameraScreen(
+            paddingValues = PaddingValues(SMALL_PADDING.dp),
+            controller =
+            remember {
+                LifecycleCameraController(context).apply {
+                    setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+                }
+            },
+            context = context,
+            isCamOpen = { isCamOpen = false },
+            addElem = { bitmap -> selectedBitmap=bitmap
+                uploadProfilePicture(
+                    uid,
+                    bitmap,
+                    onSuccess = { url ->
+                        photo = url
+                    },
+                    onFailure = { error ->
+                        Log.e(
+                            "EditProfileScreen",
+                            "Failed to upload profile picture: ${error.message}")
+                    }
+                )
+            })
+    }
+    else{
   Column(
       modifier =
           Modifier.fillMaxSize()
@@ -91,15 +158,11 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
             userId = uid,
             modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
 
-        ImagePicker(
-            onImagePicked = { uri ->
-              selectedImageUri = uri
-              uri?.let {
-                // Convert URI to Bitmap
-                selectedBitmap = uriToBitmap(it, context)
-              }
-            },
-            buttonText = "Add Profile Picture")
+      Button(
+          onClick = { showDialogImage = true },
+          modifier = Modifier.testTag("uploadPictureButton")) {
+          Text("Modify Profile Picture")
+      }
         Spacer(modifier = Modifier.padding((2*LARGE_PADDING).dp))
 
         TextFieldWithErrorState(
@@ -207,4 +270,5 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
               modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("errorMessage"))
         }
       }
+}
 }
