@@ -55,7 +55,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
       rememberGoogleSignInLauncher(viewModel, navigationActions, onAuthSuccess, onAuthError)
 
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
       content = { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding).testTag("SignInScreenColumn"),

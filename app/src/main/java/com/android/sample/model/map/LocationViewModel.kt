@@ -12,7 +12,7 @@ open class LocationViewModel
 @Inject
 constructor(
     private val repository: LocationRepository,
-    private val permissionChecker: LocationPermissionChecker
+    private val permissionChecker: PermissionChecker
 ) : ViewModel() {
 
   private val _query = MutableStateFlow("")

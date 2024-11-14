@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -56,12 +57,7 @@ class MainActivity : ComponentActivity() {
     if (!hasCameraPermissions(applicationContext)) {
       ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
-    Log.d("MainActivity", "Checking location permissions")
-    if (!hasLocationPermissions(applicationContext)) {
-      Log.d("MainActivity", "Requesting location permissions")
-      ActivityCompat.requestPermissions(
-          this, LOCATION_PERMISSIONS, LOCATION_PERMISSION_REQUEST_CODE)
-    }
+
     auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
     if (currentUser != null && currentUser.isAnonymous) {
@@ -75,7 +71,7 @@ class MainActivity : ComponentActivity() {
       Surface(
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
           color = MaterialTheme.colorScheme.background) {
-            ActivitiesApp(auth.currentUser?.uid ?: "", startDestination)
+            NavGraph(startDestination)
           }
     }
   }
@@ -86,33 +82,19 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  private fun hasLocationPermissions(context: Context): Boolean {
-    return LOCATION_PERMISSIONS.all {
-      ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-    }
-  }
-
-  private val LOCATION_PERMISSIONS =
-      arrayOf(
-          Manifest.permission.ACCESS_FINE_LOCATION,
-          Manifest.permission.ACCESS_COARSE_LOCATION,
-      )
   private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 }
 
 @Composable
-fun ActivitiesApp(uid: String, startDestination: String) {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-
-  // val listActivitiesViewModel: ListActivitiesViewModel =
-  //  viewModel(factory = ListActivitiesViewModel.Factory)
-  val profileViewModel: ProfileViewModel = hiltViewModel()
-  // need to add factory for SignInViewModel
-  val authViewModel: SignInViewModel = hiltViewModel()
-  val locationViewModel: LocationViewModel = hiltViewModel()
-
-  val listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel()
+fun NavGraph(
+    startDestination: String,
+    navController: NavHostController = rememberNavController(),
+    navigationActions: NavigationActions = NavigationActions(navController),
+    authViewModel: SignInViewModel = hiltViewModel<SignInViewModel>(),
+    profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>(),
+    listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel<ListActivitiesViewModel>(),
+    locationViewModel: LocationViewModel = hiltViewModel<LocationViewModel>(),
+) {
 
   NavHost(navController = navController, startDestination = startDestination) {
     composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
@@ -161,6 +143,7 @@ fun ActivitiesApp(uid: String, startDestination: String) {
       }
       composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
     }
+
     navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
       composable(Screen.LIKED_ACTIVITIES) {
         LikedActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
