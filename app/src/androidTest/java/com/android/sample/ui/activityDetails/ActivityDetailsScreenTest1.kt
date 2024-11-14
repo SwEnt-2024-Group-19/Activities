@@ -1,5 +1,6 @@
 package com.android.sample.ui.activityDetails
 
+import android.graphics.Bitmap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
@@ -31,9 +32,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class ActivityDetailsScreenAndroidTest {
@@ -54,7 +59,11 @@ class ActivityDetailsScreenAndroidTest {
 
     mockNavigationActions = mock(NavigationActions::class.java)
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ACTIVITY_DETAILS)
-
+      doAnswer { invocation ->
+          val onSuccess = invocation.getArgument<(List<Bitmap>) -> Unit>(1)
+          onSuccess(emptyList()) // Provide an empty list or a sample list of bitmaps
+          null // Return null as the function's return type is Unit
+      }.whenever(mock()).fetchBitmapsFromUrls(any(), any(), any())
     mockViewModel = mock(ListActivitiesViewModel::class.java)
 
     val activityStateFlow = MutableStateFlow(activityWithParticipants)

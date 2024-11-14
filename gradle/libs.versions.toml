@@ -4,7 +4,6 @@ agp = "8.6.0"
 coilComposeVersion = "2.1.0"
 coilNetworkOkhttp = "3.0.0-rc01"
 coilCompose = "3.0.0-rc01"
-firebaseBomVersion = "33.5.1"
 json = "20240303"
 kotlin = "1.9.22"
 ktfmt = "0.17.0"
@@ -41,6 +40,8 @@ firebaseFirestoreKtx = "25.1.0"
 firebaseUiAuth = "8.0.0"
 navigationRuntimeKtx = "2.8.2"
 firebaseBom = "30.3.0"
+firebaseBomVersion = "33.5.1"
+
 
 
 # Google Service and Maps
@@ -48,7 +49,8 @@ playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
 mapsCompose = "4.3.3"
 mapsComposeUtils = "4.3.0"
-
+firebaseStorageKtx = "21.0.1"
+playServicesCastFramework = "22.0.0"
 # Networking
 okhttp = "4.12.0"
 
@@ -85,8 +87,6 @@ hilt-navigation-compose = "1.2.0"
 kotlin-coroutines = "1.9.0"
 
 playServicesLocation = "21.0.1"
-firebaseStorageKtx = "21.0.1"
-playServicesCastFramework = "22.0.0"
 
 
 [libraries]
@@ -109,11 +109,9 @@ compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifes
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
-firebase-bom-v3351 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
-firebase-storage = { module = "com.google.firebase:firebase-storage" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
@@ -162,6 +160,8 @@ hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-comp
 kapt = { group = "org.jetbrains.kotlin", name = "kotlin-kapt", version.ref = "kotlin" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
+firebase-bom-v3351 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-storage = { module = "com.google.firebase:firebase-storage" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
 

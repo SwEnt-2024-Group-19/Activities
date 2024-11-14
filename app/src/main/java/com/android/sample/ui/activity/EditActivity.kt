@@ -1,7 +1,6 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -62,9 +61,9 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
-import com.android.sample.ui.ActivityImageCarousel
 import com.android.sample.ui.GalleryScreen
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -187,12 +186,7 @@ fun EditActivityScreen(
                       .verticalScroll(rememberScrollState())
                       .testTag("activityEditScreen"),
           ) {
-            ActivityImageCarousel(
-                activityId = activity?.uid ?: "",
-                onFailure = { exception ->
-                  Log.e("EditActivityScreen", "Failed to fetch images: ${exception.message}")
-                },
-            )
+            CarouselNoModif(itemsList = selectedImages, deleteImage = {})
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = title,

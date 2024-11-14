@@ -78,6 +78,34 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
   }
 }
 
+@Composable
+fun CarouselNoModif(itemsList: List<Bitmap>, deleteImage: (Bitmap) -> Unit) {
+  Row(modifier = Modifier.padding(8.dp).height(120.dp)) {
+    LazyRow {
+      items(itemsList.size) { bitmap ->
+        Card(modifier = Modifier.padding(4.dp)) {
+          Image(
+              bitmap = itemsList[bitmap].resize(100, 100).asImageBitmap(),
+              contentDescription = "Selected Image",
+              modifier = Modifier.size(100.dp))
+          IconButton(
+              onClick = { deleteImage(itemsList[bitmap]) },
+              modifier =
+                  Modifier.width(80.dp)
+                      .height(80.dp)
+                      .align(Alignment.End)
+                      .testTag("removeImageButton")) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Remove Image",
+                    tint = Color.Black)
+              }
+        }
+      }
+    }
+  }
+}
+
 fun Bitmap.resize(reqWidth: Int, reqHeight: Int): Bitmap {
   val ratio: Float = this.width.toFloat() / this.height.toFloat()
   val height = (reqWidth / ratio).toInt()

@@ -51,11 +51,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.camera.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -70,7 +72,6 @@ import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
-import com.android.sample.ui.uploadActivityImages
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 
@@ -118,6 +119,7 @@ fun CreateActivityScreen(
   var attendees: List<User> by remember { mutableStateOf(attendees_) }
   var selectedImages = remember { mutableStateListOf<Bitmap>() }
   var items = remember { mutableStateListOf<String>() }
+    val imageViewModel : ImageViewModel = hiltViewModel()
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
       topBar = {
@@ -424,7 +426,7 @@ fun CreateActivityScreen(
                           0,
                           0,
                           0)
-                      uploadActivityImages(
+                      imageViewModel.uploadActivityImages(
                           activityId,
                           selectedImages,
                           onSuccess = { imageUrls ->

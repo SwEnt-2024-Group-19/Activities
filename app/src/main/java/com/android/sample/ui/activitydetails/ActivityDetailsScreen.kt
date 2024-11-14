@@ -1,5 +1,6 @@
 package com.android.sample.ui.activitydetails
 
+import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -60,8 +61,8 @@ import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.ui.ActivityImageCarousel
 import com.android.sample.ui.ProfileImage
+import com.android.sample.ui.fetchActivityImageUrltoBitmap
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -82,6 +83,7 @@ fun ActivityDetailsScreen(
   // Check if the user is already enrolled in the activity
   val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
 
+  var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
   val location by remember { mutableStateOf(activity?.location) }
@@ -165,9 +167,11 @@ fun ActivityDetailsScreen(
                           .background(Color.Gray, shape = RoundedCornerShape(8.dp))
                           .testTag("image")) {
                     // Optional: Add placeholder text in the center
-                    ActivityImageCarousel(
-                        activityId = activity?.uid ?: "",
-                        onFailure = { Log.e("ActivityDetailsScreen", "Failed to load image") })
+                    fetchActivityImageUrltoBitmap(
+                        activity?.uid ?: "",
+                        onSuccess = { urls -> bitmaps = urls },
+                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+                    // CarouselNoModif(itemsList = bitmaps, deleteImage = { })
                     LikeButton(profile, activity, profileViewModel)
                   }
 
