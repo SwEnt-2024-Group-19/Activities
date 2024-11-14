@@ -27,6 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
 @Composable
 fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraClick: () -> Unit) {
@@ -41,7 +44,8 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
             modifier =
                 Modifier.fillMaxWidth()
                     .height(200.dp)
-                    .background(color = Color.White, shape = RoundedCornerShape(size = 16.dp))
+                    .background(
+                        color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
                     .testTag("addUserDialog"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -49,33 +53,40 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
           Text(
               text = "Add an image",
               style =
-                  TextStyle(color = Color.Black, fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                  TextStyle(
+                      color = Color.Black,
+                      fontSize = TITLE_FONTSIZE.sp,
+                      fontWeight = FontWeight.Bold),
           )
 
-          Button(onClick = onGalleryClick, modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.background(Color.Transparent)) {
-                  Text(
-                      text = "Choose from gallery",
-                      style = TextStyle(color = Color.Black, fontSize = 16.sp))
-                  Spacer(modifier = Modifier.width(8.dp))
-                  Icon(Icons.Filled.PhotoLibrary, contentDescription = "Choose from gallery")
-                }
-          }
-          Spacer(modifier = Modifier.height(8.dp))
+          Button(
+              onClick = onGalleryClick,
+              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.background(Color.Transparent)) {
+                      Text(
+                          text = "Choose from gallery",
+                          style = TextStyle(color = Color.Black, fontSize = MEDIUM_PADDING.sp))
+                      Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+                      Icon(Icons.Filled.PhotoLibrary, contentDescription = "Choose from gallery")
+                    }
+              }
+          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-          Button(onClick = onCameraClick, modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.background(Color.Transparent)) {
-                  Text(
-                      text = "Take pictures with camera",
-                      style = TextStyle(color = Color.Black, fontSize = 16.sp))
-                  Spacer(modifier = Modifier.width(8.dp))
-                  Icon(Icons.Filled.PhotoCamera, contentDescription = "Choose from gallery")
-                }
-          }
+          Button(
+              onClick = onCameraClick,
+              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.background(Color.Transparent)) {
+                      Text(
+                          text = "Take pictures with camera",
+                          style = TextStyle(color = Color.Black, fontSize = MEDIUM_PADDING.sp))
+                      Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+                      Icon(Icons.Filled.PhotoCamera, contentDescription = "Choose from gallery")
+                    }
+              }
         }
       }
 }

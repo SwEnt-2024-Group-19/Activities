@@ -32,6 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.ui.ImagePicker
 import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.components.TextFieldWithErrorState
@@ -56,25 +62,25 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
   Column(
       modifier =
           Modifier.fillMaxSize()
-              .padding(16.dp)
+              .padding(MEDIUM_PADDING.dp)
               .verticalScroll(scrollState)
               .testTag("profileCreationScrollColumn"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         Text(
             text = "Complete your profile creation",
-            fontSize = 24.sp,
+            fontSize = TITLE_FONTSIZE.sp,
             fontWeight = FontWeight.Bold, // Set the text to be bold
             modifier =
-                Modifier.padding(16.dp)
+                Modifier.padding(MEDIUM_PADDING.dp)
                     .wrapContentWidth(Alignment.CenterHorizontally)
                     .testTag("profileCreationTitle"))
 
         ProfileImage(
             url = photo,
-            modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+            modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
         ImagePicker(onImagePicked = { photo = it.toString() }, buttonText = "Add Profile Picture")
-        Spacer(modifier = Modifier.padding(48.dp))
+        Spacer(modifier = Modifier.padding((2 * LARGE_PADDING).dp))
         /*OutlinedTextField(
         value = name,
         onValueChange = { name = it },
@@ -89,7 +95,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
             modifier = Modifier.testTag("nameTextField"),
             errorTestTag = "nameError")
 
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
         TextFieldWithErrorState(
             value = surname,
             onValueChange = { surname = it },
@@ -98,14 +104,14 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
             externalError = surnameErrorState.value,
             modifier = Modifier.testTag("surnameTextField"),
             errorTestTag = "surnameError")
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
 
         var newInterest by remember { mutableStateOf("") }
         var newListInterests by remember { mutableStateOf(interests) }
 
         LazyRow(
-            modifier = Modifier.padding(16.dp).testTag("interestsList"),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            modifier = Modifier.padding(MEDIUM_PADDING.dp).testTag("interestsList"),
+            horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
               newListInterests.let {
                 items(it.size, key = { it }) { index ->
                   InterestEditBox(
@@ -119,8 +125,8 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
             value = newInterest,
             onValueChange = { newInterest = it },
             label = { Text("New Interest") },
-            modifier = Modifier.width(200.dp).testTag("newInterestInput"))
-        Spacer(modifier = Modifier.width(8.dp))
+            modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
+        Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
         Button(
             onClick = {
               if (newInterest.isNotBlank()) {
@@ -129,14 +135,14 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
               }
             },
             modifier =
-                Modifier.padding(end = 8.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                Modifier.padding(end = STANDARD_PADDING.dp)
+                    .clip(RoundedCornerShape(STANDARD_PADDING.dp))
+                    .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
                     .testTag("addInterestButton")) {
               Text("Add")
             }
 
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
         Button(
             onClick = {
               // Set errors if fields are empty
@@ -172,7 +178,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
           Text(
               text = it,
               color = Color.Red,
-              modifier = Modifier.padding(top = 8.dp).testTag("errorMessage"))
+              modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("errorMessage"))
         }
       }
 }

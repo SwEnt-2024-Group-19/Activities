@@ -58,12 +58,7 @@ class MainActivity : ComponentActivity() {
     if (!hasCameraPermissions(applicationContext)) {
       ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
-    Log.d("MainActivity", "Checking location permissions")
-    if (!hasLocationPermissions(applicationContext)) {
-      Log.d("MainActivity", "Requesting location permissions")
-      ActivityCompat.requestPermissions(
-          this, LOCATION_PERMISSIONS, LOCATION_PERMISSION_REQUEST_CODE)
-    }
+
     auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
     if (currentUser != null && currentUser.isAnonymous) {
@@ -88,17 +83,6 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  private fun hasLocationPermissions(context: Context): Boolean {
-    return LOCATION_PERMISSIONS.all {
-      ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-    }
-  }
-
-  private val LOCATION_PERMISSIONS =
-      arrayOf(
-          Manifest.permission.ACCESS_FINE_LOCATION,
-          Manifest.permission.ACCESS_COARSE_LOCATION,
-      )
   private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 }
 

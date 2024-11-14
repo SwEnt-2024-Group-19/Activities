@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 
 @Composable
 fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
@@ -37,7 +38,8 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
             modifier =
                 Modifier.fillMaxWidth()
                     .height(300.dp)
-                    .background(color = Color.White, shape = RoundedCornerShape(size = 16.dp))
+                    .background(
+                        color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
                     .testTag("addUserDialog"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -58,7 +60,7 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
               onValueChange = { surname = it },
               label = { Text("Surname") },
           )
-          Spacer(modifier = Modifier.height(16.dp))
+          Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           Button(
               modifier = Modifier.testTag("addUserButton"),
               onClick = {

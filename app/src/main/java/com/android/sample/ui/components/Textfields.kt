@@ -23,6 +23,10 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_TOP
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 
 @Composable
 fun PasswordTextField(
@@ -32,7 +36,7 @@ fun PasswordTextField(
     onPasswordVisibilityChange: () -> Unit,
     passwordError: String?
 ) {
-  Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION)) {
     OutlinedTextField(
         value = password,
         modifier = Modifier.fillMaxWidth().testTag("PasswordTextField"),
@@ -54,10 +58,10 @@ fun PasswordTextField(
       Text(
           text = it,
           color = Color.Red,
-          fontSize = 12.sp,
+          fontSize = SUBTITLE_FONTSIZE.sp,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = 16.dp, top = 4.dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = SMALL_PADDING.dp)
                   .testTag("PasswordErrorText"))
     }
   }
@@ -69,7 +73,7 @@ fun EmailTextField(
     onEmailChange: (String) -> Unit,
     emailError: String?,
 ) {
-  Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION)) {
     OutlinedTextField(
         value = email,
         onValueChange = onEmailChange,
@@ -82,10 +86,10 @@ fun EmailTextField(
       Text(
           text = it,
           color = Color.Red,
-          fontSize = 12.sp,
+          fontSize = SUBTITLE_FONTSIZE.sp,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = 16.dp, top = 4.dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = SMALL_PADDING.dp)
                   .testTag("EmailErrorText"))
     }
   }
