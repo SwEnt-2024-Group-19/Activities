@@ -30,6 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,6 +49,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -90,7 +92,7 @@ fun CreateActivityScreen(
   var selectedOption by remember { mutableStateOf("Select a type") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
-  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+  val creator = FirebaseAuth.getInstance().currentUser?.uid
 
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
@@ -128,7 +130,28 @@ fun CreateActivityScreen(
         )
       },
       content = { paddingValues ->
-        if (isCamOpen) {
+      if (creator == null) {
+          Column(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center,
+              modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+              Text(
+                  text =
+                  "You are not logged in. Login or Register to create activities.",
+                  modifier =
+                  Modifier.padding(bottom = MEDIUM_PADDING.dp)
+                      .testTag("notConnectedPrompt"),
+                  color = MaterialTheme.colorScheme.onSurface,
+                  style = MaterialTheme.typography.bodyMedium,
+                  textAlign = TextAlign.Center)
+              Button(
+                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                  modifier = Modifier.testTag("signInButton"),
+              ) {
+                  Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
+              }
+          }
+      } else if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
               controller = controller,
