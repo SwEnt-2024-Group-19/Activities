@@ -2,6 +2,7 @@ package com.android.sample.model.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.sample.model.profile.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,9 @@ constructor(
 
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
+
+  private val selectedUser_ = MutableStateFlow<User?>(null)
+  open val selectedUser: StateFlow<User?> = selectedUser_.asStateFlow()
 
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
   open val uiState: StateFlow<ActivitiesUiState> = _uiState
@@ -44,6 +48,10 @@ constructor(
 
   fun selectActivity(activity: Activity) {
     selectedActivity_.value = activity
+  }
+
+  fun selectUser(user: User) {
+    selectedUser_.value = user
   }
 
   fun getActivities(onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit = {}) {

@@ -76,6 +76,7 @@ fun ActivityDetailsScreen(
     profileViewModel: ProfileViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
+    val selectedParticipant = listActivityViewModel.selectedUser.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
   // Check if the user is already enrolled in the activity
   val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
@@ -265,30 +266,35 @@ fun ActivityDetailsScreen(
                       verticalAlignment = Alignment.CenterVertically,
                       modifier =
                           Modifier.padding(vertical = 4.dp).testTag(participant.name).clickable {
-                            if (participant.name != profile?.name) {
+                            if (participant.name == profile?.name) {
                               navigationActions.navigateTo(Screen.PROFILE)
+                            }
+                              else{
+                                  listActivityViewModel.selectUser(participant)
+                                    navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                             }
                           }) {
                         // Placeholder for participant picture
-                        if (participant.name != profile?.name) {
+                      if(participant.photo == null) {
                           Box(
                               modifier =
-                                  Modifier.size(40.dp)
-                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                      .padding(8.dp)) {
-                                Image(
-                                    painter =
-                                        painterResource(id = R.drawable.default_profile_image),
-                                    contentDescription = "Participant Image",
-                                    modifier =
-                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
-                              }
-                        } else {
+                              Modifier.size(40.dp)
+                                  .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                                  .padding(8.dp)) {
+                              Image(
+                                  painter =
+                                  painterResource(id = R.drawable.default_profile_image),
+                                  contentDescription = "Participant Image",
+                                  modifier =
+                                  Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
+                          }
+                      }
+                      else {
                           // Profile Picture
                           ProfileImage(
-                              url = profile.photo,
+                              url = participant.photo,
                               modifier = Modifier.size(40.dp).clip(CircleShape))
-                        }
+                      }
                         Spacer(modifier = Modifier.width(8.dp))
 
                         // Participant name
