@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.android.sample.resources.C.Tag.BOTTOM_CORNER
+import com.android.sample.resources.C.Tag.BOTTOM_MENU_HEIGHT
 
 @Composable
 fun BottomNavigationMenu(
@@ -24,7 +26,8 @@ fun BottomNavigationMenu(
     selectedItem: String
 ) {
   BottomNavigation(
-      modifier = Modifier.fillMaxWidth().height(60.dp).testTag("bottomNavigationMenu"),
+      modifier =
+          Modifier.fillMaxWidth().height(BOTTOM_MENU_HEIGHT.dp).testTag("bottomNavigationMenu"),
       backgroundColor = MaterialTheme.colorScheme.surface,
       content = {
         tabList.forEach { tab ->
@@ -33,7 +36,7 @@ fun BottomNavigationMenu(
               label = { Text(tab.textId) },
               selected = tab.route == selectedItem,
               onClick = { onTabSelect(tab) },
-              modifier = Modifier.clip(RoundedCornerShape(50.dp)).testTag(tab.textId))
+              modifier = Modifier.clip(RoundedCornerShape(BOTTOM_CORNER.dp)).testTag(tab.textId))
         }
       },
   )

@@ -59,6 +59,11 @@ import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -151,16 +156,16 @@ fun ActivityDetailsScreen(
             modifier =
                 Modifier.fillMaxSize()
                     .padding(padding)
-                    .padding(16.dp)
+                    .padding(MEDIUM_PADDING.dp)
                     .verticalScroll(rememberScrollState())
                     .testTag("activityDetailsScreen")) {
               // Image section
               Box(
                   modifier =
                       Modifier.fillMaxWidth()
-                          .aspectRatio(16 / 9f)
-                          .padding(16.dp)
-                          .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                          .aspectRatio(MEDIUM_PADDING / 9f)
+                          .padding(MEDIUM_PADDING.dp)
+                          .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
                     // Optional: Add placeholder text in the center
                     Text(
@@ -172,7 +177,10 @@ fun ActivityDetailsScreen(
 
               // Title
               Box(
-                  modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("title"),
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(vertical = STANDARD_PADDING.dp)
+                          .testTag("title"),
                   contentAlignment = Alignment.Center) {
                     Text(
                         text = activityTitle ?: "title not specified",
@@ -180,83 +188,87 @@ fun ActivityDetailsScreen(
                         style = MaterialTheme.typography.headlineMedium)
                   }
 
-              Spacer(modifier = Modifier.height(8.dp))
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
               // Description
               Column(
                   modifier =
                       Modifier.fillMaxWidth()
                           .height(150.dp)
-                          .padding(8.dp)
-                          .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                          .padding(STANDARD_PADDING.dp)
+                          .border(1.dp, Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .verticalScroll(rememberScrollState())
                           .testTag("description")) {
                     Text(
                         text = "Description:",
                         style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                        modifier =
+                            Modifier.padding(
+                                horizontal = STANDARD_PADDING.dp, vertical = SMALL_PADDING.dp))
                     Text(
                         text = description ?: "description not specified",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 8.dp).testTag("descriptionText"))
+                        modifier =
+                            Modifier.padding(horizontal = STANDARD_PADDING.dp)
+                                .testTag("descriptionText"))
                   }
 
-              Spacer(modifier = Modifier.height(8.dp))
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
               // price
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.testTag("price")) {
                     Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
                   }
 
-              Spacer(modifier = Modifier.height(8.dp))
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
               // location
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.testTag("location")) {
                     Icon(Icons.Default.LocationOn, contentDescription = "Location")
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = location?.name ?: "No location",
                         modifier = Modifier.testTag("locationText"))
                   }
-              Spacer(modifier = Modifier.height(8.dp))
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
               // schedule
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.testTag("schedule")) {
                     Icon(Icons.Default.DateRange, contentDescription = "Schedule")
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = if (startTime != null) "$dueDate at $startTime" else dueDate,
                         modifier = Modifier.testTag("scheduleText"))
                   }
 
-              Spacer(modifier = Modifier.height(8.dp))
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
               // duration
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.testTag("duration")) {
                     Icon(Icons.Default.Timelapse, contentDescription = "duration")
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = "Event length: ${duration ?: "not defined yet"}",
                         modifier = Modifier.testTag("durationText"))
                   }
-              Spacer(modifier = Modifier.height(32.dp))
+              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
               // Participants section
               Text(
                   text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
                   style = MaterialTheme.typography.bodyLarge,
-                  modifier = Modifier.padding(bottom = 8.dp))
+                  modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
 
               // List of participants
               Column(modifier = Modifier.testTag("participants")) {
@@ -264,32 +276,37 @@ fun ActivityDetailsScreen(
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
                       modifier =
-                          Modifier.padding(vertical = 4.dp).testTag(participant.name).clickable {
-                            if (participant.name != profile?.name) {
-                              navigationActions.navigateTo(Screen.PROFILE)
-                            }
-                          }) {
+                          Modifier.padding(vertical = SMALL_PADDING.dp)
+                              .testTag(participant.name)
+                              .clickable {
+                                if (participant.name != profile?.name) {
+                                  navigationActions.navigateTo(Screen.PROFILE)
+                                }
+                              }) {
                         // Placeholder for participant picture
                         if (participant.name != profile?.name) {
                           Box(
                               modifier =
-                                  Modifier.size(40.dp)
-                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                      .padding(8.dp)) {
+                                  Modifier.size(BUTTON_HEIGHT.dp)
+                                      .background(
+                                          Color.Gray,
+                                          shape = RoundedCornerShape(STANDARD_PADDING.dp))
+                                      .padding(STANDARD_PADDING.dp)) {
                                 Image(
                                     painter =
                                         painterResource(id = R.drawable.default_profile_image),
                                     contentDescription = "Participant Image",
                                     modifier =
-                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
+                                        Modifier.fillMaxSize()
+                                            .clip(RoundedCornerShape(STANDARD_PADDING.dp)))
                               }
                         } else {
                           // Profile Picture
                           ProfileImage(
                               url = profile.photo,
-                              modifier = Modifier.size(40.dp).clip(CircleShape))
+                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
 
                         // Participant name
                         Text(
@@ -299,7 +316,7 @@ fun ActivityDetailsScreen(
                 }
               }
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
 
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
@@ -341,7 +358,7 @@ fun ActivityDetailsScreen(
                       },
                       modifier =
                           Modifier.fillMaxWidth()
-                              .padding(horizontal = 24.dp)
+                              .padding(horizontal = LARGE_PADDING.dp)
                               .testTag("enrollButton")) {
                         Text(text = "Enroll")
                       }
@@ -350,7 +367,7 @@ fun ActivityDetailsScreen(
                       onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
                       modifier =
                           Modifier.fillMaxWidth()
-                              .padding(horizontal = 24.dp)
+                              .padding(horizontal = LARGE_PADDING.dp)
                               .testTag("editButton")) {
                         Text(text = "Edit")
                       }
@@ -365,7 +382,7 @@ fun ActivityDetailsScreen(
                     onClick = { navigationActions.navigateTo(Screen.AUTH) },
                     modifier =
                         Modifier.fillMaxWidth()
-                            .padding(horizontal = 24.dp)
+                            .padding(horizontal = LARGE_PADDING.dp)
                             .testTag("loginButton")) {
                       Text(text = "Login/Register")
                     }
@@ -413,7 +430,7 @@ fun CommentSection(
 ) {
   val newCommentText = remember { mutableStateOf("") }
 
-  Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+  Column(modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
     // Display all comments
@@ -426,13 +443,13 @@ fun CommentSection(
           allowReplies = true) // Set allowReplies to true for top-level comments
     }
 
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
     if (profileId == "anonymous") {
       // Message for users who are not logged in
       Text(
           text = "You need to be logged in to add or reply to comments.",
-          modifier = Modifier.padding(4.dp).testTag("notLoggedInMessage"))
+          modifier = Modifier.padding(SMALL_PADDING.dp).testTag("notLoggedInMessage"))
     } else {
       // Input field for new comments if the user is logged in
       OutlinedTextField(
@@ -446,7 +463,7 @@ fun CommentSection(
             onAddComment(newCommentText.value)
             newCommentText.value = ""
           },
-          modifier = Modifier.padding(top = 8.dp).testTag("PostCommentButton")) {
+          modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("PostCommentButton")) {
             Text("Post Comment")
           }
     }
@@ -464,7 +481,7 @@ fun CommentItem(
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
 
-  Column(modifier = Modifier.padding(8.dp)) {
+  Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
     Text(
         text = "${comment.userName}: ${comment.content}",
         style = MaterialTheme.typography.bodyMedium,
@@ -479,7 +496,8 @@ fun CommentItem(
           Button(
               onClick = { onDeleteComment(comment) },
               modifier =
-                  Modifier.padding(top = 4.dp, end = 8.dp).testTag("DeleteButton_${comment.uid}")) {
+                  Modifier.padding(top = SMALL_PADDING.dp, end = STANDARD_PADDING.dp)
+                      .testTag("DeleteButton_${comment.uid}")) {
                 Text("Delete")
               }
         }
@@ -489,7 +507,7 @@ fun CommentItem(
           Button(
               onClick = { showReplyField = !showReplyField },
               modifier =
-                  Modifier.padding(top = 4.dp)
+                  Modifier.padding(top = SMALL_PADDING.dp)
                       .testTag(
                           "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
                 Text(if (showReplyField) "Cancel" else "Reply")
@@ -510,7 +528,9 @@ fun CommentItem(
                 replyText = ""
                 showReplyField = false
               },
-              modifier = Modifier.padding(top = 4.dp).testTag("postReplyButton_${comment.uid}")) {
+              modifier =
+                  Modifier.padding(top = SMALL_PADDING.dp)
+                      .testTag("postReplyButton_${comment.uid}")) {
                 Text("Post Reply")
               }
         }
@@ -518,7 +538,7 @@ fun CommentItem(
 
       // Show replies for original comments, but do not allow replies on replies
       comment.replies.forEach { reply ->
-        Box(modifier = Modifier.padding(start = 16.dp)) {
+        Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
           // Pass `allowReplies = false` for replies to prevent nesting
           CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
         }

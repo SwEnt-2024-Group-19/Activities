@@ -8,10 +8,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -28,6 +28,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.navigation.NavigationActions
@@ -66,7 +70,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 painter =
                     painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
                 contentDescription = "App Logo",
-                modifier = Modifier.size(110.dp))
+                modifier = Modifier.size(IMAGE_SIZE.dp))
             Spacer(modifier = Modifier.height(48.dp))
           }
           item {
@@ -78,7 +82,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                   emailErrorState.value = if (it.isBlank()) "Email cannot be empty" else null
                 },
                 emailError = emailErrorState.value)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
           item {
             // Password field
@@ -119,7 +123,10 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     }
                   }
                 },
-                modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignUpButton")) {
+                modifier =
+                    Modifier.width(BUTTON_WIDTH.dp)
+                        .height(BUTTON_HEIGHT.dp)
+                        .testTag("SignUpButton")) {
                   Text("Sign up with Email", fontSize = 16.sp)
                 }
             Spacer(modifier = Modifier.height(16.dp))
@@ -128,7 +135,10 @@ fun SignUpScreen(navigationActions: NavigationActions) {
             // If user already has an account, navigate to the sign in screen
             TextButton(
                 onClick = { navigationActions.navigateTo(Screen.AUTH) },
-                modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignInButton")) {
+                modifier =
+                    Modifier.width(BUTTON_WIDTH.dp)
+                        .height(BUTTON_HEIGHT.dp)
+                        .testTag("GoToSignInButton")) {
                   Text("Already an account?", fontSize = 16.sp)
                 }
           }

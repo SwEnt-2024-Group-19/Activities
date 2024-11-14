@@ -27,6 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.navigation.NavigationActions
@@ -67,8 +75,8 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             Image(
                 painter = painterResource(id = R.drawable.aptivity_logo),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(110.dp).testTag("AppLogo"))
-            Spacer(modifier = Modifier.height(48.dp))
+                modifier = Modifier.size(IMAGE_SIZE.dp).testTag("AppLogo"))
+            Spacer(modifier = Modifier.height((2 * LARGE_PADDING).dp))
           }
 
           item {
@@ -82,7 +90,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                       else null
                 },
                 emailError = emailErrorState.value)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
 
           item {
@@ -92,7 +100,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                 isPasswordVisible = isPasswordVisible.value,
                 onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
                 passwordError = passwordErrorState.value)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
 
           item {
@@ -118,10 +126,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                   }
                   Log.d("SignInScreen", "Sign in with email/password")
                 },
-                modifier = Modifier.fillMaxWidth(0.8f).height(48.dp).testTag("SignInButton")) {
-                  Text("Sign in with Email", fontSize = 16.sp)
+                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION).height(BUTTON_HEIGHT.dp).testTag("SignInButton")) {
+                  Text("Sign in with Email", fontSize = SUBTITLE_FONTSIZE.sp)
                 }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
 
           item {
@@ -130,15 +138,15 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                 onSignInClick = {
                   googleSignInLauncher.launch(rememberGoogleSignInIntent(context, token))
                 })
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
 
           item {
             // If user already has an account, navigate to the sign-in screen
             TextButton(
                 onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                modifier = Modifier.fillMaxWidth(0.8f).height(36.dp).testTag("GoToSignUpButton")) {
-                  Text("No account yet?", fontSize = 16.sp)
+                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION).height(BUTTON_HEIGHT.dp).testTag("GoToSignUpButton")) {
+                  Text("No account yet?", fontSize = SUBTITLE_FONTSIZE.sp)
                 }
           }
 
@@ -197,19 +205,22 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       colors = ButtonDefaults.buttonColors(containerColor = Color.White),
       shape = RoundedCornerShape(50),
       border = BorderStroke(1.dp, Color.LightGray),
-      modifier = Modifier.padding(8.dp).height(48.dp).testTag("GoogleSignInButton")) {
+      modifier =
+          Modifier.padding(STANDARD_PADDING.dp)
+              .height(BUTTON_HEIGHT.dp)
+              .testTag("GoogleSignInButton")) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth(0.8f)) {
+            modifier = Modifier.width(BUTTON_WIDTH.dp)) {
               Image(
                   painter = painterResource(id = R.drawable.google_logo),
                   contentDescription = "Google Logo",
-                  modifier = Modifier.size(30.dp).padding(end = 8.dp))
+                  modifier = Modifier.size(IMAGE_SIZE.dp).padding(end = STANDARD_PADDING.dp))
               Text(
                   text = "Sign in with Google",
                   color = Color.Gray,
-                  fontSize = 16.sp,
+                  fontSize = MEDIUM_PADDING.sp,
                   fontWeight = FontWeight.Medium)
             }
       }

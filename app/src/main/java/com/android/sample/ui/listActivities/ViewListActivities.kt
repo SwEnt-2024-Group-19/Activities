@@ -52,6 +52,11 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -79,7 +84,7 @@ fun ListActivitiesScreen(
       topBar = {
         Box(
             modifier =
-                Modifier.height(35.dp)
+                Modifier.height(BUTTON_HEIGHT.dp)
                     .testTag("segmentedButtonRow")) { // Set the desired height here
               SingleChoiceSegmentedButtonRow {
                 options.forEachIndexed { index, label ->
@@ -115,7 +120,7 @@ fun ListActivitiesScreen(
                   Text(
                       text = "There is no activity yet.",
                       modifier =
-                          Modifier.padding(8.dp)
+                          Modifier.padding(STANDARD_PADDING.dp)
                               .align(Alignment.Center)
                               .testTag("emptyActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
@@ -123,7 +128,7 @@ fun ListActivitiesScreen(
                   Text(
                       text = "There is no activity of this type yet.",
                       modifier =
-                          Modifier.padding(8.dp)
+                          Modifier.padding(STANDARD_PADDING.dp)
                               .align(Alignment.Center)
                               .testTag("emptyActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
@@ -131,8 +136,8 @@ fun ListActivitiesScreen(
               } else {
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    modifier = Modifier.fillMaxSize().padding(horizontal = STANDARD_PADDING.dp),
+                    verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
                       // Use LazyColumn to efficiently display the list of activities
 
                       items(activitiesList) { activity ->
@@ -150,7 +155,9 @@ fun ListActivitiesScreen(
             }
             is ListActivitiesViewModel.ActivitiesUiState.Error -> {
               val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-              Text(text = "Error: ${error.message}", modifier = Modifier.padding(8.dp))
+              Text(
+                  text = "Error: ${error.message}",
+                  modifier = Modifier.padding(STANDARD_PADDING.dp))
             }
           }
         }
@@ -176,20 +183,20 @@ fun ActivityCard(
       modifier =
           Modifier.fillMaxWidth()
               .testTag("activityCard")
-              .clip(RoundedCornerShape(16.dp))
+              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
               .clickable {
                 listActivitiesViewModel.selectActivity(activity)
                 navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
               },
-      elevation = CardDefaults.cardElevation(8.dp)) {
+      elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)) {
         Column {
           // Box for overlaying the title on the image
-          Box(modifier = Modifier.fillMaxWidth().height(180.dp)) {
+          Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
             // Display the activity image
             Image(
                 painter = painterResource(R.drawable.foot),
                 contentDescription = activity.title,
-                modifier = Modifier.fillMaxWidth().height(180.dp),
+                modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
 
             // Display the activity name on top of the image
@@ -201,12 +208,14 @@ fun ActivityCard(
                         color = Color.White // Title color set to black
                         ),
                 modifier =
-                    Modifier.align(Alignment.BottomStart).padding(16.dp).testTag("titleActivity"))
+                    Modifier.align(Alignment.BottomStart)
+                        .padding(MEDIUM_PADDING.dp)
+                        .testTag("titleActivity"))
           }
 
-          Spacer(modifier = Modifier.height(8.dp))
+          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
           Row(
-              modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
@@ -242,7 +251,7 @@ fun ActivityCard(
               }
 
           Row(
-              modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
@@ -258,19 +267,22 @@ fun ActivityCard(
                     text = "${activity.placesLeft}/${activity.maxPlaces}",
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.SemiBold, color = Color.Gray, fontSize = 16.sp),
-                    modifier = Modifier.align(Alignment.CenterVertically).padding(end = 16.dp))
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Gray,
+                            fontSize = MEDIUM_PADDING.sp),
+                    modifier =
+                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
               }
 
-          Spacer(modifier = Modifier.height(4.dp))
+          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
           // Display the activity description
           Text(
               text = activity.description,
               style =
                   MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
-              modifier = Modifier.padding(horizontal = 16.dp))
-          Spacer(modifier = Modifier.height(8.dp))
+              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
+          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
         }
       }
 }
