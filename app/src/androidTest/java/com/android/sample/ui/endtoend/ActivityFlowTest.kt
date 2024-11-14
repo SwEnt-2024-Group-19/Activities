@@ -52,7 +52,6 @@ class ActivityFlowTest {
     // Opens the app as a guest
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
     composeTestRule.waitForIdle()
-    Thread.sleep(5000)
 
     // Checks that is not connected in profile
     composeTestRule.onNodeWithTag("Profile").performClick()
