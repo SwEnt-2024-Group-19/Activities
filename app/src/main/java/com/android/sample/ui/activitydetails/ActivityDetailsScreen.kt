@@ -167,7 +167,6 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
-
                     LikeButton(profile, activity, profileViewModel)
                   }
 
