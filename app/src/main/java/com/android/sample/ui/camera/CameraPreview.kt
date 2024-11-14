@@ -26,11 +26,15 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.android.sample.model.camera.resize
 import com.android.sample.resources.C.Tag.BLACK_COLOR
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MEDIUM_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
@@ -53,26 +57,26 @@ fun CameraPreview(
 
 @Composable
 fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitmap) -> Unit) {
-  Row(modifier = Modifier.padding(8.dp).height(120.dp)) {
+  Row(modifier = Modifier.padding(STANDARD_PADDING.dp).height(120.dp)) {
     FloatingActionButton(
         content = {
           Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = "Add a new image")
         },
         onClick = openDialog,
-        modifier = Modifier.size(50.dp).background(Color(0xFFFFFFFF)),
+        modifier = Modifier.size(LARGE_BUTTON_HEIGHT.dp).background(Color(WHITE_COLOR)),
     )
     LazyRow {
       items(itemsList.size) { bitmap ->
-        Card(modifier = Modifier.padding(4.dp)) {
+        Card(modifier = Modifier.padding(SMALL_PADDING.dp)) {
           Image(
-              bitmap = itemsList[bitmap].resize(100, 100).asImageBitmap(),
+              bitmap = itemsList[bitmap].resize(IMAGE_SIZE, IMAGE_SIZE).asImageBitmap(),
               contentDescription = "Selected Image",
-              modifier = Modifier.size(100.dp))
+              modifier = Modifier.size(IMAGE_SIZE.dp))
           IconButton(
               onClick = { deleteImage(itemsList[bitmap]) },
               modifier =
-                  Modifier.width(80.dp)
-                      .height(80.dp)
+                  Modifier.width(MEDIUM_IMAGE_SIZE.dp)
+                      .height(MEDIUM_IMAGE_SIZE.dp)
                       .align(Alignment.End)
                       .testTag("removeImageButton")) {
                 Icon(
@@ -86,79 +90,4 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
   }
 }
 
-fun Bitmap.resize(reqWidth: Int, reqHeight: Int): Bitmap {
-  val ratio: Float = this.width.toFloat() / this.height.toFloat()
-  val height = (reqWidth / ratio).toInt()
-  return Bitmap.createScaledBitmap(this, reqWidth, height, true)
-  Row(
-      modifier = Modifier.fillMaxWidth().height(135.dp).padding(STANDARD_PADDING.dp),
-      verticalAlignment = Alignment.CenterVertically) {
-        Card(
-            modifier =
-                Modifier.padding(STANDARD_PADDING.dp)
-                    .background(Color(WHITE_COLOR))
-                    .testTag("carouselItem"),
-        ) {
-          itemsList.forEach { items ->
-            Image(
-                bitmap = items.asImageBitmap(),
-                contentDescription = "Image",
-                modifier = Modifier.size(IMAGE_SIZE.dp))
-            IconButton(
-                onClick = { deleteImage(items) },
-                modifier =
-                    Modifier.width(BUTTON_WIDTH.dp)
-                        .height(BUTTON_WIDTH.dp)
-                        .align(Alignment.End)
-                        .testTag("removeImageButton"),
-            ) {
-              Icon(
-                  Icons.Filled.DeleteOutline,
-                  contentDescription = "remove image",
-              )
-            }
-          }
-        }
 
-        Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
-        Column(
-            modifier =
-                Modifier.padding(MEDIUM_PADDING.dp)
-                    .fillMaxHeight(), // Use size modifier for simplicity
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.End // Center the icon horizontally
-            ) {
-              if (itemsList.isEmpty()) {
-                FloatingActionButton(
-                    content = {
-                      Icon(
-                          imageVector = Icons.Outlined.AddCircle,
-                          contentDescription = "Add a new image")
-                    },
-                    onClick = openDialog,
-                    modifier = Modifier.size((2 * LARGE_PADDING).dp).background(Color(WHITE_COLOR)),
-                )
-                Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
-                Text(
-                    text = "Add Image",
-                    color = Color(BLACK_COLOR),
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = STANDARD_PADDING.sp),
-                )
-              } else {
-                FloatingActionButton(
-                    content = {
-                      Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Edit image")
-                    },
-                    onClick = openDialog,
-                    modifier = Modifier.size(BUTTON_WIDTH.dp).background(Color(WHITE_COLOR)),
-                )
-                Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
-                Text(
-                    text = "Replace Image",
-                    color = Color(BLACK_COLOR),
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = STANDARD_PADDING.sp),
-                )
-              }
-            }
-      }
-}

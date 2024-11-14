@@ -33,21 +33,24 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.camera.uriToBitmap
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
-import com.android.sample.ui.ImagePicker
-import com.android.sample.ui.ProfileImage
+
+import com.android.sample.ui.camera.ImagePicker
+import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.TextFieldWithErrorState
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.android.sample.ui.uploadProfilePicture
-import com.android.sample.ui.uriToBitmap
+
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable

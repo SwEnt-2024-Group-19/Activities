@@ -67,8 +67,8 @@ import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
-import com.android.sample.ui.ActivityImageCarousel
-import com.android.sample.ui.GalleryScreen
+import com.android.sample.ui.camera.ActivityImageCarousel
+import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
@@ -153,19 +153,7 @@ fun EditActivityScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
-        if (showDialogImage) {
-          AddImageDialog(
-              onDismiss = { showDialogImage = false },
-              onGalleryClick = {
-                showDialogImage = false
-                isGalleryOpen = true
-              },
-              onCameraClick = {
-                showDialogImage = false
-                isCamOpen = true
-              })
-        }
-        if (isGalleryOpen) {
+       if (isGalleryOpen) {
           GalleryScreen(
               isGalleryOpen = { isGalleryOpen = false },
               addImage = { bitmap -> selectedImages.add(bitmap) },
@@ -192,6 +180,18 @@ fun EditActivityScreen(
                       .verticalScroll(rememberScrollState())
                       .testTag("activityEditScreen"),
           ) {
+              if (showDialogImage) {
+                  AddImageDialog(
+                      onDismiss = { showDialogImage = false },
+                      onGalleryClick = {
+                          showDialogImage = false
+                          isGalleryOpen = true
+                      },
+                      onCameraClick = {
+                          showDialogImage = false
+                          isCamOpen = true
+                      })
+              }
             ActivityImageCarousel(
                 activityId = activity?.uid ?: "",
                 onFailure = { exception ->
