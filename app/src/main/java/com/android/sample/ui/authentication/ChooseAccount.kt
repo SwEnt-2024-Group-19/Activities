@@ -37,7 +37,9 @@ fun ChooseAccountScreen(
 ) {
   // Collect the user profile data from ProfileViewModel
   val userProfile by profileViewModel.userState.collectAsState()
-
+    val continueMessage = if (userProfile != null) {
+        "Continue as ${userProfile?.name}"
+    } else "Complete profile creation"
   LazyColumn(
       modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp).testTag("chooseAccountScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,14 +69,18 @@ fun ChooseAccountScreen(
         // Continue Button
         item {
           Button(
-              onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
+              onClick = {
+                  if (profileViewModel.userState.value != null){
+                      navigationActions.navigateTo(Screen.OVERVIEW)
+                  } else navigationActions.navigateTo(Screen.CREATE_PROFILE)
+                        },
               modifier =
                   Modifier.fillMaxWidth(0.8f)
                       .height(48.dp)
                       .clip(RoundedCornerShape(12.dp))
                       .testTag("continueText")) {
                 Text(
-                    text = "Continue as ${userProfile?.name}",
+                    text = continueMessage,
                     fontSize = 16.sp,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
