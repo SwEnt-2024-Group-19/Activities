@@ -75,5 +75,14 @@ class ActivityFlowTest {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
+
+    // Tries to create a new activity and is prompted to sign in
+    composeTestRule.onNodeWithTag("Add Activity").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
+    composeTestRule.onNodeWithTag("signInButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("SignInScreen").assertIsDisplayed()
+
   }
 }
