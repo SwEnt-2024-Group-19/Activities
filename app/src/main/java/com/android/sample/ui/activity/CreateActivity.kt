@@ -169,6 +169,24 @@ fun CreateActivityScreen(
                       .verticalScroll(scrollState)
                       .testTag("activityCreateScreen"),
           ) {
+              if (isGalleryOpen) {
+                  GalleryScreen(
+                      isGalleryOpen = { isGalleryOpen = false },
+                      addImage = { bitmap -> selectedImages.add(bitmap) },
+                      context = context)
+              }
+              if (showDialogImage) {
+                  AddImageDialog(
+                      onDismiss = { showDialogImage = false },
+                      onGalleryClick = {
+                          showDialogImage = false
+                          isGalleryOpen = true
+                      },
+                      onCameraClick = {
+                          showDialogImage = false
+                          isCamOpen = true
+                      })
+              }
             Carousel(
                 openDialog = { showDialogImage = true },
                 itemsList = selectedImages,
