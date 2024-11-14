@@ -25,6 +25,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -42,31 +49,34 @@ fun ChooseAccountScreen(
         "Continue as ${userProfile?.name}"
       } else "Complete profile creation"
   LazyColumn(
-      modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp).testTag("chooseAccountScreen"),
+      modifier =
+          Modifier.fillMaxSize()
+              .padding(horizontal = MEDIUM_PADDING.dp)
+              .testTag("chooseAccountScreen"),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center) {
         // Greeting Text
         item {
           Text(
               text = "Hello ${userProfile?.name ?: "User"}, you are already signed in!",
-              fontSize = 24.sp,
+              fontSize = TITLE_FONTSIZE.sp,
               fontWeight = FontWeight.Bold,
               textAlign = TextAlign.Center,
-              modifier = Modifier.padding(bottom = 16.dp).testTag("greetingText"),
+              modifier = Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("greetingText"),
               overflow = TextOverflow.Ellipsis,
               maxLines = 2)
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp)) }
 
         // Profile Image
         item {
           ProfileImage(
               url = userProfile?.photo,
-              modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+              modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp)) }
         // Continue Button
         item {
           Button(
@@ -76,31 +86,31 @@ fun ChooseAccountScreen(
                 } else navigationActions.navigateTo(Screen.CREATE_PROFILE)
               },
               modifier =
-                  Modifier.fillMaxWidth(0.8f)
-                      .height(48.dp)
-                      .clip(RoundedCornerShape(12.dp))
+                  Modifier.width(BUTTON_WIDTH.dp)
+                      .height(LARGE_BUTTON_HEIGHT.dp)
+                      .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
                       .testTag("continueText")) {
                 Text(
                     text = continueMessage,
-                    fontSize = 16.sp,
+                    fontSize = SUBTITLE_FONTSIZE.sp,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(vertical = 8.dp))
+                    modifier = Modifier.padding(vertical = STANDARD_PADDING.dp))
               }
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp)) }
 
         // Switch Account Button
         item {
           Text(
               text = "Switch Account",
-              fontSize = 16.sp,
+              fontSize = SUBTITLE_FONTSIZE.sp,
               color = Color.Blue,
               fontWeight = FontWeight.SemiBold,
               textDecoration = TextDecoration.Underline,
               modifier =
-                  Modifier.padding(vertical = 8.dp)
+                  Modifier.padding(vertical = STANDARD_PADDING.dp)
                       .clickable {
                         signInViewModel.signOut()
                         navigationActions.navigateTo(Screen.AUTH)

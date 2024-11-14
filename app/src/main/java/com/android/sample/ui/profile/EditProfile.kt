@@ -41,6 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.ImagePicker
 import com.android.sample.ui.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
@@ -74,11 +79,12 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
       },
       content = { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(MEDIUM_PADDING.dp),
+            verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
               ProfileImage(
                   url = photo,
-                  modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
+                  modifier =
+                      Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
 
               ImagePicker(
                   onImagePicked = { photo = it.toString() }, buttonText = "Modify Profile Picture")
@@ -94,15 +100,16 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                   onValueChange = { surname = it },
                   label = { Text("Surname") },
                   placeholder = { Text("Your surname") },
-                  modifier = Modifier.fillMaxWidth().height(100.dp).testTag("inputProfileSurname"))
+                  modifier =
+                      Modifier.fillMaxWidth().height(IMAGE_SIZE.dp).testTag("inputProfileSurname"))
 
               // Interest list and add button
               var newInterest by remember { mutableStateOf("") }
               var newListInterests by remember { mutableStateOf(interests) }
 
               LazyRow(
-                  modifier = Modifier.padding(16.dp).testTag("interestsList"),
-                  horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                  modifier = Modifier.padding(MEDIUM_PADDING.dp).testTag("interestsList"),
+                  horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
                     newListInterests?.let {
                       items(it.size, key = { it }) { index ->
                         InterestEditBox(
@@ -118,8 +125,8 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                   value = newInterest,
                   onValueChange = { newInterest = it },
                   label = { Text("New Interest") },
-                  modifier = Modifier.width(200.dp).testTag("newInterestInput"))
-              Spacer(modifier = Modifier.width(8.dp))
+                  modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
+              Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
               Button(
                   onClick = {
                     if (newInterest.isNotBlank()) {
@@ -128,9 +135,9 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                     }
                   },
                   modifier =
-                      Modifier.padding(end = 8.dp)
-                          .clip(RoundedCornerShape(8.dp))
-                          .padding(horizontal = 16.dp, vertical = 8.dp)
+                      Modifier.padding(end = STANDARD_PADDING.dp)
+                          .clip(RoundedCornerShape(STANDARD_PADDING.dp))
+                          .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
                           .testTag("addInterestButton")) {
                     Text("Add")
                   }
@@ -161,12 +168,12 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
 fun InterestEditBox(interest: String, onRemove: () -> Unit) {
   Box(
       modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(8.dp))
-              .padding(horizontal = 12.dp, vertical = 8.dp)
+          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+              .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
               .testTag("$interest")) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(text = interest, fontSize = 18.sp, color = Color.Black)
-          Spacer(Modifier.width(8.dp))
+          Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
+          Spacer(Modifier.width(STANDARD_PADDING.dp))
           IconButton(onClick = onRemove) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
           }

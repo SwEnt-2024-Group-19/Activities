@@ -35,6 +35,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.android.sample.resources.C.Tag.BLACK_COLOR
+import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.WHITE_COLOR
 
 @Composable
 fun CameraPreview(
@@ -55,21 +63,24 @@ fun CameraPreview(
 @Composable
 fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitmap) -> Unit) {
   Row(
-      modifier = Modifier.fillMaxWidth().height(135.dp).padding(8.dp),
+      modifier = Modifier.fillMaxWidth().height(135.dp).padding(STANDARD_PADDING.dp),
       verticalAlignment = Alignment.CenterVertically) {
         Card(
-            modifier = Modifier.padding(8.dp).background(Color(0xFFFFFFFF)).testTag("carouselItem"),
+            modifier =
+                Modifier.padding(STANDARD_PADDING.dp)
+                    .background(Color(WHITE_COLOR))
+                    .testTag("carouselItem"),
         ) {
           itemsList.forEach { items ->
             Image(
                 bitmap = items.asImageBitmap(),
                 contentDescription = "Image",
-                modifier = Modifier.size(100.dp))
+                modifier = Modifier.size(IMAGE_SIZE.dp))
             IconButton(
                 onClick = { deleteImage(items) },
                 modifier =
-                    Modifier.width(40.dp)
-                        .height(40.dp)
+                    Modifier.width(BUTTON_WIDTH.dp)
+                        .height(BUTTON_WIDTH.dp)
                         .align(Alignment.End)
                         .testTag("removeImageButton"),
             ) {
@@ -81,9 +92,11 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
           }
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
         Column(
-            modifier = Modifier.padding(16.dp).fillMaxHeight(), // Use size modifier for simplicity
+            modifier =
+                Modifier.padding(MEDIUM_PADDING.dp)
+                    .fillMaxHeight(), // Use size modifier for simplicity
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End // Center the icon horizontally
             ) {
@@ -95,13 +108,13 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
                           contentDescription = "Add a new image")
                     },
                     onClick = openDialog,
-                    modifier = Modifier.size(50.dp).background(Color(0xFFFFFFFF)),
+                    modifier = Modifier.size((2 * LARGE_PADDING).dp).background(Color(WHITE_COLOR)),
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
                 Text(
                     text = "Add Image",
-                    color = Color(0xFF000000),
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 8.sp),
+                    color = Color(BLACK_COLOR),
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = STANDARD_PADDING.sp),
                 )
               } else {
                 FloatingActionButton(
@@ -109,13 +122,13 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
                       Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Edit image")
                     },
                     onClick = openDialog,
-                    modifier = Modifier.size(50.dp).background(Color(0xFFFFFFFF)),
+                    modifier = Modifier.size(BUTTON_WIDTH.dp).background(Color(WHITE_COLOR)),
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
                 Text(
                     text = "Replace Image",
-                    color = Color(0xFF000000),
-                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 8.sp),
+                    color = Color(BLACK_COLOR),
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = STANDARD_PADDING.sp),
                 )
               }
             }
