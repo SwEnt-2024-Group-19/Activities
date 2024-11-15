@@ -152,4 +152,35 @@ class ActivitiesRepositoryFirestoreTest {
 
     assert(failureCalled)
   }
+
+  @Test
+  fun performFirestoreOperation_callsOnSuccess() {
+    val mockTask = Tasks.forResult<Void>(null)
+
+    var successCalled = false
+    activitiesRepositoryFirestore.performFirestoreOperation(
+        mockTask,
+        onSuccess = { successCalled = true },
+        onFailure = { fail("Failure callback should not be called") })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(successCalled)
+  }
+
+  @Test
+  fun performFirestoreOperation_callsOnFailure() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    val mockTask = Tasks.forException<Void>(exception)
+
+    var failureCalled = false
+    activitiesRepositoryFirestore.performFirestoreOperation(
+        mockTask,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
+  }
 }

@@ -1,7 +1,6 @@
 package com.android.sample.model.profile
 
 import com.android.sample.resources.dummydata.testUser
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -15,6 +14,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
@@ -29,8 +29,6 @@ class ProfilesRepositoryFirestoreTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-
-    // Initialize Firebase if necessary
 
     profileRepositoryFirestore = ProfilesRepositoryFirestore(mockFirestore)
 
@@ -53,7 +51,6 @@ class ProfilesRepositoryFirestoreTest {
 
   @Test
   fun updateProfile_shouldCallFirestoreCollection() {
-
     `when`(mockDocumentReference.set(testUser)).thenReturn(Tasks.forResult(null))
 
     profileRepositoryFirestore.updateProfile(testUser, onSuccess = {}, onFailure = {})
@@ -62,22 +59,114 @@ class ProfilesRepositoryFirestoreTest {
   }
 
   @Test
-  fun updateProfile_shouldCallFirestoreCollectionn() {
-    val mockTaskVoid: Task<Void> = Tasks.forResult(null)
-    `when`(mockDocumentReference.set(testUser)).thenReturn(mockTaskVoid)
-
-    profileRepositoryFirestore.updateProfile(testUser, onSuccess = {}, onFailure = {})
-
-    verify(mockDocumentReference).set(testUser)
-  }
-
-  @Test
   fun addProfileToDatabase_shouldCallFirestoreToAddUserProfile() {
-    val mockTaskVoid: Task<Void> = Tasks.forResult(null)
+    val mockTaskVoid = Tasks.forResult<Void>(null)
     `when`(mockDocumentReference.set(testUser)).thenReturn(mockTaskVoid)
 
     profileRepositoryFirestore.addProfileToDatabase(testUser, onSuccess = {}, onFailure = {})
 
     verify(mockDocumentReference).set(testUser)
+  }
+
+  @Test
+  fun addActivity_shouldCallFirestoreToAddActivity() {
+    `when`(mockDocumentReference.update(eq("activities"), any())).thenReturn(Tasks.forResult(null))
+
+    profileRepositoryFirestore.addActivity("1", "activityId", onSuccess = {}, onFailure = {})
+
+    verify(mockDocumentReference).update(eq("activities"), any())
+  }
+
+  @Test
+  fun addLikedActivity_shouldCallFirestoreToAddLikedActivity() {
+    `when`(mockDocumentReference.update(eq("likedActivities"), any()))
+        .thenReturn(Tasks.forResult(null))
+
+    profileRepositoryFirestore.addLikedActivity("1", "activityId", onSuccess = {}, onFailure = {})
+
+    verify(mockDocumentReference).update(eq("likedActivities"), any())
+  }
+
+  @Test
+  fun removeLikedActivity_shouldCallFirestoreToRemoveLikedActivity() {
+    `when`(mockDocumentReference.update(eq("likedActivities"), any()))
+        .thenReturn(Tasks.forResult(null))
+
+    profileRepositoryFirestore.removeLikedActivity(
+        "1", "activityId", onSuccess = {}, onFailure = {})
+
+    verify(mockDocumentReference).update(eq("likedActivities"), any())
+  }
+
+  @Test
+  fun getUser_shouldCallFailureCallbackOnError() {
+    val exception = Exception("Test exception")
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forException(exception))
+
+    profileRepositoryFirestore.getUser(
+        "1",
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { assert(it == exception) })
+  }
+
+  @Test
+  fun addActivity_shouldCallFailureCallbackOnError() {
+    val exception = Exception("Test exception")
+    `when`(mockDocumentReference.update(eq("activities"), any()))
+        .thenReturn(Tasks.forException(exception))
+
+    profileRepositoryFirestore.addActivity(
+        "1",
+        "activityId",
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { assert(it == exception) })
+  }
+
+  @Test
+  fun addLikedActivity_shouldCallFailureCallbackOnError() {
+    val exception = Exception("Test exception")
+    `when`(mockDocumentReference.update(eq("likedActivities"), any()))
+        .thenReturn(Tasks.forException(exception))
+
+    profileRepositoryFirestore.addLikedActivity(
+        "1",
+        "activityId",
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { assert(it == exception) })
+  }
+
+  @Test
+  fun removeLikedActivity_shouldCallFailureCallbackOnError() {
+    val exception = Exception("Test exception")
+    `when`(mockDocumentReference.update(eq("likedActivities"), any()))
+        .thenReturn(Tasks.forException(exception))
+
+    profileRepositoryFirestore.removeLikedActivity(
+        "1",
+        "activityId",
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { assert(it == exception) })
+  }
+
+  @Test
+  fun updateProfile_shouldCallFailureCallbackOnError() {
+    val exception = Exception("Test exception")
+    `when`(mockDocumentReference.set(testUser)).thenReturn(Tasks.forException(exception))
+
+    profileRepositoryFirestore.updateProfile(
+        testUser,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { assert(it == exception) })
+  }
+
+  @Test
+  fun addProfileToDatabase_shouldCallFailureCallbackOnError() {
+    val exception = Exception("Test exception")
+    `when`(mockDocumentReference.set(testUser)).thenReturn(Tasks.forException(exception))
+
+    profileRepositoryFirestore.addProfileToDatabase(
+        testUser,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { assert(it == exception) })
   }
 }

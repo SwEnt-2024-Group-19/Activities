@@ -130,39 +130,6 @@ fun CreateActivityScreen(
         )
       },
       content = { paddingValues ->
-        /*if (creator == null) {
-          Column(
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center,
-              modifier =
-                  Modifier.padding(paddingValues).fillMaxSize().testTag("activityCreateScreen")) {
-                Text(
-                    text = "You are not logged in. Login or Register to create activities.",
-                    modifier =
-                        Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("notConnectedPrompt"),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center)
-                Button(
-                    onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                    modifier = Modifier.testTag("signInButton"),
-                ) {
-                  Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
-                }
-              }
-        } else {*/
-        if (showDialogImage) {
-          AddImageDialog(
-              onDismiss = { showDialogImage = false },
-              onGalleryClick = {
-                showDialogImage = false
-                isGalleryOpen = true
-              },
-              onCameraClick = {
-                showDialogImage = false
-                isCamOpen = true
-              })
-        }
         if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
@@ -464,13 +431,7 @@ fun CreateActivityScreen(
                   val parts = dueDate.split("/")
 
                   val activityId = listActivityViewModel.getNewUid()
-                  if (creator == "") {
-                    Toast.makeText(
-                            context,
-                            "You must be logged in to create an activity.",
-                            Toast.LENGTH_SHORT)
-                        .show()
-                  } else if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
+                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
                     attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(
@@ -545,7 +506,6 @@ fun CreateActivityScreen(
             Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
         }
-        // }
       },
       bottomBar = {
         BottomNavigationMenu(
