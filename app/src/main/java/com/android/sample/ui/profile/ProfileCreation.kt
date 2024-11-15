@@ -1,7 +1,6 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -64,11 +63,9 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
   var interests by remember { mutableStateOf(listOf<String>()) }
   var photo by remember { mutableStateOf("") }
   var errorMessage by remember { mutableStateOf<String?>(null) }
-  var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
   var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
-  var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
   val context = LocalContext.current
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -97,7 +94,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
               bitmap,
               onSuccess = { url -> photo = url },
               onFailure = { error ->
-                Log.e("EditProfileScreen", "Failed to upload profile picture: ${error.message}")
+                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
               })
         },
         context = context)
@@ -120,7 +117,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
               bitmap,
               onSuccess = { url -> photo = url },
               onFailure = { error ->
-                Log.e("EditProfileScreen", "Failed to upload profile picture: ${error.message}")
+                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
               })
         })
   } else {
