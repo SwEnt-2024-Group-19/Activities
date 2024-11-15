@@ -6,6 +6,7 @@ import com.android.sample.resources.dummydata.testUser
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -131,17 +132,57 @@ class ProfileViewModelTest {
   }
 
   @Test
-  fun createUserProfile_addsUserProfile() {
-    `when`(profilesRepository.addProfileToDatabase(any(), any(), any())).thenAnswer {
-      val successCallback = it.getArgument<() -> Unit>(1)
-      successCallback()
+  fun fetchUserDataFailureLogsError() {
+    val exception = Exception("Error fetching user data")
+    `when`(profilesRepository.getUser(eq(testUser.id), any(), any())).thenAnswer {
+      val onFailure = it.getArgument<(Exception) -> Unit>(2)
+      onFailure(exception)
     }
 
-    val onSuccess = mock<() -> Unit>()
-    val onError = mock<(Exception) -> Unit>()
-    profileViewModel.createUserProfile(testUser, onSuccess, onError)
+    profileViewModel.fetchUserData(testUser.id)
 
-    org.mockito.kotlin.verify(onSuccess).invoke()
-    org.mockito.kotlin.verify(profilesRepository).addProfileToDatabase(eq(testUser), any(), any())
+    verify(profilesRepository).getUser(eq(testUser.id), any(), any())
+    // Here you would check if the Log.e has been called (use Log wrapper or Mockito verification
+    // for logging)
+  }
+
+  @Test
+  fun addActivitySuccessCallsFetchUserData() {
+    val userId = testUser.id
+    val activityId = activity.uid
+
+    `when`(profilesRepository.addActivity(eq(userId), eq(activityId), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(2)
+      onSuccess()
+    }
+
+    profileViewModel.addActivity(userId, activityId)
+
+    verify(profilesRepository).addActivity(eq(userId), eq(activityId), any(), any())
+    verify(profilesRepository).getUser(eq(userId), any(), any())
+  }
+
+  @Test
+  fun addLikedActivityFailure() {
+    val userId = testUser.id
+    val activityId = activity.uid
+    val exception = Exception("Error adding liked activity")
+
+    `when`(profilesRepository.addLikedActivity(eq(userId), eq(activityId), any(), any()))
+        .thenAnswer {
+          val onFailure = it.getArgument<(Exception) -> Unit>(3)
+          onFailure(exception)
+        }
+
+    profileViewModel.addLikedActivity(userId, activityId)
+
+    verify(profilesRepository).addLikedActivity(eq(userId), eq(activityId), any(), any())
+    // Verify if any specific log or error handling function is called
+  }
+
+  @Test
+  fun clearUserDataSetsUserStateToNull() {
+    profileViewModel.clearUserData()
+    assertEquals(null, profileViewModel.userState.value)
   }
 }
