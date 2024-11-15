@@ -79,7 +79,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
   }
 
-
   fun aUserTriesToLookAtAnActivity() {
     // Signs in
     composeTestRule.onNodeWithTag("SignInButton").performClick()
@@ -100,8 +99,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Activity Location")
     composeTestRule.onNodeWithTag("createButton").performClick()
     composeTestRule.waitForIdle()
-
-
 
     // check in profile that the activity was added
     composeTestRule.onNodeWithTag("Profile").performClick()
@@ -130,7 +127,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("editButton").performClick()
     composeTestRule.waitForIdle()
 
-
     // Opens the activity details
     composeTestRule.onNodeWithTag("activityCard").performClick()
     composeTestRule.waitForIdle()
@@ -156,15 +152,7 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("LikedActivities").assertExists()
     composeTestRule.onNodeWithTag("LikedActivities").performClick()
     composeTestRule.waitForIdle()
-composeTestRule.onNodeWithTag("likedActivityCard").assertExists()
-  composeTestRule.onNodeWithTag("likedActivityCard").performClick()
-
-
-
-
-
-
-
+    composeTestRule.onNodeWithTag("activityCard").assertExists()
+    composeTestRule.onNodeWithTag("activityCard").performClick()
   }
-
 }

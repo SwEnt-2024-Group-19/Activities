@@ -263,8 +263,8 @@ fun ActivityDetailsScreen(
               Text(
                   text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
                   style = MaterialTheme.typography.bodyLarge,
-                  modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).
-                  testTag("numberParticipants"))
+                  modifier =
+                      Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("numberParticipants"))
 
               // List of participants
               Column(modifier = Modifier.testTag("participants")) {
@@ -300,8 +300,10 @@ fun ActivityDetailsScreen(
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape).
-                          testTag("profileImage"))
+                              modifier =
+                                  Modifier.size(BUTTON_HEIGHT.dp)
+                                      .clip(CircleShape)
+                                      .testTag("profileImage"))
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
 
