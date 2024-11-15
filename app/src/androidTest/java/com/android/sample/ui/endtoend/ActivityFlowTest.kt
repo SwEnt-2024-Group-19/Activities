@@ -48,7 +48,7 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun aGuestTriesToLookAtAnActivity() {
+  fun guestAppFlow() {
     // Opens the app as a guest
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
     composeTestRule.waitForIdle()
@@ -77,7 +77,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
     composeTestRule.onNodeWithTag("goBackButton").assertExists()
     composeTestRule.onNodeWithTag("goBackButton").performClick()
-
     composeTestRule.onNodeWithTag("Liked").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("notConnectedPrompt").assertIsDisplayed()
@@ -92,18 +91,15 @@ class ActivityFlowTest {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("Profile").performClick()
     composeTestRule.waitForIdle()
+
+    // Tries to create a new activity and is prompted to sign in
+    composeTestRule.onNodeWithTag("Add Activity").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("notConnectedPrompt").assertExists()
     composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
-
-    // Tries to create a new activity and is prompted to sign in
-    composeTestRule.onNodeWithTag("Add Activity").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
-    composeTestRule.onNodeWithTag("signInButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("SignInScreen").assertIsDisplayed()
   }
 }
