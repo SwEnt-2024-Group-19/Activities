@@ -28,7 +28,6 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
       if (currentUser != null) {
         fetchUserData(currentUser.uid)
       } else {
-        Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
         clearUserData()
       }
     }

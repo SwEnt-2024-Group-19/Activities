@@ -7,7 +7,6 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -24,7 +23,6 @@ class ProfilesRepositoryFirestoreTest {
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
-  @Mock private lateinit var mockActivityQuerySnapshot: QuerySnapshot
 
   private lateinit var profileRepositoryFirestore: ProfilesRepositoryFirestore
 
@@ -69,6 +67,16 @@ class ProfilesRepositoryFirestoreTest {
     `when`(mockDocumentReference.set(testUser)).thenReturn(mockTaskVoid)
 
     profileRepositoryFirestore.updateProfile(testUser, onSuccess = {}, onFailure = {})
+
+    verify(mockDocumentReference).set(testUser)
+  }
+
+  @Test
+  fun addProfileToDatabase_shouldCallFirestoreToAddUserProfile() {
+    val mockTaskVoid: Task<Void> = Tasks.forResult(null)
+    `when`(mockDocumentReference.set(testUser)).thenReturn(mockTaskVoid)
+
+    profileRepositoryFirestore.addProfileToDatabase(testUser, onSuccess = {}, onFailure = {})
 
     verify(mockDocumentReference).set(testUser)
   }

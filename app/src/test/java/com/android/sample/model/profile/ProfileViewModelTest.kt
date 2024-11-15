@@ -129,4 +129,19 @@ class ProfileViewModelTest {
     profileViewModel.removeLikedActivity(testUser.id, activity.uid)
     verify(profilesRepository).removeLikedActivity(eq(testUser.id), eq(activity.uid), any(), any())
   }
+
+  @Test
+  fun createUserProfile_addsUserProfile() {
+    `when`(profilesRepository.addProfileToDatabase(any(), any(), any())).thenAnswer {
+      val successCallback = it.getArgument<() -> Unit>(1)
+      successCallback()
+    }
+
+    val onSuccess = mock<() -> Unit>()
+    val onError = mock<(Exception) -> Unit>()
+    profileViewModel.createUserProfile(testUser, onSuccess, onError)
+
+    org.mockito.kotlin.verify(onSuccess).invoke()
+    org.mockito.kotlin.verify(profilesRepository).addProfileToDatabase(eq(testUser), any(), any())
+  }
 }
