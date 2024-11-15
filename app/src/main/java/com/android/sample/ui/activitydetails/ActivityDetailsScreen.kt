@@ -486,7 +486,7 @@ fun CommentItem(
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
     if (profileId != "anonymous") {
-      Row {
+      Column() {
         if (comment.userId == profileId) {
           Button(
               onClick = { onDeleteComment(comment) },
