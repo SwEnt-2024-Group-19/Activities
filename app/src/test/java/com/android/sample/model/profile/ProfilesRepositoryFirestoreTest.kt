@@ -72,4 +72,14 @@ class ProfilesRepositoryFirestoreTest {
 
     verify(mockDocumentReference).set(testUser)
   }
+
+  @Test
+  fun createProfile_shouldCallFirestoreCollectionn() {
+    val mockTaskVoid: Task<Void> = Tasks.forResult(null)
+    `when`(mockDocumentReference.set(testUser)).thenReturn(mockTaskVoid)
+
+    profileRepositoryFirestore.addProfileToDatabase(testUser, onSuccess = {}, onFailure = {})
+
+    verify(mockDocumentReference).set(testUser)
+  }
 }
