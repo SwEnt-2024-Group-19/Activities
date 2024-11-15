@@ -72,11 +72,41 @@ class CreateActivityScreenTest {
     `when`(profileViewModel.userState).thenReturn(MutableStateFlow(testUser))
   }
 
-  private fun setUpComposeContent() {
+  @Test
+  fun createActivityAddImagesCamera() {
     composeTestRule.setContent {
       CreateActivityScreen(
           mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
+    composeTestRule.onNodeWithTag("addImageButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addImageButton").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("cameraScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("takePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("switchCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("activityCreateScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun createActivityAddImagesGallery() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+    }
+    composeTestRule.onNodeWithTag("addImageButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addImageButton").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").performClick()
+    composeTestRule.waitForIdle()
   }
 
   @Test
