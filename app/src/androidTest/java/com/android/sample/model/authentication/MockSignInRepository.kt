@@ -13,8 +13,7 @@ class MockSignInRepository : SignInRepository {
   override suspend fun signInWithEmail(email: String, password: String): AuthResult {
     // Simulate a delay and return a mocked AuthResult object
     delay(500)
-    return Mockito.mock(AuthResult::class.java).apply {
-    }
+    return Mockito.mock(AuthResult::class.java).apply {}
   }
 
   override suspend fun signInWithGoogle(idToken: String): AuthResult {
@@ -26,10 +25,10 @@ class MockSignInRepository : SignInRepository {
   }
 
   override fun checkUserProfile(
-    uid: String?,
-    navigationActions: NavigationActions,
-    onAuthSuccess: () -> Unit,
-    onAuthError: (String) -> Unit
+      uid: String?,
+      navigationActions: NavigationActions,
+      onAuthSuccess: () -> Unit,
+      onAuthError: (String) -> Unit
   ) {
     // Simulate the profile check logic
     if (true) { // Will be correctly implemented when an e2e will test onAuthError

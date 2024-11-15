@@ -26,11 +26,11 @@ class MockProfilesRepository : ProfilesRepository {
     }
   }
 
-    override fun observeAuthState(onSignedIn: (String) -> Unit, onSignedOut: () -> Unit) {
-        onSignedIn("u1")
-    }
+  override fun observeAuthState(onSignedIn: (String) -> Unit, onSignedOut: () -> Unit) {
+    onSignedIn("u1")
+  }
 
-    override fun addActivity(
+  override fun addActivity(
       userId: String,
       activityId: String,
       onSuccess: () -> Unit,

@@ -3,7 +3,9 @@ package com.android.sample.ui.endtoend
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.MainActivity
 import com.android.sample.model.activity.ActivitiesRepository
@@ -11,6 +13,7 @@ import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
+import com.android.sample.resources.dummydata.email
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
@@ -75,5 +78,22 @@ class ActivityFlowTest {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
+  }
+
+  @Test
+  fun aUserTriesToLookAtAnActivity() {
+    // Tries to log in but fails
+    composeTestRule.onNodeWithTag("SignInButton").performClick()
+    composeTestRule.waitForIdle()
+
+    //  Enters credentials then connects
+    composeTestRule.onNodeWithTag("EmailTextField").performTextInput(email)
+    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("password")
+    composeTestRule.onNodeWithTag("SignInButton").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("Profile").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Alice Smith").assertIsDisplayed()
   }
 }

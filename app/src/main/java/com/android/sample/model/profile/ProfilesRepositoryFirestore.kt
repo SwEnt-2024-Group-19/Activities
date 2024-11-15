@@ -34,21 +34,21 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     }
   }
 
-    override fun observeAuthState(onSignedIn: (String) -> Unit, onSignedOut: () -> Unit) {
-        Firebase.auth.addAuthStateListener { auth ->
-            val currentUser = auth.currentUser
-            Log.d("ProfileViewModel", "User is authenticated, fetching data.")
-            if (currentUser != null) {
-                Log.d("ProfileViewModel", "User is authenticated, fetching data.")
-                onSignedIn(currentUser.uid)
-            } else {
-                Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
-                onSignedOut()
-            }
-        }
+  override fun observeAuthState(onSignedIn: (String) -> Unit, onSignedOut: () -> Unit) {
+    Firebase.auth.addAuthStateListener { auth ->
+      val currentUser = auth.currentUser
+      Log.d("ProfileViewModel", "User is authenticated, fetching data.")
+      if (currentUser != null) {
+        Log.d("ProfileViewModel", "User is authenticated, fetching data.")
+        onSignedIn(currentUser.uid)
+      } else {
+        Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
+        onSignedOut()
+      }
     }
+  }
 
-    private fun documentToUser(document: DocumentSnapshot): User? {
+  private fun documentToUser(document: DocumentSnapshot): User? {
     return try {
       val id = document.id
       Log.d("ProfilesRepositoryFirestore", "User profile id: $id")

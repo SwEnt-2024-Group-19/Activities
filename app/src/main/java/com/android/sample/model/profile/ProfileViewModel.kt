@@ -23,8 +23,7 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
 
   private fun observeAuthState() {
     repository.observeAuthState(
-        onSignedIn = { fetchUserData(it) },
-        onSignedOut = { clearUserData() })
+        onSignedIn = { fetchUserData(it) }, onSignedOut = { clearUserData() })
   }
 
   fun fetchUserData(userId: String) {
