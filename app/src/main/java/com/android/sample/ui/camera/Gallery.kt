@@ -7,26 +7,14 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.Size
-import com.android.sample.model.camera.fetchActivityImageUrls
 import com.android.sample.model.camera.fetchProfileImageUrl
 import com.android.sample.model.camera.uriToBitmap
-import com.android.sample.resources.C.Tag.IMAGE_SIZE
-import com.android.sample.resources.C.Tag.SMALL_PADDING
 
 @Composable
 fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context: Context) {
@@ -49,6 +37,7 @@ fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context
     }
   }
 }
+
 @Composable
 fun ProfileImage(userId: String, modifier: Modifier = Modifier) {
   var imageUrl by remember { mutableStateOf<String?>(null) }

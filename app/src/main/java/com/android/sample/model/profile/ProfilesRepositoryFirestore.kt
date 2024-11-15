@@ -30,14 +30,18 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
 
   private fun documentToUser(document: DocumentSnapshot): User? {
     return try {
-        User(
-          id =  document.id,
+      User(
+          id = document.id,
           name = document.getString("name") ?: return null,
           surname = document.getString("surname") ?: return null,
-          interests = (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null,
-          activities =(document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null ,
+          interests =
+              (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null,
+          activities =
+              (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null,
           photo = document.getString("photo") ?: return null,
-          likedActivities = (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>() ?: return null)
+          likedActivities =
+              (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>()
+                  ?: return null)
     } catch (e: Exception) {
       Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null
@@ -115,9 +119,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     db.collection("profiles")
         .document(userProfile.id)
         .set(userProfile)
-        .addOnSuccessListener {
-          onSuccess()
-        }
+        .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { exception ->
           Log.e("ProfilesRepository", "Error adding user profile")
           onFailure(exception)
