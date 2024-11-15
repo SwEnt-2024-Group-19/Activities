@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -72,6 +74,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
   var isGalleryOpen by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
   var photo by remember { mutableStateOf(profile.photo) }
+  val scrollState = rememberScrollState()
 
   val context = LocalContext.current
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
@@ -145,7 +148,12 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               })
         } else {
           Column(
-              modifier = Modifier.fillMaxSize().padding(paddingValues).padding(MEDIUM_PADDING.dp),
+              modifier =
+                  Modifier.fillMaxSize()
+                      .padding(paddingValues)
+                      .padding(MEDIUM_PADDING.dp)
+                      .testTag("editProfileContent")
+                      .verticalScroll(scrollState),
               verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
                 ProfileImage(
                     userId = profile.id,
