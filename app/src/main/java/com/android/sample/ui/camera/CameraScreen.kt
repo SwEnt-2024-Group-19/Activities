@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.android.sample.model.camera.flipCamera
 import com.android.sample.model.camera.takePhoto
 
@@ -27,7 +28,7 @@ fun CameraScreen(
     isCamOpen: () -> Unit,
     addElem: (Bitmap) -> Unit
 ) {
-  Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+  Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("cameraScreen")) {
     CameraPreview(controller, Modifier.fillMaxSize())
     IconButton(onClick = isCamOpen, modifier = Modifier.align(Alignment.TopEnd)) {
       Icon(Icons.Default.ArrowBack, contentDescription = "Close camera")
@@ -42,12 +43,12 @@ fun CameraScreen(
               },
               context)
         },
-        modifier = Modifier.align(Alignment.BottomCenter)) {
+        modifier = Modifier.align(Alignment.BottomCenter).testTag("takePicture")) {
           Icon(Icons.Default.PhotoCamera, contentDescription = "Take picture")
         }
     IconButton(
         onClick = { controller.cameraSelector = flipCamera(controller.cameraSelector) },
-        modifier = Modifier.align(Alignment.BottomEnd)) {
+        modifier = Modifier.align(Alignment.BottomEnd).testTag("switchCamera")) {
           Icon(Icons.Default.Cameraswitch, contentDescription = "Switch camera")
         }
   }

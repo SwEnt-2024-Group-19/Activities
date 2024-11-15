@@ -166,6 +166,8 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 
 dependencies {
 
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.play.services.cast.framework)
     testImplementation("androidx.arch.core:core-testing:2.2.0")
 
     // Core
@@ -316,6 +318,8 @@ dependencies {
     kaptAndroidTest(libs.hilt.android.compiler)
     androidTestImplementation(libs.hilt.android.testing)
     implementation(libs.hilt.navigation.compose)
+
+
 
 }
 

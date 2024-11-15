@@ -46,7 +46,7 @@ object C {
 
     const val SMALL_IMAGE_SIZE = 30
 
-    const val MEDIUM_IMAGE_SIZE = 64
+    const val MEDIUM_IMAGE_SIZE = 80
 
     const val BOTTOM_MENU_HEIGHT = 60
 

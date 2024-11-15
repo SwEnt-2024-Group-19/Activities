@@ -64,7 +64,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.ui.ProfileImage
+import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -167,11 +167,6 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
-                    // Optional: Add placeholder text in the center
-                    Text(
-                        text = "Activity Image",
-                        color = Color.White,
-                        modifier = Modifier.align(Alignment.Center))
                     LikeButton(profile, activity, profileViewModel)
                   }
 
@@ -301,7 +296,7 @@ fun ActivityDetailsScreen(
                       else {
                           // Profile Picture
                           ProfileImage(
-                              url = profile?.photo,
+                              userId = participant.id,
                               modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
