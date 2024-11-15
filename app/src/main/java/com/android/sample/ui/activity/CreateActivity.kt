@@ -435,12 +435,13 @@ fun CreateActivityScreen(
                   val parts = dueDate.split("/")
 
                   val activityId = listActivityViewModel.getNewUid()
-                    if (creator=="") {
-                      Toast.makeText(
-                          context, "You must be logged in to create an activity.", Toast.LENGTH_SHORT)
-                          .show()
-                    }else
-                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
+                  if (creator == "") {
+                    Toast.makeText(
+                            context,
+                            "You must be logged in to create an activity.",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
                     attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(
