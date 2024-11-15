@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.MainActivity
 import com.android.sample.model.activity.ActivitiesRepository
@@ -21,26 +22,35 @@ import org.junit.Test
 @HiltAndroidTest
 class ActivityFlowTest {
 
-  @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
+  @get:Rule(order = 0)
+  var hiltRule = HiltAndroidRule(this)
 
-  @JvmField @Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @JvmField
+  @Rule(order = 1)
+  val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-  @Inject lateinit var authRepository: SignInRepository
+  @Inject
+  lateinit var authRepository: SignInRepository
 
-  @Inject lateinit var profilesRepository: ProfilesRepository
+  @Inject
+  lateinit var profilesRepository: ProfilesRepository
 
-  @Inject lateinit var activitiesRepository: ActivitiesRepository
+  @Inject
+  lateinit var activitiesRepository: ActivitiesRepository
 
-  @Inject lateinit var locationRepository: LocationRepository
+  @Inject
+  lateinit var locationRepository: LocationRepository
 
-  @Inject lateinit var permissionChecker: PermissionChecker
+  @Inject
+  lateinit var permissionChecker: PermissionChecker
 
   @get:Rule
   val permissionRule: GrantPermissionRule =
-      GrantPermissionRule.grant(
-          android.Manifest.permission.ACCESS_FINE_LOCATION,
-          android.Manifest.permission.ACCESS_COARSE_LOCATION,
-          android.Manifest.permission.CAMERA)
+    GrantPermissionRule.grant(
+      android.Manifest.permission.ACCESS_FINE_LOCATION,
+      android.Manifest.permission.ACCESS_COARSE_LOCATION,
+      android.Manifest.permission.CAMERA
+    )
 
   @Before
   fun setUp() {
@@ -75,5 +85,47 @@ class ActivityFlowTest {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
+  }
+
+  @Test
+  fun aUserTriesToLookAtAnActivity() {
+    // Signs in
+    composeTestRule.onNodeWithTag("SignInButton").performClick()
+    composeTestRule.waitForIdle()
+
+    // Fills in the email and password fields
+    composeTestRule.onNodeWithTag("EmailTextField").performTextInput("user@example.com")
+    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("password123")
+    composeTestRule.onNodeWithTag("SignInButton").performClick()
+    composeTestRule.waitForIdle()
+
+    // Verifies profile is connected
+    composeTestRule.onNodeWithTag("Profile").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("connectedProfileScreen").assertIsDisplayed()
+
+    // Navigates back to the overview to view activities
+    composeTestRule.onNodeWithTag("Overview").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
+
+    // Filters for specific activity types
+    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+
+    // Opens the activity details
+    composeTestRule.onNodeWithTag("activityCard").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
+
+    // Verifies user-specific options (enrollment, edit, or activity details)
+    composeTestRule.onNodeWithTag("enrollButton").assertExists()
+    composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
   }
 }

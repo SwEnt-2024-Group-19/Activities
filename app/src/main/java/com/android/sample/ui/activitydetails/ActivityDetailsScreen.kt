@@ -301,7 +301,7 @@ fun ActivityDetailsScreen(
                       else {
                           // Profile Picture
                           ProfileImage(
-                              url = profile.photo,
+                              url = profile?.photo,
                               modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
