@@ -136,7 +136,8 @@ fun CreateActivityScreen(
           Column(
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.Center,
-              modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+              modifier =
+                  Modifier.padding(paddingValues).fillMaxSize().testTag("activityCreateScreen")) {
                 Text(
                     text = "You are not logged in. Login or Register to create activities.",
                     modifier =
