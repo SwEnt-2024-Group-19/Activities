@@ -2,10 +2,8 @@ package com.android.sample.model.profile
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,15 +75,5 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
 
   fun updateProfile(user: User) {
     repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
-  }
-
-  companion object {
-    fun Factory(): ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ProfileViewModel(ProfilesRepositoryFirestore(Firebase.firestore)) as T
-          }
-        }
   }
 }
