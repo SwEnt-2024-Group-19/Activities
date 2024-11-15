@@ -49,19 +49,6 @@ fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context
     }
   }
 }
-
-@Composable
-fun ImagePicker(onImagePicked: (Uri?) -> Unit, buttonText: String = "Select Image") {
-  // Launches the gallery picker
-  val pickImageLauncher =
-      rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        onImagePicked(uri) // Pass the selected URI back
-      }
-  Button(onClick = { pickImageLauncher.launch("image/*") }, Modifier.testTag("uploadPicture")) {
-    Text(buttonText)
-  }
-}
-
 @Composable
 fun ProfileImage(userId: String, modifier: Modifier = Modifier) {
   var imageUrl by remember { mutableStateOf<String?>(null) }
@@ -97,45 +84,4 @@ fun ProfileImage(userId: String, modifier: Modifier = Modifier) {
       contentDescription = "Profile Image",
       modifier = modifier,
       contentScale = ContentScale.Crop)
-}
-
-@Composable
-fun ActivityImageCarousel(activityId: String, onFailure: (Exception) -> Unit) {
-  var imageUrls by remember { mutableStateOf<List<String>>(emptyList()) }
-
-  // Fetch the image URLs from Firestore
-  LaunchedEffect(activityId) {
-    fetchActivityImageUrls(
-        activityId = activityId,
-        onSuccess = { urls ->
-          imageUrls = urls // Update the state with the list of URLs
-        },
-        onFailure = { exception ->
-          onFailure(exception) // Handle the error (e.g., show a message)
-        })
-  }
-
-  // Display the carousel if image URLs are available
-  if (imageUrls.isNotEmpty()) {
-    LazyRow {
-      items(imageUrls.size) { index ->
-        val imageUrl = imageUrls[index]
-        Card(modifier = Modifier.padding(SMALL_PADDING.dp)) {
-          Image(
-              painter =
-                  rememberAsyncImagePainter(
-                      model =
-                          ImageRequest.Builder(LocalContext.current)
-                              .data(imageUrl)
-                              .size(
-                                  Size(
-                                      IMAGE_SIZE,
-                                      IMAGE_SIZE)) // Restrict Coil to load a 100x100 image
-                              .build()),
-              contentDescription = "Selected Image",
-              modifier = Modifier.size(IMAGE_SIZE.dp))
-        }
-      }
-    }
-  }
 }
