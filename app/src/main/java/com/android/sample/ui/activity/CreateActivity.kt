@@ -94,7 +94,7 @@ fun CreateActivityScreen(
   var selectedOption by remember { mutableStateOf("Select a type") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
-  val creator = FirebaseAuth.getInstance().currentUser?.uid
+  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
@@ -132,7 +132,7 @@ fun CreateActivityScreen(
         )
       },
       content = { paddingValues ->
-        if (creator == null) {
+        /*if (creator == null) {
           Column(
               horizontalAlignment = Alignment.CenterHorizontally,
               verticalArrangement = Arrangement.Center,
@@ -152,7 +152,7 @@ fun CreateActivityScreen(
                   Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
                 }
               }
-        } else {
+        } else {*/
           if (showDialogImage) {
             AddImageDialog(
                 onDismiss = { showDialogImage = false },
@@ -474,7 +474,11 @@ fun CreateActivityScreen(
                     val parts = dueDate.split("/")
 
                     val activityId = listActivityViewModel.getNewUid()
-                    if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
+                      if (creator == "") {
+                        Toast.makeText(
+                            context, "You must be logged in to create an activity.", Toast.LENGTH_SHORT)
+                            .show()
+                      } else if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
                       attendees += profileViewModel.userState.value!!
                       try {
                         calendar.set(
@@ -551,7 +555,7 @@ fun CreateActivityScreen(
               Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
             }
           }
-        }
+        //}
       },
       bottomBar = {
         BottomNavigationMenu(
