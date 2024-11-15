@@ -175,7 +175,7 @@ fun ActivityCard2(
   Card(
       modifier =
           Modifier.fillMaxWidth()
-              .testTag("activityCard")
+              .testTag("likedActivityCard")
               .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
               .clickable {
                 listActivitiesViewModel.selectActivity(activity)

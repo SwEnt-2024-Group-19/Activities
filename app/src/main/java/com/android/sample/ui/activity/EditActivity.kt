@@ -131,7 +131,7 @@ fun EditActivityScreen(
         })
   }
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("editActivityScreen"),
       topBar = {
         TopAppBar(
             title = { Text("Edit the activity") },
