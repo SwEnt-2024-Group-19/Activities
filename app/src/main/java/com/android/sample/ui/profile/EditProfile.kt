@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -75,10 +74,9 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
   var isGalleryOpen by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
   var photo by remember { mutableStateOf(profile.photo) }
-    val scrollState = rememberScrollState()
+  val scrollState = rememberScrollState()
 
-
-    val context = LocalContext.current
+  val context = LocalContext.current
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
 
   Scaffold(
@@ -150,8 +148,12 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               })
         } else {
           Column(
-              modifier = Modifier.fillMaxSize().padding(paddingValues).padding(MEDIUM_PADDING.dp)
-                  .testTag("editProfileContent").verticalScroll(scrollState),
+              modifier =
+                  Modifier.fillMaxSize()
+                      .padding(paddingValues)
+                      .padding(MEDIUM_PADDING.dp)
+                      .testTag("editProfileContent")
+                      .verticalScroll(scrollState),
               verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
                 ProfileImage(
                     userId = profile.id,

@@ -30,9 +30,10 @@ fun CameraScreen(
 ) {
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("cameraScreen")) {
     CameraPreview(controller, Modifier.fillMaxSize())
-    IconButton(onClick = isCamOpen, modifier = Modifier.align(Alignment.TopEnd).testTag("closeCamera")) {
-      Icon(Icons.Default.ArrowBack, contentDescription = "Close camera")
-    }
+    IconButton(
+        onClick = isCamOpen, modifier = Modifier.align(Alignment.TopEnd).testTag("closeCamera")) {
+          Icon(Icons.Default.ArrowBack, contentDescription = "Close camera")
+        }
     IconButton(
         onClick = {
           takePhoto(

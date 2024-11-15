@@ -54,11 +54,11 @@ class EditProfileScreenTest {
   }
 
   @Test
-  fun testProfileEditionWithDialogWithCamera(){
+  fun testProfileEditionWithDialogWithCamera() {
     composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
     composeTestRule
-      .onNodeWithTag("editProfileContent")
-      .performScrollToNode(hasTestTag("uploadPicture"))
+        .onNodeWithTag("editProfileContent")
+        .performScrollToNode(hasTestTag("uploadPicture"))
     composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
@@ -76,11 +76,11 @@ class EditProfileScreenTest {
   }
 
   @Test
-  fun testProfileEditionWithDialogWithGallery(){
+  fun testProfileEditionWithDialogWithGallery() {
     composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
     composeTestRule
-      .onNodeWithTag("editProfileContent")
-      .performScrollToNode(hasTestTag("uploadPicture"))
+        .onNodeWithTag("editProfileContent")
+        .performScrollToNode(hasTestTag("uploadPicture"))
     composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
@@ -88,6 +88,7 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").performClick()
   }
+
   @Test
   fun testAddInterestButtonFunctionality() {
     composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }

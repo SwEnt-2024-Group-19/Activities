@@ -61,7 +61,8 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
 
           Button(
               onClick = onGalleryClick,
-              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("galleryButton")) {
+              modifier =
+                  Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("galleryButton")) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.background(Color.Transparent)) {
@@ -76,7 +77,8 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
 
           Button(
               onClick = onCameraClick,
-              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("cameraButton")) {
+              modifier =
+                  Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("cameraButton")) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.background(Color.Transparent)) {

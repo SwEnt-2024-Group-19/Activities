@@ -60,10 +60,10 @@ class ProfileCreationTest {
   }
 
   @Test
-  fun testProfileCreationWithDialogWithCamera(){
+  fun testProfileCreationWithDialogWithCamera() {
     composeTestRule
-      .onNodeWithTag("profileCreationScrollColumn")
-      .performScrollToNode(hasTestTag("uploadPicture"))
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
     composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
@@ -81,10 +81,10 @@ class ProfileCreationTest {
   }
 
   @Test
-  fun testProfileCreationWithDialogWithGallery(){
+  fun testProfileCreationWithDialogWithGallery() {
     composeTestRule
-      .onNodeWithTag("profileCreationScrollColumn")
-      .performScrollToNode(hasTestTag("uploadPicture"))
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
     composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
@@ -92,6 +92,7 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").performClick()
   }
+
   @Test
   fun testProfileCreationScreenElementsDisplayed() {
     composeTestRule.onNodeWithTag("profileCreationTitle").assertIsDisplayed()
