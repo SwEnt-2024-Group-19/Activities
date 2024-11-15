@@ -6,8 +6,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.performTextInput
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.MainActivity
 import com.android.sample.model.activity.ActivitiesRepository
@@ -57,7 +55,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
     composeTestRule.waitForIdle()
 
-
     // Goes back to the main screen and tries to filter activities
     composeTestRule.onNodeWithTag("Overview").performClick()
     composeTestRule.waitForIdle()
@@ -66,7 +63,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithText("Activity 1").assertIsDisplayed()
     composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
-
 
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
     composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
@@ -93,23 +89,16 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
     composeTestRule.onNodeWithTag("scheduleText").assertIsDisplayed()
 
-
-
-
-
     composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
     composeTestRule.onNodeWithTag("goBackButton").assertExists()
     composeTestRule.onNodeWithTag("goBackButton").performClick()
     composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
-
-
-
   }
+
   @Test
-  fun guestShouldSignUpForOtherFunctionalities(){
+  fun guestShouldSignUpForOtherFunctionalities() {
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
     composeTestRule.waitForIdle()
-
 
     composeTestRule.onNodeWithTag("Liked").performClick()
     composeTestRule.waitForIdle()
