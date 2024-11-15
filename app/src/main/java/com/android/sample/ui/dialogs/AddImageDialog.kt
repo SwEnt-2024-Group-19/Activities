@@ -46,7 +46,7 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
                     .height(200.dp)
                     .background(
                         color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
-                    .testTag("addUserDialog"),
+                    .testTag("addImageDialog"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -61,7 +61,7 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
 
           Button(
               onClick = onGalleryClick,
-              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
+              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("galleryButton")) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.background(Color.Transparent)) {
@@ -76,7 +76,7 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
 
           Button(
               onClick = onCameraClick,
-              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
+              modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("cameraButton")) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.background(Color.Transparent)) {

@@ -60,6 +60,39 @@ class ProfileCreationTest {
   }
 
   @Test
+  fun testProfileCreationWithDialogWithCamera(){
+    composeTestRule
+      .onNodeWithTag("profileCreationScrollColumn")
+      .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("cameraScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("takePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("switchCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("profileCreationScrollColumn").assertIsDisplayed()
+  }
+
+  @Test
+  fun testProfileCreationWithDialogWithGallery(){
+    composeTestRule
+      .onNodeWithTag("profileCreationScrollColumn")
+      .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").performClick()
+  }
+  @Test
   fun testProfileCreationScreenElementsDisplayed() {
     composeTestRule.onNodeWithTag("profileCreationTitle").assertIsDisplayed()
 

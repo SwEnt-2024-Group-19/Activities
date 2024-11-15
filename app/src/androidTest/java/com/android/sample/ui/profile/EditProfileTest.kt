@@ -2,10 +2,12 @@ package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.profile.ProfileViewModel
@@ -51,6 +53,41 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
   }
 
+  @Test
+  fun testProfileEditionWithDialogWithCamera(){
+    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule
+      .onNodeWithTag("editProfileContent")
+      .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("cameraScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("takePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("switchCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("editProfileContent").assertIsDisplayed()
+  }
+
+  @Test
+  fun testProfileEditionWithDialogWithGallery(){
+    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule
+      .onNodeWithTag("editProfileContent")
+      .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").performClick()
+  }
   @Test
   fun testAddInterestButtonFunctionality() {
     composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
