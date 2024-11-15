@@ -95,7 +95,8 @@ class ActivityFlowTest {
     // Tries to create a new activity and is prompted to sign in
     composeTestRule.onNodeWithTag("Add Activity").performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("notConnectedPrompt").assertExists()
+    composeTestRule.onNodeWithTag("createButton").performClick()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()
