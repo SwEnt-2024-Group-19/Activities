@@ -21,14 +21,15 @@ import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 
@@ -41,8 +42,9 @@ class CreateActivityScreenTest {
   private lateinit var mockNavigationActions: NavigationActions
   private lateinit var mockViewModel: ListActivitiesViewModel
   private lateinit var mockLocationViewModel: LocationViewModel
-  private val mockProfileViewModel = mockk<ProfileViewModel>()
   private lateinit var mockPermissionChecker: LocationPermissionChecker
+
+  private lateinit var profileViewModel: ProfileViewModel
 
   private val location = Location(46.519962, 6.633597, "EPFL")
   private val location2 = Location(46.5, 6.6, "Lausanne")
@@ -66,20 +68,23 @@ class CreateActivityScreenTest {
     mockLocationViewModel = LocationViewModel(mockLocationRepository, mockPermissionChecker)
 
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ADD_ACTIVITY)
+    profileViewModel = mock(ProfileViewModel::class.java)
+    `when`(profileViewModel.userState).thenReturn(MutableStateFlow(testUser))
   }
 
   private fun setUpComposeContent() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
   }
 
   @Test
   fun createActivityScreen_displaysTitleField() {
+
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -92,7 +97,7 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysDescriptionField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -105,7 +110,7 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysDateField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -118,7 +123,7 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysPriceField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -131,7 +136,7 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysPlacesLeftField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -144,7 +149,7 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysLocationField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -157,7 +162,7 @@ class CreateActivityScreenTest {
   fun createButton_isDisabledInitially() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
 
     // Wait for the UI to finish rendering
@@ -179,7 +184,7 @@ class CreateActivityScreenTest {
   fun createButton_isEnabledWhenAllFieldsAreFilled() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -215,7 +220,7 @@ class CreateActivityScreenTest {
   fun createButton_isDisabledWhenFieldsAreCleared() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -259,7 +264,7 @@ class CreateActivityScreenTest {
   fun createButton_isDisabledWhenPartialFieldsAreFilled() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -283,7 +288,7 @@ class CreateActivityScreenTest {
   fun createActivityScreen_dropdownOpensAndDisplaysOptions() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -302,7 +307,7 @@ class CreateActivityScreenTest {
   fun createActivityScreen_selectsDropdownOption1() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
 
     composeTestRule
@@ -338,7 +343,7 @@ class CreateActivityScreenTest {
   fun simpleUserIsDisplayed() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, mockProfileViewModel, mockLocationViewModel)
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
