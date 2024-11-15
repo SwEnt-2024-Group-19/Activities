@@ -19,14 +19,18 @@ class MockProfilesRepository : ProfilesRepository {
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     try {
       // Retrieve the user profile by userId
-      val user = userProfiles[userId]
+      val user = userProfiles["u1"]
       onSuccess(user)
     } catch (e: Exception) {
       onFailure(e)
     }
   }
 
-  override fun addActivity(
+    override fun observeAuthState(onSignedIn: (String) -> Unit, onSignedOut: () -> Unit) {
+        onSignedIn("u1")
+    }
+
+    override fun addActivity(
       userId: String,
       activityId: String,
       onSuccess: () -> Unit,
@@ -51,7 +55,17 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    TODO("Not yet implemented")
+    try {
+      // Add liked activity to user's liked activities list
+      if (userProfiles.containsKey(userId)) {
+        userProfiles[userId]?.likedActivities?.toMutableList()?.add(activityId)
+        onSuccess()
+      } else {
+        throw Exception("User not found")
+      }
+    } catch (e: Exception) {
+      onFailure(e)
+    }
   }
 
   override fun removeLikedActivity(
@@ -60,7 +74,17 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    TODO("Not yet implemented")
+    try {
+      // Remove liked activity from user's liked activities list
+      if (userProfiles.containsKey(userId)) {
+        userProfiles[userId]?.likedActivities?.toMutableList()?.remove(activityId)
+        onSuccess()
+      } else {
+        throw Exception("User not found")
+      }
+    } catch (e: Exception) {
+      onFailure(e)
+    }
   }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {

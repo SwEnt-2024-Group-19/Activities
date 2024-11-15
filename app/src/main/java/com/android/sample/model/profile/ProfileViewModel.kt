@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -23,15 +22,9 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
   }
 
   private fun observeAuthState() {
-    Firebase.auth.addAuthStateListener { auth ->
-      val currentUser = auth.currentUser
-      if (currentUser != null) {
-        fetchUserData(currentUser.uid)
-      } else {
-        Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
-        clearUserData()
-      }
-    }
+    repository.observeAuthState(
+        onSignedIn = { fetchUserData(it) },
+        onSignedOut = { clearUserData() })
   }
 
   fun fetchUserData(userId: String) {

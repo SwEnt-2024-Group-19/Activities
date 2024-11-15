@@ -1,6 +1,8 @@
 package com.android.sample.model.profile
 
 import android.util.Log
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,7 +34,21 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     }
   }
 
-  private fun documentToUser(document: DocumentSnapshot): User? {
+    override fun observeAuthState(onSignedIn: (String) -> Unit, onSignedOut: () -> Unit) {
+        Firebase.auth.addAuthStateListener { auth ->
+            val currentUser = auth.currentUser
+            Log.d("ProfileViewModel", "User is authenticated, fetching data.")
+            if (currentUser != null) {
+                Log.d("ProfileViewModel", "User is authenticated, fetching data.")
+                onSignedIn(currentUser.uid)
+            } else {
+                Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
+                onSignedOut()
+            }
+        }
+    }
+
+    private fun documentToUser(document: DocumentSnapshot): User? {
     return try {
       val id = document.id
       Log.d("ProfilesRepositoryFirestore", "User profile id: $id")
