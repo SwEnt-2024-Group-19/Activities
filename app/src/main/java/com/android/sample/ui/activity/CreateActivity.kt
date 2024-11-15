@@ -130,18 +130,6 @@ fun CreateActivityScreen(
         )
       },
       content = { paddingValues ->
-        if (showDialogImage) {
-          AddImageDialog(
-              onDismiss = { showDialogImage = false },
-              onGalleryClick = {
-                showDialogImage = false
-                isGalleryOpen = true
-              },
-              onCameraClick = {
-                showDialogImage = false
-                isCamOpen = true
-              })
-        }
         if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
