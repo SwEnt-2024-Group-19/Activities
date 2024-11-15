@@ -28,7 +28,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     }
   }
 
-  private fun documentToUser(document: DocumentSnapshot): User? {
+  fun documentToUser(document: DocumentSnapshot): User? {
     return try {
       User(
           id = document.id,
