@@ -53,7 +53,7 @@ import com.android.sample.R
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.ui.ProfileImage
+import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -138,7 +138,7 @@ fun ParticipantProfileContent(
 
                 // Profile Picture
                 ProfileImage(
-                    url = user.photo,
+                    userId = user.id,
                     modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
 
                 // User Name and Surname

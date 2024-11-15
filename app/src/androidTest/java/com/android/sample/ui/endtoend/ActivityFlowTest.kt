@@ -93,22 +93,35 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("SignInButton").performClick()
     composeTestRule.waitForIdle()
 
-    // Fills in the email and password fields
-    composeTestRule.onNodeWithTag("EmailTextField").performTextInput("user@example.com")
-    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("password123")
-    composeTestRule.onNodeWithTag("SignInButton").performClick()
-    composeTestRule.waitForIdle()
-
-    // Verifies profile is connected
-    composeTestRule.onNodeWithTag("Profile").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("connectedProfileScreen").assertIsDisplayed()
-
-    // Navigates back to the overview to view activities
+    // create an activity
     composeTestRule.onNodeWithTag("Overview").performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Add Activity").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Activity Title")
+    composeTestRule.onNodeWithTag("Description").performTextInput("Activity Description")
+    composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("12/12/2025")
+    composeTestRule.onNodeWithTag("inputStartTime").performTextInput("15:30")
+    composeTestRule.onNodeWithTag("inputDurationCreate").performTextInput("00:30")
+    composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("13")
+    composeTestRule.onNodeWithTag("inputPlacesCreate").performTextInput("7")
+    composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Activity Location")
+    composeTestRule.onNodeWithTag("createButton").performClick()
+    composeTestRule.waitForIdle()
+
+
+
+    // check in profile that the activity was added
+    composeTestRule.onNodeWithTag("Profile").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("profileScreen").assertExists()
+    composeTestRule.onNodeWithTag("activityCreated").assertExists()
+    composeTestRule.onNodeWithTag("activityCreated").performClick()
+    composeTestRule.waitForIdle()
+
+
+
+
 
     // Filters for specific activity types
     composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()

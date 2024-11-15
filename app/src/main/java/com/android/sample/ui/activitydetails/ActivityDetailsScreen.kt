@@ -274,8 +274,12 @@ fun ActivityDetailsScreen(
                           Modifier.padding(vertical = SMALL_PADDING.dp)
                               .testTag(participant.name)
                               .clickable {
-                                if (participant.name != profile?.name) {
+                                if (participant.name == profile?.name) {
                                   navigationActions.navigateTo(Screen.PROFILE)
+                                }
+                                else {
+                                    listActivityViewModel.selectUser(participant)
+                                    navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                                 }
                               }) {
                         // Placeholder for participant picture
