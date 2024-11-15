@@ -8,9 +8,13 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -168,5 +172,124 @@ class ProfilesRepositoryFirestoreTest {
         testUser,
         onSuccess = { fail("Success callback should not be called") },
         onFailure = { assert(it == exception) })
+  }
+
+  @Test
+  fun `documentToUser returns User when document is valid`() {
+    // Arrange
+    val document = mock(DocumentSnapshot::class.java)
+    `when`(document.id).thenReturn("12345")
+    `when`(document.getString("name")).thenReturn("John")
+    `when`(document.getString("surname")).thenReturn("Doe")
+    `when`(document.get("interests")).thenReturn(listOf("reading", "hiking"))
+    `when`(document.get("activities")).thenReturn(listOf("running", "swimming"))
+    `when`(document.getString("photo")).thenReturn("photo_url")
+    `when`(document.get("likedActivities")).thenReturn(listOf("cycling"))
+
+    // Act
+    val user = profileRepositoryFirestore.documentToUser(document)
+
+    // Assert
+    assertNotNull(user)
+    assertEquals("12345", user?.id)
+    assertEquals("John", user?.name)
+    assertEquals("Doe", user?.surname)
+    assertEquals(listOf("reading", "hiking"), user?.interests)
+    assertEquals(listOf("running", "swimming"), user?.activities)
+    assertEquals("photo_url", user?.photo)
+    assertEquals(listOf("cycling"), user?.likedActivities)
+  }
+
+  @Test
+  fun `documentToUser returns null when name is missing`() {
+    // Arrange
+    val document = mock(DocumentSnapshot::class.java)
+    `when`(document.getString("name")).thenReturn(null)
+
+    // Act
+    val user = profileRepositoryFirestore.documentToUser(document)
+
+    // Assert
+    assertNull(user)
+  }
+
+  @Test
+  fun `documentToUser returns null when surname is missing`() {
+    // Arrange
+    val document = mock(DocumentSnapshot::class.java)
+    `when`(document.getString("name")).thenReturn("John")
+    `when`(document.getString("surname")).thenReturn(null)
+
+    // Act
+    val user = profileRepositoryFirestore.documentToUser(document)
+
+    // Assert
+    assertNull(user)
+  }
+
+  @Test
+  fun `documentToUser returns null when interests is not a List`() {
+    // Arrange
+    val document = mock(DocumentSnapshot::class.java)
+    `when`(document.getString("name")).thenReturn("John")
+    `when`(document.getString("surname")).thenReturn("Doe")
+    `when`(document.get("interests")).thenReturn("invalid_value")
+
+    // Act
+    val user = profileRepositoryFirestore.documentToUser(document)
+
+    // Assert
+    assertNull(user)
+  }
+
+  @Test
+  fun `documentToUser returns null when activities is not a List`() {
+    // Arrange
+    val document = mock(DocumentSnapshot::class.java)
+    `when`(document.getString("name")).thenReturn("John")
+    `when`(document.getString("surname")).thenReturn("Doe")
+    `when`(document.get("interests")).thenReturn(listOf("reading"))
+    `when`(document.get("activities")).thenReturn("invalid_value")
+
+    // Act
+    val user = profileRepositoryFirestore.documentToUser(document)
+
+    // Assert
+    assertNull(user)
+  }
+
+  @Test
+  fun `documentToUser returns null when photo is missing`() {
+    // Arrange
+    val document = mock(DocumentSnapshot::class.java)
+    `when`(document.getString("name")).thenReturn("John")
+    `when`(document.getString("surname")).thenReturn("Doe")
+    `when`(document.get("interests")).thenReturn(listOf("reading"))
+    `when`(document.get("activities")).thenReturn(listOf("running"))
+    `when`(document.getString("photo")).thenReturn(null)
+
+    // Act
+    val user = profileRepositoryFirestore.documentToUser(document)
+
+    // Assert
+    assertNull(user)
+  }
+
+  @Test
+  fun `documentToUser returns null when likedActivities is not a List`() {
+    // Arrange
+    val document = mock(DocumentSnapshot::class.java)
+    `when`(document.getString("name")).thenReturn("John")
+    `when`(document.getString("surname")).thenReturn("Doe")
+    `when`(document.get("interests")).thenReturn(listOf("reading"))
+    `when`(document.get("activities")).thenReturn(listOf("running"))
+    `when`(document.getString("photo")).thenReturn("photo_url")
+    `when`(document.get("likedActivities")).thenReturn("invalid_value")
+
+    // Act
+    val user = profileRepositoryFirestore.documentToUser(document)
+
+    // Assert
+    assertNull(user)
   }
 }
