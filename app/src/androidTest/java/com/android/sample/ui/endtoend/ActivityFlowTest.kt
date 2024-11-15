@@ -88,7 +88,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("GoToSignInButton").assertExists()
     composeTestRule.onNodeWithTag("GoToSignInButton").performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("").assertIsDisplayed()
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("Profile").performClick()
