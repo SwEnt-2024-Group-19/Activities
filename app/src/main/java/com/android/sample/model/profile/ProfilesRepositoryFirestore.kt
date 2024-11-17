@@ -51,6 +51,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
   override fun addActivity(
       userId: String,
       activityId: String,
+      field: String, // field name is either "likedActivities" or "activities"
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
@@ -69,63 +70,23 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
         }
   }
 
-  override fun addLikedActivity(
-      userId: String,
-      activityId: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection("profiles")
-        .document(userId)
-        .update("likedActivities", FieldValue.arrayUnion(activityId))
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            onSuccess()
-          } else {
-            task.exception?.let { e ->
-              Log.e("ProfilesRepository", "Error adding activity to profile", e)
-              onFailure(e)
-            }
-          }
-        }
-  }
 
-  override fun removeLikedActivity(
-      userId: String,
-      activityId: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection("profiles")
-        .document(userId)
-        .update("likedActivities", FieldValue.arrayRemove(activityId))
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            onSuccess()
-          } else {
-            task.exception?.let { e ->
-              Log.e("ProfilesRepository", "Error adding activity to profile", e)
-              onFailure(e)
-            }
-          }
-        }
-  }
-
-    override fun removeEnrolledActivity(
+    override fun removeActivity(
         userId: String,
         activityId: String,
+        field: String, // field name is either "likedActivities" or "activities"
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
         db.collection("profiles")
             .document(userId)
-            .update("activities", FieldValue.arrayRemove(activityId))
+            .update(field, FieldValue.arrayRemove(activityId))
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     onSuccess()
                 } else {
                     task.exception?.let { e ->
-                        Log.e("ProfilesRepository", "Error adding activity to profile", e)
+                        Log.e("ProfilesRepository", "Error removing activity from profile", e)
                         onFailure(e)
                     }
                 }

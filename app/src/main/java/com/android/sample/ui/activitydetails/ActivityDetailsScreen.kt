@@ -331,8 +331,6 @@ fun ActivityDetailsScreen(
             // Enroll button
             if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
 
-
-
                 if (activity.creator != profile.id) {
                     Button(
                         onClick = {
@@ -352,7 +350,7 @@ fun ActivityDetailsScreen(
                                 navigationActions.navigateTo(Screen.PROFILE)
                             } else {
                                 // Logic to enroll in the activity
-                            if ((placesTaken ?: 0) < (maxPlaces ?: 0)) {
+                                if ((placesTaken ?: 0) < (maxPlaces ?: 0)) {
                                     val theActivity = activity.copy(
                                         placesLeft = min(
                                             (placesTaken ?: 0) + 1, maxPlaces ?: 0
@@ -371,27 +369,27 @@ fun ActivityDetailsScreen(
                                     Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT)
                                         .show()
                                     navigationActions.navigateTo(Screen.OVERVIEW)
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Enroll failed, limit of places reached",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Enroll failed, limit of places reached",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                                 navigationActions.navigateTo(Screen.OVERVIEW)
-                        }
-
-                                  },
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = LARGE_PADDING.dp)
                             .testTag("enrollButton")
                     ) {
-                        if(isUserEnrolled) Text(text = "Leave")
+                        if (isUserEnrolled) Text(text = "Leave")
                         else
-                        Text(text = "Enroll")
+                            Text(text = "Enroll")
                     }
-                } else { // Creator of the activity
+                } else {
+                    // Creator of the activity
                     Button(
                         onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
                         modifier = Modifier
@@ -491,7 +489,8 @@ fun CommentSection(
             )
         } else {
             // Input field for new comments if the user is logged in
-            OutlinedTextField(value = newCommentText.value,
+            OutlinedTextField(
+                value = newCommentText.value,
                 onValueChange = { newCommentText.value = it },
                 label = { Text("Add a comment") },
                 modifier = Modifier
@@ -567,7 +566,8 @@ fun CommentItem(
 
                 // Conditionally show the reply input field if the user is logged in
                 if (showReplyField) {
-                    OutlinedTextField(value = replyText,
+                    OutlinedTextField(
+                        value = replyText,
                         onValueChange = { replyText = it },
                         label = { Text("Reply") },
                         modifier = Modifier

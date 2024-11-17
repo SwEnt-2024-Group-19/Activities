@@ -6,27 +6,15 @@ interface ProfilesRepository {
   fun addActivity(
       userId: String,
       activityId: String,
+      field: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   )
 
-  fun addLikedActivity(
-      userId: String,
-      activityId: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  )
-
-  fun removeLikedActivity(
-      userId: String,
-      activityId: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  )
-
-    fun removeEnrolledActivity(
+    fun removeActivity(
         userId: String,
         activityId: String,
+        field: String,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     )

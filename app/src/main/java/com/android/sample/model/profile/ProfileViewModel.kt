@@ -53,27 +53,13 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         repository.addActivity(
             userId = userId,
             activityId = activityId,
+            if
             onSuccess = { fetchUserData(userId) },
             onFailure = {})
     }
 
-    fun addLikedActivity(userId: String, activityId: String) {
-        repository.addLikedActivity(
-            userId = userId,
-            activityId = activityId,
-            onSuccess = { fetchUserData(userId) },
-            onFailure = {})
-    }
 
-    fun removeLikedActivity(userId: String, activityId: String) {
-        repository.removeLikedActivity(
-            userId = userId,
-            activityId = activityId,
-            onSuccess = { fetchUserData(userId) },
-            onFailure = {})
-    }
-
-    fun removeEnrolledActivity(userId: String, activityId: String) {
+    fun removeActivity(userId: String, activityId: String) {
         repository.removeEnrolledActivity(
             userId = userId,
             activityId = activityId,
