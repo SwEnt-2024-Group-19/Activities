@@ -132,6 +132,13 @@ class ProfileViewModelTest {
   }
 
   @Test
+  fun removeEnrolledActivity() {
+    // Set up user with the activity in activities
+    profileViewModel.removeEnrolledActivity(testUser.id, activity.uid)
+    verify(profilesRepository).removeEnrolledActivity(eq(testUser.id), eq(activity.uid), any(), any())
+  }
+
+  @Test
   fun fetchUserDataFailureLogsError() {
     val exception = Exception("Error fetching user data")
     `when`(profilesRepository.getUser(eq(testUser.id), any(), any())).thenAnswer {

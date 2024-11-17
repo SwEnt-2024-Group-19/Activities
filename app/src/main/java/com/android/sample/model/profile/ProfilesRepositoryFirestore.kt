@@ -124,7 +124,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     ) {
         db.collection("profiles")
             .document(userId)
-            .update("Activities", FieldValue.arrayRemove(activityId))
+            .update("activities", FieldValue.arrayRemove(activityId))
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     onSuccess()
