@@ -55,14 +55,14 @@ class MapScreenTest {
     val stateFlow = MutableStateFlow(uiState)
     Mockito.doReturn(stateFlow).`when`(listActivitiesViewModel).uiState
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
-    composeTestRule.setContent {
-      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
-    }
+
   }
 
   @Test
   fun testMapScreenIsDisplayed() {
-
+    composeTestRule.setContent {
+      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+    }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
     composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
@@ -70,7 +70,26 @@ class MapScreenTest {
 
   @Test
   fun testCenterOnCurrentLocationTriggersGetCurrentLocation() {
-
+    composeTestRule.setContent {
+      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+    }
     verify(mockRepository).getCurrentLocation(any(), any())
   }
+
+    @Test
+    fun activityDetailsDisplayed(){
+      composeTestRule.setContent { DisplayActivity(activity) }
+      composeTestRule.onNodeWithTag("activityDetails").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("activityTitle").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("activityDate").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("calendarIcon").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("calendarText").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("activityLocation").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("locationIcon").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("activityPrice").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("placesLeft").assertIsDisplayed()
+    }
 }

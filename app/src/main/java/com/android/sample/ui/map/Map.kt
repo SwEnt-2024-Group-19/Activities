@@ -108,6 +108,7 @@ fun MapScreen(
                         .filter { it.location != null }
                         .forEach { item ->
                             Marker(
+
                                 state =
                                 MarkerState(
                                     position =
@@ -211,7 +212,7 @@ fun DisplayActivity(activity: Activity) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(16.dp).testTag("activityDetails")
     ) {
         // Image en haut
         if (activity.images.isNotEmpty()) {
@@ -221,7 +222,7 @@ fun DisplayActivity(activity: Activity) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .clip(RoundedCornerShape(12.dp)),
+                    .clip(RoundedCornerShape(12.dp)).testTag("activityImage"),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -231,39 +232,47 @@ fun DisplayActivity(activity: Activity) {
         Text(
             text = activity.title,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp).testTag("activityTitle"),
         )
         Text(
             text = activity.description,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp).testTag("activityDescription"),
         )
         Spacer(modifier = Modifier.height(12.dp))
 
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp).testTag("activityDate")
         ) {
             Icon(
                 imageVector = Icons.Default.CalendarToday,
                 contentDescription = "Date",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.testTag("calendarIcon")
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Date: ${activity.date.toDate()}")
+            Text(text = "Date: ${activity.date.toDate()}",
+                modifier = Modifier.testTag("calendarText")
+            )
         }
         if (activity.location != null) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp).testTag("activityLocation")
             ) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = "Location",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.testTag("locationIcon")
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Location: ${activity.location!!.name}")
+                Text(text = "Location: ${activity.location!!.name}",
+                    modifier = Modifier.testTag("locationText")
+                )
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -271,15 +280,17 @@ fun DisplayActivity(activity: Activity) {
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().testTag("activityPrice")
         ) {
             Text(
                 text = "Price: ${activity.price}€",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.testTag("priceText")
             )
             Text(
                 text = "Places left: ${activity.placesLeft}/${activity.maxPlaces}",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.testTag("placesLeft")
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
