@@ -166,6 +166,10 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithText("Enroll").assertIsDisplayed()
   }
 
+    fun leaveButton_displays_whenUserIsParticipant() {
+
+    }
+
   @Test
   fun editButton_displaysForActiveActivity_whenUserIsTheCreator() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
@@ -236,7 +240,44 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithText("Enroll failed, limit of places reached").isDisplayed()
   }
 
-  @Test
+    @Test
+    fun leaveActivityToast_displays_whenLeftActivity() {
+        // Mock the ProfileViewModel
+        mockProfileViewModel = mock(ProfileViewModel::class.java)
+        `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "123")))
+
+        // Mock an activity where the user is already enrolled but not the creator
+        val enrolledActivity =
+            activityWithParticipants.copy(
+                creator = "456", // Different creator
+                participants = listOf(testUser.copy(id = "123"))
+            )
+        `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(enrolledActivity))
+
+        // Set the content of the ActivityDetailsScreen
+        composeTestRule.setContent {
+            ActivityDetailsScreen(
+                listActivityViewModel = mockViewModel,
+                profileViewModel = mockProfileViewModel,
+                navigationActions = mockNavigationActions
+            )
+        }
+
+        // Ensure the "Leave" button is displayed and click it
+        composeTestRule
+            .onNodeWithTag("activityDetailsScreen")
+            .performScrollToNode(hasTestTag("leaveButton"))
+        composeTestRule.onNodeWithTag("leaveButton").assertIsDisplayed().performClick()
+
+        // Verify that the correct toast message is displayed
+        composeTestRule.onNodeWithText("Successfully left the activity").assertExists()
+
+        // Verify navigation to the profile screen occurs
+        verify(mockNavigationActions).navigateTo(Screen.PROFILE)
+    }
+
+
+    @Test
   fun deleteMainComment_removesMainCommentSuccessfully() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))

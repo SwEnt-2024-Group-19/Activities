@@ -104,11 +104,10 @@ class ProfilesRepositoryFirestoreTest {
 
   @Test
   fun removeEnrolledActivity_shouldCallFirestoreToRemoveEnrolledActivity() {
-    `when`(mockDocumentReference.update(eq("activities"), any()))
-      .thenReturn(Tasks.forResult(null))
+    `when`(mockDocumentReference.update(eq("activities"), any())).thenReturn(Tasks.forResult(null))
 
     profileRepositoryFirestore.removeEnrolledActivity(
-      "1", "activityId", onSuccess = {}, onFailure = {})
+        "1", "activityId", onSuccess = {}, onFailure = {})
 
     verify(mockDocumentReference).update(eq("activities"), any())
   }
@@ -141,13 +140,13 @@ class ProfilesRepositoryFirestoreTest {
   fun removeEnrolledActivity_shouldCallFailureCallbackOnError() {
     val exception = Exception("Test exception")
     `when`(mockDocumentReference.update(eq("activities"), any()))
-      .thenReturn(Tasks.forException(exception))
+        .thenReturn(Tasks.forException(exception))
 
     profileRepositoryFirestore.removeEnrolledActivity(
-      "1",
-      "activityId",
-      onSuccess = { fail("Success callback should not be called") },
-      onFailure = { assert(it == exception) })
+        "1",
+        "activityId",
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { assert(it == exception) })
   }
 
   @Test

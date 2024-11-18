@@ -49,13 +49,21 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = { error -> onError(error) })
   }
 
-  fun addActivity(userId: String, activityId: String) {
-    repository.addActivity(
+  fun addCreatedActivity(userId: String, activityId: String) {
+    repository.addCreatedActivity(
         userId = userId,
         activityId = activityId,
         onSuccess = { fetchUserData(userId) },
         onFailure = {})
   }
+
+    fun addJoinedActivity(userId: String, activityId: String) {
+        repository.addJoinedActivity(
+            userId = userId,
+            activityId = activityId,
+            onSuccess = { fetchUserData(userId) },
+            onFailure = {})
+    }
 
   fun addLikedActivity(userId: String, activityId: String) {
     repository.addLikedActivity(
@@ -73,13 +81,13 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = {})
   }
 
-    fun removeEnrolledActivity(userId: String, activityId: String) {
-        repository.removeEnrolledActivity(
-            userId = userId,
-            activityId = activityId,
-            onSuccess = { fetchUserData(userId) },
-            onFailure = {})
-    }
+  fun removeEnrolledActivity(userId: String, activityId: String) {
+    repository.removeEnrolledActivity(
+        userId = userId,
+        activityId = activityId,
+        onSuccess = { fetchUserData(userId) },
+        onFailure = {})
+  }
 
   fun updateProfile(user: User) {
     repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})

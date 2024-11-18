@@ -135,7 +135,8 @@ class ProfileViewModelTest {
   fun removeEnrolledActivity() {
     // Set up user with the activity in activities
     profileViewModel.removeEnrolledActivity(testUser.id, activity.uid)
-    verify(profilesRepository).removeEnrolledActivity(eq(testUser.id), eq(activity.uid), any(), any())
+    verify(profilesRepository)
+        .removeEnrolledActivity(eq(testUser.id), eq(activity.uid), any(), any())
   }
 
   @Test

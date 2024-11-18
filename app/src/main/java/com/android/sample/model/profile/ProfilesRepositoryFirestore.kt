@@ -40,8 +40,12 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
                 surname = document.getString("surname") ?: return null,
                 interests =
                 (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null,
-                activities =
-                (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null,
+                createdActivities =
+                (document.get("createdActivities") as? List<*>)?.filterIsInstance<String>()
+                    ?: return null,
+                joinedActivities =
+                (document.get("joinedActivities") as? List<*>)?.filterIsInstance<String>()
+                    ?: return null,
                 photo = document.getString("photo") ?: return null,
                 likedActivities =
                 (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>()
@@ -53,7 +57,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
         }
     }
 
-    override fun addActivity(
+    override fun addCreatedActivity(
         userId: String,
         activityId: String,
         onSuccess: () -> Unit,
@@ -61,7 +65,29 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     ) {
         db.collection("profiles")
             .document(userId)
-            .update("activities", FieldValue.arrayUnion(activityId))
+            .update("createdActivities", FieldValue.arrayUnion(activityId))
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    onSuccess()
+                } else {
+                    task.exception?.let { e ->
+                        Log.e("ProfilesRepository", "Error adding activity to profile", e)
+                        onFailure(e)
+                    }
+                }
+            }
+    }
+
+
+    override fun addJoinedActivity(
+        userId: String,
+        activityId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection("profiles")
+            .document(userId)
+            .update("joinedActivities", FieldValue.arrayUnion(activityId))
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     onSuccess()
@@ -116,7 +142,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
             }
     }
 
-    override fun removeEnrolledActivity(
+    override fun removeJoinedActivity(
         userId: String,
         activityId: String,
         onSuccess: () -> Unit,

@@ -63,19 +63,19 @@ class MockProfilesRepository : ProfilesRepository {
     TODO("Not yet implemented")
   }
 
-    override fun removeEnrolledActivity(
-        userId: String,
-        activityId: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        if (userProfiles.containsKey(userId)) {
-            activitiesList[userId]?.remove(activityId)
-            onSuccess()
-        } else {
-            onFailure(Exception("User not found"))
-        }
+  override fun removeEnrolledActivity(
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    if (userProfiles.containsKey(userId)) {
+      activitiesList[userId]?.remove(activityId)
+      onSuccess()
+    } else {
+      onFailure(Exception("User not found"))
     }
+  }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
     try {
