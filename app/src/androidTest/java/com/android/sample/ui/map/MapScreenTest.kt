@@ -17,7 +17,6 @@ import com.android.sample.resources.dummydata.activity
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
-import okhttp3.internal.wait
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,7 +57,6 @@ class MapScreenTest {
     val stateFlow = MutableStateFlow(uiState)
     Mockito.doReturn(stateFlow).`when`(listActivitiesViewModel).uiState
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
-
   }
 
   @Test
@@ -79,25 +77,25 @@ class MapScreenTest {
     verify(mockRepository).getCurrentLocation(any(), any())
   }
 
-    @Test
-    fun activityDetailsDisplayed(){
-      composeTestRule.setContent { DisplayActivity(activity) }
-      composeTestRule.onNodeWithTag("activityDetails").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("activityTitle").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("activityDate").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("calendarIcon").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("calendarText").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("activityLocation").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("locationIcon").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("activityPrice").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("placesLeft").assertIsDisplayed()
-    }
+  @Test
+  fun activityDetailsDisplayed() {
+    composeTestRule.setContent { DisplayActivity(activity) }
+    composeTestRule.onNodeWithTag("activityDetails").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityDate").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("calendarIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("calendarText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityLocation").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("locationIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityPrice").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("placesLeft").assertIsDisplayed()
+  }
 
   @Test
-  fun seeActivityDetails(){
+  fun seeActivityDetails() {
     composeTestRule.setContent { SeeMoreDetailsButton(navigationActions) }
     composeTestRule.onNodeWithText("See more details").assertIsDisplayed()
     composeTestRule.onNodeWithTag("seeMoreDetailsButton").performClick()
