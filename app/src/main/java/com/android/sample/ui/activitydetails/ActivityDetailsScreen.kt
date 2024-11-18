@@ -83,7 +83,7 @@ fun ActivityDetailsScreen(
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
   // Check if the user is already enrolled in the activity
-  val isUserEnrolled = profile?.joinedActivities?.contains(activity?.uid) ?: false
+  val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
 
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
@@ -327,7 +327,7 @@ fun ActivityDetailsScreen(
                                   participants =
                                       activity.participants.filter { it.id != profile.id })
                           listActivityViewModel.updateActivity(updatedActivity)
-                          profileViewModel.removeEnrolledActivity(profile.id, activity.uid)
+                          profileViewModel.removeJoinedActivity(profile.id, activity.uid)
                           Toast.makeText(
                                   context, "Successfully left the activity", Toast.LENGTH_SHORT)
                               .show()
@@ -346,11 +346,10 @@ fun ActivityDetailsScreen(
                                                 id = profile.id,
                                                 photo = profile.photo,
                                                 interests = profile.interests,
-                                                createdActivities = profile.createdActivities,
-                                                joinedActivities = profile.joinedActivities))
+                                                activities = profile.activities))
 
                             listActivityViewModel.updateActivity(theActivity)
-                            profileViewModel.addJoinedActivity(profile.id, theActivity.uid)
+                            profileViewModel.addActivity(profile.id, theActivity.uid)
                             Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
                             navigationActions.navigateTo(Screen.OVERVIEW)
                           } else {
@@ -395,6 +394,7 @@ fun ActivityDetailsScreen(
                       Text(text = "Login/Register")
                     }
               }
+
               CommentSection(
                   profileId = profile?.id ?: "anonymous",
                   comments = comments,

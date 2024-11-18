@@ -16,6 +16,8 @@ import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.MockActivitiesRepository
+import com.android.sample.model.profile.MockProfilesRepository
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -32,11 +34,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
 class ActivityDetailsScreenAndroidTest {
+
   private lateinit var mockNavigationActions: NavigationActions
 
   private lateinit var mockViewModel: ListActivitiesViewModel
@@ -149,26 +153,29 @@ class ActivityDetailsScreenAndroidTest {
   }
 
   @Test
-  fun enrollButton_displays_whenUserLoggedIn() {
+  fun enrollButton_displays_whenUserLoggedInAndNotActivityCreator() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
+    val testUser = testUser.copy(id = "123")
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+
+    val activity =
+        activityWithParticipants.copy(
+            creator = "456", // Different from user ID
+            status = ActivityStatus.ACTIVE)
+    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
+
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
           profileViewModel = mockProfileViewModel)
     }
-
     composeTestRule
         .onNodeWithTag("activityDetailsScreen")
         .performScrollToNode(hasTestTag("enrollButton"))
     composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed()
     composeTestRule.onNodeWithText("Enroll").assertIsDisplayed()
   }
-
-    fun leaveButton_displays_whenUserIsParticipant() {
-
-    }
 
   @Test
   fun editButton_displaysForActiveActivity_whenUserIsTheCreator() {
@@ -197,7 +204,6 @@ class ActivityDetailsScreenAndroidTest {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
 
-    // Set the user state to null to simulate the user not being logged in
     val userStateFlow = MutableStateFlow<User?>(null)
     `when`(mockProfileViewModel.userState).thenReturn(userStateFlow)
 
@@ -240,44 +246,96 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithText("Enroll failed, limit of places reached").isDisplayed()
   }
 
-    @Test
-    fun leaveActivityToast_displays_whenLeftActivity() {
-        // Mock the ProfileViewModel
-        mockProfileViewModel = mock(ProfileViewModel::class.java)
-        `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "123")))
+  @Test
+  fun enrollButton_addsUserToActivity() {
+    val mockActivitiesRepo = MockActivitiesRepository()
+    mockViewModel = spy(ListActivitiesViewModel(mockActivitiesRepo))
 
-        // Mock an activity where the user is already enrolled but not the creator
-        val enrolledActivity =
-            activityWithParticipants.copy(
-                creator = "456", // Different creator
-                participants = listOf(testUser.copy(id = "123"))
-            )
-        `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(enrolledActivity))
+    val mockProfileRepo = MockProfilesRepository()
+    mockProfileViewModel = spy(ProfileViewModel(mockProfileRepo))
 
-        // Set the content of the ActivityDetailsScreen
-        composeTestRule.setContent {
-            ActivityDetailsScreen(
-                listActivityViewModel = mockViewModel,
-                profileViewModel = mockProfileViewModel,
-                navigationActions = mockNavigationActions
-            )
-        }
+    val testUser = testUser.copy(id = "123")
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
 
-        // Ensure the "Leave" button is displayed and click it
-        composeTestRule
-            .onNodeWithTag("activityDetailsScreen")
-            .performScrollToNode(hasTestTag("leaveButton"))
-        composeTestRule.onNodeWithTag("leaveButton").assertIsDisplayed().performClick()
+    val initialActivity =
+        activityWithParticipants.copy(
+            uid = "act1",
+            creator = "456",
+            maxPlaces = 5,
+            placesLeft = 2,
+            participants = emptyList())
+    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(initialActivity))
 
-        // Verify that the correct toast message is displayed
-        composeTestRule.onNodeWithText("Successfully left the activity").assertExists()
-
-        // Verify navigation to the profile screen occurs
-        verify(mockNavigationActions).navigateTo(Screen.PROFILE)
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          profileViewModel = mockProfileViewModel,
+          navigationActions = mockNavigationActions)
     }
 
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("enrollButton"))
+    composeTestRule.onNodeWithTag("enrollButton").performClick()
 
-    @Test
+    verify(mockProfileViewModel).addActivity(testUser.id, "act1")
+  }
+
+  @Test
+  fun leaveActivityToast_displays_whenLeftActivity() {
+    val mockActivitiesRepo = MockActivitiesRepository()
+    mockViewModel = spy(ListActivitiesViewModel(mockActivitiesRepo))
+
+    val mockProfileRepo = MockProfilesRepository()
+    mockProfileViewModel = spy(ProfileViewModel(mockProfileRepo))
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "123")))
+
+    val enrolledActivity =
+        activityWithParticipants.copy(
+            creator = "456", participants = listOf(testUser.copy(id = "123")))
+    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(enrolledActivity))
+
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          profileViewModel = mockProfileViewModel,
+          navigationActions = mockNavigationActions)
+    }
+
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("enrollButton"))
+    composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithText("Successfully left the activity").isDisplayed()
+  }
+
+  @Test
+  fun enrollButton_showsLeaveTextWhenUserEnrolled() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    val testUser = testUser.copy(id = "123")
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+
+    val activity =
+        activityWithParticipants.copy(
+            creator = "456", status = ActivityStatus.ACTIVE, participants = listOf(testUser))
+    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
+
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          profileViewModel = mockProfileViewModel,
+          navigationActions = mockNavigationActions)
+    }
+
+    composeTestRule
+        .onNodeWithTag("activityDetailsScreen")
+        .performScrollToNode(hasTestTag("enrollButton"))
+    composeTestRule.onNodeWithTag("enrollButton").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Leave").isDisplayed()
+  }
+
+  @Test
   fun deleteMainComment_removesMainCommentSuccessfully() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))

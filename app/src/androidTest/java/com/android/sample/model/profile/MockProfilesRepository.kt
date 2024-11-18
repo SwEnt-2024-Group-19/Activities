@@ -63,7 +63,7 @@ class MockProfilesRepository : ProfilesRepository {
     TODO("Not yet implemented")
   }
 
-  override fun removeEnrolledActivity(
+  override fun removeJoinedActivity(
       userId: String,
       activityId: String,
       onSuccess: () -> Unit,

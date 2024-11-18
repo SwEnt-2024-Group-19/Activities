@@ -106,7 +106,7 @@ class ProfilesRepositoryFirestoreTest {
   fun removeEnrolledActivity_shouldCallFirestoreToRemoveEnrolledActivity() {
     `when`(mockDocumentReference.update(eq("activities"), any())).thenReturn(Tasks.forResult(null))
 
-    profileRepositoryFirestore.removeEnrolledActivity(
+    profileRepositoryFirestore.removeJoinedActivity(
         "1", "activityId", onSuccess = {}, onFailure = {})
 
     verify(mockDocumentReference).update(eq("activities"), any())
@@ -142,7 +142,7 @@ class ProfilesRepositoryFirestoreTest {
     `when`(mockDocumentReference.update(eq("activities"), any()))
         .thenReturn(Tasks.forException(exception))
 
-    profileRepositoryFirestore.removeEnrolledActivity(
+    profileRepositoryFirestore.removeJoinedActivity(
         "1",
         "activityId",
         onSuccess = { fail("Success callback should not be called") },

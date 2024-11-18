@@ -49,21 +49,13 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = { error -> onError(error) })
   }
 
-  fun addCreatedActivity(userId: String, activityId: String) {
-    repository.addCreatedActivity(
+  fun addActivity(userId: String, activityId: String) {
+    repository.addActivity(
         userId = userId,
         activityId = activityId,
         onSuccess = { fetchUserData(userId) },
         onFailure = {})
   }
-
-    fun addJoinedActivity(userId: String, activityId: String) {
-        repository.addJoinedActivity(
-            userId = userId,
-            activityId = activityId,
-            onSuccess = { fetchUserData(userId) },
-            onFailure = {})
-    }
 
   fun addLikedActivity(userId: String, activityId: String) {
     repository.addLikedActivity(
@@ -81,8 +73,8 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = {})
   }
 
-  fun removeEnrolledActivity(userId: String, activityId: String) {
-    repository.removeEnrolledActivity(
+  fun removeJoinedActivity(userId: String, activityId: String) {
+    repository.removeJoinedActivity(
         userId = userId,
         activityId = activityId,
         onSuccess = { fetchUserData(userId) },
