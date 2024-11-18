@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.model.activity.ActivitiesRepository
@@ -15,6 +17,7 @@ import com.android.sample.resources.dummydata.activity
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
+import okhttp3.internal.wait
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -92,4 +95,12 @@ class MapScreenTest {
       composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
       composeTestRule.onNodeWithTag("placesLeft").assertIsDisplayed()
     }
+
+  @Test
+  fun seeActivityDetails(){
+    composeTestRule.setContent { SeeMoreDetailsButton(navigationActions) }
+    composeTestRule.onNodeWithText("See more details").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("seeMoreDetailsButton").performClick()
+    verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
+  }
 }

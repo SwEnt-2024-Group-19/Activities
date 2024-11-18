@@ -26,6 +26,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
+import org.junit.Test
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,6 +119,7 @@ fun MapScreen(
                                 snippet = item.description,
                                 onClick = {
                                     selectedActivity = item
+                                    selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }
                                     showBottomSheet = true
                                     true
                                 }
@@ -177,16 +180,8 @@ fun MapScreen(
                     horizontalArrangement = Arrangement.SpaceBetween, // Espace entre les éléments
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Bouton "See more details" à gauche
-                    Button(
-                        onClick = {
-                            selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }
-                            navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-                            showBottomSheet = false
-                        },
-                    ) {
-                        Text("See more details")
-                    }
+
+                    SeeMoreDetailsButton(navigationActions)
 
                     // Icône de fermeture (croix) à droite
                     IconButton(onClick = { showBottomSheet = false }) {
@@ -297,6 +292,22 @@ fun DisplayActivity(activity: Activity) {
 
 
 
+    }
+
+
+}
+@Composable
+
+fun SeeMoreDetailsButton(navigationActions: NavigationActions){
+    Button(
+        modifier = Modifier.testTag("seeMoreDetailsButton"),
+        onClick = {
+
+            navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+
+        },
+    ) {
+        Text(text="See more details")
     }
 }
 
