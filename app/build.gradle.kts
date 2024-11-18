@@ -41,6 +41,7 @@ android {
 
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
     }
 
 
@@ -200,9 +201,7 @@ dependencies {
     // JUnit for unit testing
     testImplementation("junit:junit:4.13.2")
 
-    // MockK for mocking
-    testImplementation("io.mockk:mockk:1.13.2")
-    androidTestImplementation("io.mockk:mockk-android:1.13.2")
+
     // Or replace with Mockito if preferred:
     // testImplementation("org.mockito:mockito-core:5.5.0")
 
@@ -248,9 +247,7 @@ dependencies {
 
     // Testing Unit
     testImplementation(libs.junit)
-    androidTestImplementation(libs.mockk)
-    androidTestImplementation(libs.mockk.android)
-    androidTestImplementation(libs.mockk.agent)
+
     //testImplementation("io.mockk:mockk:1.12.0")
     testImplementation(libs.json)
 
