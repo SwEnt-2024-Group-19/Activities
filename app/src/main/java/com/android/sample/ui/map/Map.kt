@@ -191,7 +191,7 @@ fun MapScreen(
                     IconButton(onClick = { showBottomSheet = false }) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Fermer",
+                            contentDescription = "Close",
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -217,7 +217,7 @@ fun DisplayActivity(activity: Activity) {
         if (activity.images.isNotEmpty()) {
             AsyncImage(
                 model = activity.images.first(),
-                contentDescription = "Image de l'activité",
+                contentDescription = "Activity image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -240,7 +240,7 @@ fun DisplayActivity(activity: Activity) {
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Date et localisation
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -259,32 +259,32 @@ fun DisplayActivity(activity: Activity) {
             ) {
                 Icon(
                     imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Lieu",
+                    contentDescription = "Location",
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Lieu: ${activity.location!!.name}")
+                Text(text = "Location: ${activity.location!!.name}")
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Prix et places disponibles
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Prix: ${activity.price}€",
+                text = "Price: ${activity.price}€",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Places restantes: ${activity.placesLeft}/${activity.maxPlaces}",
+                text = "Places left: ${activity.placesLeft}/${activity.maxPlaces}",
                 style = MaterialTheme.typography.bodyMedium
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Participants
+
 
     }
 }
