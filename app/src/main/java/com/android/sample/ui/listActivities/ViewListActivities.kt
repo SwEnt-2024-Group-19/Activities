@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +58,7 @@ import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.ui.components.SearchBar
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -64,6 +66,7 @@ import com.android.sample.ui.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun ListActivitiesScreen(
@@ -78,27 +81,15 @@ fun ListActivitiesScreen(
   val typesToString = types.map { it.name }
   val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
+    var searchText by remember { mutableStateOf("") }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
       topBar = {
-        Box(
-            modifier =
-                Modifier.height(BUTTON_HEIGHT.dp)
-                    .testTag("segmentedButtonRow")) { // Set the desired height here
-              SingleChoiceSegmentedButtonRow {
-                options.forEachIndexed { index, label ->
-                  SegmentedButton(
-                      modifier = Modifier.testTag("segmentedButton$label"),
-                      shape =
-                          SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                      onClick = { selectedIndex = index },
-                      selected = index == selectedIndex) {
-                        Text(label)
-                      }
-                }
-              }
-            }
+            SearchBar(
+                onValueChange = { searchText = it },
+                value = searchText
+            )
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -106,62 +97,105 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
-        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
-          when (uiState) {
-            is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-              var activitiesList =
-                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              if (selectedIndex != 0) {
-
-                activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
-              }
-              if (activitiesList.isEmpty()) {
-                if (selectedIndex == 0) {
-                  Text(
-                      text = "There is no activity yet.",
-                      modifier =
-                          Modifier.padding(STANDARD_PADDING.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
-                      color = MaterialTheme.colorScheme.onSurface)
-                } else {
-                  Text(
-                      text = "There is no activity of this type yet.",
-                      modifier =
-                          Modifier.padding(STANDARD_PADDING.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
-                      color = MaterialTheme.colorScheme.onSurface)
-                }
-              } else {
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = STANDARD_PADDING.dp),
-                    verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
-                      // Use LazyColumn to efficiently display the list of activities
-
-                      items(activitiesList) { activity ->
-                        if (activity.participants.size < activity.maxPlaces) {
-                          ActivityCard(
-                              activity = activity,
-                              navigationActions,
-                              viewModel,
-                              profileViewModel,
-                              profile)
-                        }
+      Column(modifier = Modifier
+          .fillMaxSize()
+          .padding(paddingValues)) {
+          Box(
+              modifier =
+              Modifier
+                  .height(BUTTON_HEIGHT.dp)
+                  .testTag("segmentedButtonRow")
+                  .fillMaxWidth()
+                  .padding(horizontal = STANDARD_PADDING.dp)) { // Set the desired height here
+              SingleChoiceSegmentedButtonRow {
+                  options.forEachIndexed { index, label ->
+                      SegmentedButton(
+                          modifier = Modifier.testTag("segmentedButton$label"),
+                          shape =
+                          SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                          onClick = { selectedIndex = index },
+                          selected = index == selectedIndex) {
+                          Text(label)
                       }
-                    }
+                  }
               }
-            }
-            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-              Text(
-                  text = "Error: ${error.message}",
-                  modifier = Modifier.padding(STANDARD_PADDING.dp))
-            }
           }
-        }
+          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+          Box(modifier = modifier.fillMaxWidth()) {
+              when (uiState) {
+                  is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+                      var activitiesList =
+                          (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+                      if (selectedIndex != 0) {
+                          activitiesList =
+                              activitiesList.filter { it.type.name == options[selectedIndex] }
+                      }
+                      if (activitiesList.isEmpty()) {
+                          if (selectedIndex == 0) {
+                              Text(
+                                  text = "There is no activity yet.",
+                                  modifier =
+                                  Modifier
+                                      .padding(STANDARD_PADDING.dp)
+                                      .align(Alignment.Center)
+                                      .testTag("emptyActivityPrompt"),
+                                  color = MaterialTheme.colorScheme.onSurface
+                              )
+                          } else {
+                              Text(
+                                  text = "There is no activity of this type yet.",
+                                  modifier =
+                                  Modifier
+                                      .padding(STANDARD_PADDING.dp)
+                                      .align(Alignment.Center)
+                                      .testTag("emptyActivityPrompt"),
+                                  color = MaterialTheme.colorScheme.onSurface
+                              )
+                          }
+                      } else {
+                          var filteredActivities = activitiesList.filter {
+                              if(searchText.isEmpty()||searchText.isBlank())true
+                              else{
+                                  it.title.contains(searchText, ignoreCase = true)
+                                    || it.description.contains(searchText, ignoreCase = true)
+                                    || it.location?.name?.contains(searchText, ignoreCase = true) ?: false
+                              }
+                          }
+                          LazyColumn(
+                              modifier = Modifier
+                                  .fillMaxSize()
+                                  .padding(horizontal = STANDARD_PADDING.dp),
+                              verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)
+                          ) {
+                              // Use LazyColumn to efficiently display the list of activities
+
+                              items(filteredActivities) { activity ->
+                                  if (activity.participants.size < activity.maxPlaces) {
+                                      ActivityCard(
+                                          activity = activity,
+                                          navigationActions,
+                                          viewModel,
+                                          profileViewModel,
+                                          profile
+                                      )
+                                  }
+                              }
+                          }
+                      }
+                  }
+
+                  is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+                      val error =
+                          (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+                      Text(
+                          text = "Error: ${error.message}",
+                          modifier = Modifier.padding(STANDARD_PADDING.dp)
+                      )
+                  }
+              }
+          }
       }
+  }
 }
 
 @Composable
@@ -181,22 +215,27 @@ fun ActivityCard(
 
   Card(
       modifier =
-          Modifier.fillMaxWidth()
-              .testTag("activityCard")
-              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable {
-                listActivitiesViewModel.selectActivity(activity)
-                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-              },
+      Modifier
+          .fillMaxWidth()
+          .testTag("activityCard")
+          .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+          .clickable {
+              listActivitiesViewModel.selectActivity(activity)
+              navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+          },
       elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)) {
         Column {
           // Box for overlaying the title on the image
-          Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
+          Box(modifier = Modifier
+              .fillMaxWidth()
+              .height(LARGE_IMAGE_SIZE.dp)) {
             // Display the activity image
             Image(
                 painter = painterResource(R.drawable.foot),
                 contentDescription = activity.title,
-                modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
 
             // Display the activity name on top of the image
@@ -208,14 +247,17 @@ fun ActivityCard(
                         color = Color.White // Title color set to black
                         ),
                 modifier =
-                    Modifier.align(Alignment.BottomStart)
-                        .padding(MEDIUM_PADDING.dp)
-                        .testTag("titleActivity"))
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(MEDIUM_PADDING.dp)
+                    .testTag("titleActivity"))
           }
 
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
           Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(horizontal = MEDIUM_PADDING.dp)
+                  .fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
@@ -251,7 +293,9 @@ fun ActivityCard(
               }
 
           Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(horizontal = MEDIUM_PADDING.dp)
+                  .fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
@@ -271,7 +315,9 @@ fun ActivityCard(
                             color = Color.Gray,
                             fontSize = MEDIUM_PADDING.sp),
                     modifier =
-                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
+                    Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = MEDIUM_PADDING.dp))
               }
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
