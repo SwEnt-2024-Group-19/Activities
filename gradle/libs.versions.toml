@@ -15,6 +15,7 @@ composeActivity = "1.8.2"
 composeViewModel = "2.7.0"
 
 
+mockitoCoreVersion = "5.7.0"
 sonar = "4.4.1.3373"
 gms = "4.4.2"
 hilt = "2.48"
@@ -146,6 +147,7 @@ maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", ve
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-core-v570 = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin" , version.ref="mockitoKotlin"}
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
