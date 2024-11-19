@@ -6,6 +6,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -308,4 +310,52 @@ class OverviewScreenTest {
     // Verify that the like button is toggled
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
   }
+
+    @Test
+    fun searchBarFiltersActivities(){
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+        composeTestRule.setContent {
+            ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+        }
+        val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
+        val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+        val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
+
+        `when`(activitiesRepository.getActivities(any(), any())).then {
+            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity, activity1, activity2, activity3))
+        }
+
+        listActivitiesViewModel.getActivities()
+        composeTestRule.onNodeWithTag("searchBar").performClick()
+        composeTestRule.onNodeWithTag("searchBar").performTextInput("cook")
+        composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+        composeTestRule.onNodeWithText("dance").assertDoesNotExist()
+        composeTestRule.onNodeWithText("football").assertDoesNotExist()
+    }
+
+    @Test
+    fun searchBarClearsFilter(){
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+        composeTestRule.setContent {
+            ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+        }
+        val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
+        val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+        val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
+
+        `when`(activitiesRepository.getActivities(any(), any())).then {
+            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2, activity3))
+        }
+
+        listActivitiesViewModel.getActivities()
+        composeTestRule.onNodeWithTag("searchBar").performClick()
+        composeTestRule.onNodeWithTag("searchBar").performTextInput("cook")
+        composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("searchBar").performTextClearance()
+        composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+        composeTestRule.onNodeWithText("dance").assertIsDisplayed()
+        composeTestRule.onNodeWithText("football").assertIsDisplayed()
+    }
 }
