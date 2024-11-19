@@ -257,13 +257,13 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    testImplementation(libs.mockito.core)
 
-
-    testImplementation(libs.mockito.inline)
+    // Added for consistent Mockito usage across tests
+    testImplementation(libs.mockito.core.v570)
     testImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation("org.mockito:mockito-android:5.7.0")
+
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.kaspresso)
     androidTestImplementation(libs.kaspresso.allure.support)
