@@ -2,10 +2,12 @@ package com.android.sample.ui.listActivities
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ActivitiesRepository
@@ -354,8 +356,12 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("searchBar").performTextInput("cook")
     composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
     composeTestRule.onNodeWithTag("searchBar").performTextClearance()
+    composeTestRule.onNodeWithTag("lazyColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("lazyColumn").performScrollToNode(hasText("cooking"))
     composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("lazyColumn").performScrollToNode(hasText("dance"))
     composeTestRule.onNodeWithText("dance").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("lazyColumn").performScrollToNode(hasText("football"))
     composeTestRule.onNodeWithText("football").assertIsDisplayed()
   }
 }
