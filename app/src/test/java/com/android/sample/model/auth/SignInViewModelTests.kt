@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInViewModel
-import com.android.sample.model.profile.MockProfilesRepository // Replace this with the correct
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.android.sample.resources.dummydata.email
@@ -29,6 +28,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.robolectric.RobolectricTestRunner
 
@@ -55,20 +55,19 @@ class SignInViewModelTest {
 
     // Use the provided MockProfilesRepository
     profilesRepository =
-        MockProfilesRepository().apply {
-          // Add a mock user profile to simulate the existence of the user
-          addProfileToDatabase(
-              userProfile =
-                  User(
-                      id = uid,
-                      name = "Test User",
-                      surname = "Test",
-                      interests = listOf(),
-                      activities = listOf(),
-                      photo = null,
-                      likedActivities = listOf()),
-              onSuccess = {},
-              onFailure = {})
+        mock(ProfilesRepository::class.java).apply {
+          `when`(this.getUser(eq(uid), any(), any())).thenAnswer { invocation ->
+            val onSuccess = invocation.arguments[1] as (User?) -> Unit
+            onSuccess(
+                User(
+                    id = uid,
+                    name = "Test User",
+                    surname = "Test",
+                    interests = listOf(),
+                    activities = listOf(),
+                    photo = null,
+                    likedActivities = listOf()))
+          }
         }
 
     // Initialize the ViewModel with the mocked repositories
