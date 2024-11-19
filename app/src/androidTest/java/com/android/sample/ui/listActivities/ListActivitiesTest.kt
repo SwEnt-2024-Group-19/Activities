@@ -311,51 +311,51 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
   }
 
-    @Test
-    fun searchBarFiltersActivities(){
-        userProfileViewModel = mock(ProfileViewModel::class.java)
-        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-        composeTestRule.setContent {
-            ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
-        }
-        val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-        val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
-        val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
+  @Test
+  fun searchBarFiltersActivities() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+    }
+    val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
+    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+    val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
 
-        `when`(activitiesRepository.getActivities(any(), any())).then {
-            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity, activity1, activity2, activity3))
-        }
-
-        listActivitiesViewModel.getActivities()
-        composeTestRule.onNodeWithTag("searchBar").performClick()
-        composeTestRule.onNodeWithTag("searchBar").performTextInput("cook")
-        composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
-        composeTestRule.onNodeWithText("dance").assertDoesNotExist()
-        composeTestRule.onNodeWithText("football").assertDoesNotExist()
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity, activity1, activity2, activity3))
     }
 
-    @Test
-    fun searchBarClearsFilter(){
-        userProfileViewModel = mock(ProfileViewModel::class.java)
-        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-        composeTestRule.setContent {
-            ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
-        }
-        val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-        val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
-        val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
+    listActivitiesViewModel.getActivities()
+    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.onNodeWithTag("searchBar").performTextInput("cook")
+    composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+    composeTestRule.onNodeWithText("dance").assertDoesNotExist()
+    composeTestRule.onNodeWithText("football").assertDoesNotExist()
+  }
 
-        `when`(activitiesRepository.getActivities(any(), any())).then {
-            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2, activity3))
-        }
-
-        listActivitiesViewModel.getActivities()
-        composeTestRule.onNodeWithTag("searchBar").performClick()
-        composeTestRule.onNodeWithTag("searchBar").performTextInput("cook")
-        composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("searchBar").performTextClearance()
-        composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
-        composeTestRule.onNodeWithText("dance").assertIsDisplayed()
-        composeTestRule.onNodeWithText("football").assertIsDisplayed()
+  @Test
+  fun searchBarClearsFilter() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
     }
+    val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
+    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+    val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2, activity3))
+    }
+
+    listActivitiesViewModel.getActivities()
+    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.onNodeWithTag("searchBar").performTextInput("cook")
+    composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("searchBar").performTextClearance()
+    composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+    composeTestRule.onNodeWithText("dance").assertIsDisplayed()
+    composeTestRule.onNodeWithText("football").assertIsDisplayed()
+  }
 }
