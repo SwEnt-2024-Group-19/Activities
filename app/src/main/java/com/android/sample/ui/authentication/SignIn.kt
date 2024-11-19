@@ -52,15 +52,18 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
   val token = stringResource(R.string.default_web_client_id)
   val isPasswordVisible = remember { mutableStateOf(false) }
-  val onAuthSuccess = { Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show() }
   val emailErrorState = remember { mutableStateOf<String?>(null) }
-  val onAuthError = { errorMessage: String ->
+  val onProfileExists = { navigationActions.navigateTo(Screen.OVERVIEW) }
+
+  val onProfileMissing = { navigationActions.navigateTo(Screen.CREATE_PROFILE) }
+
+  val onSignInFailure = { errorMessage: String ->
     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
   }
 
   // Google Sign-In Launcher
   val googleSignInLauncher =
-      rememberGoogleSignInLauncher(viewModel, navigationActions, onAuthSuccess, onAuthError)
+      rememberGoogleSignInLauncher(viewModel, onProfileExists, onProfileMissing, onSignInFailure)
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
@@ -119,9 +122,9 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                       viewModel.signInWithEmailAndPassword(
                           emailState.value,
                           passwordState.value,
-                          onAuthSuccess,
-                          onAuthError,
-                          navigationActions)
+                          onProfileExists,
+                          onProfileMissing,
+                          onSignInFailure)
                     }
                   }
                   Log.d("SignInScreen", "Sign in with email/password")
@@ -171,9 +174,9 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
 @Composable
 fun rememberGoogleSignInLauncher(
     viewModel: SignInViewModel,
-    navigationActions: NavigationActions,
-    onAuthSuccess: () -> Unit,
-    onAuthError: (String) -> Unit
+    onProfileExists: () -> Unit,
+    onProfileMissing: () -> Unit,
+    onFailure: (String) -> Unit
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
   val scope = rememberCoroutineScope()
   return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -184,12 +187,12 @@ fun rememberGoogleSignInLauncher(
         val account = task.getResult(ApiException::class.java)!!
         val idToken = account.idToken // Extract the actual ID token
         if (idToken != null) {
-          viewModel.handleGoogleSignInResult(idToken, onAuthSuccess, onAuthError, navigationActions)
+          viewModel.handleGoogleSignInResult(idToken, onProfileExists, onProfileMissing, onFailure)
         } else {
-          onAuthError("Google Sign-in failed! Token is null.")
+          onFailure("Google Sign-in failed! Token is null.")
         }
       } catch (e: ApiException) {
-        onAuthError("Google Sign-in failed! ${e.message}")
+        onFailure("Google Sign-in failed! ${e.message}")
       }
     }
   }
