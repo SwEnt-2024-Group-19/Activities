@@ -135,7 +135,7 @@ fun MapScreen(
           FloatingActionButton(
               modifier =
                   Modifier.align(Alignment.BottomStart)
-                      .padding(16.dp)
+                      .padding(MEDIUM_PADDING.dp)
                       .testTag("centerOnCurrentLocation"),
               onClick = {
                 coroutineScope.launch {
@@ -162,7 +162,7 @@ fun MapScreen(
     ModalBottomSheet(
         onDismissRequest = { showBottomSheet = false },
     ) {
-      Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+      Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
             horizontalArrangement = Arrangement.SpaceBetween, // Espace entre les éléments
@@ -186,7 +186,7 @@ fun MapScreen(
 
 @Composable
 fun DisplayActivity(activity: Activity) {
-  Column(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("activityDetails")) {
+  Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("activityDetails")) {
     if (activity.images.isNotEmpty()) {
       AsyncImage(
           model = activity.images.first(),
@@ -203,38 +203,38 @@ fun DisplayActivity(activity: Activity) {
     Text(
         text = activity.title,
         style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.padding(bottom = 8.dp).testTag("activityTitle"),
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityTitle"),
     )
     Text(
         text = activity.description,
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 8.dp).testTag("activityDescription"),
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityDescription"),
     )
     Spacer(modifier = Modifier.height(12.dp))
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 8.dp).testTag("activityDate")) {
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityDate")) {
           Icon(
               imageVector = Icons.Default.CalendarToday,
               contentDescription = "Date",
               tint = MaterialTheme.colorScheme.primary,
               modifier = Modifier.testTag("calendarIcon"))
-          Spacer(modifier = Modifier.width(8.dp))
+          Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
           Text(
               text = "Date: ${activity.date.toDate()}", modifier = Modifier.testTag("calendarText"))
         }
     if (activity.location != null) {
       Row(
           verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.padding(bottom = 8.dp).testTag("activityLocation")) {
+          modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityLocation")) {
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = "Location",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.testTag("locationIcon"))
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
             Text(
                 text = "Location: ${activity.location!!.name}",
                 modifier = Modifier.testTag("locationText"))
