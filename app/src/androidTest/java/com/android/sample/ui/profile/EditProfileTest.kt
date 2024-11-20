@@ -10,6 +10,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -100,6 +101,7 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithText("Indoor Activity").performClick()
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("New Interest")
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
+    composeTestRule.onNodeWithTag("interestsList").performScrollTo()
     composeTestRule.onNodeWithTag("interestsList").assertIsDisplayed()
   }
 
@@ -160,7 +162,9 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 
     // Verify the interest appears in the list
-    composeTestRule.onNodeWithText("Football").assertIsDisplayed()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("interestsList").performScrollTo()
+    composeTestRule.onNodeWithTag("Football").assertIsDisplayed()
   }
 
   @Test
@@ -177,12 +181,14 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 
     // Ensure the interest appears in the list
+    composeTestRule.onNodeWithTag("interestsList").performScrollTo()
     composeTestRule.onNodeWithText("Luge").assertIsDisplayed()
 
     // Now, simulate clicking the remove button for the "Football" interest
     // Note: This assumes that there is a button tagged specifically for removal within the
     // InterestEditBox component
     // You might need to adjust this based on your actual implementation details
+    composeTestRule.onNodeWithTag("Luge").performScrollTo()
     composeTestRule.onNodeWithTag("removeInterest-Luge").performClick()
 
     composeTestRule.waitForIdle()
