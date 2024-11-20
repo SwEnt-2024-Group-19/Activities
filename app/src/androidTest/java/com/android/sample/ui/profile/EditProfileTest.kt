@@ -154,10 +154,12 @@ class EditProfileScreenTest {
     composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
 
     // Select a category
+    composeTestRule.onNodeWithTag("categoryDropdown").performScrollTo()
     composeTestRule.onNodeWithTag("categoryDropdown").performClick()
     composeTestRule.onNodeWithText("Sport").performClick()
 
     // Input a new interest
+    composeTestRule.onNodeWithTag("newInterestInput").performScrollTo()
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Football")
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 
@@ -173,11 +175,14 @@ class EditProfileScreenTest {
 
     // Assume "Sport" is a valid category and "Football" is a valid interest
     // First, open the category dropdown and select a category
+    composeTestRule.onNodeWithTag("categoryDropdown").performScrollTo()
     composeTestRule.onNodeWithTag("categoryDropdown").performClick()
     composeTestRule.onNodeWithText("Sport").performClick()
 
     // Input an interest and add it
+    composeTestRule.onNodeWithTag("newInterestInput").performScrollTo()
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Luge")
+    composeTestRule.onNodeWithTag("addInterestButton").performScrollTo()
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 
     // Ensure the interest appears in the list
