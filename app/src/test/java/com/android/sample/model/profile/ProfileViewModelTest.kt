@@ -132,6 +132,13 @@ class ProfileViewModelTest {
   }
 
   @Test
+  fun removeJoinedActivity() {
+    // Set up user with the activity in activities
+    profileViewModel.removeJoinedActivity(testUser.id, activity.uid)
+    verify(profilesRepository).removeJoinedActivity(eq(testUser.id), eq(activity.uid), any(), any())
+  }
+
+  @Test
   fun fetchUserDataFailureLogsError() {
     val exception = Exception("Error fetching user data")
     `when`(profilesRepository.getUser(eq(testUser.id), any(), any())).thenAnswer {

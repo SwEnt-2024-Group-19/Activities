@@ -215,3 +215,46 @@ val userWithActivities =
 const val email = "test@example.com"
 const val idToken = "testGoogleIdToken"
 val uid = "testUid"
+
+val documentId = "testDocumentId"
+val validData =
+    mapOf(
+        "title" to "Sample Title",
+        "description" to "Sample Description",
+        "date" to Timestamp.now(),
+        "startTime" to "10:00",
+        "duration" to "2 hours",
+        "price" to 15.0,
+        "location" to mapOf("latitude" to 12.34, "longitude" to 56.78, "name" to "Sample Location"),
+        "creator" to "creatorUserId",
+        "images" to listOf("image1.jpg", "image2.jpg"),
+        "placesLeft" to 5L,
+        "maxPlaces" to 20L,
+        "status" to "ACTIVE",
+        "type" to "SOLO",
+        "participants" to
+            listOf(
+                mapOf(
+                    "name" to "John",
+                    "surname" to "Doe",
+                    "id" to "user123",
+                    "interests" to listOf("hiking", "reading"),
+                    "activities" to listOf("activity1", "activity2"),
+                    "photo" to "profile.jpg",
+                    "likedActivities" to listOf("liked1", "liked2"))),
+        "comments" to
+            listOf(
+                mapOf(
+                    "uid" to "comment1",
+                    "userId" to "user123",
+                    "userName" to "John Doe",
+                    "content" to "Nice activity!",
+                    "timestamp" to Timestamp.now(),
+                    "replies" to
+                        listOf(
+                            mapOf(
+                                "uid" to "reply1",
+                                "userId" to "user456",
+                                "userName" to "Jane Smith",
+                                "content" to "I agree!",
+                                "timestamp" to Timestamp.now())))))

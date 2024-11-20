@@ -1,8 +1,10 @@
 package com.android.sample.ui.endtoend
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.rule.GrantPermissionRule
@@ -58,20 +60,20 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun aGuestTriesToLookAtAnActivity() {
+  fun guestCanSeeCorrectOverviewAndNavigateToActivityDetails() {
     // Opens the app as a guest
     composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
     composeTestRule.waitForIdle()
-
-    // Checks that is not connected in profile
-    composeTestRule.onNodeWithTag("Profile").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
 
     // Goes back to the main screen and tries to filter activities
     composeTestRule.onNodeWithTag("Overview").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Activity 1").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
+
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
     composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
     composeTestRule.waitForIdle()
@@ -84,9 +86,29 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("activityCard").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("image").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("title").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("titleText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("descriptionText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("price").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("location").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("scheduleText").assertIsDisplayed()
+
     composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
     composeTestRule.onNodeWithTag("goBackButton").assertExists()
     composeTestRule.onNodeWithTag("goBackButton").performClick()
+    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
+  }
+
+  @Test
+  fun guestShouldSignUpForOtherFunctionalities() {
+    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
+    composeTestRule.waitForIdle()
 
     composeTestRule.onNodeWithTag("Liked").performClick()
     composeTestRule.waitForIdle()
@@ -102,6 +124,22 @@ class ActivityFlowTest {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("Profile").performClick()
     composeTestRule.waitForIdle()
+
+    // Tries to create a new activity and is prompted to sign in
+    composeTestRule.onNodeWithTag("Add Activity").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("inputTitleCreate").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputPlacesCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
+    composeTestRule.onNodeWithTag("chooseTypeMenu").assertExists()
+    composeTestRule.onNodeWithTag("addAttendeeButton").assertExists()
+    composeTestRule.onNodeWithTag("inputTimeCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputDurationCreate").assertExists()
+    composeTestRule.onNodeWithTag("createButton").assertExists()
+
     composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()

@@ -216,7 +216,8 @@ fun CreateActivityScreen(
                 value = startTime,
                 onValueChange = { startTime = it },
                 label = { Text("Time") },
-                modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputStartTime"),
+                modifier =
+                    Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputTimeCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
                 singleLine = true,
             )
@@ -226,7 +227,10 @@ fun CreateActivityScreen(
                 value = duration,
                 onValueChange = { duration = it },
                 label = { Text("Duration") },
-                modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputDurationCreate"),
+                modifier =
+                    Modifier.padding(STANDARD_PADDING.dp)
+                        .fillMaxWidth()
+                        .testTag("inputDurationCreate"),
                 placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
                 singleLine = true,
             )
@@ -431,7 +435,13 @@ fun CreateActivityScreen(
                   val parts = dueDate.split("/")
 
                   val activityId = listActivityViewModel.getNewUid()
-                  if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
+                  if (creator == "") {
+                    Toast.makeText(
+                            context,
+                            "You must be logged in to create an activity.",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
                     attendees += profileViewModel.userState.value!!
                     try {
                       calendar.set(

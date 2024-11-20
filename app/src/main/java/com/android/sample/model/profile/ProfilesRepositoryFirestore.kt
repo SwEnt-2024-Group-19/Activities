@@ -28,7 +28,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     }
   }
 
-  private fun documentToUser(document: DocumentSnapshot): User? {
+  fun documentToUser(document: DocumentSnapshot): User? {
     return try {
       User(
           id = document.id,
@@ -99,6 +99,27 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     db.collection("profiles")
         .document(userId)
         .update("likedActivities", FieldValue.arrayRemove(activityId))
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            task.exception?.let { e ->
+              Log.e("ProfilesRepository", "Error adding activity to profile", e)
+              onFailure(e)
+            }
+          }
+        }
+  }
+
+  override fun removeJoinedActivity(
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection("profiles")
+        .document(userId)
+        .update("activities", FieldValue.arrayRemove(activityId))
         .addOnCompleteListener { task ->
           if (task.isSuccessful) {
             onSuccess()

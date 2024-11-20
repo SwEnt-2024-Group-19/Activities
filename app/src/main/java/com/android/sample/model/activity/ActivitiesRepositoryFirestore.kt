@@ -37,82 +37,83 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
                 .map { document ->
                   Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
-                  val images = data["images"] as? List<String> ?: listOf()
-                  val participants =
-                      (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
-                        User(
-                            name = participantData["name"] as? String ?: "No Name",
-                            surname = participantData["surname"] as? String ?: "No Surname",
-                            id = participantData["id"] as? String ?: "No ID",
-                            interests = (participantData["interests"] as? List<String>) ?: listOf(),
-                            activities =
-                                (participantData["activities"] as? List<String>) ?: listOf(),
-                            photo = participantData["photo"] as? String,
-                            likedActivities =
-                                (participantData["likedActivities"] as? List<String>) ?: listOf())
-                      } ?: listOf()
-                  val activityType =
-                      data["type"]?.let {
-                        try {
-                          ActivityType.valueOf(it as String)
-                        } catch (e: IllegalArgumentException) {
-                          ActivityType.SOLO // Replace with your default ActivityType
-                        }
-                      } ?: ActivityType.SOLO
-                  val comments =
-                      (data["comments"] as? List<Map<String, Any>>)?.map { commentData ->
-                        Comment(
-                            uid = commentData["uid"] as? String ?: "No UID",
-                            userId = commentData["userId"] as? String ?: "No User ID",
-                            userName = commentData["userName"] as? String ?: "No User Name",
-                            content = commentData["content"] as? String ?: "No Content",
-                            timestamp = commentData["timestamp"] as? Timestamp ?: Timestamp.now(),
-                            replies =
-                                (commentData["replies"] as? List<Map<String, Any>>)?.map { replyData
-                                  ->
-                                  Comment(
-                                      uid = replyData["uid"] as? String ?: "No UID",
-                                      userId = replyData["userId"] as? String ?: "No User ID",
-                                      userName = replyData["userName"] as? String ?: "No User Name",
-                                      content = replyData["content"] as? String ?: "No Content",
-                                      timestamp =
-                                          replyData["timestamp"] as? Timestamp ?: Timestamp.now(),
-                                  )
-                                } ?: emptyList())
-                      } ?: emptyList()
-
-                  val locationData = data["location"] as? Map<String, Any>
-                  val location =
-                      locationData?.let {
-                        Location(
-                            latitude = it["latitude"] as? Double ?: 0.0,
-                            longitude = it["longitude"] as? Double ?: 0.0,
-                            name = it["name"] as? String ?: "No Location")
-                      } ?: Location(0.0, 0.0, "No Location")
-
-                  Activity(
-                      uid = document.id,
-                      title = data["title"] as? String ?: "No Title",
-                      description = data["description"] as? String ?: "No Description",
-                      date = data["date"] as? Timestamp ?: Timestamp.now(),
-                      startTime = data["startTime"] as? String ?: "HH:mm",
-                      duration = data["duration"] as? String ?: "HH:mm",
-                      price = data["price"] as? Double ?: 0.0,
-                      location = location, // Default value
-                      creator = data["creator"] as? String ?: "Anonymous",
-                      images = images,
-                      placesLeft = data["placesLeft"] as? Long ?: 0,
-                      maxPlaces = data["maxPlaces"] as? Long ?: 0,
-                      status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
-                      type = activityType,
-                      participants = participants,
-                      comments = comments)
+                  documentToActivity(data, document.id)
                 }
                 .filterNotNull() // Filter out any null results
 
         onSuccess(activities)
       } else onFailure(e ?: Exception("Error getting documents"))
     }
+  }
+
+  fun documentToActivity(data: Map<String, Any>, documentId: String): Activity? {
+
+    val images = data["images"] as? List<String> ?: listOf()
+    val participants =
+        (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
+          User(
+              name = participantData["name"] as? String ?: "No Name",
+              surname = participantData["surname"] as? String ?: "No Surname",
+              id = participantData["id"] as? String ?: "No ID",
+              interests = (participantData["interests"] as? List<String>) ?: listOf(),
+              activities = (participantData["activities"] as? List<String>) ?: listOf(),
+              photo = participantData["photo"] as? String,
+              likedActivities = (participantData["likedActivities"] as? List<String>) ?: listOf())
+        } ?: listOf()
+    val activityType =
+        data["type"]?.let {
+          try {
+            ActivityType.valueOf(it as String)
+          } catch (e: IllegalArgumentException) {
+            ActivityType.SOLO // Replace with your default ActivityType
+          }
+        } ?: ActivityType.SOLO
+    val comments =
+        (data["comments"] as? List<Map<String, Any>>)?.map { commentData ->
+          Comment(
+              uid = commentData["uid"] as? String ?: "No UID",
+              userId = commentData["userId"] as? String ?: "No User ID",
+              userName = commentData["userName"] as? String ?: "No User Name",
+              content = commentData["content"] as? String ?: "No Content",
+              timestamp = commentData["timestamp"] as? Timestamp ?: Timestamp.now(),
+              replies =
+                  (commentData["replies"] as? List<Map<String, Any>>)?.map { replyData ->
+                    Comment(
+                        uid = replyData["uid"] as? String ?: "No UID",
+                        userId = replyData["userId"] as? String ?: "No User ID",
+                        userName = replyData["userName"] as? String ?: "No User Name",
+                        content = replyData["content"] as? String ?: "No Content",
+                        timestamp = replyData["timestamp"] as? Timestamp ?: Timestamp.now(),
+                    )
+                  } ?: emptyList())
+        } ?: emptyList()
+
+    val locationData = data["location"] as? Map<String, Any>
+    val location =
+        locationData?.let {
+          Location(
+              latitude = it["latitude"] as? Double ?: 0.0,
+              longitude = it["longitude"] as? Double ?: 0.0,
+              name = it["name"] as? String ?: "No Location")
+        } ?: Location(0.0, 0.0, "No Location")
+
+    return Activity(
+        uid = documentId,
+        title = data["title"] as? String ?: "No Title",
+        description = data["description"] as? String ?: "No Description",
+        date = data["date"] as? Timestamp ?: Timestamp.now(),
+        startTime = data["startTime"] as? String ?: "HH:mm",
+        duration = data["duration"] as? String ?: "HH:mm",
+        price = data["price"] as? Double ?: 0.0,
+        location = location, // Default value
+        creator = data["creator"] as? String ?: "Anonymous",
+        images = images,
+        placesLeft = data["placesLeft"] as? Long ?: 0,
+        maxPlaces = data["maxPlaces"] as? Long ?: 0,
+        status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
+        type = activityType,
+        participants = participants,
+        comments = comments)
   }
 
   override fun addActivity(
