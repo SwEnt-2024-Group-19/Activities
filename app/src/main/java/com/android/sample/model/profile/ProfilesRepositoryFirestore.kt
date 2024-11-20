@@ -35,7 +35,18 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           name = document.getString("name") ?: return null,
           surname = document.getString("surname") ?: return null,
           interests =
-              (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null,
+              (document.get("interests") as? List<*>)?.mapNotNull { interestData ->
+                // Ensure interestData is a map and extract category and interest
+                (interestData as? Map<*, *>)?.let {
+                  val category = it["category"] as? String
+                  val interest = it["interest"] as? String
+                  if (category != null && interest != null) {
+                    Interest(category, interest)
+                  } else {
+                    null
+                  }
+                }
+              },
           activities =
               (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null,
           photo = document.getString("photo") ?: return null,
