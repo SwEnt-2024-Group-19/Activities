@@ -206,7 +206,7 @@ fun ProfileContent(
                     contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
                       user.interests?.let { interests ->
                         items(interests.size) { index ->
-                          InterestBox(interest = user.interests[index])
+                          InterestBox(interest = user.interests[index].interest)
                         }
                       }
                     }
