@@ -161,14 +161,14 @@ fun MapScreen(
         onDismissRequest = { showBottomSheet = false },
     ) {
       Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        // Ligne pour la croix en haut à droite
+
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween, // Espace entre les éléments
             verticalAlignment = Alignment.CenterVertically) {
               SeeMoreDetailsButton(navigationActions)
 
-              // Icône de fermeture (croix) à droite
+
               IconButton(onClick = { showBottomSheet = false }) {
                 Icon(
                     imageVector = Icons.Default.Close,
