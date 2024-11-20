@@ -5,6 +5,7 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.map.Location
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.User
 import com.google.firebase.Timestamp
 import java.util.Calendar
@@ -15,6 +16,9 @@ val timestamp = Timestamp.now()
 val location = Location(46.519962, 6.633597, "EPFL")
 val location2 = Location(46.5, 6.6, "Lausanne")
 val locationList = listOf(location, location2)
+val interest1 = Interest("Sport", "Cycling")
+val interest2 = Interest("Indoor Activity", "Reading")
+val interest3 = listOf(interest1, interest2)
 val activity =
     Activity(
         "1",
@@ -78,7 +82,7 @@ val activityWithParticipants =
                     id = "1",
                     name = "Amine",
                     surname = "A",
-                    interests = listOf("Cycling"),
+                    interests = listOf(interest1),
                     activities = listOf(),
                     photo = "",
                     likedActivities = listOf("1")),
@@ -86,7 +90,7 @@ val activityWithParticipants =
                     id = "2",
                     name = "John",
                     surname = "Doe",
-                    interests = listOf("Reading"),
+                    interests = listOf(interest2),
                     activities = listOf(),
                     photo = "",
                     likedActivities = listOf("1"))),
@@ -135,7 +139,7 @@ val activityBiking =
                     id = "1",
                     name = "Amine",
                     surname = "A",
-                    interests = listOf("Cycling"),
+                    interests = listOf(interest1),
                     activities = listOf(),
                     photo = "",
                     likedActivities = listOf("1")),
@@ -143,7 +147,7 @@ val activityBiking =
                     id = "2",
                     name = "John",
                     surname = "Doe",
-                    interests = listOf("Reading"),
+                    interests = listOf(interest2),
                     activities = listOf(),
                     photo = "",
                     likedActivities = listOf("1"))),
@@ -198,7 +202,7 @@ val testUser =
         name = "Amine",
         surname = "A",
         photo = "",
-        interests = listOf("Cycling", "Reading"),
+        interests = interest3,
         activities = listOf(),
         likedActivities = listOf(activityBiking.uid))
 
@@ -208,7 +212,7 @@ val userWithActivities =
         name = "Amine",
         surname = "A",
         photo = "",
-        interests = listOf("Cycling", "Reading"),
+        interests = interest3,
         activities = listOf(),
         likedActivities = listOf(activityBiking.uid))
 
@@ -238,7 +242,10 @@ val validData =
                     "name" to "John",
                     "surname" to "Doe",
                     "id" to "user123",
-                    "interests" to listOf("hiking", "reading"),
+                    "interests" to
+                        listOf(
+                            mapOf("category" to "Indoor Activity", "interest" to "reading"),
+                            mapOf("category" to "Outdoor Activity", "interest" to "hiking")),
                     "activities" to listOf("activity1", "activity2"),
                     "photo" to "profile.jpg",
                     "likedActivities" to listOf("liked1", "liked2"))),
