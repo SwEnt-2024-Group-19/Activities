@@ -180,7 +180,7 @@ fun MapScreen(
           DisplayActivity(activity = selectedActivity!!)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
       }
     }
   }
