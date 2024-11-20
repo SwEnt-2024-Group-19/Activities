@@ -34,6 +34,8 @@ import coil.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -162,8 +164,8 @@ fun MapScreen(
     ) {
       Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+            horizontalArrangement = Arrangement.SpaceBetween, // Espace entre les éléments
             verticalAlignment = Alignment.CenterVertically) {
               SeeMoreDetailsButton(navigationActions)
 
@@ -176,7 +178,7 @@ fun MapScreen(
             }
         selectedActivity?.let { DisplayActivity(activity = it) }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
       }
     }
   }
