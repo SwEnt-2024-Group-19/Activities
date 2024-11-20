@@ -163,7 +163,7 @@ fun MapScreen(
       Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         // Ligne pour la croix en haut à droite
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
             horizontalArrangement = Arrangement.SpaceBetween, // Espace entre les éléments
             verticalAlignment = Alignment.CenterVertically) {
               SeeMoreDetailsButton(navigationActions)
