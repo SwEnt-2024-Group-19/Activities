@@ -176,9 +176,7 @@ fun MapScreen(
                     tint = MaterialTheme.colorScheme.onSurface)
               }
             }
-        if (selectedActivity != null) {
-          DisplayActivity(activity = selectedActivity!!)
-        }
+          selectedActivity?.let { DisplayActivity(activity = it) }
 
         Spacer(modifier = Modifier.height(16.dp))
       }
