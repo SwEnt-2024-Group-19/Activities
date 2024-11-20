@@ -66,6 +66,7 @@ import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
 
 @Composable
@@ -258,6 +259,21 @@ fun ProfileContent(
                       navigationActions)
                 }
               }
+              item {
+                Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+                Text(
+                    text = "Past activities",
+                    fontSize = TITLE_FONTSIZE.sp,
+                    modifier =
+                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
+                            .testTag("pastActivitiesTitle"))
+              }
+              user.activities?.let { activities ->
+                items(activities.size) { index ->
+                  ActivityPastBox(
+                      activity = activities[index], listActivitiesViewModel, navigationActions)
+                }
+              }
             }
       }
 }
@@ -274,7 +290,7 @@ fun ActivityCreatedBox(
   val thisActivity = activitiesList.find { it.uid == activity }
 
   if (thisActivity != null) {
-    if (thisActivity.creator == user.id) {
+    if (thisActivity.creator == user.id && thisActivity.date > Timestamp.now()) {
       Row(
           modifier =
               Modifier.fillMaxWidth()
@@ -319,7 +335,7 @@ fun ActivityEnrolledBox(
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val thisActivity = activitiesList.find { it.uid == activity }
 
-  if (thisActivity != null) {
+  if (thisActivity != null && thisActivity.date > Timestamp.now()) {
     if (thisActivity.creator != user.id) {
       Row(
           modifier =
@@ -330,6 +346,51 @@ fun ActivityEnrolledBox(
                   .clickable {
                     listActivitiesViewModel.selectActivity(thisActivity)
                     navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+                  },
+          verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = R.drawable.foot),
+                contentDescription = "Activity Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+              Text(
+                  text = thisActivity.title,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color.Black)
+              Text(
+                  text = thisActivity.description,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  color = Color.Gray)
+            }
+          }
+    }
+  }
+}
+
+@Composable
+fun ActivityPastBox(
+    activity: String,
+    listActivitiesViewModel: ListActivitiesViewModel,
+    navigationActions: NavigationActions
+) {
+  val uiState by listActivitiesViewModel.uiState.collectAsState()
+  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+  val thisActivity = activitiesList.find { it.uid == activity }
+
+  if (thisActivity != null) {
+    if (thisActivity.date < Timestamp.now()) {
+      Row(
+          modifier =
+              Modifier.fillMaxWidth()
+                  .testTag("activityPast")
+                  .padding(STANDARD_PADDING.dp)
+                  .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+                  .clickable {
+                    listActivitiesViewModel.selectActivity(thisActivity)
+                    navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
                   },
           verticalAlignment = Alignment.CenterVertically) {
             Image(
