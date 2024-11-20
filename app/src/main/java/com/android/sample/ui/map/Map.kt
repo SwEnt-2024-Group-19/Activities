@@ -34,8 +34,10 @@ import coil.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -165,7 +167,7 @@ fun MapScreen(
       Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-            horizontalArrangement = Arrangement.SpaceBetween, // Espace entre les éléments
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
               SeeMoreDetailsButton(navigationActions)
 
@@ -193,11 +195,11 @@ fun DisplayActivity(activity: Activity) {
           contentDescription = "Activity image",
           modifier =
               Modifier.fillMaxWidth()
-                  .height(200.dp)
-                  .clip(RoundedCornerShape(12.dp))
+                  .height(LARGE_IMAGE_SIZE.dp)
+                  .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
                   .testTag("activityImage"),
           contentScale = ContentScale.Crop)
-      Spacer(modifier = Modifier.height(12.dp))
+      Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
     }
 
     Text(
@@ -211,7 +213,7 @@ fun DisplayActivity(activity: Activity) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityDescription"),
     )
-    Spacer(modifier = Modifier.height(12.dp))
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -240,7 +242,7 @@ fun DisplayActivity(activity: Activity) {
                 modifier = Modifier.testTag("locationText"))
           }
     }
-    Spacer(modifier = Modifier.height(12.dp))
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -254,7 +256,7 @@ fun DisplayActivity(activity: Activity) {
               style = MaterialTheme.typography.bodyMedium,
               modifier = Modifier.testTag("placesLeft"))
         }
-    Spacer(modifier = Modifier.height(12.dp))
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
   }
 }
 
