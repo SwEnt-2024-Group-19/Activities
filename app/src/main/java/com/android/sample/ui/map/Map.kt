@@ -161,13 +161,11 @@ fun MapScreen(
         onDismissRequest = { showBottomSheet = false },
     ) {
       Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
               SeeMoreDetailsButton(navigationActions)
-
 
               IconButton(onClick = { showBottomSheet = false }) {
                 Icon(
@@ -176,7 +174,7 @@ fun MapScreen(
                     tint = MaterialTheme.colorScheme.onSurface)
               }
             }
-          selectedActivity?.let { DisplayActivity(activity = it) }
+        selectedActivity?.let { DisplayActivity(activity = it) }
 
         Spacer(modifier = Modifier.height(16.dp))
       }
@@ -187,7 +185,6 @@ fun MapScreen(
 @Composable
 fun DisplayActivity(activity: Activity) {
   Column(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("activityDetails")) {
-   
     if (activity.images.isNotEmpty()) {
       AsyncImage(
           model = activity.images.first(),
@@ -200,7 +197,6 @@ fun DisplayActivity(activity: Activity) {
           contentScale = ContentScale.Crop)
       Spacer(modifier = Modifier.height(12.dp))
     }
-
 
     Text(
         text = activity.title,
