@@ -164,7 +164,7 @@ fun MapScreen(
 
         Row(
             modifier = Modifier.fillMaxWidth().padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween, // Espace entre les éléments
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
               SeeMoreDetailsButton(navigationActions)
 
@@ -187,7 +187,7 @@ fun MapScreen(
 @Composable
 fun DisplayActivity(activity: Activity) {
   Column(modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("activityDetails")) {
-    // Image en haut
+   
     if (activity.images.isNotEmpty()) {
       AsyncImage(
           model = activity.images.first(),
@@ -201,7 +201,7 @@ fun DisplayActivity(activity: Activity) {
       Spacer(modifier = Modifier.height(12.dp))
     }
 
-    // Titre et description
+
     Text(
         text = activity.title,
         style = MaterialTheme.typography.bodyLarge,
