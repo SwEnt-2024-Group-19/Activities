@@ -87,7 +87,7 @@ fun ListActivitiesScreen(
     locationViewModel: LocationViewModel,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
   var selectedIndex by remember { mutableIntStateOf(0) }
   val all = "ALL"
@@ -96,25 +96,25 @@ fun ListActivitiesScreen(
   val profile = profileViewModel.userState.collectAsState().value
   var searchText by remember { mutableStateOf("") }
 
-    val locationPermissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission(),
-            onResult = { isGranted ->
-                if (isGranted) {
-                    locationViewModel.fetchCurrentLocation()
-                } else {
-                    Log.d("OverviewScreen", "Location permission denied by the user.")
-                }
-            })
+  val locationPermissionLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.RequestPermission(),
+          onResult = { isGranted ->
+            if (isGranted) {
+              locationViewModel.fetchCurrentLocation()
+            } else {
+              Log.d("OverviewScreen", "Location permission denied by the user.")
+            }
+          })
 
-    LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-            PackageManager.PERMISSION_GRANTED) {
-            locationViewModel.fetchCurrentLocation()
-        } else {
-            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
+  LaunchedEffect(Unit) {
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+        PackageManager.PERMISSION_GRANTED) {
+      locationViewModel.fetchCurrentLocation()
+    } else {
+      locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
+  }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -199,8 +199,7 @@ fun ListActivitiesScreen(
                                 viewModel,
                                 profileViewModel,
                                 profile,
-                                locationViewModel.getDistanceFromCurrentLocation(activity.location)
-                            )
+                                locationViewModel.getDistanceFromCurrentLocation(activity.location))
                           }
                         }
                       }
@@ -331,22 +330,24 @@ fun ActivityCard(
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-
-            if (distance != null) {
-                val distanceString = "Distance : " + if (distance < 1) {
-                    "${round(distance * 1000)}m"
-                } else {
-                    "${round(distance * 10) / 10}km"
-                }
-                Text(
-                    text = distanceString,
-                    modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp) // Takes up remaining space
+          if (distance != null) {
+            val distanceString =
+                "Distance : " +
+                    if (distance < 1) {
+                      "${round(distance * 1000)}m"
+                    } else {
+                      "${round(distance * 10) / 10}km"
+                    }
+            Text(
+                text = distanceString,
+                modifier =
+                    Modifier.padding(horizontal = MEDIUM_PADDING.dp) // Takes up remaining space
                 )
-            }
+          }
 
-            Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-            // Display the activity description
+          // Display the activity description
           Text(
               text = activity.description,
               style =

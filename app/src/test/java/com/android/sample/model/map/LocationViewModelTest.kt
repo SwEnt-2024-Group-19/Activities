@@ -122,8 +122,9 @@ class LocationViewModelTest {
     assertEquals(null, viewModel.currentLocation.first())
   }
 
-    @Test
-    fun `getDistanceFromCurrentLocation should return null when current location is null`() = runTest {
+  @Test
+  fun `getDistanceFromCurrentLocation should return null when current location is null`() =
+      runTest {
         // Given
         viewModel.setCurrentLocation(null)
         val activityLocation = Location(1.0, 2.0, "Test Location")
@@ -133,10 +134,11 @@ class LocationViewModelTest {
 
         // Then
         assertEquals(null, distance)
-    }
+      }
 
-    @Test
-    fun `getDistanceFromCurrentLocation should return distance between current location and activity location`() = runTest {
+  @Test
+  fun `getDistanceFromCurrentLocation should return distance between current location and activity location`() =
+      runTest {
         // Given
         val currentLocation = Location(46.518831258, 6.559331096, "EPFL")
         viewModel.setCurrentLocation(currentLocation)
@@ -146,7 +148,7 @@ class LocationViewModelTest {
         // Then
         assertNotNull(distance)
         if (distance != null) {
-            assertEquals(2.34f, distance, 0.05f)
+          assertEquals(2.34f, distance, 0.05f)
         }
-    }
+      }
 }
