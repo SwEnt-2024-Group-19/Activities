@@ -63,7 +63,6 @@ fun ProfileScreen(
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoadingScreen(navigationActions: NavigationActions) {
   Scaffold(
@@ -225,8 +224,6 @@ fun ProfileHeader(user: User) {
       modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
 }
 
-
-
 @Composable
 fun ActivityBox(
     activityId: String,
@@ -245,7 +242,7 @@ fun ActivityBox(
           activity = activity,
           onClickAction = {
             listActivitiesViewModel.selectActivity(activity)
-            navigateToActivity(category, activity, navigationActions)
+            navigateToActivity(category, navigationActions)
           },
           testTag = "activity${category.capitalize()}")
     }
@@ -261,7 +258,7 @@ fun shouldShowActivity(activity: Activity, user: User, category: String): Boolea
   }
 }
 
-fun navigateToActivity(category: String, activity: Activity, navigationActions: NavigationActions) {
+fun navigateToActivity(category: String, navigationActions: NavigationActions) {
   when (category) {
     "created",
     "past" -> navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
@@ -294,16 +291,16 @@ fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) 
           Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
         }
       }
-
 }
+
 @Composable
 fun InterestBox(interest: String) {
-    Box(
-        modifier =
-        Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
-            .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-            .testTag("$interest"),
-        contentAlignment = Alignment.Center) {
+  Box(
+      modifier =
+          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+              .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
+              .testTag("$interest"),
+      contentAlignment = Alignment.Center) {
         Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
-    }
+      }
 }
