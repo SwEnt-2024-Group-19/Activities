@@ -151,7 +151,7 @@ val activityBiking =
         startTime = "10:00")
 
 val testUserId = "testUser123"
-val listOfActivitiesUid = listOf("3", "2","28")
+val listOfActivitiesUid = listOf("3", "2", "28")
 
 val activity1 =
     Activity(
@@ -204,23 +204,23 @@ val pastActivity =
         placesLeft = 8,
         maxPlaces = 15,
         participants =
-        listOf(
-            User(
-                id = "2",
-                name = "John",
-                surname = "Doe",
-                interests = listOf("Reading"),
-                activities = listOf(),
-                photo = "",
-                likedActivities = listOf("1")),
-            User(
-                id = "Rola",
-                name = "Amine",
-                surname = "A",
-                photo = "",
-                interests = listOf("Cycling", "Reading"),
-                activities = listOf("pastActivityUID", "1", "123"),
-            )),
+            listOf(
+                User(
+                    id = "2",
+                    name = "John",
+                    surname = "Doe",
+                    interests = listOf("Reading"),
+                    activities = listOf(),
+                    photo = "",
+                    likedActivities = listOf("1")),
+                User(
+                    id = "Rola",
+                    name = "Amine",
+                    surname = "A",
+                    photo = "",
+                    interests = listOf("Cycling", "Reading"),
+                    activities = listOf("pastActivityUID", "1", "123"),
+                )),
         duration = "2 hours",
         startTime = "10:00")
 
