@@ -151,7 +151,7 @@ val activityBiking =
         startTime = "10:00")
 
 val testUserId = "testUser123"
-val listOfActivitiesUid = listOf("3", "2")
+val listOfActivitiesUid = listOf("3", "2","28")
 
 val activity1 =
     Activity(
@@ -189,8 +189,43 @@ val activity2 =
         duration = "2 hours",
         startTime = "10:00",
     )
+val pastActivity =
+    Activity(
+        uid = "28",
+        title = "Watch World Cup 2022",
+        description = "Exciting mountain biking experience.",
+        date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time),
+        location = Location(46.519962, 6.633597, "EPFL"),
+        creator = "Chris",
+        images = listOf(),
+        price = 10.0,
+        status = ActivityStatus.ACTIVE,
+        type = ActivityType.PRO,
+        placesLeft = 8,
+        maxPlaces = 15,
+        participants =
+        listOf(
+            User(
+                id = "2",
+                name = "John",
+                surname = "Doe",
+                interests = listOf("Reading"),
+                activities = listOf(),
+                photo = "",
+                likedActivities = listOf("1")),
+            User(
+                id = "Rola",
+                name = "Amine",
+                surname = "A",
+                photo = "",
+                interests = listOf("Cycling", "Reading"),
+                activities = listOf("pastActivityUID", "1", "123"),
+            )),
+        duration = "2 hours",
+        startTime = "10:00")
 
 val activityList = listOf(activity1, activity2)
+val activityListWithPastActivity = listOf(activity1, activity2, pastActivity)
 
 val testUser =
     User(
