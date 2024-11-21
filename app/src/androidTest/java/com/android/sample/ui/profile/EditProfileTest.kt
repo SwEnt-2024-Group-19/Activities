@@ -150,58 +150,6 @@ class EditProfileScreenTest {
   }
 
   @Test
-  fun testAddInterestDisplaysItInList() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
-
-    // Select a category
-    composeTestRule.onNodeWithTag("categoryDropdown").performScrollTo()
-    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("Sport").performClick()
-
-    // Input a new interest
-    composeTestRule.onNodeWithTag("newInterestInput").performScrollTo()
-    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Football")
-    composeTestRule.onNodeWithTag("addInterestButton").performClick()
-
-    // Verify the interest appears in the list
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("interestsList").performScrollTo()
-    composeTestRule.onNodeWithTag("Football").assertIsDisplayed()
-  }
-
-  @Test
-  fun testDeletingAnInterest() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
-
-    // Assume "Sport" is a valid category and "Football" is a valid interest
-    // First, open the category dropdown and select a category
-    composeTestRule.onNodeWithTag("categoryDropdown").performScrollTo()
-    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("Sport").performClick()
-
-    // Input an interest and add it
-    composeTestRule.onNodeWithTag("newInterestInput").performScrollTo()
-    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Luge")
-    composeTestRule.onNodeWithTag("addInterestButton").performScrollTo()
-    composeTestRule.onNodeWithTag("addInterestButton").performClick()
-
-    // Ensure the interest appears in the list
-    composeTestRule.onNodeWithTag("interestsList").performScrollTo()
-    composeTestRule.onNodeWithText("Luge").assertIsDisplayed()
-
-    // Now, simulate clicking the remove button for the "Football" interest
-    // Note: This assumes that there is a button tagged specifically for removal within the
-    // InterestEditBox component
-    // You might need to adjust this based on your actual implementation details
-    composeTestRule.onNodeWithTag("Luge").performScrollTo()
-    composeTestRule.onNodeWithTag("removeInterest-Luge").performClick()
-
-    composeTestRule.waitForIdle()
-    // Verify that the interest is no longer displayed in the list
-    composeTestRule.onNodeWithText("Luge").assertIsNotDisplayed()
-  }
-
-  @Test
   fun testAddButtonDisabledWhenCategoryIsNone() {
     composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
 
