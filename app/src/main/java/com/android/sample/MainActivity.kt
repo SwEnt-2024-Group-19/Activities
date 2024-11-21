@@ -114,7 +114,7 @@ fun NavGraph(
         route = Route.OVERVIEW,
     ) {
       composable(Screen.OVERVIEW) {
-        ListActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
+        ListActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
       }
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel)

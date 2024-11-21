@@ -1,6 +1,11 @@
 package com.android.sample.ui.listActivities
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +35,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,16 +47,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -66,6 +75,7 @@ import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
@@ -74,8 +84,10 @@ fun ListActivitiesScreen(
     viewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
+    locationViewModel: LocationViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
   var selectedIndex by remember { mutableIntStateOf(0) }
   val all = "ALL"
@@ -83,6 +95,26 @@ fun ListActivitiesScreen(
   val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
   var searchText by remember { mutableStateOf("") }
+
+    val locationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    locationViewModel.fetchCurrentLocation()
+                } else {
+                    Log.d("OverviewScreen", "Location permission denied by the user.")
+                }
+            })
+
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED) {
+            locationViewModel.fetchCurrentLocation()
+        } else {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -166,7 +198,9 @@ fun ListActivitiesScreen(
                                 navigationActions,
                                 viewModel,
                                 profileViewModel,
-                                profile)
+                                profile,
+                                locationViewModel.getDistanceFromCurrentLocation(activity.location)
+                            )
                           }
                         }
                       }
@@ -190,7 +224,8 @@ fun ActivityCard(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
     profileViewModel: ProfileViewModel,
-    profile: User?
+    profile: User?,
+    distance: Float? = null
 ) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
@@ -296,7 +331,22 @@ fun ActivityCard(
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-          // Display the activity description
+
+            if (distance != null) {
+                val distanceString = "Distance : " + if (distance < 1) {
+                    "${round(distance * 1000)}m"
+                } else {
+                    "${round(distance * 10) / 10}km"
+                }
+                Text(
+                    text = distanceString,
+                    modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp) // Takes up remaining space
+                )
+            }
+
+            Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+
+            // Display the activity description
           Text(
               text = activity.description,
               style =
