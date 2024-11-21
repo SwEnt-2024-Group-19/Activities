@@ -73,6 +73,14 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = {})
   }
 
+  fun removeJoinedActivity(userId: String, activityId: String) {
+    repository.removeJoinedActivity(
+        userId = userId,
+        activityId = activityId,
+        onSuccess = { fetchUserData(userId) },
+        onFailure = {})
+  }
+
   fun updateProfile(user: User) {
     repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
   }

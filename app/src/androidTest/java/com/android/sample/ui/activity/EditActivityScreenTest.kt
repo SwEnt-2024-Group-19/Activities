@@ -109,7 +109,7 @@ class EditActivityScreenTest {
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").assertTextContains("5/9/2024")
+    composeTestRule.onNodeWithTag("inputDateEdit").assertTextContains("1/1/2050")
   }
 
   @Test
@@ -161,7 +161,7 @@ class EditActivityScreenTest {
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").performTextInput("5/10/2024")
+    composeTestRule.onNodeWithTag("inputDateEdit").performTextInput("1/1/2050")
   }
 
   @Test

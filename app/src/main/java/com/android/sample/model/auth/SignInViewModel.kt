@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.ProfilesRepositoryFirestore
-import com.android.sample.ui.navigation.NavigationActions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -19,24 +19,24 @@ open class SignInViewModel
 @Inject
 constructor(
     private val signInRepository: SignInRepository,
+    private val profilesRepository: ProfilesRepository
 ) : ViewModel() {
 
   // Handles Email/Password Sign-in
   fun signInWithEmailAndPassword(
       email: String,
       password: String,
-      onAuthSuccess: () -> Unit,
-      onAuthError: (String) -> Unit,
-      navigationActions: NavigationActions
+      onProfileExists: () -> Unit,
+      onProfileMissing: () -> Unit,
+      onFailure: (String) -> Unit
   ) {
-    Log.d("SignInViewModel", "signInWithEmailAndPassword")
     viewModelScope.launch {
       try {
         val authResult = signInRepository.signInWithEmail(email, password)
-        signInRepository.checkUserProfile(
-            authResult.user?.uid, navigationActions, onAuthSuccess, onAuthError)
+        checkUserProfile(authResult.user?.uid, onProfileExists, onProfileMissing, onFailure)
       } catch (e: Exception) {
-        onAuthError("Email login failed: ${e.message}")
+        Log.e("SignInViewModel", "Error signing in with email", e)
+        onFailure(e.message ?: "Unknown error")
       }
     }
   }
@@ -44,28 +44,50 @@ constructor(
   // Handles Google Sign-in (called from the Composable)
   fun handleGoogleSignInResult(
       idToken: String?,
-      onAuthSuccess: () -> Unit,
-      onAuthError: (String) -> Unit,
-      navigationActions: NavigationActions
+      onProfileExists: () -> Unit,
+      onProfileMissing: () -> Unit,
+      onFailure: (String) -> Unit
   ) {
     if (idToken == null) {
-      onAuthError("Google Sign-in failed! Token is null.")
+      onFailure("Google Sign-in failed! Token is null.")
       return
     }
     viewModelScope.launch {
       try {
         val authResult = signInRepository.signInWithGoogle(idToken)
-
-        signInRepository.checkUserProfile(
-            authResult.user?.uid, navigationActions, onAuthSuccess, onAuthError)
+        checkUserProfile(authResult.user?.uid, onProfileExists, onProfileMissing, onFailure)
       } catch (e: Exception) {
-        onAuthError("Google Sign-in failed: ${e.message}")
+        Log.e("SignInViewModel", "Error signing in with Google", e)
+        onFailure(e.message ?: "Unknown error")
       }
     }
   }
 
   fun signOut() {
     signInRepository.signOut()
+  }
+
+  private fun checkUserProfile(
+      uid: String?,
+      onProfileExists: () -> Unit,
+      onProfileMissing: () -> Unit,
+      onFailure: (String) -> Unit
+  ) {
+    uid?.let {
+      profilesRepository.getUser(
+          it,
+          { user ->
+            if (user != null) {
+              onProfileExists()
+            } else {
+              onProfileMissing()
+            }
+          },
+          {
+            Log.e("SignInViewModel", "Error checking user profile", it)
+            onFailure("Error checking user profile")
+          })
+    } ?: onFailure("UID is null")
   }
 
   companion object {
@@ -81,7 +103,7 @@ constructor(
             val profilesRepository = ProfilesRepositoryFirestore(firestore)
             // Pass both to SignInRepositoryFirebase
             val signInRepository = SignInRepositoryFirebase(firebaseAuth, profilesRepository)
-            return SignInViewModel(signInRepository) as T
+            return SignInViewModel(signInRepository, profilesRepository) as T
           }
         }
   }

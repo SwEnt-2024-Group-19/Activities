@@ -97,10 +97,10 @@ fun ActivityDetailsScreen(
             calendar.time = activity.date.toDate()
           }
           return@let "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
-                    calendar.get(
-                        Calendar.YEAR
-                    )
-                }"
+                calendar.get(
+                    Calendar.YEAR
+                )
+            }"
         })
   }
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
@@ -315,17 +315,26 @@ fun ActivityDetailsScreen(
 
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
+
                 if (activity.creator != profile.id) {
                   Button(
                       onClick = {
-                        if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                          if (isUserEnrolled) {
-                            Toast.makeText(
-                                    context,
-                                    "You are already enrolled in this activity",
-                                    Toast.LENGTH_SHORT)
-                                .show()
-                          } else {
+                        if (isUserEnrolled) {
+                          // Logic to leave the activity once enrolled
+                          val updatedActivity =
+                              activity.copy(
+                                  placesLeft = min((placesTaken ?: 0) - 1, maxPlaces ?: 0),
+                                  participants =
+                                      activity.participants.filter { it.id != profile.id })
+                          listActivityViewModel.updateActivity(updatedActivity)
+                          profileViewModel.removeJoinedActivity(profile.id, activity.uid)
+                          Toast.makeText(
+                                  context, "Successfully left the activity", Toast.LENGTH_SHORT)
+                              .show()
+                          navigationActions.navigateTo(Screen.PROFILE)
+                        } else {
+                          // Logic to enroll in the activity
+                          if ((placesTaken ?: 0) < (maxPlaces ?: 0)) {
                             val theActivity =
                                 activity.copy(
                                     placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
@@ -338,26 +347,29 @@ fun ActivityDetailsScreen(
                                                 photo = profile.photo,
                                                 interests = profile.interests,
                                                 activities = profile.activities))
+
                             listActivityViewModel.updateActivity(theActivity)
                             profileViewModel.addActivity(profile.id, theActivity.uid)
                             Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
                             navigationActions.navigateTo(Screen.OVERVIEW)
+                          } else {
+                            Toast.makeText(
+                                    context,
+                                    "Enroll failed, limit of places reached",
+                                    Toast.LENGTH_SHORT)
+                                .show()
                           }
-                        } else {
-                          Toast.makeText(
-                                  context,
-                                  "Enroll failed, limit of places reached",
-                                  Toast.LENGTH_SHORT)
-                              .show()
+                          navigationActions.navigateTo(Screen.OVERVIEW)
                         }
                       },
                       modifier =
                           Modifier.fillMaxWidth()
                               .padding(horizontal = LARGE_PADDING.dp)
                               .testTag("enrollButton")) {
-                        Text(text = "Enroll")
+                        if (isUserEnrolled) Text(text = "Leave") else Text(text = "Enroll")
                       }
                 } else {
+                  // Creator of the activity
                   Button(
                       onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
                       modifier =
@@ -382,6 +394,7 @@ fun ActivityDetailsScreen(
                       Text(text = "Login/Register")
                     }
               }
+
               CommentSection(
                   profileId = profile?.id ?: "anonymous",
                   comments = comments,
@@ -486,7 +499,7 @@ fun CommentItem(
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
     if (profileId != "anonymous") {
-      Column() {
+      Column {
         if (comment.userId == profileId) {
           Button(
               onClick = { onDeleteComment(comment) },

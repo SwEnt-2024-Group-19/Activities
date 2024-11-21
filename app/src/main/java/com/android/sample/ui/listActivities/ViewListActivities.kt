@@ -16,12 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,13 +58,16 @@ import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.ui.components.SearchBar
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun ListActivitiesScreen(
@@ -80,92 +82,102 @@ fun ListActivitiesScreen(
   val typesToString = types.map { it.name }
   val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
-    var showFilterDialog by remember { mutableStateOf(false) }
+  var searchText by remember { mutableStateOf("") }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
-      topBar = {
-        Box(
-            modifier =
-                Modifier.height(BUTTON_HEIGHT.dp)
-                    .testTag("segmentedButtonRow")) { // Set the desired height here
-              SingleChoiceSegmentedButtonRow {
-                options.forEachIndexed { index, label ->
-                  SegmentedButton(
-                      modifier = Modifier.testTag("segmentedButton$label"),
-                      shape =
-                          SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                      onClick = { selectedIndex = index },
-                      selected = index == selectedIndex) {
-                        Text(label)
-                      }
-                }
-              }
-            }
-      },
+      topBar = { SearchBar(onValueChange = { searchText = it }, value = searchText) },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
-      },
-      floatingActionButton = {
-          FloatingActionButton(onClick = { showFilterDialog = true }) {
-              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
-          }
       }) { paddingValues ->
-        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
-          when (uiState) {
-            is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-              var activitiesList =
-                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              if (selectedIndex != 0) {
-
-                activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
-              }
-              if (activitiesList.isEmpty()) {
-                if (selectedIndex == 0) {
-                  Text(
-                      text = "There is no activity yet.",
-                      modifier =
-                          Modifier.padding(STANDARD_PADDING.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
-                      color = MaterialTheme.colorScheme.onSurface)
-                } else {
-                  Text(
-                      text = "There is no activity of this type yet.",
-                      modifier =
-                          Modifier.padding(STANDARD_PADDING.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyActivityPrompt"),
-                      color = MaterialTheme.colorScheme.onSurface)
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+          Box(
+              modifier =
+                  Modifier.height(BUTTON_HEIGHT.dp)
+                      .testTag("segmentedButtonRow")
+                      .fillMaxWidth()
+                      .padding(horizontal = STANDARD_PADDING.dp)) { // Set the desired height here
+                SingleChoiceSegmentedButtonRow {
+                  options.forEachIndexed { index, label ->
+                    SegmentedButton(
+                        modifier = Modifier.testTag("segmentedButton$label"),
+                        shape =
+                            SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                        onClick = { selectedIndex = index },
+                        selected = index == selectedIndex) {
+                          Text(label)
+                        }
+                  }
                 }
-              } else {
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = STANDARD_PADDING.dp),
-                    verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
-                      // Use LazyColumn to efficiently display the list of activities
-
-                      items(activitiesList) { activity ->
-                        if (activity.participants.size < activity.maxPlaces) {
-                          ActivityCard(
-                              activity = activity,
-                              navigationActions,
-                              viewModel,
-                              profileViewModel,
-                              profile)
+              }
+          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+          Box(modifier = modifier.fillMaxWidth()) {
+            when (uiState) {
+              is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+                var activitiesList =
+                    (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+                if (selectedIndex != 0) {
+                  activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
+                }
+                activitiesList = activitiesList.filter { it.date >= Timestamp.now() }
+                if (activitiesList.isEmpty()) {
+                  if (selectedIndex == 0) {
+                    Text(
+                        text = "There is no activity yet.",
+                        modifier =
+                            Modifier.padding(STANDARD_PADDING.dp)
+                                .align(Alignment.Center)
+                                .testTag("emptyActivityPrompt"),
+                        color = MaterialTheme.colorScheme.onSurface)
+                  } else {
+                    Text(
+                        text = "There is no activity of this type yet.",
+                        modifier =
+                            Modifier.padding(STANDARD_PADDING.dp)
+                                .align(Alignment.Center)
+                                .testTag("emptyActivityPrompt"),
+                        color = MaterialTheme.colorScheme.onSurface)
+                  }
+                } else {
+                  var filteredActivities =
+                      activitiesList.filter {
+                        if (searchText.isEmpty() || searchText.isBlank()) true
+                        else {
+                          it.title.contains(searchText, ignoreCase = true) ||
+                              it.description.contains(searchText, ignoreCase = true) ||
+                              it.location?.name?.contains(searchText, ignoreCase = true) ?: false
                         }
                       }
-                    }
+                  LazyColumn(
+                      modifier =
+                          Modifier.fillMaxSize()
+                              .padding(horizontal = STANDARD_PADDING.dp)
+                              .testTag("lazyColumn"),
+                      verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
+                        // Use LazyColumn to efficiently display the list of activities
+
+                        items(filteredActivities) { activity ->
+                          if (activity.participants.size < activity.maxPlaces) {
+                            ActivityCard(
+                                activity = activity,
+                                navigationActions,
+                                viewModel,
+                                profileViewModel,
+                                profile)
+                          }
+                        }
+                      }
+                }
               }
-            }
-            is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-              val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-              Text(
-                  text = "Error: ${error.message}",
-                  modifier = Modifier.padding(STANDARD_PADDING.dp))
+              is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+                val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+                Text(
+                    text = "Error: ${error.message}",
+                    modifier = Modifier.padding(STANDARD_PADDING.dp))
+              }
             }
           }
         }

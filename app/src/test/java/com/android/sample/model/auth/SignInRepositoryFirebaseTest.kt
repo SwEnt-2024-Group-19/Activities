@@ -2,13 +2,10 @@ package com.android.sample.model.auth
 
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.profile.ProfilesRepositoryFirestore
-import com.android.sample.model.profile.User
 import com.android.sample.resources.dummydata.email
 import com.android.sample.resources.dummydata.idToken
 import com.android.sample.resources.dummydata.password
-import com.android.sample.resources.dummydata.uid
 import com.android.sample.ui.navigation.NavigationActions
-import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.AuthCredential
@@ -17,14 +14,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.eq
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
@@ -121,69 +114,5 @@ class SignInRepositoryFirebaseTest {
 
     // When
     signInRepository.signInWithGoogle(idToken) // Should throw the exception
-  }
-
-  @Test
-  fun `checkUserProfile should call onAuthError if user ID is null`() {
-    // Given
-    val onAuthError = mock<(String) -> Unit>()
-
-    // When
-    signInRepository.checkUserProfile(null, navigationActions, {}, onAuthError)
-
-    // Then
-    verify(onAuthError).invoke("User ID is null, cannot proceed!")
-  }
-
-  @Test
-  fun `checkUserProfile should navigate to create profile if user profile is not found`() =
-      runTest {
-        // Mock getUser to return null (no profile found)
-        `when`(profilesRepository.getUser(anyOrNull(), anyOrNull(), anyOrNull())).thenAnswer {
-          println("Simulating getUser callback with null profile")
-          val onSuccess = it.arguments[1] as (Any?) -> Unit
-          onSuccess(null) // Simulate no profile found
-        }
-
-        `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
-        // When
-        signInRepository.checkUserProfile(uid, navigationActions, {}, {})
-
-        advanceUntilIdle()
-        // Then
-        verify(navigationActions).navigateTo(Screen.CREATE_PROFILE)
-      }
-
-  @Test
-  fun `checkUserProfile should navigate to overview if user profile is found`() = runTest {
-    val mockUserProfile = mock(User::class.java)
-
-    // Mock getUser to return a user profile
-    `when`(profilesRepository.getUser(eq(uid), anyOrNull(), anyOrNull())).thenAnswer { invocation ->
-      val onSuccess = invocation.arguments[1] as (Any?) -> Unit
-      onSuccess(mockUserProfile) // Simulate profile found
-    }
-    `when`(navigationActions.currentRoute()).thenReturn(Screen.AUTH)
-
-    // When
-    signInRepository.checkUserProfile(uid, navigationActions, {}, {})
-
-    // Then
-    verify(navigationActions).navigateTo(Screen.OVERVIEW)
-  }
-
-  @Test
-  fun `checkUserProfile should call onAuthError if getUser fails`() = runTest {
-    // Mock getUser to throw an exception
-    `when`(profilesRepository.getUser(eq(uid), anyOrNull(), anyOrNull())).thenAnswer { invocation ->
-      val onFailure = invocation.arguments[2] as (Exception) -> Unit
-      onFailure(Exception("getUser failed")) // Simulate failure
-    }
-
-    // When
-    signInRepository.checkUserProfile(uid, navigationActions, {}, {})
-
-    // Then
-    verify(navigationActions, never()).navigateTo(Screen.CREATE_PROFILE)
   }
 }
