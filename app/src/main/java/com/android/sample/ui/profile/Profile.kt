@@ -4,18 +4,9 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,22 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -65,9 +43,9 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun ProfileScreen(
@@ -75,7 +53,6 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
-
   val profileState = userProfileViewModel.userState.collectAsState()
   when (val profile = profileState.value) {
     null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
@@ -83,7 +60,6 @@ fun ProfileScreen(
       ProfileContent(
           user = profile, navigationActions, listActivitiesViewModel, userProfileViewModel)
     }
-  // Proceed with showing profile content
   }
 }
 
@@ -122,7 +98,7 @@ fun ProfileContent(
     listActivitiesViewModel: ListActivitiesViewModel,
     userProfileViewModel: ProfileViewModel
 ) {
-  var showMenu by remember { mutableStateOf(false) } // To control the visibility of the menu
+  var showMenu by remember { mutableStateOf(false) }
   Log.d("ProfileScreen", "User photo: ${user.photo}")
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
@@ -150,7 +126,6 @@ fun ProfileContent(
                     Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
                   }
 
-              // DropdownMenu for options
               DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(
                     text = { Text("Logout") },
@@ -159,7 +134,6 @@ fun ProfileContent(
                       userProfileViewModel.clearUserData()
                       Firebase.auth.signOut()
                       navigationActions.navigateTo(Screen.AUTH)
-                      // Handle logout action
                     },
                     enabled = Firebase.auth.currentUser?.isAnonymous == false)
               }
@@ -173,256 +147,163 @@ fun ProfileContent(
         LazyColumn(
             Modifier.fillMaxSize().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              item {
-                Spacer(Modifier.height(MEDIUM_PADDING.dp))
-                Text(
-                    text = "Profile",
-                    fontSize = TOP_TITLE_SIZE.sp,
-                    modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
+              item { ProfileHeader(user) }
 
-                // Profile Picture
-                ProfileImage(
-                    userId = user.id,
-                    modifier =
-                        Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+              item { SectionTitle(title = "Interests", testTag = "interestsSection") }
 
-                // User Name and Surname
-                Text(
-                    text = "${user.name} ${user.surname}",
-                    fontSize = TITLE_FONTSIZE.sp,
-                    modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
-              }
-              item {
-                // Interests Section
-                Text(
-                    text = "Interests",
-                    fontSize = TITLE_FONTSIZE.sp,
-                    modifier =
-                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
-                            .testTag("interestsSection"))
-              }
               item {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
                     contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-                      user.interests?.let { interests ->
-                        items(interests.size) { index ->
-                          InterestBox(interest = user.interests[index])
-                        }
+                      user.interests?.forEach { interest ->
+                        item { InterestBox(interest = interest) }
                       }
                     }
               }
 
-              item {
-
-                // Activities Section
-
-                Text(
-                    text = "Activities Created",
-                    fontSize = TITLE_FONTSIZE.sp,
-                    modifier =
-                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
-                            .testTag("activitiesCreatedTitle"))
-              }
-
-              // Activities Created
-
-              user.activities?.let { activities ->
-                items(activities.size) { index ->
-                  ActivityCreatedBox(
-                      activity = activities[index],
-                      user,
-                      listActivitiesViewModel,
-                      navigationActions)
-                }
-              }
-
-              item { // Activities Enrolled in
-                Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-
-                Text(
-                    text = "Activities Enrolled in",
-                    fontSize = TITLE_FONTSIZE.sp,
-                    modifier =
-                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
-                            .testTag("activitiesEnrolledTitle"))
-              }
-
-              // Activities Enrolled
-
-              user.activities?.let { activities ->
-                items(activities.size) { index ->
-                  ActivityEnrolledBox(
-                      activity = activities[index],
-                      user,
-                      listActivitiesViewModel,
-                      navigationActions)
-                }
-              }
-              item {
-                Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-                Text(
-                    text = "Past activities",
-                    fontSize = TITLE_FONTSIZE.sp,
-                    modifier =
-                        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
-                            .testTag("pastActivitiesTitle"))
-              }
-              user.activities?.let { activities ->
-                items(activities.size) { index ->
-                  ActivityPastBox(
-                      activity = activities[index], listActivitiesViewModel, navigationActions)
-                }
-              }
+              // Display activities sections
+              displayActivitySection(
+                  "Activities Created", "created", user, listActivitiesViewModel, navigationActions)
+              displayActivitySection(
+                  "Activities Enrolled in",
+                  "enrolled",
+                  user,
+                  listActivitiesViewModel,
+                  navigationActions)
+              displayActivitySection(
+                  "Past Activities", "past", user, listActivitiesViewModel, navigationActions)
             }
       }
 }
 
-@Composable
-fun ActivityCreatedBox(
-    activity: String,
+fun LazyListScope.displayActivitySection(
+    sectionTitle: String,
+    category: String,
     user: User,
     listActivitiesViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions
 ) {
-  val uiState by listActivitiesViewModel.uiState.collectAsState()
-  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-  val thisActivity = activitiesList.find { it.uid == activity }
+  item {
+    Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+    SectionTitle(title = sectionTitle, testTag = "${category}ActivitiesTitle")
+  }
 
-  if (thisActivity != null) {
-    if (thisActivity.creator == user.id && thisActivity.date > Timestamp.now()) {
-      Row(
-          modifier =
-              Modifier.fillMaxWidth()
-                  .testTag("activityCreated")
-                  .padding(STANDARD_PADDING.dp)
-                  .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-                  .clickable {
-                    listActivitiesViewModel.selectActivity(thisActivity)
-                    navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
-                  },
-          verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.foot),
-                contentDescription = "Activity Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-              Text(
-                  text = thisActivity.title,
-                  fontSize = SUBTITLE_FONTSIZE.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color.Black)
-              Text(
-                  text = thisActivity.description,
-                  fontSize = SUBTITLE_FONTSIZE.sp,
-                  color = Color.Gray)
-            }
-          }
+  user.activities?.let { activities ->
+    items(activities.size) { index ->
+      ActivityBox(
+          activityId = activities[index],
+          user = user,
+          listActivitiesViewModel = listActivitiesViewModel,
+          navigationActions = navigationActions,
+          category = category)
     }
   }
 }
 
 @Composable
-fun ActivityEnrolledBox(
-    activity: String,
+fun SectionTitle(title: String, testTag: String) {
+  Text(
+      text = title,
+      fontSize = TITLE_FONTSIZE.sp,
+      modifier =
+          Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp).testTag(testTag))
+}
+
+@Composable
+fun ProfileHeader(user: User) {
+  Spacer(Modifier.height(MEDIUM_PADDING.dp))
+  Text(
+      text = "Profile",
+      fontSize = TOP_TITLE_SIZE.sp,
+      modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
+  ProfileImage(
+      userId = user.id,
+      modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+  Text(
+      text = "${user.name} ${user.surname}",
+      fontSize = TITLE_FONTSIZE.sp,
+      modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
+}
+
+
+
+@Composable
+fun ActivityBox(
+    activityId: String,
     user: User,
     listActivitiesViewModel: ListActivitiesViewModel,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    category: String
 ) {
   val uiState by listActivitiesViewModel.uiState.collectAsState()
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-  val thisActivity = activitiesList.find { it.uid == activity }
+  val thisActivity = activitiesList.find { it.uid == activityId }
 
-  if (thisActivity != null && thisActivity.date > Timestamp.now()) {
-    if (thisActivity.creator != user.id) {
-      Row(
-          modifier =
-              Modifier.fillMaxWidth()
-                  .testTag("activityEnrolled")
-                  .padding(STANDARD_PADDING.dp)
-                  .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-                  .clickable {
-                    listActivitiesViewModel.selectActivity(thisActivity)
-                    navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-                  },
-          verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.foot),
-                contentDescription = "Activity Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-              Text(
-                  text = thisActivity.title,
-                  fontSize = SUBTITLE_FONTSIZE.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color.Black)
-              Text(
-                  text = thisActivity.description,
-                  fontSize = SUBTITLE_FONTSIZE.sp,
-                  color = Color.Gray)
-            }
-          }
+  thisActivity?.let { activity ->
+    if (shouldShowActivity(activity, user, category)) {
+      ActivityRow(
+          activity = activity,
+          onClickAction = {
+            listActivitiesViewModel.selectActivity(activity)
+            navigateToActivity(category, activity, navigationActions)
+          },
+          testTag = "activity${category.capitalize()}")
     }
+  }
+}
+
+fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
+  return when (category) {
+    "created" -> activity.creator == user.id && activity.date > Timestamp.now()
+    "enrolled" -> activity.creator != user.id && activity.date > Timestamp.now()
+    "past" -> activity.date < Timestamp.now()
+    else -> false
+  }
+}
+
+fun navigateToActivity(category: String, activity: Activity, navigationActions: NavigationActions) {
+  when (category) {
+    "created",
+    "past" -> navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
+    "enrolled" -> navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
   }
 }
 
 @Composable
-fun ActivityPastBox(
-    activity: String,
-    listActivitiesViewModel: ListActivitiesViewModel,
-    navigationActions: NavigationActions
-) {
-  val uiState by listActivitiesViewModel.uiState.collectAsState()
-  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-  val thisActivity = activitiesList.find { it.uid == activity }
+fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) {
+  Row(
+      modifier =
+          Modifier.fillMaxWidth()
+              .testTag(testTag)
+              .padding(STANDARD_PADDING.dp)
+              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+              .clickable { onClickAction() },
+      verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            painter = painterResource(id = R.drawable.foot),
+            contentDescription = "Activity Image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
-  if (thisActivity != null) {
-    if (thisActivity.date < Timestamp.now()) {
-      Row(
-          modifier =
-              Modifier.fillMaxWidth()
-                  .testTag("activityPast")
-                  .padding(STANDARD_PADDING.dp)
-                  .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-                  .clickable {
-                    listActivitiesViewModel.selectActivity(thisActivity)
-                    navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
-                  },
-          verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.foot),
-                contentDescription = "Activity Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
+        Column(modifier = Modifier.weight(1f)) {
+          Text(
+              text = activity.title,
+              fontSize = SUBTITLE_FONTSIZE.sp,
+              fontWeight = FontWeight.Bold,
+              color = Color.Black)
+          Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
+        }
+      }
 
-            Column(modifier = Modifier.weight(1f)) {
-              Text(
-                  text = thisActivity.title,
-                  fontSize = SUBTITLE_FONTSIZE.sp,
-                  fontWeight = FontWeight.Bold,
-                  color = Color.Black)
-              Text(
-                  text = thisActivity.description,
-                  fontSize = SUBTITLE_FONTSIZE.sp,
-                  color = Color.Gray)
-            }
-          }
-    }
-  }
 }
-
 @Composable
 fun InterestBox(interest: String) {
-  Box(
-      modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
-              .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-              .testTag("$interest"),
-      contentAlignment = Alignment.Center) {
+    Box(
+        modifier =
+        Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+            .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
+            .testTag("$interest"),
+        contentAlignment = Alignment.Center) {
         Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
-      }
+    }
 }
