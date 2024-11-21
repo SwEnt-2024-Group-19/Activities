@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -122,7 +123,7 @@ class LocationViewModelTest {
   }
 
     @Test
-    fun `getDistanceFromCurrentLocation should return 0 when current location is null`() = runTest {
+    fun `getDistanceFromCurrentLocation should return null when current location is null`() = runTest {
         // Given
         viewModel.setCurrentLocation(null)
         val activityLocation = Location(1.0, 2.0, "Test Location")
@@ -131,7 +132,7 @@ class LocationViewModelTest {
         val distance = viewModel.getDistanceFromCurrentLocation(activityLocation)
 
         // Then
-        assertEquals(0f, distance)
+        assertEquals(null, distance)
     }
 
     @Test
@@ -143,6 +144,9 @@ class LocationViewModelTest {
         // When
         val distance = viewModel.getDistanceFromCurrentLocation(activityLocation)
         // Then
-        assertEquals(2.34f, distance, 0.05f)
+        assertNotNull(distance)
+        if (distance != null) {
+            assertEquals(2.34f, distance, 0.05f)
+        }
     }
 }

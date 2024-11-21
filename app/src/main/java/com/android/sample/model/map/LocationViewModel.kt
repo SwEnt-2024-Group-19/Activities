@@ -66,8 +66,9 @@ constructor(
      * @param activityLocation The location of the activity.
      * @return The distance in kilometers.
      */
-    fun getDistanceFromCurrentLocation(activityLocation: Location): Float {
-        val currentLocation = _currentLocation.value ?: return 0f
+    fun getDistanceFromCurrentLocation(activityLocation: Location?): Float? {
+        if (activityLocation == null) return null
+        val currentLocation = _currentLocation.value ?: return null
         return calculateDistance(
             currentLocation.latitude,
             currentLocation.longitude,
