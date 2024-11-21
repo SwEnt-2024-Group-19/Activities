@@ -144,7 +144,7 @@ fun ProfileContent(
         }
       }) { innerPadding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(innerPadding),
+            Modifier.fillMaxSize().padding(innerPadding).testTag("profileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
               item { ProfileHeader(user) }
 

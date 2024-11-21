@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
@@ -132,7 +133,10 @@ class ProfileScreenTest {
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel)
     }
-
+    composeTestRule
+        .onNodeWithTag("profileContentColumn")
+        .assertIsDisplayed()
+        .performScrollToNode(hasTestTag("pastActivitiesTitle"))
     composeTestRule.onNodeWithTag("pastActivitiesTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("pastActivitiesTitle").assertTextEquals("Past Activities")
     composeTestRule.onNodeWithText("Watch World Cup 2022").assertIsDisplayed()
@@ -152,7 +156,10 @@ class ProfileScreenTest {
 
     // Get all nodes with the "activityPast" test tag
     val activityNodes = composeTestRule.onAllNodes(hasTestTag("activityPast"))
-
+    composeTestRule
+        .onNodeWithTag("profileContentColumn")
+        .assertIsDisplayed()
+        .performScrollToNode(hasTestTag("pastActivitiesTitle"))
     // Perform a click on the first past activity node
     activityNodes.onFirst().performClick()
 
