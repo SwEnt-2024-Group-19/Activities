@@ -63,6 +63,7 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -121,6 +122,7 @@ fun ListActivitiesScreen(
                 if (selectedIndex != 0) {
                   activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
                 }
+                activitiesList = activitiesList.filter { it.date >= Timestamp.now() }
                 if (activitiesList.isEmpty()) {
                   if (selectedIndex == 0) {
                     Text(

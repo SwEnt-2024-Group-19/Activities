@@ -23,6 +23,8 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import java.util.Calendar
+import java.util.GregorianCalendar
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +47,7 @@ class OverviewScreenTest {
           uid = "1",
           title = "Mountain Biking",
           description = "Exciting mountain biking experience.",
-          date = Timestamp.now(),
+          date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
           location = Location(46.519962, 6.633597, "EPFL"),
           creator = "Chris",
           images = listOf(),
