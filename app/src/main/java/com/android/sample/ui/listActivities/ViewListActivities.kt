@@ -16,10 +16,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -78,6 +80,7 @@ fun ListActivitiesScreen(
   val typesToString = types.map { it.name }
   val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
+    var showFilterDialog by remember { mutableStateOf(false) }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -105,6 +108,11 @@ fun ListActivitiesScreen(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
+      },
+      floatingActionButton = {
+          FloatingActionButton(onClick = { showFilterDialog = true }) {
+              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
+          }
       }) { paddingValues ->
         Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
           when (uiState) {
