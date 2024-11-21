@@ -174,7 +174,7 @@ fun ProfileContent(
             }
       }
 }
-
+/** Display the activity section based on the category */
 fun LazyListScope.displayActivitySection(
     sectionTitle: String,
     category: String,
@@ -207,7 +207,7 @@ fun SectionTitle(title: String, testTag: String) {
       modifier =
           Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp).testTag(testTag))
 }
-
+/** Display the user's profile picture and name */
 @Composable
 fun ProfileHeader(user: User) {
   Spacer(Modifier.height(MEDIUM_PADDING.dp))
@@ -223,7 +223,7 @@ fun ProfileHeader(user: User) {
       fontSize = TITLE_FONTSIZE.sp,
       modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
 }
-
+/** Display a single activity in a box, the same box is used for all categories */
 @Composable
 fun ActivityBox(
     activityId: String,
@@ -249,6 +249,7 @@ fun ActivityBox(
   }
 }
 
+/** Check if the activity should be displayed based on the category and the user's role in the */
 fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
   return when (category) {
     "created" -> activity.creator == user.id && activity.date > Timestamp.now()
@@ -257,15 +258,15 @@ fun shouldShowActivity(activity: Activity, user: User, category: String): Boolea
     else -> false
   }
 }
-
+/** Navigate to the appropriate screen based on the category */
 fun navigateToActivity(category: String, navigationActions: NavigationActions) {
   when (category) {
-    "created",
+    "created" -> navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
     "past" -> navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
     "enrolled" -> navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
   }
 }
-
+/** Display a single activity in a row */
 @Composable
 fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) {
   Row(
@@ -292,7 +293,7 @@ fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) 
         }
       }
 }
-
+/** Display a single interest in a box */
 @Composable
 fun InterestBox(interest: String) {
   Box(
