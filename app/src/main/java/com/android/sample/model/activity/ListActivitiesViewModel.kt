@@ -98,6 +98,20 @@ constructor(
     // user.interests.size.coerceAtLeast(1) TODO in Sprint 7
     return 0.0
   }
+
+  open fun calculateParticipationScore(userActivities: List<String>?, creator: String): Double {
+    var participationScore = 0.0
+    if (userActivities.isNullOrEmpty() || creator.isEmpty()) return participationScore
+    profilesRepository.getUser(
+        creator,
+        { creatorLambda ->
+          val matchingActivities =
+              creatorLambda?.activities?.count { userActivities.contains(it) } ?: 0
+          participationScore = (matchingActivities.toDouble() / 10).coerceAtMost(1.0)
+        },
+        { participationScore = 0.0 })
+    return participationScore
+  }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
