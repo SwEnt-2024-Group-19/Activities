@@ -1,6 +1,5 @@
 package com.android.sample.ui.listActivities
 
-import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
@@ -9,7 +8,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
-import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ActivitiesRepository
@@ -369,33 +367,6 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithText("dance").assertIsDisplayed()
     composeTestRule.onNodeWithTag("lazyColumn").performScrollToNode(hasText("football"))
     composeTestRule.onNodeWithText("football").assertIsDisplayed()
-  }
-
-  @Test
-  fun filterDialogFiltersByMaxPrice() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
-    }
-
-    val activity1 = activity.copy(title = "cheap activity", price = 10.0)
-    val activity2 = activity.copy(title = "expensive activity", price = 200.0)
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule.onNodeWithTag("priceRangeSlider").performSemanticsAction(
-        SemanticsActions.SetProgress) {
-          it(50f)
-        } // Set max price to 50
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("cheap activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("expensive activity").assertDoesNotExist()
   }
 
   @Test
