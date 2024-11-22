@@ -2,6 +2,9 @@ package com.android.sample.model.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.sample.model.map.Location
+import com.android.sample.model.profile.ProfilesRepository
+import com.android.sample.model.profile.User
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.concurrent.TimeUnit
@@ -15,6 +18,7 @@ import kotlinx.coroutines.launch
 open class ListActivitiesViewModel
 @Inject
 constructor(
+    private val profilesRepository: ProfilesRepository,
     private val repository: ActivitiesRepository,
 ) : ViewModel() {
 
@@ -62,6 +66,15 @@ constructor(
       onFailure(exception)
     }
     repository.getActivities(onS, onF)
+  }
+
+  fun sortActivitiesByScore(user: User, distanceTo: (Location?) -> Float?) {
+    val activities =
+        (_uiState.value as? ActivitiesUiState.Success)?.activities?.sortedByDescending {
+          calculateActivityScore(it, user, distanceTo)
+        }
+
+    if (activities != null) _uiState.value = ActivitiesUiState.Success(activities)
   }
 
   open fun getWeights(): Map<String, Double> {
