@@ -245,7 +245,7 @@ fun ActivityDetailsScreen(
                                 } else {
                                   "${round(distance * 10) / 10}km"
                                 }
-                        Text(text = distanceString)
+                        Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
                       }
                     }
                   }

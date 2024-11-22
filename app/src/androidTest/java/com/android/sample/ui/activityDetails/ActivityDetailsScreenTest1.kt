@@ -33,7 +33,6 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,7 +79,6 @@ class ActivityDetailsScreenAndroidTest {
         LocationViewModel(mockLocationRepository, mock(PermissionChecker::class.java))
   }
 
-  @After
   fun tearDown() {
     reset(
         mockViewModel,
