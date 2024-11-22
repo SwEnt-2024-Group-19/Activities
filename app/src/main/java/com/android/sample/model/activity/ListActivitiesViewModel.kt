@@ -2,6 +2,7 @@ package com.android.sample.model.activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -22,6 +23,9 @@ constructor(
 
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
   open val uiState: StateFlow<ActivitiesUiState> = _uiState
+
+  private val cachedScores_ = mutableMapOf<String, Double>()
+  open val cachedScores = cachedScores_
 
   init {
     repository.init { viewModelScope.launch { getActivities() } }
@@ -123,6 +127,36 @@ constructor(
     val MAX_PRICE = 100.0 // Maximum reasonable price
     return 1 - (price / MAX_PRICE).coerceAtMost(1.0)
   }
+
+  open fun calculateActivityScore(
+      activity: Activity,
+      user: User,
+      distanceTo: (Location?) -> Float?
+  ): Double {
+    val weights = getWeights()
+    val totalWeights = weights.values.sum()
+
+    if (cachedScores_.containsKey(activity.uid)) return cachedScores_[activity.uid]!!
+
+    val distanceScore = calculateDistanceScore(distanceTo(activity.location))
+    val dateScore = calculateDateScore(activity.date)
+    val interestScore = calculateInterestScore()
+    val participationScore = calculateParticipationScore(user.activities, activity.creator)
+    val completionScore = calculateCompletionScore(activity.participants.size, activity.maxPlaces)
+    val priceScore = calculatePriceScore(activity.price)
+
+    val score =
+        (distanceScore * weights["distance"]!! +
+            dateScore * weights["date"]!! +
+            interestScore * weights["interest"]!! +
+            participationScore * weights["participation"]!! +
+            completionScore * weights["completion"]!! +
+            priceScore * weights["price"]!!) / totalWeights
+
+    cachedScores_[activity.uid] = score
+    return score
+  }
+
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
