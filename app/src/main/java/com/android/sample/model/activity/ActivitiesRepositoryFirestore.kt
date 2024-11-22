@@ -2,6 +2,7 @@ package com.android.sample.model.activity
 
 import android.util.Log
 import com.android.sample.model.map.Location
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
@@ -55,7 +56,19 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
               name = participantData["name"] as? String ?: "No Name",
               surname = participantData["surname"] as? String ?: "No Surname",
               id = participantData["id"] as? String ?: "No ID",
-              interests = (participantData["interests"] as? List<String>) ?: listOf(),
+              interests =
+                  (participantData["interests"] as? List<*>)?.mapNotNull { interestData ->
+                    // Ensure interestData is a map and extract category and interest
+                    (interestData as? Map<*, *>)?.let {
+                      val category = it["category"] as? String
+                      val interest = it["interest"] as? String
+                      if (category != null && interest != null) {
+                        Interest(category, interest)
+                      } else {
+                        null
+                      }
+                    }
+                  } ?: listOf(),
               activities = (participantData["activities"] as? List<String>) ?: listOf(),
               photo = participantData["photo"] as? String,
               likedActivities = (participantData["likedActivities"] as? List<String>) ?: listOf())

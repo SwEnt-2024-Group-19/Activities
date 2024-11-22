@@ -27,7 +27,10 @@ class ProfilesRepositoryFirestoreTest {
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
-
+  val mockInterests =
+      listOf(
+          mapOf("category" to "Indoor Activity", "interest" to "reading"),
+          mapOf("category" to "Outdoor Activity", "interest" to "hiking"))
   private lateinit var profileRepositoryFirestore: ProfilesRepositoryFirestore
 
   @Before
@@ -200,11 +203,12 @@ class ProfilesRepositoryFirestoreTest {
   @Test
   fun `documentToUser returns User when document is valid`() {
     // Arrange
+    // When the function `get` is called with the argument "interests", return mockInterests
     val document = mock(DocumentSnapshot::class.java)
     `when`(document.id).thenReturn("12345")
     `when`(document.getString("name")).thenReturn("John")
     `when`(document.getString("surname")).thenReturn("Doe")
-    `when`(document.get("interests")).thenReturn(listOf("reading", "hiking"))
+    `when`(document.get("interests")).thenReturn(mockInterests)
     `when`(document.get("activities")).thenReturn(listOf("running", "swimming"))
     `when`(document.getString("photo")).thenReturn("photo_url")
     `when`(document.get("likedActivities")).thenReturn(listOf("cycling"))
@@ -217,7 +221,9 @@ class ProfilesRepositoryFirestoreTest {
     assertEquals("12345", user?.id)
     assertEquals("John", user?.name)
     assertEquals("Doe", user?.surname)
-    assertEquals(listOf("reading", "hiking"), user?.interests)
+    assertEquals(
+        listOf(Interest("Indoor Activity", "reading"), Interest("Outdoor Activity", "hiking")),
+        user?.interests)
     assertEquals(listOf("running", "swimming"), user?.activities)
     assertEquals("photo_url", user?.photo)
     assertEquals(listOf("cycling"), user?.likedActivities)
@@ -271,7 +277,7 @@ class ProfilesRepositoryFirestoreTest {
     val document = mock(DocumentSnapshot::class.java)
     `when`(document.getString("name")).thenReturn("John")
     `when`(document.getString("surname")).thenReturn("Doe")
-    `when`(document.get("interests")).thenReturn(listOf("reading"))
+    `when`(document.get("interests")).thenReturn(mockInterests)
     `when`(document.get("activities")).thenReturn("invalid_value")
 
     // Act
@@ -287,7 +293,7 @@ class ProfilesRepositoryFirestoreTest {
     val document = mock(DocumentSnapshot::class.java)
     `when`(document.getString("name")).thenReturn("John")
     `when`(document.getString("surname")).thenReturn("Doe")
-    `when`(document.get("interests")).thenReturn(listOf("reading"))
+    `when`(document.get("interests")).thenReturn(mockInterests)
     `when`(document.get("activities")).thenReturn(listOf("running"))
     `when`(document.getString("photo")).thenReturn(null)
 
@@ -304,7 +310,7 @@ class ProfilesRepositoryFirestoreTest {
     val document = mock(DocumentSnapshot::class.java)
     `when`(document.getString("name")).thenReturn("John")
     `when`(document.getString("surname")).thenReturn("Doe")
-    `when`(document.get("interests")).thenReturn(listOf("reading"))
+    `when`(document.get("interests")).thenReturn(mockInterests)
     `when`(document.get("activities")).thenReturn(listOf("running"))
     `when`(document.getString("photo")).thenReturn("photo_url")
     `when`(document.get("likedActivities")).thenReturn("invalid_value")
