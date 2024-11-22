@@ -451,7 +451,7 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
 
     val activity1 = activity.copy(title = "Few spots", maxPlaces = 5)
@@ -478,7 +478,7 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
 
     val activity1 =
@@ -511,7 +511,7 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
 
     val activity1 = activity.copy(title = "Short activity", duration = "01:00")
@@ -538,7 +538,7 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
 
     val activity1 = activity.copy(title = "Short activity", duration = "01:00", price = 10.0)
