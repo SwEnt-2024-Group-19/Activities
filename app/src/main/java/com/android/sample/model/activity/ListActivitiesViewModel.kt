@@ -28,6 +28,11 @@ constructor(
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
   open val uiState: StateFlow<ActivitiesUiState> = _uiState
 
+  /** Set the UI state to a new value For testing purposes only */
+  open fun setUiState(state: ActivitiesUiState) {
+    _uiState.value = state
+  }
+
   private val cachedScores_ = mutableMapOf<String, Double>()
   open val cachedScores = cachedScores_
 
