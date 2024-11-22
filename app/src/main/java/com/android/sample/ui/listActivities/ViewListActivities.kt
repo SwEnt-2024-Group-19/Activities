@@ -16,11 +16,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,6 +61,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.components.SearchBar
+import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -83,6 +86,13 @@ fun ListActivitiesScreen(
   val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
   var searchText by remember { mutableStateOf("") }
+    var showFilterDialog by remember { mutableStateOf(false) }
+
+    var maxPrice by remember { mutableStateOf(30000.0) }
+    var availablePlaces by remember { mutableStateOf<Int?>(null) }
+    var minDate by remember { mutableStateOf<Timestamp?>(null) }
+    var duration by remember { mutableStateOf<String?>(null) }
+
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -92,8 +102,23 @@ fun ListActivitiesScreen(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
+      }, floatingActionButton = {
+          FloatingActionButton(onClick = { showFilterDialog = true },
+              modifier = Modifier.testTag("filterDialog")) {
+              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
+          }
       }) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            if(showFilterDialog) {
+                FilterDialog(
+                    onDismiss = { showFilterDialog = false },
+                    onFilter = { price, placesAvailable, mindateTimestamp, acDuration ->
+                        maxPrice= price?.toDouble() ?: 30000.0
+                        availablePlaces = placesAvailable
+                        minDate = mindateTimestamp
+                        duration = acDuration}
+                )
+            }
           Box(
               modifier =
                   Modifier.height(BUTTON_HEIGHT.dp)
@@ -144,12 +169,22 @@ fun ListActivitiesScreen(
                 } else {
                   var filteredActivities =
                       activitiesList.filter {
-                        if (searchText.isEmpty() || searchText.isBlank()) true
-                        else {
-                          it.title.contains(searchText, ignoreCase = true) ||
-                              it.description.contains(searchText, ignoreCase = true) ||
-                              it.location?.name?.contains(searchText, ignoreCase = true) ?: false
-                        }
+                          if(it.price > maxPrice) false
+                          else if(availablePlaces != null && (it.maxPlaces-it.placesLeft)
+                              <= availablePlaces!!) false
+                          else if(minDate != null && it.date < minDate!!) false
+                          else if(duration != null && it.duration != duration) false
+                          else {
+                              if (searchText.isEmpty() || searchText.isBlank()) true
+                              else {
+                                  it.title.contains(searchText, ignoreCase = true) ||
+                                          it.description.contains(searchText, ignoreCase = true) ||
+                                          it.location?.name?.contains(
+                                              searchText,
+                                              ignoreCase = true
+                                          ) ?: false
+                              }
+                          }
                       }
                   LazyColumn(
                       modifier =
@@ -284,7 +319,7 @@ fun ActivityCard(
                     )
 
                 Text(
-                    text = "${activity.placesLeft}/${activity.maxPlaces}",
+                    text = "${activity.participants.size}/${activity.maxPlaces}",
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold,

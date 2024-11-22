@@ -1,5 +1,6 @@
 package com.android.sample.ui.listActivities
 
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
@@ -8,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.sample.model.activity.ActivitiesRepository
@@ -365,5 +367,134 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithText("dance").assertIsDisplayed()
     composeTestRule.onNodeWithTag("lazyColumn").performScrollToNode(hasText("football"))
     composeTestRule.onNodeWithText("football").assertIsDisplayed()
+  }
+
+  @Test
+  fun filterDialogFiltersByMaxPrice() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+    }
+
+    val activity1 = activity.copy(title = "cheap activity", price = 10.0)
+    val activity2 = activity.copy(title = "expensive activity", price = 200.0)
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("priceRangeSlider").performSemanticsAction(SemanticsActions.SetProgress) { it(50f) } // Set max price to 50
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+
+    composeTestRule.onNodeWithText("cheap activity").assertIsDisplayed()
+    composeTestRule.onNodeWithText("expensive activity").assertDoesNotExist()
+  }
+
+  @Test
+  fun filterDialogFiltersByPlacesAvailable() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+    }
+
+    val activity1 = activity.copy(title = "Few spots", maxPlaces = 5)
+    val activity2 = activity.copy(title = "Many spots", maxPlaces = 20)
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput("5") // Set available places to 5
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+
+    composeTestRule.onNodeWithText("Many spots").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Few spots").assertDoesNotExist()
+  }
+
+  @Test
+  fun filterDialogFiltersByMinDate() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+    }
+
+    val activity1 = activity.copy(title = "Past activity", date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time))
+    val activity2 = activity.copy(title = "Future activity", date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time))
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("minDateTextField").performTextInput("01/01/2030") // Set min date to 01/01/2030
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+
+    composeTestRule.onNodeWithText("Future activity").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Past activity").assertDoesNotExist()
+  }
+
+  @Test
+  fun filterDialogFiltersByDuration() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+    }
+
+    val activity1 = activity.copy(title = "Short activity", duration = "01:00")
+    val activity2 = activity.copy(title = "Long activity", duration = "04:00")
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("durationTextField").performTextInput("01:00") // Set duration to 1 hour
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+
+    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Long activity").assertDoesNotExist()
+  }
+
+  @Test
+  fun filterDialogClearsFilters() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+    }
+
+    val activity1 = activity.copy(title = "Short activity", duration = "01:00", price = 10.0)
+    val activity2 = activity.copy(title = "Long activity", duration = "04:00", price = 100.0)
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("durationTextField").performTextInput("01:00") // Set duration to 1 hour
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("durationTextField").performTextClearance() // Clear duration filter
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+
+    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Long activity").assertIsDisplayed()
   }
 }
