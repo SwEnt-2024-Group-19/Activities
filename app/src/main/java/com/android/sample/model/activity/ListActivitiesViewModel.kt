@@ -92,6 +92,12 @@ constructor(
     val differenceMillis = endMillis - startMillis
     return TimeUnit.MILLISECONDS.toHours(differenceMillis)
   }
+
+  open fun calculateInterestScore(): Double {
+    // return user.interests.count { it == activity.category }.toDouble() /
+    // user.interests.size.coerceAtLeast(1) TODO in Sprint 7
+    return 0.0
+  }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
