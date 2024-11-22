@@ -341,7 +341,8 @@ fun ActivityCard(
             Text(
                 text = distanceString,
                 modifier =
-                    Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("distanceText") // Takes up remaining space
+                    Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                        .testTag("distanceText") // Takes up remaining space
                 )
           }
 
