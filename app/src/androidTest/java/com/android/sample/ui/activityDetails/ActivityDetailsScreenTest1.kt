@@ -17,6 +17,10 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.MockActivitiesRepository
+import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationRepository
+import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.MockProfilesRepository
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
@@ -29,7 +33,6 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +42,7 @@ import org.mockito.Mockito.reset
 import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
 
 @RunWith(AndroidJUnit4::class)
 class ActivityDetailsScreenAndroidTest {
@@ -50,6 +54,9 @@ class ActivityDetailsScreenAndroidTest {
   private lateinit var mockProfileViewModel: ProfileViewModel
   private lateinit var mockFirebaseRepository: ActivitiesRepositoryFirestore
   private lateinit var mockRepository: ProfilesRepository
+
+  private lateinit var mockLocationViewModel: LocationViewModel
+  private lateinit var mockLocationRepository: LocationRepository
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -65,16 +72,21 @@ class ActivityDetailsScreenAndroidTest {
 
     val activityStateFlow = MutableStateFlow(activityWithParticipants)
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
+
+    mockLocationRepository = mock(LocationRepository::class.java)
+
+    mockLocationViewModel =
+        LocationViewModel(mockLocationRepository, mock(PermissionChecker::class.java))
   }
 
-  @After
   fun tearDown() {
     reset(
         mockViewModel,
         mockProfileViewModel,
         mockNavigationActions,
         mockFirebaseRepository,
-        mockRepository)
+        mockRepository,
+        mockLocationViewModel)
   }
 
   @Test
@@ -85,7 +97,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
 
     composeTestRule.onNodeWithTag("image").assertIsDisplayed()
@@ -106,7 +119,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityDetailsScreen")
@@ -124,7 +138,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
 
     composeTestRule.onNodeWithTag("enrollButton").assertDoesNotExist()
@@ -138,7 +153,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
 
     composeTestRule.onNodeWithTag("titleText").assertTextContains("Sample Activity")
@@ -157,7 +173,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
     composeTestRule.onNodeWithTag("goBackButton").performClick()
 
@@ -180,7 +197,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityDetailsScreen")
@@ -200,7 +218,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityDetailsScreen")
@@ -223,7 +242,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           profileViewModel = mockProfileViewModel,
-          navigationActions = mockNavigationActions)
+          navigationActions = mockNavigationActions,
+          locationViewModel = mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityDetailsScreen")
@@ -248,7 +268,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           profileViewModel = mockProfileViewModel,
-          navigationActions = mockNavigationActions)
+          navigationActions = mockNavigationActions,
+          locationViewModel = mockLocationViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityDetailsScreen")
@@ -277,7 +298,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           profileViewModel = mockProfileViewModel,
-          navigationActions = mockNavigationActions)
+          navigationActions = mockNavigationActions,
+          locationViewModel = mockLocationViewModel)
     }
 
     // Verify the button is displayed and clickable
@@ -306,7 +328,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           profileViewModel = mockProfileViewModel,
-          navigationActions = mockNavigationActions)
+          navigationActions = mockNavigationActions,
+          locationViewModel = mockLocationViewModel)
     }
 
     composeTestRule
@@ -332,7 +355,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           profileViewModel = mockProfileViewModel,
-          navigationActions = mockNavigationActions)
+          navigationActions = mockNavigationActions,
+          locationViewModel = mockLocationViewModel)
     }
 
     composeTestRule
@@ -358,7 +382,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
 
     // Simulate the deletion of the main comment
@@ -393,7 +418,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
 
     // Simulate the deletion of the reply
@@ -412,7 +438,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
@@ -433,7 +460,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
 
     // Simulate replying to the main comment
@@ -448,6 +476,50 @@ class ActivityDetailsScreenAndroidTest {
   }
 
   @Test
+  fun distanceIsCorrectlyDisplayedInMeters() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    mockLocationViewModel.setCurrentLocation(Location(46.52, 6.64, "Close to EPFL"))
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
+    }
+    composeTestRule.onNodeWithTag("distanceText").assertTextContains("Distance : 490m")
+  }
+
+  @Test
+  fun distanceIsCorrectlyDisplayedInKilometers() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    mockLocationViewModel.setCurrentLocation(Location(50.0, 5.0, "Random Point"))
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
+    }
+    composeTestRule.onNodeWithTag("distanceText").assertTextContains("Distance : 405.4km")
+  }
+
+  @Test
+  fun distanceIsNotDisplayedWhenLocationIsNotAvailable() {
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
+    }
+    composeTestRule.onNodeWithTag("distanceText").assertIsNotDisplayed()
+  }
+
+  @Test
   fun participantsList_isDisplayedCorrectly() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
@@ -455,7 +527,8 @@ class ActivityDetailsScreenAndroidTest {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
           navigationActions = mockNavigationActions,
-          profileViewModel = mockProfileViewModel)
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel)
     }
 
     // Check if the participants list is displayed
