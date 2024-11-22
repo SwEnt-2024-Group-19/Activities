@@ -74,6 +74,13 @@ constructor(
     if (distance == null) return 0.0
     return 1 - (distance / MAX_DISTANCE).coerceAtMost(1.0)
   }
+
+  open fun calculateDateScore(date: Timestamp): Double {
+    val MAX_HOURS = 96.0 // 4 days
+    val hoursBetween = calculateHoursBetween(Timestamp.now(), date)?.toDouble() ?: return 0.0
+
+    return 1 - (hoursBetween / MAX_HOURS).coerceAtMost(1.0)
+  }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
