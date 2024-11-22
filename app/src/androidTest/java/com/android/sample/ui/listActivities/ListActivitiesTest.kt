@@ -16,6 +16,7 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -62,7 +63,7 @@ class OverviewScreenTest {
                       id = "1",
                       name = "Amine",
                       surname = "A",
-                      interests = listOf("Cycling"),
+                      interests = listOf(Interest("Sport", "Cycling")),
                       activities = listOf(),
                       photo = "",
                       likedActivities = listOf("1")),
@@ -70,7 +71,7 @@ class OverviewScreenTest {
                       id = "2",
                       name = "John",
                       surname = "Doe",
-                      interests = listOf("Reading"),
+                      interests = listOf(Interest("Indoor Activity", "Reading")),
                       activities = listOf(),
                       photo = "",
                       likedActivities = listOf("1"))),
@@ -92,7 +93,8 @@ class OverviewScreenTest {
             name = "Amine",
             surname = "A",
             photo = "",
-            interests = listOf("Cycling", "Reading"),
+            interests =
+                listOf(Interest("Sport", "Cycling"), Interest("Indoor Activity", "Reading")),
             activities = listOf(activity.uid),
         )
 

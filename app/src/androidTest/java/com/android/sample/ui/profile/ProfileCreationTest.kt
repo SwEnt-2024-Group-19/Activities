@@ -5,6 +5,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
@@ -106,6 +107,8 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
     composeTestRule.onNodeWithTag("interestsLists")
+    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
+    composeTestRule.onNodeWithText("Sport").performClick()
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Android")
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 

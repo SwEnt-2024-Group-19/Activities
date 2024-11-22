@@ -25,7 +25,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -47,6 +49,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.profile.Interest
+import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
@@ -183,43 +187,12 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                             .testTag("inputProfileSurname"))
 
                 // Interest list and add button
-                var newInterest by remember { mutableStateOf("") }
-                var newListInterests by remember { mutableStateOf(interests) }
 
-                LazyRow(
-                    modifier = Modifier.padding(MEDIUM_PADDING.dp).testTag("interestsList"),
-                    horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
-                      newListInterests?.let {
-                        items(it.size, key = { it }) { index ->
-                          InterestEditBox(
-                              interest = newListInterests!![index],
-                              onRemove = {
-                                newListInterests = newListInterests!! - newListInterests!![index]
-                              })
-                        }
-                      }
-                    }
+                var newListInterests by remember { mutableStateOf(interests ?: emptyList()) }
 
-                OutlinedTextField(
-                    value = newInterest,
-                    onValueChange = { newInterest = it },
-                    label = { Text("New Interest") },
-                    modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
-                Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-                Button(
-                    onClick = {
-                      if (newInterest.isNotBlank()) {
-                        newListInterests = newListInterests?.plus(newInterest)
-                        newInterest = "" // Clear the field after adding
-                      }
-                    },
-                    modifier =
-                        Modifier.padding(end = STANDARD_PADDING.dp)
-                            .clip(RoundedCornerShape(STANDARD_PADDING.dp))
-                            .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
-                            .testTag("addInterestButton")) {
-                      Text("Add")
-                    }
+                ManageInterests(
+                    initialInterests = interests ?: emptyList(),
+                    onUpdateInterests = { newListInterests = it })
 
                 Button(
                     onClick = {
@@ -257,6 +230,80 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
       })
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<Interest>) -> Unit) {
+
+  var newListInterests by remember { mutableStateOf(initialInterests) }
+  val categories = InterestCategories
+  var selectedCategory by remember { mutableStateOf("") }
+  var expanded by remember { mutableStateOf(false) }
+  var newInterest by remember { mutableStateOf("") }
+
+  Row(verticalAlignment = Alignment.CenterVertically) {
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+      OutlinedTextField(
+          value = selectedCategory,
+          onValueChange = { selectedCategory = it },
+          label = { Text("Category") },
+          readOnly = true,
+          modifier = Modifier.menuAnchor().width(LARGE_IMAGE_SIZE.dp).testTag("categoryDropdown"))
+
+      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        categories.forEach { category ->
+          DropdownMenuItem(
+              text = { Text(category) },
+              onClick = {
+                selectedCategory = category
+                expanded = false
+              })
+        }
+      }
+    }
+
+    OutlinedTextField(
+        value = newInterest,
+        onValueChange = { newInterest = it },
+        label = { Text("New Interest") },
+        enabled = selectedCategory.isNotEmpty() && selectedCategory != "None",
+        modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
+  }
+
+  Row(verticalAlignment = Alignment.CenterVertically) {
+    Button(
+        onClick = {
+          if (newInterest.isNotBlank() &&
+              selectedCategory.isNotBlank() &&
+              selectedCategory != "None") {
+            val updatedList = newListInterests + Interest(selectedCategory, newInterest)
+            newListInterests = updatedList
+            newInterest = ""
+            selectedCategory = ""
+            onUpdateInterests(updatedList)
+          }
+        },
+        enabled =
+            newInterest.isNotBlank() && selectedCategory.isNotBlank() && selectedCategory != "None",
+        modifier = Modifier.testTag("addInterestButton")) {
+          Text("Add")
+        }
+  }
+
+  LazyRow(
+      modifier = Modifier.testTag("interestsList"),
+      horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
+        items(newListInterests.size) { interest ->
+          InterestEditBox(
+              interest = newListInterests[interest].interest,
+              onRemove = {
+                val updatedList = newListInterests - newListInterests[interest]
+                newListInterests = updatedList
+                onUpdateInterests(updatedList)
+              })
+        }
+      }
+}
+
 @Composable
 fun InterestEditBox(interest: String, onRemove: () -> Unit) {
   Box(
@@ -267,7 +314,7 @@ fun InterestEditBox(interest: String, onRemove: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
           Spacer(Modifier.width(STANDARD_PADDING.dp))
-          IconButton(onClick = onRemove) {
+          IconButton(onClick = onRemove, modifier = Modifier.testTag("removeInterest-$interest")) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
           }
         }
