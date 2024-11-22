@@ -114,6 +114,12 @@ fun ListActivitiesScreen(
     } else {
       locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
+
+    if (profile != null) {
+      viewModel.sortActivitiesByScore(profile) {
+        locationViewModel.getDistanceFromCurrentLocation(it)
+      }
+    }
   }
 
   Scaffold(
