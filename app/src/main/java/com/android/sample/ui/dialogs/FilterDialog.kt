@@ -15,8 +15,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.sample.R
+import com.android.sample.resources.C.Tag.DEFAULT_MAX_PRICE
+import com.android.sample.resources.C.Tag.DIALOG_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TEXT_PADDING
 import com.google.firebase.Timestamp
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -26,7 +30,7 @@ fun FilterDialog(
     onFilter:
         (price: Double?, membersAvailable: Int?, schedule: Timestamp?, duration: String?) -> Unit
 ) {
-  var maxPrice by remember { mutableStateOf(300f) }
+  var maxPrice by remember { mutableStateOf(DEFAULT_MAX_PRICE) }
   var availablePlaces by remember { mutableStateOf<Int?>(null) }
   var minDate by remember { mutableStateOf<String?>(null) }
   var minDateTimestamp by remember { mutableStateOf<Timestamp?>(null) }
@@ -38,7 +42,7 @@ fun FilterDialog(
         Column(
             modifier =
                 Modifier.fillMaxWidth()
-                    .height(600.dp)
+                    .height(DIALOG_PADDING.dp)
                     .background(
                         color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
                     .testTag("FilterDialog"),
@@ -51,7 +55,8 @@ fun FilterDialog(
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Price Range",
-                    modifier = Modifier.padding(bottom = 8.dp).testTag("priceRangeLabel"))
+                    modifier =
+                        Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("priceRangeLabel"))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -70,7 +75,7 @@ fun FilterDialog(
                 Slider(
                     value = maxPrice,
                     onValueChange = { newMaxPrice -> maxPrice = newMaxPrice },
-                    valueRange = 0f..300f, // Total range of the slider
+                    valueRange = 0f..DEFAULT_MAX_PRICE, // Total range of the slider
                     modifier = Modifier.testTag("priceRangeSlider"))
 
                 OutlinedTextField(
@@ -78,7 +83,7 @@ fun FilterDialog(
                     onValueChange = { availablePlaces = it.toIntOrNull() },
                     label = { Text("Members Available") },
                     modifier = Modifier.testTag("membersAvailableTextField"),
-                    shape = RoundedCornerShape(40.dp))
+                    shape = RoundedCornerShape(TEXT_PADDING.dp))
 
                 OutlinedTextField(
                     value = minDate ?: "",
@@ -90,13 +95,13 @@ fun FilterDialog(
                           text = stringResource(id = R.string.request_date_activity_withFormat))
                     },
                     singleLine = true,
-                    shape = RoundedCornerShape(40.dp))
+                    shape = RoundedCornerShape(TEXT_PADDING.dp))
                 OutlinedTextField(
                     value = duration ?: "",
                     onValueChange = { duration = it },
                     label = { Text("Duration") },
                     modifier = Modifier.testTag("durationTextField"),
-                    shape = RoundedCornerShape(40.dp))
+                    shape = RoundedCornerShape(TEXT_PADDING.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                   TextButton(

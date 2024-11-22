@@ -20,6 +20,8 @@ object C {
 
     const val STANDARD_PADDING = 8
 
+    const val DEFAULT_MAX_PRICE = 300f
+
     const val BUTTON_WIDTH = 300
 
     const val BUTTON_HEIGHT = 40
@@ -33,6 +35,10 @@ object C {
     const val SMALL_PADDING = 4
 
     const val TITLE_FONTSIZE = 24
+
+    const val TEXT_PADDING = 40
+
+    const val DIALOG_PADDING = 600
 
     const val SUBTITLE_FONTSIZE = 16
 

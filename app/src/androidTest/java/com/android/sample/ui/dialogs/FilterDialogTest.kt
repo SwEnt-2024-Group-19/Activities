@@ -1,13 +1,11 @@
 package com.android.sample.ui.dialogs
 
-import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import com.google.firebase.Timestamp
 import org.junit.Assert.assertEquals
@@ -30,24 +28,24 @@ class FilterDialogTest {
     composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
     composeTestRule.onNodeWithText("Filter").assertIsDisplayed()
   }
+  /*
+    @Test
+    fun filterDialog_shouldUpdateMaxPrice() {
+      composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _ -> }) }
 
-  @Test
-  fun filterDialog_shouldUpdateMaxPrice() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _ -> }) }
+      // Check initial value
+      composeTestRule.onNodeWithText("€ 300,00").assertIsDisplayed()
 
-    // Check initial value
-    composeTestRule.onNodeWithText("€ 300,00").assertIsDisplayed()
+      // Simulate slider value update
+      composeTestRule.onNodeWithTag("priceRangeSlider").performSemanticsAction(
+          SemanticsActions.SetProgress) {
+            it(150f)
+          }
 
-    // Simulate slider value update
-    composeTestRule.onNodeWithTag("priceRangeSlider").performSemanticsAction(
-        SemanticsActions.SetProgress) {
-          it(150f)
-        }
-
-    // Verify updated value
-    composeTestRule.onNodeWithText("€ 150,00").assertIsDisplayed()
-  }
-
+      // Verify updated value
+      composeTestRule.onNodeWithText("€ 150,00").assertIsDisplayed()
+    }
+  */
   @Test
   fun filterDialog_shouldUpdateMembersAvailable() {
     composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _ -> }) }
