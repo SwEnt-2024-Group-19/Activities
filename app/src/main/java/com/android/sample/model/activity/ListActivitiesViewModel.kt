@@ -118,6 +118,11 @@ constructor(
         return 0.0
     return (numberParticipants.toDouble() / maxPlaces).coerceAtMost(1.0)
   }
+
+  open fun calculatePriceScore(price: Double): Double {
+    val MAX_PRICE = 100.0 // Maximum reasonable price
+    return 1 - (price / MAX_PRICE).coerceAtMost(1.0)
+  }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
