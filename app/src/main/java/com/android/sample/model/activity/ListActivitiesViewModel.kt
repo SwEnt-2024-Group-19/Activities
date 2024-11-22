@@ -112,6 +112,12 @@ constructor(
         { participationScore = 0.0 })
     return participationScore
   }
+
+  open fun calculateCompletionScore(numberParticipants: Int, maxPlaces: Long): Double {
+    if (maxPlaces == 0L || numberParticipants == 0 || numberParticipants > maxPlaces.toInt())
+        return 0.0
+    return (numberParticipants.toDouble() / maxPlaces).coerceAtMost(1.0)
+  }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
