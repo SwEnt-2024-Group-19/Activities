@@ -241,7 +241,7 @@ fun ActivityDetailsScreen(
                         val distanceString =
                             "Distance : " +
                                 if (distance < 1) {
-                                  "${round(distance * 1000)}m"
+                                  "${round(distance * 1000).toInt()}m"
                                 } else {
                                   "${round(distance * 10) / 10}km"
                                 }

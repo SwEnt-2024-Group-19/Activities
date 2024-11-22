@@ -334,14 +334,14 @@ fun ActivityCard(
             val distanceString =
                 "Distance : " +
                     if (distance < 1) {
-                      "${round(distance * 1000)}m"
+                      "${round(distance * 1000).toInt()}m"
                     } else {
                       "${round(distance * 10) / 10}km"
                     }
             Text(
                 text = distanceString,
                 modifier =
-                    Modifier.padding(horizontal = MEDIUM_PADDING.dp) // Takes up remaining space
+                    Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("distanceText") // Takes up remaining space
                 )
           }
 
