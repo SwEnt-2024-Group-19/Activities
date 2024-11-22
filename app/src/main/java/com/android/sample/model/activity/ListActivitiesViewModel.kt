@@ -68,6 +68,12 @@ constructor(
         "completion" to 0.1,
         "price" to 0.15)
   }
+
+  open fun calculateDistanceScore(distance: Float?): Double {
+    val MAX_DISTANCE = 100.0 // 100 km
+    if (distance == null) return 0.0
+    return 1 - (distance / MAX_DISTANCE).coerceAtMost(1.0)
+  }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
