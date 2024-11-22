@@ -158,7 +158,6 @@ fun ProfileContent(
                         items(interests.size) { index ->
                           InterestBox(interest = user.interests[index].interest)
                         }
-
                       }
                     }
               }
