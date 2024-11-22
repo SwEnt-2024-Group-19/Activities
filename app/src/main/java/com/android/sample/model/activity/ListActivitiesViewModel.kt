@@ -3,6 +3,7 @@ package com.android.sample.model.activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -80,6 +81,16 @@ constructor(
     val hoursBetween = calculateHoursBetween(Timestamp.now(), date)?.toDouble() ?: return 0.0
 
     return 1 - (hoursBetween / MAX_HOURS).coerceAtMost(1.0)
+  }
+
+  open fun calculateHoursBetween(start: Timestamp, end: Timestamp): Long? {
+    val startMillis = start.toDate().time
+    val endMillis = end.toDate().time
+
+    if (startMillis > endMillis) return null
+
+    val differenceMillis = endMillis - startMillis
+    return TimeUnit.MILLISECONDS.toHours(differenceMillis)
   }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
