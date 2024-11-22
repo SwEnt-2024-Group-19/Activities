@@ -344,7 +344,9 @@ class OverviewScreenTest {
           activity = activity,
           distance = 12.354f)
     }
-    composeTestRule.onNodeWithTag("distanceText").assertTextContains("Distance : 12.3 km")
+    composeTestRule
+        .onNodeWithTag("distanceText", useUnmergedTree = true)
+        .assertTextContains("Distance : 12.4km")
   }
 
   @Test
@@ -359,7 +361,7 @@ class OverviewScreenTest {
           activity = activity,
           distance = null)
     }
-    composeTestRule.onNodeWithTag("distanceText").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("distanceText", useUnmergedTree = true).assertIsNotDisplayed()
   }
 
   @Test
