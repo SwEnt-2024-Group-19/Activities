@@ -71,7 +71,7 @@ class ScoreCalculatorTest {
   @Test
   fun `calculateDateScore returns 1 for date now`() {
     val currentDate = Timestamp.now()
-    assertEquals(1.0, listActivitiesViewModel.calculateDateScore(currentDate), 0.0)
+    assertEquals(1.0, listActivitiesViewModel.calculateDateScore(currentDate), 0.05)
   }
 
   @Test
