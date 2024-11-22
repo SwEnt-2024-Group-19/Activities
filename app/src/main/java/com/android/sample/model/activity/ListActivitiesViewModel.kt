@@ -59,6 +59,15 @@ constructor(
     repository.getActivities(onS, onF)
   }
 
+  open fun getWeights(): Map<String, Double> {
+    return mapOf(
+        "distance" to 0.2,
+        "date" to 0.15,
+        "interest" to 0.25,
+        "participation" to 0.15,
+        "completion" to 0.1,
+        "price" to 0.15)
+  }
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
