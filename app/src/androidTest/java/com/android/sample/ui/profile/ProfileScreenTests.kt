@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performScrollToNode
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.dummydata.activityListWithPastActivity
@@ -54,7 +55,8 @@ class ProfileScreenTest {
             name = "Amine",
             surname = "A",
             photo = "",
-            interests = listOf("Cycling", "Reading"),
+            interests =
+                listOf(Interest("Sport", "Cycling"), Interest("Indoor Activity", "Reading")),
             activities = listOfActivitiesUid,
         )
     val userStateFlow = MutableStateFlow(testUser)

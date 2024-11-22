@@ -154,8 +154,10 @@ fun ProfileContent(
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
                     contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-                      user.interests?.forEach { interest ->
-                        item { InterestBox(interest = interest) }
+                      user.interests?.let { interests ->
+                        items(interests.size) { index ->
+                          InterestBox(interest = user.interests[index].interest)
+                        }
                       }
                     }
               }
