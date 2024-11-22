@@ -57,6 +57,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -72,13 +73,15 @@ import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.UUID
 import kotlin.math.min
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    locationViewModel: LocationViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
@@ -105,6 +108,7 @@ fun ActivityDetailsScreen(
   }
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
+  val distance = locationViewModel.getDistanceFromCurrentLocation(location)
   val context = LocalContext.current
   val startTime by remember { mutableStateOf(activity?.startTime) }
   val duration by remember { mutableStateOf(activity?.duration) }
@@ -229,10 +233,23 @@ fun ActivityDetailsScreen(
                   modifier = Modifier.testTag("location")) {
                     Icon(Icons.Default.LocationOn, contentDescription = "Location")
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-                    Text(
-                        text = location?.name ?: "No location",
-                        modifier = Modifier.testTag("locationText"))
+                    Column {
+                      Text(
+                          text = location?.name ?: "No location",
+                          modifier = Modifier.testTag("locationText"))
+                      if (distance != null) {
+                        val distanceString =
+                            "Distance : " +
+                                if (distance < 1) {
+                                  "${round(distance * 1000).toInt()}m"
+                                } else {
+                                  "${round(distance * 10) / 10}km"
+                                }
+                        Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
+                      }
+                    }
                   }
+
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
               // schedule
@@ -264,6 +281,8 @@ fun ActivityDetailsScreen(
                   text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
                   style = MaterialTheme.typography.bodyLarge,
                   modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+
+              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
               // List of participants
               Column(modifier = Modifier.testTag("participants")) {

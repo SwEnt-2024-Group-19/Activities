@@ -1,7 +1,9 @@
 package com.android.sample.ui.listActivities
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -10,12 +12,16 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.test.rule.GrantPermissionRule
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
+import com.android.sample.model.map.LocationRepository
+import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
@@ -41,6 +47,7 @@ class OverviewScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var userProfileViewModel: ProfileViewModel
+  private lateinit var locationViewModel: LocationViewModel
   private lateinit var testUser: User
 
   private val activity =
@@ -80,6 +87,13 @@ class OverviewScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
+  @get:Rule
+  val permissionRule: GrantPermissionRule =
+      GrantPermissionRule.grant(
+          android.Manifest.permission.ACCESS_FINE_LOCATION,
+          android.Manifest.permission.ACCESS_COARSE_LOCATION,
+          android.Manifest.permission.CAMERA)
+
   @Before
   fun setUp() {
     profilesRepository = mock(ProfilesRepository::class.java)
@@ -103,6 +117,8 @@ class OverviewScreenTest {
     // `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
 
     `when`(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
+    locationViewModel =
+        LocationViewModel(mock(LocationRepository::class.java), mock(PermissionChecker::class.java))
   }
 
   @Test
@@ -110,7 +126,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     `when`(activitiesRepository.getActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf())
@@ -125,7 +142,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     // Mock the activities repository to return an activity
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -151,7 +169,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     // Ensure segmented buttons are displayed
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
@@ -169,7 +188,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     composeTestRule.onNodeWithText("SOLO").performClick()
     composeTestRule.onNodeWithText("There is no activity of this type yet.").assertIsDisplayed()
@@ -180,7 +200,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val fullActivity = activity.copy(maxPlaces = 2, placesLeft = 2)
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -197,7 +218,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     // Ensure bottom navigation menu is displayed
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
@@ -210,7 +232,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -231,7 +254,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
     val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
@@ -258,7 +282,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     `when`(activitiesRepository.getActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity))
@@ -280,13 +305,63 @@ class OverviewScreenTest {
     val newUser = testUser.copy(likedActivities = listOf(activity.uid))
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(newUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     // composeTestRule.setContent {
 
     // ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
     // }
     composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
+  }
+
+  @Test
+  fun distanceIsCorrectlyDisplayedInMeters() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity,
+          distance = 0.5503f)
+    }
+    composeTestRule
+        .onNodeWithTag("distanceText", useUnmergedTree = true)
+        .assertTextContains("Distance : 550m")
+  }
+
+  @Test
+  fun distanceIsCorrectlyDisplayedInKilometers() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity,
+          distance = 12.354f)
+    }
+    composeTestRule
+        .onNodeWithTag("distanceText", useUnmergedTree = true)
+        .assertTextContains("Distance : 12.4km")
+  }
+
+  @Test
+  fun distanceIsNotDisplayedWhenNullDistance() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity,
+          distance = null)
+    }
+    composeTestRule.onNodeWithTag("distanceText", useUnmergedTree = true).assertIsNotDisplayed()
   }
 
   @Test
@@ -322,7 +397,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
     val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
@@ -345,7 +421,8 @@ class OverviewScreenTest {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
-      ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
     val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
