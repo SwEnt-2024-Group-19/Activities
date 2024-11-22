@@ -388,7 +388,10 @@ class OverviewScreenTest {
     listActivitiesViewModel.getActivities()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule.onNodeWithTag("priceRangeSlider").performSemanticsAction(SemanticsActions.SetProgress) { it(50f) } // Set max price to 50
+    composeTestRule.onNodeWithTag("priceRangeSlider").performSemanticsAction(
+        SemanticsActions.SetProgress) {
+          it(50f)
+        } // Set max price to 50
     composeTestRule.onNodeWithTag("filterButton").performClick()
 
     composeTestRule.onNodeWithText("cheap activity").assertIsDisplayed()
@@ -413,7 +416,9 @@ class OverviewScreenTest {
     listActivitiesViewModel.getActivities()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput("5") // Set available places to 5
+    composeTestRule
+        .onNodeWithTag("membersAvailableTextField")
+        .performTextInput("5") // Set available places to 5
     composeTestRule.onNodeWithTag("filterButton").performClick()
 
     composeTestRule.onNodeWithText("Many spots").assertIsDisplayed()
@@ -428,8 +433,14 @@ class OverviewScreenTest {
       ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
     }
 
-    val activity1 = activity.copy(title = "Past activity", date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time))
-    val activity2 = activity.copy(title = "Future activity", date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time))
+    val activity1 =
+        activity.copy(
+            title = "Past activity",
+            date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time))
+    val activity2 =
+        activity.copy(
+            title = "Future activity",
+            date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time))
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
@@ -438,7 +449,9 @@ class OverviewScreenTest {
     listActivitiesViewModel.getActivities()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule.onNodeWithTag("minDateTextField").performTextInput("01/01/2030") // Set min date to 01/01/2030
+    composeTestRule
+        .onNodeWithTag("minDateTextField")
+        .performTextInput("01/01/2030") // Set min date to 01/01/2030
     composeTestRule.onNodeWithTag("filterButton").performClick()
 
     composeTestRule.onNodeWithText("Future activity").assertIsDisplayed()
@@ -463,7 +476,9 @@ class OverviewScreenTest {
     listActivitiesViewModel.getActivities()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule.onNodeWithTag("durationTextField").performTextInput("01:00") // Set duration to 1 hour
+    composeTestRule
+        .onNodeWithTag("durationTextField")
+        .performTextInput("01:00") // Set duration to 1 hour
     composeTestRule.onNodeWithTag("filterButton").performClick()
 
     composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
@@ -488,12 +503,16 @@ class OverviewScreenTest {
     listActivitiesViewModel.getActivities()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule.onNodeWithTag("durationTextField").performTextInput("01:00") // Set duration to 1 hour
+    composeTestRule
+        .onNodeWithTag("durationTextField")
+        .performTextInput("01:00") // Set duration to 1 hour
     composeTestRule.onNodeWithTag("filterButton").performClick()
     composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule.onNodeWithTag("durationTextField").performTextClearance() // Clear duration filter
+    composeTestRule
+        .onNodeWithTag("durationTextField")
+        .performTextClearance() // Clear duration filter
     composeTestRule.onNodeWithTag("filterButton").performClick()
 
     composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()

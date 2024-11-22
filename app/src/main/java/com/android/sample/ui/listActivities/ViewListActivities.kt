@@ -86,13 +86,12 @@ fun ListActivitiesScreen(
   val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
   var searchText by remember { mutableStateOf("") }
-    var showFilterDialog by remember { mutableStateOf(false) }
+  var showFilterDialog by remember { mutableStateOf(false) }
 
-    var maxPrice by remember { mutableStateOf(30000.0) }
-    var availablePlaces by remember { mutableStateOf<Int?>(null) }
-    var minDate by remember { mutableStateOf<Timestamp?>(null) }
-    var duration by remember { mutableStateOf<String?>(null) }
-
+  var maxPrice by remember { mutableStateOf(30000.0) }
+  var availablePlaces by remember { mutableStateOf<Int?>(null) }
+  var minDate by remember { mutableStateOf<Timestamp?>(null) }
+  var duration by remember { mutableStateOf<String?>(null) }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -102,23 +101,24 @@ fun ListActivitiesScreen(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
-      }, floatingActionButton = {
-          FloatingActionButton(onClick = { showFilterDialog = true },
-              modifier = Modifier.testTag("filterDialog")) {
+      },
+      floatingActionButton = {
+        FloatingActionButton(
+            onClick = { showFilterDialog = true }, modifier = Modifier.testTag("filterDialog")) {
               Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
-          }
+            }
       }) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            if(showFilterDialog) {
-                FilterDialog(
-                    onDismiss = { showFilterDialog = false },
-                    onFilter = { price, placesAvailable, mindateTimestamp, acDuration ->
-                        maxPrice= price?.toDouble() ?: 30000.0
-                        availablePlaces = placesAvailable
-                        minDate = mindateTimestamp
-                        duration = acDuration}
-                )
-            }
+          if (showFilterDialog) {
+            FilterDialog(
+                onDismiss = { showFilterDialog = false },
+                onFilter = { price, placesAvailable, mindateTimestamp, acDuration ->
+                  maxPrice = price?.toDouble() ?: 30000.0
+                  availablePlaces = placesAvailable
+                  minDate = mindateTimestamp
+                  duration = acDuration
+                })
+          }
           Box(
               modifier =
                   Modifier.height(BUTTON_HEIGHT.dp)
@@ -169,22 +169,20 @@ fun ListActivitiesScreen(
                 } else {
                   var filteredActivities =
                       activitiesList.filter {
-                          if(it.price > maxPrice) false
-                          else if(availablePlaces != null && (it.maxPlaces-it.placesLeft)
-                              <= availablePlaces!!) false
-                          else if(minDate != null && it.date < minDate!!) false
-                          else if(duration != null && it.duration != duration) false
+                        if (it.price > maxPrice) false
+                        else if (availablePlaces != null &&
+                            (it.maxPlaces - it.placesLeft) <= availablePlaces!!)
+                            false
+                        else if (minDate != null && it.date < minDate!!) false
+                        else if (duration != null && it.duration != duration) false
+                        else {
+                          if (searchText.isEmpty() || searchText.isBlank()) true
                           else {
-                              if (searchText.isEmpty() || searchText.isBlank()) true
-                              else {
-                                  it.title.contains(searchText, ignoreCase = true) ||
-                                          it.description.contains(searchText, ignoreCase = true) ||
-                                          it.location?.name?.contains(
-                                              searchText,
-                                              ignoreCase = true
-                                          ) ?: false
-                              }
+                            it.title.contains(searchText, ignoreCase = true) ||
+                                it.description.contains(searchText, ignoreCase = true) ||
+                                it.location?.name?.contains(searchText, ignoreCase = true) ?: false
                           }
+                        }
                       }
                   LazyColumn(
                       modifier =
