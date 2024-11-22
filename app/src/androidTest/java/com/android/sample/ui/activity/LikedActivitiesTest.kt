@@ -42,7 +42,7 @@ class LikedActivitiesTest {
     activitiesRepository = mock(ActivitiesRepository::class.java)
     profilesRepository = mock(ProfilesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
-    viewModel = ListActivitiesViewModel(activitiesRepository)
+    viewModel = ListActivitiesViewModel(profilesRepository, activitiesRepository)
 
     // val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)

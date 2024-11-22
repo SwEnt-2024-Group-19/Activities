@@ -13,6 +13,7 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.activity
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -51,7 +52,9 @@ class MapScreenTest {
     mockPermissionChecker = LocationPermissionChecker(context)
     locationViewModel = LocationViewModel(mockRepository, mockPermissionChecker)
     activitiesRepository = mock(ActivitiesRepository::class.java)
-    listActivitiesViewModel = Mockito.spy(ListActivitiesViewModel(activitiesRepository))
+    listActivitiesViewModel =
+        Mockito.spy(
+            ListActivitiesViewModel(mock(ProfilesRepository::class.java), activitiesRepository))
     val activities = listOf(activity)
     val uiState = ListActivitiesViewModel.ActivitiesUiState.Success(activities)
     val stateFlow = MutableStateFlow(uiState)
