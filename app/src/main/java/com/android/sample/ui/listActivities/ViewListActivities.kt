@@ -1,6 +1,11 @@
 package com.android.sample.ui.listActivities
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +21,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +37,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -41,16 +49,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -59,12 +70,15 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.components.SearchBar
+import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
@@ -73,8 +87,10 @@ fun ListActivitiesScreen(
     viewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
+    locationViewModel: LocationViewModel,
     modifier: Modifier = Modifier
 ) {
+  val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
   var selectedIndex by remember { mutableIntStateOf(0) }
   val all = "ALL"
@@ -82,6 +98,32 @@ fun ListActivitiesScreen(
   val options = listOf(all) + typesToString
   val profile = profileViewModel.userState.collectAsState().value
   var searchText by remember { mutableStateOf("") }
+  var showFilterDialog by remember { mutableStateOf(false) }
+
+  var maxPrice by remember { mutableStateOf(30000.0) }
+  var availablePlaces by remember { mutableStateOf<Int?>(null) }
+  var minDate by remember { mutableStateOf<Timestamp?>(null) }
+  var duration by remember { mutableStateOf<String?>(null) }
+
+  val locationPermissionLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.RequestPermission(),
+          onResult = { isGranted ->
+            if (isGranted) {
+              locationViewModel.fetchCurrentLocation()
+            } else {
+              Log.d("OverviewScreen", "Location permission denied by the user.")
+            }
+          })
+
+  LaunchedEffect(Unit) {
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+        PackageManager.PERMISSION_GRANTED) {
+      locationViewModel.fetchCurrentLocation()
+    } else {
+      locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+  }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -91,8 +133,24 @@ fun ListActivitiesScreen(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
+      },
+      floatingActionButton = {
+        FloatingActionButton(
+            onClick = { showFilterDialog = true }, modifier = Modifier.testTag("filterDialog")) {
+              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
+            }
       }) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+          if (showFilterDialog) {
+            FilterDialog(
+                onDismiss = { showFilterDialog = false },
+                onFilter = { price, placesAvailable, mindateTimestamp, acDuration ->
+                  maxPrice = price?.toDouble() ?: 30000.0
+                  availablePlaces = placesAvailable
+                  minDate = mindateTimestamp
+                  duration = acDuration
+                })
+          }
           Box(
               modifier =
                   Modifier.height(BUTTON_HEIGHT.dp)
@@ -121,6 +179,7 @@ fun ListActivitiesScreen(
                 if (selectedIndex != 0) {
                   activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
                 }
+                activitiesList = activitiesList.filter { it.date >= Timestamp.now() }
                 if (activitiesList.isEmpty()) {
                   if (selectedIndex == 0) {
                     Text(
@@ -142,11 +201,19 @@ fun ListActivitiesScreen(
                 } else {
                   var filteredActivities =
                       activitiesList.filter {
-                        if (searchText.isEmpty() || searchText.isBlank()) true
+                        if (it.price > maxPrice) false
+                        else if (availablePlaces != null &&
+                            (it.maxPlaces - it.placesLeft) <= availablePlaces!!)
+                            false
+                        else if (minDate != null && it.date < minDate!!) false
+                        else if (duration != null && it.duration != duration) false
                         else {
-                          it.title.contains(searchText, ignoreCase = true) ||
-                              it.description.contains(searchText, ignoreCase = true) ||
-                              it.location?.name?.contains(searchText, ignoreCase = true) ?: false
+                          if (searchText.isEmpty() || searchText.isBlank()) true
+                          else {
+                            it.title.contains(searchText, ignoreCase = true) ||
+                                it.description.contains(searchText, ignoreCase = true) ||
+                                it.location?.name?.contains(searchText, ignoreCase = true) ?: false
+                          }
                         }
                       }
                   LazyColumn(
@@ -164,7 +231,8 @@ fun ListActivitiesScreen(
                                 navigationActions,
                                 viewModel,
                                 profileViewModel,
-                                profile)
+                                profile,
+                                locationViewModel.getDistanceFromCurrentLocation(activity.location))
                           }
                         }
                       }
@@ -188,7 +256,8 @@ fun ActivityCard(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
     profileViewModel: ProfileViewModel,
-    profile: User?
+    profile: User?,
+    distance: Float? = null
 ) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
@@ -282,7 +351,7 @@ fun ActivityCard(
                     )
 
                 Text(
-                    text = "${activity.placesLeft}/${activity.maxPlaces}",
+                    text = "${activity.participants.size}/${activity.maxPlaces}",
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold,
@@ -291,6 +360,24 @@ fun ActivityCard(
                     modifier =
                         Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
               }
+
+          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+
+          if (distance != null) {
+            val distanceString =
+                "Distance : " +
+                    if (distance < 1) {
+                      "${round(distance * 1000).toInt()}m"
+                    } else {
+                      "${round(distance * 10) / 10}km"
+                    }
+            Text(
+                text = distanceString,
+                modifier =
+                    Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                        .testTag("distanceText") // Takes up remaining space
+                )
+          }
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
