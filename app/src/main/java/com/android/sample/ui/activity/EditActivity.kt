@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -44,6 +45,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,6 +61,8 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
+import com.android.sample.model.camera.fetchActivityImagesAsBitmaps
+import com.android.sample.model.camera.uploadActivityImages
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -67,6 +71,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
@@ -115,6 +120,7 @@ fun EditActivityScreen(
   var isGalleryOpen by remember { mutableStateOf(false) }
   var selectedImages = remember { mutableStateListOf<Bitmap>() }
 
+  var items by remember { mutableStateOf(activity?.images ?: listOf()) }
   // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember {
     mutableStateOf(
@@ -130,6 +136,12 @@ fun EditActivityScreen(
                 }"
         })
   }
+  fetchActivityImagesAsBitmaps(
+      activity?.uid ?: "",
+      { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
+      onFailure = { error ->
+        Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
+      })
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
@@ -191,7 +203,11 @@ fun EditActivityScreen(
                   })
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Carousel(
+                openDialog = { showDialogImage = true },
+                itemsList = selectedImages,
+                deleteImage = { bitmap -> selectedImages.remove(bitmap) })
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -456,6 +472,13 @@ fun EditActivityScreen(
                           0,
                           0)
 
+                      uploadActivityImages(
+                          activity?.uid ?: "",
+                          selectedImages.toList(),
+                          { urls -> items = urls },
+                          { error ->
+                            Log.e("EditActivityScreen", "Failed to upload images: ${error.message}")
+                          })
                       val updatedActivity =
                           Activity(
                               uid = activity?.uid ?: "",

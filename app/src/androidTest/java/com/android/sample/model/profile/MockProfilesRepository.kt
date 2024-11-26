@@ -9,7 +9,7 @@ class MockProfilesRepository : ProfilesRepository {
                   id = "u1",
                   name = "Alice",
                   surname = "Smith",
-                  interests = listOf("Hiking", "Cycling"),
+                  interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
                   activities = listOf("a1", "a2"),
                   photo = null,
                   likedActivities = listOf("a1")))
