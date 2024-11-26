@@ -1,5 +1,7 @@
 package com.android.sample.ui.activitydetails
 
+import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,6 +59,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.camera.fetchActivityImagesAsBitmaps
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -64,6 +67,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -110,6 +114,7 @@ fun ActivityDetailsScreen(
   val duration by remember { mutableStateOf(activity?.duration) }
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
+  var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
   val deleteComment: (Comment) -> Unit = { commentToDelete ->
     // Filter out the main comment and any replies associated with it
     val newComments = comments.filter { it.uid != commentToDelete.uid }
@@ -167,6 +172,11 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
+                    fetchActivityImagesAsBitmaps(
+                        activity?.uid ?: "",
+                        onSuccess = { urls -> bitmaps = urls },
+                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+                    CarouselNoModif(itemsList = bitmaps, deleteImage = {})
                     LikeButton(profile, activity, profileViewModel)
                   }
 
