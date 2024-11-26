@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
@@ -61,6 +62,7 @@ import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.NavigationActions
 
@@ -81,6 +83,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
   val scrollState = rememberScrollState()
 
   val context = LocalContext.current
+  val networkManager = NetworkManager(context)
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
 
   Scaffold(
@@ -165,7 +168,13 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                         Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
 
                 Button(
-                    onClick = { showDialogImage = true },
+                    onClick = {
+                      performOfflineAwareAction(
+                          context = context,
+                          networkManager = networkManager,
+                          onPerform = { showDialogImage = true },
+                      )
+                    },
                     modifier = Modifier.testTag("uploadPicture")) {
                       Text("Modify Profile Picture")
                     }
@@ -196,31 +205,36 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
 
                 Button(
                     onClick = {
-                      selectedImage?.let { bitmap ->
-                        uploadProfilePicture(
-                            profile.id,
-                            bitmap,
-                            onSuccess = { url ->
-                              photo = url // Update photo URL in profile
-                            },
-                            onFailure = { error ->
-                              Log.e(
-                                  "EditProfileScreen",
-                                  "Failed to upload profile picture: ${error.message}")
-                            })
-                      }
-                      try {
-                        profileViewModel.updateProfile(
-                            User(
-                                id = profile.id,
-                                name = name,
-                                surname = surname,
-                                interests = newListInterests,
-                                activities = profile.activities,
-                                photo = photo,
-                                likedActivities = profile.likedActivities))
-                        navigationActions.goBack()
-                      } catch (_: NumberFormatException) {}
+                      performOfflineAwareAction(
+                          context = context,
+                          networkManager = networkManager,
+                          onPerform = {
+                            selectedImage?.let { bitmap ->
+                              uploadProfilePicture(
+                                  profile.id,
+                                  bitmap,
+                                  onSuccess = { url ->
+                                    photo = url // Update photo URL in profile
+                                  },
+                                  onFailure = { error ->
+                                    Log.e(
+                                        "EditProfileScreen",
+                                        "Failed to upload profile picture: ${error.message}")
+                                  })
+                            }
+                            try {
+                              profileViewModel.updateProfile(
+                                  User(
+                                      id = profile.id,
+                                      name = name,
+                                      surname = surname,
+                                      interests = newListInterests,
+                                      activities = profile.activities,
+                                      photo = photo,
+                                      likedActivities = profile.likedActivities))
+                              navigationActions.goBack()
+                            } catch (_: NumberFormatException) {}
+                          })
                     },
                     modifier = Modifier.fillMaxWidth().testTag("profileSaveButton")) {
                       Text("Save", color = Color.White)
@@ -239,6 +253,8 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
   var selectedCategory by remember { mutableStateOf("") }
   var expanded by remember { mutableStateOf(false) }
   var newInterest by remember { mutableStateOf("") }
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
 
   Row(verticalAlignment = Alignment.CenterVertically) {
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
@@ -272,15 +288,20 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
   Row(verticalAlignment = Alignment.CenterVertically) {
     Button(
         onClick = {
-          if (newInterest.isNotBlank() &&
-              selectedCategory.isNotBlank() &&
-              selectedCategory != "None") {
-            val updatedList = newListInterests + Interest(selectedCategory, newInterest)
-            newListInterests = updatedList
-            newInterest = ""
-            selectedCategory = ""
-            onUpdateInterests(updatedList)
-          }
+          performOfflineAwareAction(
+              context = context,
+              networkManager = networkManager,
+              onPerform = {
+                if (newInterest.isNotBlank() &&
+                    selectedCategory.isNotBlank() &&
+                    selectedCategory != "None") {
+                  val updatedList = newListInterests + Interest(selectedCategory, newInterest)
+                  newListInterests = updatedList
+                  newInterest = ""
+                  selectedCategory = ""
+                  onUpdateInterests(updatedList)
+                }
+              })
         },
         enabled =
             newInterest.isNotBlank() && selectedCategory.isNotBlank() && selectedCategory != "None",
@@ -296,9 +317,14 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
           InterestEditBox(
               interest = newListInterests[interest].interest,
               onRemove = {
-                val updatedList = newListInterests - newListInterests[interest]
-                newListInterests = updatedList
-                onUpdateInterests(updatedList)
+                performOfflineAwareAction(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerform = {
+                      val updatedList = newListInterests - newListInterests[interest]
+                      newListInterests = updatedList
+                      onUpdateInterests(updatedList)
+                    })
               })
         }
       }
