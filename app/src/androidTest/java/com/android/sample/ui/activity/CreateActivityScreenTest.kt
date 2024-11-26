@@ -137,19 +137,6 @@ class CreateActivityScreenTest {
   }
 
   @Test
-  fun createActivityScreen_displaysDateField() {
-    composeTestRule.setContent {
-      CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
-    }
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputDateCreate").assertIsDisplayed()
-  }
-
-  @Test
   fun createActivityScreen_displaysPriceField() {
     composeTestRule.setContent {
       CreateActivityScreen(
@@ -226,10 +213,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("inputDescriptionCreate").performTextInput("Description")
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
     composeTestRule
@@ -270,10 +253,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("inputDescriptionCreate").performTextInput("Description")
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
     composeTestRule
@@ -300,10 +279,6 @@ class CreateActivityScreenTest {
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputTitleCreate"))
     composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Title")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputPriceCreate"))
