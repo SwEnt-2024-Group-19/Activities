@@ -33,6 +33,7 @@ import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
@@ -56,6 +57,7 @@ fun MapScreen(
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
+    location: Location? = null
 ) {
   val context = LocalContext.current
   val currentLocation by locationViewModel.currentLocation.collectAsState()
@@ -65,7 +67,7 @@ fun MapScreen(
   var selectedActivity by remember { mutableStateOf<Activity?>(null) }
   var showBottomSheet by remember { mutableStateOf(false) }
 
-  val firstToDoLocation =
+  val firstLocation =
       try {
         val loc =
             (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
@@ -73,10 +75,11 @@ fun MapScreen(
                 .firstNotNullOf { it.location }
         LatLng(loc.latitude, loc.longitude)
       } catch (_: NoSuchElementException) {
-        defaultLocation
+          //if no location is given in parameters, use the default location
+          location?.let { LatLng(it.latitude, it.longitude) } ?: defaultLocation
       }
   val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(firstToDoLocation, 10f)
+    position = CameraPosition.fromLatLngZoom(firstLocation, 10f)
   }
 
   // Activity result launcher to request permissions

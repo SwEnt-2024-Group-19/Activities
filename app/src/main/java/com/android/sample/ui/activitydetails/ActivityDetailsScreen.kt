@@ -254,6 +254,7 @@ fun ActivityDetailsScreen(
                         }
                         Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
                         Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                        // text field button to navigate to the activity's location on the map screen
                         Text(
                             text = stringResource(id = R.string.button_to_map),
                             modifier = Modifier.testTag("activityToMapText").clickable(
