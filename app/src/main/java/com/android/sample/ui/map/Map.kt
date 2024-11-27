@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 fun MapScreen(
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel,
-    listActivitiesViewModel: ListActivitiesViewModel
+    listActivitiesViewModel: ListActivitiesViewModel,
 ) {
   val context = LocalContext.current
   val currentLocation by locationViewModel.currentLocation.collectAsState()
