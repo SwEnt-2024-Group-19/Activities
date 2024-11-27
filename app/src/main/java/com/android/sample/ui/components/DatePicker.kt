@@ -10,8 +10,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 @Composable
-fun MyDatePicker(onDateSelected: (Timestamp) -> Unit, isOpen: Boolean) {
-  // Implementation
+fun MyDatePicker(onDateSelected: (Timestamp) -> Unit, isOpen: Boolean, initialDate: LocalDate?) {
   MaterialDialog(
       dialogState = rememberMaterialDialogState(isOpen),
       buttons = {
@@ -19,16 +18,10 @@ fun MyDatePicker(onDateSelected: (Timestamp) -> Unit, isOpen: Boolean) {
         negativeButton("Cancel")
       }) {
         datepicker(
-            initialDate = LocalDate.now(),
+            initialDate = initialDate?:LocalDate.now(),
             title = "Select a date",
             allowedDateValidator = { date -> date.isAfter(LocalDate.now().minusDays(1)) }) {
               onDateSelected(Timestamp(it.atStartOfDay().toInstant(ZoneOffset.MIN)))
             }
       }
-}
-
-@Preview
-@Composable
-fun MyDatePickerPreview() {
-  MyDatePicker(onDateSelected = {}, isOpen = true)
 }
