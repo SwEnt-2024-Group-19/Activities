@@ -215,6 +215,9 @@ class EditActivityScreenTest {
 
     @Test
     fun startTimeButtonSHowDialog(){
+        composeTestRule.setContent {
+            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+        }
         composeTestRule.onNodeWithTag("activityEditScreen")
             .performScrollToNode(hasTestTag("changeTimeButton"))
         composeTestRule.onNodeWithTag("changeTimeButton").performClick()
@@ -223,6 +226,9 @@ class EditActivityScreenTest {
 
     @Test
     fun endTimeButtonShowDialog(){
+        composeTestRule.setContent {
+            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+        }
         composeTestRule.onNodeWithTag("activityEditScreen")
             .performScrollToNode(hasTestTag("changeEndingTimeButton"))
         composeTestRule.onNodeWithTag("changeEndingTimeButton").performClick()
