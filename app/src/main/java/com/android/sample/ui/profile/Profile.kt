@@ -242,10 +242,10 @@ fun ActivityBox(
     if (shouldShowActivity(activity, user, category)) {
       ActivityRow(
           activity = activity,
-          onClickAction = {
-            listActivitiesViewModel.selectActivity(activity)
-            navigateToActivity(category, navigationActions)
-          },
+          listActivitiesViewModel = listActivitiesViewModel,
+          navigationActions = navigationActions,
+          category = category,
+          userId = user.id,
           testTag = "activity${category.capitalize()}")
     }
   }
@@ -270,14 +270,17 @@ fun navigateToActivity(category: String, navigationActions: NavigationActions) {
 }
 /** Display a single activity in a row */
 @Composable
-fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) {
+fun ActivityRow(activity: Activity, listActivitiesViewModel: ListActivitiesViewModel, navigationActions: NavigationActions, category: String, userId: String, testTag: String) {
   Row(
       modifier =
           Modifier.fillMaxWidth()
               .testTag(testTag)
               .padding(STANDARD_PADDING.dp)
               .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable { onClickAction() },
+              .clickable {
+                  listActivitiesViewModel.selectActivity(activity)
+                  navigateToActivity(category, navigationActions)
+             },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = painterResource(id = R.drawable.foot),
