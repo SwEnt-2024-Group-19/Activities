@@ -283,6 +283,7 @@ class CreateActivityScreenTest {
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
+      composeTestRule.onNodeWithTag("inputPriceCreate").assertTextEquals("100")
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("createButton"))
@@ -363,4 +364,75 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
   }
+
+    @Test
+    fun datePickerButtonIsDisplayed() {
+        composeTestRule.setContent {
+            CreateActivityScreen(
+                mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+        }
+        composeTestRule
+            .onNodeWithTag("activityCreateScreen")
+            .performScrollToNode(hasTestTag("datePickerButton"))
+        composeTestRule.onNodeWithTag("datePickerButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("iconDateCreate").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("datePickerButton")
+            .assertTextEquals("Select Date for the activity")
+    }
+
+    @Test
+    fun timePickerButtonIsDisplayed() {
+        composeTestRule.setContent {
+            CreateActivityScreen(
+                mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+        }
+        composeTestRule
+            .onNodeWithTag("activityCreateScreen")
+            .performScrollToNode(hasTestTag("inputStartTimeCreate"))
+        composeTestRule.onNodeWithTag("inputStartTimeCreate").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("iconStartTimeCreate").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("inputStartTimeCreate")
+            .assertTextEquals("Select start Time")
+    }
+
+    @Test
+    fun endTimePickerButtonIsDisplayed(){
+        composeTestRule.setContent {
+            CreateActivityScreen(
+                mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+        }
+        composeTestRule
+            .onNodeWithTag("activityCreateScreen")
+            .performScrollToNode(hasTestTag("inputEndTimeCreate"))
+        composeTestRule.onNodeWithTag("inputEndTimeCreate").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("iconEndTimeCreate").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("inputEndTimeCreate")
+            .assertTextEquals("Select End Time for the activity")
+    }
+
+    @Test
+    fun dateDialogIsDisplayed(){
+        composeTestRule.setContent {
+            CreateActivityScreen(
+                mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+        }
+        composeTestRule
+            .onNodeWithTag("activityCreateScreen")
+            .performScrollToNode(hasTestTag("inputDateCreate"))
+        composeTestRule.onNodeWithTag("inputDateCreate").performClick()
+        composeTestRule.onNodeWithText("Select a date").assertIsDisplayed()
+    }
+
+    @Test
+    fun timeDialogIsDisplayed(){
+        composeTestRule.setContent {
+            CreateActivityScreen(
+                mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+        }
+        composeTestRule
+            .onNodeWithTag("activityCreateScreen")
+            .performScrollToNode(hasTestTag("inputStartTimeCreate"))
+        composeTestRule.onNodeWithTag("inputStartTimeCreate").performClick()
+        composeTestRule.onNodeWithText("Select a time").assertIsDisplayed()
+    }
 }

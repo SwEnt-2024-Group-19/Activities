@@ -238,12 +238,14 @@ fun CreateActivityScreen(
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
                 onClick = { startTimeIsOpen = true },
-                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)
+                    .testTag("inputStartTimeCreate"),
             ) {
               Icon(
                   Icons.Filled.AccessTime,
                   contentDescription = "select start time",
-                  modifier = Modifier.padding(end = STANDARD_PADDING.dp))
+                  modifier = Modifier.padding(end = STANDARD_PADDING.dp)
+                      .testTag("iconStartTimeCreate"))
               if (startTimeIsSet) Text("Start time: ${startTime} (click to change)")
               else Text("Select start time")
             }
@@ -265,13 +267,15 @@ fun CreateActivityScreen(
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
                 onClick = { durationIsOpen = true },
-                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)
+                    .testTag("inputEndTimeCreate"),
             ) {
               Icon(
                   Icons.Filled.HourglassTop,
                   contentDescription = "select duration",
                   modifier =
-                      Modifier.padding(end = STANDARD_PADDING.dp).align(Alignment.CenterVertically))
+                      Modifier.padding(end = STANDARD_PADDING.dp).align(Alignment.CenterVertically)
+                          .testTag("iconEndTimeCreate"))
               if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
               else Text("Select End Time")
             }
