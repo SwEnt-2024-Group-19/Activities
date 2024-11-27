@@ -7,7 +7,6 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -93,7 +92,7 @@ fun CreateActivityScreen(
   var expandedType by remember { mutableStateOf(false) }
   var expandedCategory by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf("Select a type") }
-    var selectedOptionCategory by remember { mutableStateOf("Select a category") }
+  var selectedOptionCategory by remember { mutableStateOf("Select a category") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -349,30 +348,28 @@ fun CreateActivityScreen(
                               modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
                               text = { Text(selectionOption.name) },
                               onClick = {
-                                selectedOptionType= selectionOption.name
+                                selectedOptionType = selectionOption.name
                                 expandedType = false
                               })
                         }
                       }
                 }
 
-
-
-              ExposedDropdownMenuBox(
-                  modifier =
-                  Modifier.testTag("chooseCategoryMenu")
-                      .align(Alignment.CenterHorizontally)
-                      .fillMaxWidth()
-                      .padding(STANDARD_PADDING.dp),
-                  expanded = expandedCategory,
-                  onExpandedChange = { expandedCategory = !expandedCategory }) {
+            ExposedDropdownMenuBox(
+                modifier =
+                    Modifier.testTag("chooseCategoryMenu")
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
+                expanded = expandedCategory,
+                onExpandedChange = { expandedCategory = !expandedCategory }) {
                   OutlinedTextField(
                       readOnly = true,
                       value = selectedOptionCategory,
                       onValueChange = {},
                       label = { Text("Activity Category") },
                       trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
                       modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
@@ -380,18 +377,17 @@ fun CreateActivityScreen(
                       expanded = expandedCategory,
                       onDismissRequest = { expandedCategory = false },
                       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                      categories.forEach { selectionOption ->
+                        categories.forEach { selectionOption ->
                           DropdownMenuItem(
                               modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
                               text = { Text(selectionOption.name) },
                               onClick = {
-                                  selectedOptionCategory = selectionOption.name
-                                  expandedCategory = false
+                                selectedOptionCategory = selectionOption.name
+                                expandedCategory = false
                               })
+                        }
                       }
-                  }
-              }
-
+                }
 
             Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
@@ -523,7 +519,9 @@ fun CreateActivityScreen(
                               participants = attendees,
                               type = types.find { it.name == selectedOptionType } ?: types[0],
                               comments = listOf(),
-                              category = categories.find { it.name == selectedOptionCategory } ?: categories[0])
+                              category =
+                                  categories.find { it.name == selectedOptionCategory }
+                                      ?: categories[0])
                       listActivityViewModel.addActivity(activity)
                       profileViewModel.addActivity(creator, activity.uid)
                       navigationActions.navigateTo(Screen.OVERVIEW)
@@ -566,4 +564,3 @@ fun CreateActivityScreen(
             selectedItem = Route.ADD_ACTIVITY)
       })
 }
-

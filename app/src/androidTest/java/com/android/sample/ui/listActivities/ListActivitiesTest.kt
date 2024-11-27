@@ -264,25 +264,25 @@ class OverviewScreenTest {
     val activity4 = activity.copy(title = "networking", category = Category.SKILLS)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity, activity1, activity2, activity3, activity4))
+      it.getArgument<(List<Activity>) -> Unit>(0)(
+          listOf(activity, activity1, activity2, activity3, activity4))
     }
 
     listActivitiesViewModel.getActivities()
     composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
     composeTestRule.onNodeWithText("football").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
 
     composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
     composeTestRule.onNodeWithText("dance").assertIsDisplayed()
-      composeTestRule.onNodeWithText("football").assertIsNotDisplayed()
-      composeTestRule.onNodeWithText("Italian cooking").assertIsNotDisplayed()
-      composeTestRule.onNodeWithText("networking").assertIsNotDisplayed()
-      composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
+    composeTestRule.onNodeWithText("football").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("Italian cooking").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("networking").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
 
     composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
     composeTestRule.onNodeWithText("Italian cooking").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
-
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
 
     composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick()
     composeTestRule.onNodeWithText("networking").assertIsDisplayed()

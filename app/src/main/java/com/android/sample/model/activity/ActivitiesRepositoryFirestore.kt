@@ -128,7 +128,6 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
         participants = participants,
         comments = comments,
         category = Category.valueOf(data["category"] as? String ?: "SPORT"))
-
   }
 
   override fun addActivity(

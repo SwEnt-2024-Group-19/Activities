@@ -101,9 +101,9 @@ fun EditActivityScreen(
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration) }
   var expandedType by remember { mutableStateOf(false) }
-    var expandedCategory by remember { mutableStateOf(false) }
+  var expandedCategory by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf(activity?.type.toString()) }
-    var selectedOptionCategory by remember { mutableStateOf(activity?.category.toString()) }
+  var selectedOptionCategory by remember { mutableStateOf(activity?.category.toString()) }
 
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
@@ -304,18 +304,20 @@ fun EditActivityScreen(
                       }
                 }
 
-              ExposedDropdownMenuBox(
-                  modifier =
-                  Modifier.testTag("chooseCategoryMenu").fillMaxWidth().padding(STANDARD_PADDING.dp),
-                  expanded = expandedCategory,
-                  onExpandedChange = { expandedCategory = !expandedCategory }) {
+            ExposedDropdownMenuBox(
+                modifier =
+                    Modifier.testTag("chooseCategoryMenu")
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
+                expanded = expandedCategory,
+                onExpandedChange = { expandedCategory = !expandedCategory }) {
                   OutlinedTextField(
                       readOnly = true,
                       value = selectedOptionCategory,
                       onValueChange = {},
                       label = { Text("Activity Category") },
                       trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
                       modifier = Modifier.menuAnchor().fillMaxWidth())
@@ -323,19 +325,17 @@ fun EditActivityScreen(
                       expanded = expandedCategory,
                       onDismissRequest = { expandedCategory = false },
                       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                      categories.forEach { selectionOption ->
+                        categories.forEach { selectionOption ->
                           DropdownMenuItem(
                               modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
                               text = { Text(selectionOption.name) },
                               onClick = {
-                                  selectedOptionCategory = selectionOption.name
-                                  expandedCategory = false
+                                selectedOptionCategory = selectionOption.name
+                                expandedCategory = false
                               })
+                        }
                       }
-                  }
-              }
-
-
+                }
 
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
@@ -390,10 +390,6 @@ fun EditActivityScreen(
                         }
                       }
                 }
-
-
-
-
 
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
@@ -512,7 +508,9 @@ fun EditActivityScreen(
                               type = types.find { it.name == selectedOptionType } ?: types[0],
                               participants = attendees,
                               comments = activity?.comments ?: listOf(),
-                              category = categories.find { it.name == selectedOptionCategory } ?: categories[0])
+                              category =
+                                  categories.find { it.name == selectedOptionCategory }
+                                      ?: categories[0])
                       listActivityViewModel.updateActivity(updatedActivity)
                       navigationActions.navigateTo(Screen.OVERVIEW)
                     } catch (_: Exception) {}

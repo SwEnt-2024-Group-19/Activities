@@ -11,7 +11,7 @@ data class Activity(
     var date: Timestamp,
     var startTime: String,
     var duration: String,
-    var category: Category=Category.SPORT,
+    var category: Category = Category.SPORT,
     var price: Double,
     var location: Location?,
     var creator: String,
@@ -46,12 +46,11 @@ enum class ActivityStatus {
   FINISHED,
 }
 
- enum class Category {
-     SPORT,
-     CULTURE,
-        SKILLS,
-     ENTERTAINMENT,
- }
+enum class Category {
+  SPORT,
+  CULTURE,
+  SKILLS,
+  ENTERTAINMENT,
+}
 
- val categories = Category.values().toList()
-
+val categories = Category.values().toList()

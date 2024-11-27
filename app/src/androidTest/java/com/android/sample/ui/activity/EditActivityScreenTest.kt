@@ -197,63 +197,52 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
   }
 
-    @Test
-    fun editActivityScreen_dropdownCategoryOpensAndDisplaysOptions() {
-        composeTestRule.setContent {
-            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
-        }
-        composeTestRule
-            .onNodeWithTag("activityEditScreen")
-            .performScrollToNode(hasTestTag("chooseCategoryMenu"))
-        composeTestRule.onNodeWithText(activity.category.toString()).assertIsDisplayed()
+  @Test
+  fun editActivityScreen_dropdownCategoryOpensAndDisplaysOptions() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+    composeTestRule.onNodeWithText(activity.category.toString()).assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 
+    composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
+  }
 
-        composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
-        composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
-        composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
-
+  @Test
+  fun editActivityScreen_selectsCategoryDropdownOption1() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
     }
 
-    @Test
-    fun editActivityScreen_selectsCategoryDropdownOption1() {
-        composeTestRule.setContent {
-            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
-        }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("chooseCategoryMenu"))
 
-        composeTestRule
-            .onNodeWithTag("activityCreateScreen")
-            .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+    composeTestRule.onNodeWithTag("categoryTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Activity Category").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("categoryTextField").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Activity Category").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 
-        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+    composeTestRule.onNodeWithText(categories[0].name).performClick()
 
+    composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
 
-        composeTestRule.onNodeWithText(categories[0].name).performClick()
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 
+    composeTestRule.onNodeWithText(categories[1].name).performClick()
 
-        composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 
+    composeTestRule.onNodeWithText(categories[2].name).performClick()
 
-        composeTestRule.onNodeWithText(categories[1].name).performClick()
-
-
-        composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
-
-        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
-
-
-        composeTestRule.onNodeWithText(categories[2].name).performClick()
-
-
-        composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
-
-    }
-
-
+    composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
+  }
 }
