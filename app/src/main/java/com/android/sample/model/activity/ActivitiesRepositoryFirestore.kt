@@ -126,7 +126,9 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
         status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
         type = activityType,
         participants = participants,
-        comments = comments)
+        comments = comments,
+        likes = data["likes"] as? Map<String, Boolean?> ?: emptyMap()
+        )
   }
 
   override fun addActivity(

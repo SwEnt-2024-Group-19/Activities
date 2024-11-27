@@ -21,7 +21,8 @@ data class Activity(
     var status: ActivityStatus,
     val type: ActivityType,
     var participants: List<User>,
-    var comments: List<Comment> = emptyList()
+    var comments: List<Comment> = emptyList(),
+    var likes: Map<String, Boolean?> = emptyMap(),
 )
 
 data class Comment(
