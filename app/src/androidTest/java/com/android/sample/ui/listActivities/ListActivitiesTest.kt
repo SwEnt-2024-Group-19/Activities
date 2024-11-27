@@ -99,7 +99,7 @@ class OverviewScreenTest {
     profilesRepository = mock(ProfilesRepository::class.java)
     activitiesRepository = mock(ActivitiesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
-    listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
+    listActivitiesViewModel = ListActivitiesViewModel(profilesRepository, activitiesRepository)
 
     testUser =
         User(
