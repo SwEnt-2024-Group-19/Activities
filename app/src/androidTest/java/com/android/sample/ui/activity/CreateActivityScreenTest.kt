@@ -390,7 +390,7 @@ class CreateActivityScreenTest {
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputDateCreate"))
     composeTestRule.onNodeWithTag("inputDateCreate").performClick()
-    composeTestRule.onNodeWithText("Select a date").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Pick a date").assertIsDisplayed()
   }
 
   @Test
@@ -416,6 +416,6 @@ class CreateActivityScreenTest {
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputEndTimeCreate"))
     composeTestRule.onNodeWithTag("inputEndTimeCreate").performClick()
-    composeTestRule.onNodeWithText("Select a time").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
   }
 }
