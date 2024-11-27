@@ -316,7 +316,7 @@ class ActivityDetailsScreenAndroidTest {
     mockViewModel = spy(ListActivitiesViewModel(mockActivitiesRepo))
 
     val mockProfileRepo = MockProfilesRepository()
-    mockProfileViewModel = spy(ProfileViewModel(mockProfileRepo))
+    mockProfileViewModel = spy(ProfileViewModel(mockProfileRepo, mock()))
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "123")))
 
     val enrolledActivity =
@@ -543,7 +543,7 @@ class ActivityDetailsScreenAndroidTest {
     }
 
     fun changeIconWhenActivityIsLiked() {
-      mockProfileViewModel = ProfileViewModel(mockRepository)
+      mockProfileViewModel = ProfileViewModel(mockRepository, mock())
 
       composeTestRule.setContent {
         LikeButton(testUser, activityWithParticipants, mockProfileViewModel)
