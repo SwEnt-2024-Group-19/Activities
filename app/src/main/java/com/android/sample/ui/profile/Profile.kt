@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -247,14 +248,14 @@ fun ActivityBox(
   val uiState by listActivitiesViewModel.uiState.collectAsState()
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val thisActivity = activitiesList.find { it.uid == activityId }
-
+  val context = LocalContext.current
   thisActivity?.let { activity ->
     if (shouldShowActivity(activity, user, category)) {
       ActivityRow(
           activity = activity,
           onClickAction = {
             listActivitiesViewModel.selectActivity(activity)
-            navigateToActivity(category, navigationActions)
+            navigateToActivity(category, navigationActions, context)
           },
           testTag = "activity${category.capitalize()}")
     }
@@ -271,10 +272,19 @@ fun shouldShowActivity(activity: Activity, user: User, category: String): Boolea
   }
 }
 /** Navigate to the appropriate screen based on the category */
-fun navigateToActivity(category: String, navigationActions: NavigationActions) {
+fun navigateToActivity(category: String, navigationActions: NavigationActions, context: Context) {
+  val networkManager = NetworkManager(context)
   when (category) {
-    "created" -> navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
-    "past" -> navigationActions.navigateTo(Screen.EDIT_ACTIVITY)
+    "created" ->
+        performOfflineAwareAction(
+            context,
+            networkManager,
+            onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
+    "past" ->
+        performOfflineAwareAction(
+            context,
+            networkManager,
+            onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
     "enrolled" -> navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
   }
 }
