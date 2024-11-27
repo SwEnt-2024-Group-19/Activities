@@ -10,6 +10,7 @@ import com.android.sample.model.profile.database.UserDao
 @Database(entities = [User::class, Activity::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun activityDao(): ActivityDao
-    abstract fun userDao(): UserDao
+  abstract fun activityDao(): ActivityDao
+
+  abstract fun userDao(): UserDao
 }

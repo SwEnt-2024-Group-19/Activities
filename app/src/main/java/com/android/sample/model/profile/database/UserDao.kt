@@ -8,12 +8,9 @@ import com.android.sample.model.profile.User
 
 @Dao
 interface UserDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(user: User)
+  @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun insert(user: User)
 
-    @Query("SELECT * FROM User WHERE id = :userId LIMIT 1")
-    suspend fun getUser(userId: String): User?
+  @Query("SELECT * FROM User WHERE id = :userId LIMIT 1") suspend fun getUser(userId: String): User?
 
-    @Query("DELETE FROM User")
-    suspend fun clear()
+  @Query("DELETE FROM User") suspend fun clear()
 }
