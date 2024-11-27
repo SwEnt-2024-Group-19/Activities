@@ -401,7 +401,12 @@ fun ActivityDetailsScreen(
                 } else {
                   // Creator of the activity
                   Button(
-                      onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
+                      onClick = {
+                        performOfflineAwareAction(
+                            context = context,
+                            networkManager = networkManager,
+                            onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
+                      },
                       modifier =
                           Modifier.fillMaxWidth()
                               .padding(horizontal = LARGE_PADDING.dp)
