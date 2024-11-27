@@ -436,4 +436,17 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("inputStartTimeCreate").performClick()
     composeTestRule.onNodeWithText("Select a time").assertIsDisplayed()
   }
+
+  @Test
+  fun timeEndDialogIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputEndTimeCreate"))
+    composeTestRule.onNodeWithTag("inputEndTimeCreate").performClick()
+    composeTestRule.onNodeWithText("Select a time").assertIsDisplayed()
+  }
 }
