@@ -31,6 +31,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
+import androidx.compose.material3.MultiChoiceSegmentedButtonRowScope
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -41,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,6 +63,7 @@ import androidx.core.content.ContextCompat
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -80,7 +84,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.round
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun ListActivitiesScreen(
@@ -92,14 +96,11 @@ fun ListActivitiesScreen(
 ) {
   val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
-  var selectedIndex by remember { mutableIntStateOf(0) }
-  val all = "ALL"
-  val typesToString = types.map { it.name }
-  val options = listOf(all) + typesToString
+  val options = categories.map { it.name }
   val profile = profileViewModel.userState.collectAsState().value
   var searchText by remember { mutableStateOf("") }
   var showFilterDialog by remember { mutableStateOf(false) }
-
+  val checkedList = remember { mutableStateListOf<Int>() }
   var maxPrice by remember { mutableStateOf(30000.0) }
   var availablePlaces by remember { mutableStateOf<Int?>(null) }
   var minDate by remember { mutableStateOf<Timestamp?>(null) }
@@ -156,32 +157,39 @@ fun ListActivitiesScreen(
                   Modifier.height(BUTTON_HEIGHT.dp)
                       .testTag("segmentedButtonRow")
                       .fillMaxWidth()
-                      .padding(horizontal = STANDARD_PADDING.dp)) { // Set the desired height here
-                SingleChoiceSegmentedButtonRow {
+                      .padding(horizontal = STANDARD_PADDING.dp)) {
+              MultiChoiceSegmentedButtonRow(modifier=Modifier.fillMaxWidth()) {
                   options.forEachIndexed { index, label ->
-                    SegmentedButton(
-                        modifier = Modifier.testTag("segmentedButton$label"),
-                        shape =
-                            SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                        onClick = { selectedIndex = index },
-                        selected = index == selectedIndex) {
+                      SegmentedButton(
+                          modifier = Modifier.testTag("segmentedButton$label").fillMaxWidth(),
+                          shape =
+                          SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                          onCheckedChange = {
+                              if (index in checkedList) {
+                                  checkedList.remove(index)
+                              } else {
+                                  checkedList.add(index)
+                              }
+                          },
+                          checked = index in checkedList
+                      ) {
                           Text(label)
-                        }
+                      }
                   }
-                }
               }
+          }
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
           Box(modifier = modifier.fillMaxWidth()) {
             when (uiState) {
               is ListActivitiesViewModel.ActivitiesUiState.Success -> {
                 var activitiesList =
                     (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-                if (selectedIndex != 0) {
-                  activitiesList = activitiesList.filter { it.type.name == options[selectedIndex] }
+                if (checkedList.isNotEmpty()) {
+                  activitiesList = activitiesList.filter { checkedList.contains(categories.indexOf(it.category)) }
                 }
                 activitiesList = activitiesList.filter { it.date >= Timestamp.now() }
                 if (activitiesList.isEmpty()) {
-                  if (selectedIndex == 0) {
+                  if (checkedList.isEmpty()) {
                     Text(
                         text = "There is no activity yet.",
                         modifier =
@@ -191,7 +199,7 @@ fun ListActivitiesScreen(
                         color = MaterialTheme.colorScheme.onSurface)
                   } else {
                     Text(
-                        text = "There is no activity of this type yet.",
+                        text = "There is no activity of these categories yet.",
                         modifier =
                             Modifier.padding(STANDARD_PADDING.dp)
                                 .align(Alignment.Center)
@@ -248,6 +256,7 @@ fun ListActivitiesScreen(
           }
         }
       }
+
 }
 
 @Composable
@@ -259,135 +268,146 @@ fun ActivityCard(
     profile: User?,
     distance: Float? = null
 ) {
-  val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-  val formattedDate = dateFormat.format(activity.date.toDate())
+    val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+    val formattedDate = dateFormat.format(activity.date.toDate())
 
-  var isLiked by remember {
-    mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
-  }
+    var isLiked by remember {
+        mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
+    }
 
-  Card(
-      modifier =
-          Modifier.fillMaxWidth()
-              .testTag("activityCard")
-              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable {
+    Card(
+        modifier =
+        Modifier.fillMaxWidth()
+            .testTag("activityCard")
+            .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+            .clickable {
                 listActivitiesViewModel.selectActivity(activity)
                 navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-              },
-      elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)) {
+            },
+        elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)
+    ) {
         Column {
-          // Box for overlaying the title on the image
-          Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
-            // Display the activity image
-            Image(
-                painter = painterResource(R.drawable.foot),
-                contentDescription = activity.title,
-                modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
-                contentScale = ContentScale.Crop)
+            // Box for overlaying the title on the image
+            Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
+                // Display the activity image
+                Image(
+                    painter = painterResource(R.drawable.foot),
+                    contentDescription = activity.title,
+                    modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
+                    contentScale = ContentScale.Crop
+                )
 
-            // Display the activity name on top of the image
-            Text(
-                text = activity.title,
-                style =
+                // Display the activity name on top of the image
+                Text(
+                    text = activity.title,
+                    style =
                     MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.White // Title color set to black
-                        ),
-                modifier =
+                    ),
+                    modifier =
                     Modifier.align(Alignment.BottomStart)
                         .padding(MEDIUM_PADDING.dp)
-                        .testTag("titleActivity"))
-          }
+                        .testTag("titleActivity")
+                )
+            }
 
-          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-          Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically) {
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            Row(
+                modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 // Display the date
                 Text(
                     text = formattedDate,
                     style =
-                        MaterialTheme.typography.bodySmall.copy(
-                            color = Color.Gray, // Light gray color for the date
-                            fontStyle = FontStyle.Italic),
+                    MaterialTheme.typography.bodySmall.copy(
+                        color = Color.Gray, // Light gray color for the date
+                        fontStyle = FontStyle.Italic
+                    ),
                     modifier = Modifier.weight(1f) // Takes up remaining space
-                    )
+                )
 
                 if (profile != null) {
-                  IconButton(
-                      onClick = {
-                        isLiked = !isLiked
-                        if (isLiked) {
-                          profileViewModel.addLikedActivity(profile.id, activity.uid)
-                        } else {
-                          profileViewModel.removeLikedActivity(profile.id, activity.uid)
-                        }
-                      },
-                      modifier = Modifier.testTag("likeButton$isLiked"),
-                  ) {
-                    Icon(
-                        imageVector =
+                    IconButton(
+                        onClick = {
+                            isLiked = !isLiked
+                            if (isLiked) {
+                                profileViewModel.addLikedActivity(profile.id, activity.uid)
+                            } else {
+                                profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                            }
+                        },
+                        modifier = Modifier.testTag("likeButton$isLiked"),
+                    ) {
+                        Icon(
+                            imageVector =
                             if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color.Black else Color.Gray,
-                    )
-                  }
+                            contentDescription = if (isLiked) "Liked" else "Not Liked",
+                            tint = if (isLiked) Color.Black else Color.Gray,
+                        )
+                    }
                 }
-              }
+            }
 
-          Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 // Location on the left
                 Text(
                     text = activity.location?.name ?: "No location",
                     style =
-                        MaterialTheme.typography.bodySmall.copy(
-                            fontStyle = FontStyle.Italic, color = Color.Gray),
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontStyle = FontStyle.Italic, color = Color.Gray
+                    ),
                     modifier = Modifier.weight(1f) // Takes up remaining space
-                    )
+                )
 
                 Text(
                     text = "${activity.participants.size}/${activity.maxPlaces}",
                     style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray,
-                            fontSize = MEDIUM_PADDING.sp),
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.Gray,
+                        fontSize = MEDIUM_PADDING.sp
+                    ),
                     modifier =
-                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
-              }
+                    Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp)
+                )
+            }
 
-          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+            Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-          if (distance != null) {
-            val distanceString =
-                "Distance : " +
-                    if (distance < 1) {
-                      "${round(distance * 1000).toInt()}m"
-                    } else {
-                      "${round(distance * 10) / 10}km"
-                    }
-            Text(
-                text = distanceString,
-                modifier =
+            if (distance != null) {
+                val distanceString =
+                    "Distance : " +
+                            if (distance < 1) {
+                                "${round(distance * 1000).toInt()}m"
+                            } else {
+                                "${round(distance * 10) / 10}km"
+                            }
+                Text(
+                    text = distanceString,
+                    modifier =
                     Modifier.padding(horizontal = MEDIUM_PADDING.dp)
                         .testTag("distanceText") // Takes up remaining space
                 )
-          }
+            }
 
-          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+            Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-          // Display the activity description
-          Text(
-              text = activity.description,
-              style =
-                  MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
-          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            // Display the activity description
+            Text(
+                text = activity.description,
+                style =
+                MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
+                modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+            )
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
         }
-      }
+    }
+
 }
