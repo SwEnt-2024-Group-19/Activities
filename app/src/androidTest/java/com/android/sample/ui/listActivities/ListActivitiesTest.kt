@@ -17,6 +17,7 @@ import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationRepository
@@ -250,31 +251,38 @@ class OverviewScreenTest {
   }
 
   @Test
-  fun filteringWorks() {
+  fun filteringCategoryWorks() {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
-    val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
-    val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
+    val activity1 = activity.copy(title = "Italian cooking", category = Category.CULTURE)
+    val activity2 = activity.copy(title = "dance", category = Category.ENTERTAINMENT)
+    val activity3 = activity.copy(title = "football", category = Category.SPORT)
+    val activity4 = activity.copy(title = "networking", category = Category.SKILLS)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity, activity1, activity2, activity3))
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity, activity1, activity2, activity3, activity4))
     }
 
     listActivitiesViewModel.getActivities()
-    composeTestRule.onNodeWithTag("segmentedButtonINDIVIDUAL").performClick()
-    composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
     composeTestRule.onNodeWithText("football").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
 
-    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
     composeTestRule.onNodeWithText("dance").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
 
-    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
-    composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
+    composeTestRule.onNodeWithText("Italian cooking").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
+
+
+    composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick()
+    composeTestRule.onNodeWithText("networking").assertIsDisplayed()
   }
 
   @Test
