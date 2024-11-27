@@ -78,7 +78,7 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
           try {
             ActivityType.valueOf(it as String)
           } catch (e: IllegalArgumentException) {
-            ActivityType.SOLO // Replace with your default ActivityType
+            ActivityType.SOLO
           }
         } ?: ActivityType.SOLO
     val comments =
@@ -126,7 +126,9 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
         status = ActivityStatus.valueOf(data["status"] as? String ?: "ACTIVE"),
         type = activityType,
         participants = participants,
-        comments = comments)
+        comments = comments,
+        category = Category.valueOf(data["category"] as? String ?: "SPORT"))
+
   }
 
   override fun addActivity(
