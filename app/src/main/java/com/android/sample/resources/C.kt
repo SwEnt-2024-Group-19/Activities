@@ -63,5 +63,8 @@ object C {
     const val TEXT_FONTSIZE = 12
 
     const val WIDTH_FRACTION = 0.8f
+
+    // errors
+    const val OFFLINE_TOAST_MESSAGE = "You are offline. Action not allowed."
   }
 }
