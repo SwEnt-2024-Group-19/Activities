@@ -61,6 +61,7 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
 import com.android.sample.model.camera.uploadActivityImages
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -91,8 +92,9 @@ fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
 ) {
+   val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
@@ -211,12 +213,15 @@ fun CreateActivityScreen(
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
                 onClick = { dateIsOpen = true },
-                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(STANDARD_PADDING.dp)
+                    .testTag("inputDateCreate"),
             ) {
               Icon(
                   Icons.Filled.CalendarMonth,
                   contentDescription = "select date",
-                  modifier = Modifier.padding(end = STANDARD_PADDING.dp))
+                  modifier = Modifier.padding(end = STANDARD_PADDING.dp)
+                      .testTag("iconDateCreate"))
               if (dateIsSet)
                   Text(
                       "Selected date: ${dueDate.toDate().toString().take(11)}," +
@@ -230,7 +235,8 @@ fun CreateActivityScreen(
                     dateIsOpen = false
                     dateIsSet = true
                   },
-                  isOpen = dateIsOpen)
+                  isOpen = dateIsOpen
+              ,null)
             }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
@@ -269,8 +275,8 @@ fun CreateActivityScreen(
                   contentDescription = "select duration",
                   modifier =
                       Modifier.padding(end = STANDARD_PADDING.dp).align(Alignment.CenterVertically))
-              if (durationIsSet) Text("Duration: ${duration} (click to change)")
-              else Text("Select duration")
+              if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
+              else Text("Select End Time")
             }
             if (durationIsOpen) {
               MyTimePicker(
@@ -470,20 +476,6 @@ fun CreateActivityScreen(
             Button(
                 enabled = title.isNotEmpty() && description.isNotEmpty(),
                 onClick = {
-                  val timeFormat = startTime.split(":")
-                  if (timeFormat.size != 2) {
-                    Toast.makeText(
-                            context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
-                        .show()
-                  }
-                  val durationFormat = duration.split(":")
-                  if (durationFormat.size != 2) {
-                    Toast.makeText(
-                            context, "Invalid format, duration must be HH:MM.", Toast.LENGTH_SHORT)
-                        .show()
-                  }
-                  val calendar = GregorianCalendar()
-
                   val activityId = listActivityViewModel.getNewUid()
                   if (creator == "") {
                     Toast.makeText(
@@ -491,7 +483,26 @@ fun CreateActivityScreen(
                             "You must be logged in to create an activity.",
                             Toast.LENGTH_SHORT)
                         .show()
-                  } else if (timeFormat.size == 2 && durationFormat.size == 2) {
+                  } else if (hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
+                    Toast.makeText(
+                            context,
+                            "The start time must be before the end time.",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (price.toDoubleOrNull() == null) {
+                    Toast.makeText(
+                            context, "Invalid price format.", Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (placesMax.toLongOrNull() == null) {
+                    Toast.makeText(
+                            context, "Invalid places format.", Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (selectedLocation == null) {
+                    Toast.makeText(
+                            context, "You must select a location.", Toast.LENGTH_SHORT)
+                        .show()
+                  }
+                  else {
                     attendees += profileViewModel.userState.value!!
                     try {
                       uploadActivityImages(
@@ -514,7 +525,7 @@ fun CreateActivityScreen(
                               description = description,
                               date = dueDate,
                               startTime = startTime,
-                              duration = duration,
+                              duration = hourDateViewModel.calculateDuration(startTime, duration),
                               price = price.toDouble(),
                               placesLeft = attendees.size.toLong(),
                               maxPlaces = placesMax.toLongOrNull() ?: 0,
