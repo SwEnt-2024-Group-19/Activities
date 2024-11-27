@@ -39,12 +39,7 @@ enum class ActivityType {
   SOLO,
 }
 
-val types =
-    listOf(
-        ActivityType.PRO,
-        ActivityType.INDIVIDUAL,
-        ActivityType.SOLO,
-    )
+val types = ActivityType.values().toList()
 
 enum class ActivityStatus {
   ACTIVE,
