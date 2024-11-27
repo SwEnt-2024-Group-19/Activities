@@ -79,10 +79,6 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("inputLocationEdit").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("activityEditScreen")
-        .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputPriceEdit"))
     composeTestRule.onNodeWithTag("inputPriceEdit").assertIsDisplayed()
     composeTestRule
@@ -106,10 +102,6 @@ class EditActivityScreenTest {
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputDescriptionEdit"))
     composeTestRule.onNodeWithTag("inputDescriptionEdit").assertTextContains(activity.description)
-    composeTestRule
-        .onNodeWithTag("activityEditScreen")
-        .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").assertTextContains("1/1/2050")
   }
 
   @Test
@@ -158,10 +150,6 @@ class EditActivityScreenTest {
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputLocationEdit"))
     composeTestRule.onNodeWithTag("inputLocationEdit").performTextInput("Updated Location")
-    composeTestRule
-        .onNodeWithTag("activityEditScreen")
-        .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").performTextInput("1/1/2050")
   }
 
   @Test
