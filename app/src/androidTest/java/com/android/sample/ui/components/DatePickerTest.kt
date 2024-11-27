@@ -3,7 +3,6 @@ package com.android.sample.ui.components
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.android.sample.resources.dummydata.initialDate
 import com.google.firebase.Timestamp
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
