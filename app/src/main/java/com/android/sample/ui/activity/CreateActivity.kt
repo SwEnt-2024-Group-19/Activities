@@ -339,7 +339,7 @@ fun CreateActivityScreen(
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth())
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("typeTextField"))
                   ExposedDropdownMenu(
                       expanded = expandedType,
                       onDismissRequest = { expandedType = false },
@@ -375,7 +375,7 @@ fun CreateActivityScreen(
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth())
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
                   ExposedDropdownMenu(
                       expanded = expandedCategory,
                       onDismissRequest = { expandedCategory = false },

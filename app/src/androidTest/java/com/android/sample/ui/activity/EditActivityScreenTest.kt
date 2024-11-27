@@ -194,4 +194,5 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
   }
+
 }
