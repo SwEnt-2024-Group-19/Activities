@@ -18,12 +18,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
@@ -126,9 +129,28 @@ fun NavGraph(
       }
     }
 
+    // map navigation if we want to pass a location parameter to the map screen
     navigation(startDestination = Screen.MAP, route = Route.MAP) {
-      composable(Screen.MAP) {
-        MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+      composable(
+        route = "Map?lat={lat}&lng={lng}",
+        arguments = listOf(
+          navArgument("lat") {
+            type = NavType.FloatType
+            nullable = true
+            defaultValue = null
+          },
+          navArgument("lng") {
+            type = NavType.FloatType
+            nullable = true
+            defaultValue = null
+          }
+        )
+      ) { backStackEntry ->
+        val lat = backStackEntry.arguments?.getFloat("lat")?.toDouble()
+        val lng = backStackEntry.arguments?.getFloat("lng")?.toDouble()
+        val initialLocation = if (lat != null && lng != null) Location(lat, lng, "") else null
+
+        MapScreen(navigationActions, locationViewModel, listActivitiesViewModel, initialLocation)
       }
     }
 
