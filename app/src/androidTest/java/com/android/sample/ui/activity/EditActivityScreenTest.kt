@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
@@ -182,4 +183,49 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
   }
+
+    @Test
+    fun buttonDateAndTimeAreDisplayed(){
+        composeTestRule.setContent {
+            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+        }
+        composeTestRule.onNodeWithTag("activityEditScreen")
+            .performScrollToNode(hasTestTag("changeDateButton"))
+        composeTestRule.onNodeWithTag("changeDateButton").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("activityEditScreen")
+            .performScrollToNode(hasTestTag("changeTimeButton"))
+        composeTestRule.onNodeWithTag("changeTimeButton").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("activityEditScreen")
+            .performScrollToNode(hasTestTag("changeEndingTimeButton"))
+        composeTestRule.onNodeWithTag("changeEndingTimeButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun buttonDateShowDialog(){
+        composeTestRule.setContent {
+            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+        }
+        composeTestRule.onNodeWithTag("activityEditScreen")
+            .performScrollToNode(hasTestTag("changeDateButton"))
+        composeTestRule.onNodeWithTag("changeDateButton").performClick()
+        composeTestRule.onNodeWithText("Select a date").assertIsDisplayed()
+    }
+
+    @Test
+    fun startTimeButtonSHowDialog(){
+        composeTestRule.onNodeWithTag("activityEditScreen")
+            .performScrollToNode(hasTestTag("changeTimeButton"))
+        composeTestRule.onNodeWithTag("changeTimeButton").performClick()
+        composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
+    }
+
+    @Test
+    fun endTimeButtonShowDialog(){
+        composeTestRule.onNodeWithTag("activityEditScreen")
+            .performScrollToNode(hasTestTag("changeEndingTimeButton"))
+        composeTestRule.onNodeWithTag("changeEndingTimeButton").performClick()
+        composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
+    }
 }

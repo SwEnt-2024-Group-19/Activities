@@ -103,7 +103,7 @@ fun EditActivityScreen(
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
-  var duration by remember { mutableStateOf(activity?.duration) }
+  var duration by remember { mutableStateOf(hourDateViewModel.addDurationToTime(startTime?:"",activity?.duration?:"")) }
   var expanded by remember { mutableStateOf(false) }
   val controller = remember {
     LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
@@ -492,7 +492,7 @@ fun EditActivityScreen(
                             description = description,
                             date = dueDate,
                             startTime = startTime ?: "",
-                            duration = duration ?: "",
+                            duration = hourDateViewModel.calculateDuration(startTime ?: "", duration ?: ""),
                             price = price.toDouble(),
                             placesLeft = attendees.size.toLong(),
                             maxPlaces = maxPlaces.toLongOrNull() ?: 0,
