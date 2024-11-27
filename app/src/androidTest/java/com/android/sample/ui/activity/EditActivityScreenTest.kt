@@ -7,12 +7,14 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.categories
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
@@ -194,5 +196,64 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
   }
+
+    @Test
+    fun editActivityScreen_dropdownCategoryOpensAndDisplaysOptions() {
+        composeTestRule.setContent {
+            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+        }
+        composeTestRule
+            .onNodeWithTag("activityEditScreen")
+            .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+        composeTestRule.onNodeWithText(activity.category.toString()).assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+
+        composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
+        composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+        composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
+
+    }
+
+    @Test
+    fun editActivityScreen_selectsCategoryDropdownOption1() {
+        composeTestRule.setContent {
+            EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+        }
+
+        composeTestRule
+            .onNodeWithTag("activityCreateScreen")
+            .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+
+        composeTestRule.onNodeWithTag("categoryTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Activity Category").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+
+        composeTestRule.onNodeWithText(categories[0].name).performClick()
+
+
+        composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+
+        composeTestRule.onNodeWithText(categories[1].name).performClick()
+
+
+        composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+
+        composeTestRule.onNodeWithText(categories[2].name).performClick()
+
+
+        composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
+
+    }
+
 
 }
