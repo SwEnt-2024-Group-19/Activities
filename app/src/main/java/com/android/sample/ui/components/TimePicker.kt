@@ -1,7 +1,6 @@
 package com.android.sample.ui.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -26,10 +25,4 @@ fun MyTimePicker(onTimeSelected: (Timestamp) -> Unit, isOpen: Boolean) {
                   LocalDate.now().atTime(it).atZone(java.time.ZoneId.systemDefault()).toInstant()))
         }
       }
-}
-
-@Preview
-@Composable
-fun TimePickerPreview() {
-  MyTimePicker(onTimeSelected = {}, isOpen = true)
 }
