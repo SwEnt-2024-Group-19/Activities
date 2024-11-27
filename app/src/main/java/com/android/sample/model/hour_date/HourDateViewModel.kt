@@ -32,4 +32,15 @@ open class HourDateViewModel : ViewModel() {
     val endTime = LocalTime.parse(end, formatter)
     return endTime.isAfter(startTime)
   }
+
+  fun addDurationToTime(start: String, duration: String): String {
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    val startTime = LocalTime.parse(start, formatter)
+    val durationParts = duration.split(":")
+    val hoursToAdd = durationParts[0].toLong()
+    val minutesToAdd = durationParts[1].toLong()
+
+    val resultTime = startTime.plusHours(hoursToAdd).plusMinutes(minutesToAdd)
+    return resultTime.format(formatter)
+  }
 }

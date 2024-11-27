@@ -43,4 +43,22 @@ class HourDateViewModelTest {
     val result = viewModel.isBeginGreaterThanEnd("12:00", "12:00")
     assertFalse(result)
   }
+
+  @Test
+fun addDurationToTime_returnsCorrectTime_whenDurationIsAdded() {
+    val result = viewModel.addDurationToTime("08:00", "02:30")
+    assertEquals("10:30", result)
+}
+
+@Test
+fun addDurationToTime_returnsCorrectTime_whenDurationCrossesMidnight() {
+    val result = viewModel.addDurationToTime("23:00", "02:30")
+    assertEquals("01:30", result)
+}
+
+@Test
+fun addDurationToTime_returnsCorrectTime_whenDurationIsZero() {
+    val result = viewModel.addDurationToTime("12:00", "00:00")
+    assertEquals("12:00", result)
+}
 }
