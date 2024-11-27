@@ -59,6 +59,12 @@ constructor(
     repository.getActivities(onS, onF)
   }
 
+  fun reviewActivity(activity: Activity, userId: String, review: Boolean?) {
+    val newLikes = activity.likes.plus(userId to review)
+    val newActivity = activity.copy(likes = newLikes)
+    updateActivity(newActivity)
+  }
+
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()
 
