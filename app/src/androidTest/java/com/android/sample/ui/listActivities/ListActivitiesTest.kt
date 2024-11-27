@@ -274,6 +274,9 @@ class OverviewScreenTest {
 
     composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
     composeTestRule.onNodeWithText("dance").assertIsDisplayed()
+      composeTestRule.onNodeWithText("football").assertIsNotDisplayed()
+      composeTestRule.onNodeWithText("Italian cooking").assertIsNotDisplayed()
+      composeTestRule.onNodeWithText("networking").assertIsNotDisplayed()
       composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
 
     composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
@@ -316,10 +319,7 @@ class OverviewScreenTest {
       ListActivitiesScreen(
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
-    // composeTestRule.setContent {
 
-    // ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
-    // }
     composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
   }
 
