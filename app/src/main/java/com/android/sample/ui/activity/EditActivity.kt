@@ -55,23 +55,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.PermissionChecker
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.navigation.compose.rememberNavController
 import com.android.sample.R
-import com.android.sample.model.activity.ActivitiesRepositoryFirestore
-import com.android.sample.model.activity.ActivitiesRepositoryFirestore_Factory
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.Location
-import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
@@ -88,7 +80,6 @@ import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +88,7 @@ fun EditActivityScreen(
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel
 ) {
-    val hourDateViewModel : HourDateViewModel = HourDateViewModel()
+  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
@@ -221,9 +212,10 @@ fun EditActivityScreen(
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
                 onClick = { dateIsOpen = true },
-                modifier = Modifier.fillMaxWidth()
-                    .padding(STANDARD_PADDING.dp)
-                    .testTag("changeDateButton"),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("changeDateButton"),
             ) {
               Icon(
                   Icons.Default.CalendarMonth,
@@ -241,17 +233,22 @@ fun EditActivityScreen(
                     dateIsOpen = false
                   },
                   isOpen = dateIsOpen,
-                    initialDate = dueDate.toDate().toInstant().atZone(java.time.ZoneId.systemDefault())
-                        .toLocalDate(),
+                  initialDate =
+                      dueDate
+                          .toDate()
+                          .toInstant()
+                          .atZone(java.time.ZoneId.systemDefault())
+                          .toLocalDate(),
               )
             }
 
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
                 onClick = { timeIsOpen = true },
-                modifier = Modifier.fillMaxWidth()
-                    .padding(STANDARD_PADDING.dp)
-                    .testTag("changeTimeButton"),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("changeTimeButton"),
             ) {
               Icon(
                   Icons.Default.CalendarMonth,
@@ -277,15 +274,15 @@ fun EditActivityScreen(
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
                 onClick = { durationIsOpen = true },
-                modifier = Modifier.fillMaxWidth()
-                    .padding(STANDARD_PADDING.dp)
-                    .testTag("changeEndingTimeButton"),
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("changeEndingTimeButton"),
             ) {
               Icon(
                   Icons.Default.HourglassTop,
                   contentDescription = "Change Ending Time",
-                  modifier = Modifier.testTag("changeEndingTimeIcon")
-              )
+                  modifier = Modifier.testTag("changeEndingTimeIcon"))
               Text("Change Ending Time (Actual: ${duration})")
             }
             if (durationIsOpen) {
@@ -480,33 +477,35 @@ fun EditActivityScreen(
             Button(
                 enabled = title.isNotEmpty() && description.isNotEmpty(),
                 onClick = {
-                    if(hourDateViewModel.isBeginGreaterThanEnd(startTime?:"00:00", duration?: "00:01")) {
-                        Toast.makeText(context, "Start time must be before end time", Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-                    try {
-                      val updatedActivity =
-                          Activity(
-                              uid = activity?.uid ?: "",
-                              title = title,
-                              description = description,
-                              date = dueDate,
-                              startTime = startTime ?: "",
-                              duration = duration ?: "",
-                              price = price.toDouble(),
-                              placesLeft = attendees.size.toLong(),
-                              maxPlaces = maxPlaces.toLongOrNull() ?: 0,
-                              creator = creator,
-                              status = ActivityStatus.ACTIVE,
-                              location = selectedLocation,
-                              images = activity?.images ?: listOf(),
-                              type = types.find { it.name == selectedOption } ?: types[0],
-                              participants = attendees,
-                              comments = activity?.comments ?: listOf())
-                      listActivityViewModel.updateActivity(updatedActivity)
-                      navigationActions.navigateTo(Screen.OVERVIEW)
-                    } catch (_: Exception) {}
-
+                  if (hourDateViewModel.isBeginGreaterThanEnd(
+                      startTime ?: "00:00", duration ?: "00:01")) {
+                    Toast.makeText(
+                            context, "Start time must be before end time", Toast.LENGTH_SHORT)
+                        .show()
+                    return@Button
+                  }
+                  try {
+                    val updatedActivity =
+                        Activity(
+                            uid = activity?.uid ?: "",
+                            title = title,
+                            description = description,
+                            date = dueDate,
+                            startTime = startTime ?: "",
+                            duration = duration ?: "",
+                            price = price.toDouble(),
+                            placesLeft = attendees.size.toLong(),
+                            maxPlaces = maxPlaces.toLongOrNull() ?: 0,
+                            creator = creator,
+                            status = ActivityStatus.ACTIVE,
+                            location = selectedLocation,
+                            images = activity?.images ?: listOf(),
+                            type = types.find { it.name == selectedOption } ?: types[0],
+                            participants = attendees,
+                            comments = activity?.comments ?: listOf())
+                    listActivityViewModel.updateActivity(updatedActivity)
+                    navigationActions.navigateTo(Screen.OVERVIEW)
+                  } catch (_: Exception) {}
                 },
                 modifier =
                     Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("editButton"),

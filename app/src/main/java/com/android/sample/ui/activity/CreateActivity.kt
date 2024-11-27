@@ -1,7 +1,6 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
-import android.icu.util.GregorianCalendar
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -94,7 +93,7 @@ fun CreateActivityScreen(
     profileViewModel: ProfileViewModel,
     locationViewModel: LocationViewModel,
 ) {
-   val hourDateViewModel: HourDateViewModel = HourDateViewModel()
+  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
@@ -213,15 +212,13 @@ fun CreateActivityScreen(
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
                 onClick = { dateIsOpen = true },
-                modifier = Modifier.fillMaxWidth()
-                    .padding(STANDARD_PADDING.dp)
-                    .testTag("inputDateCreate"),
+                modifier =
+                    Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
             ) {
               Icon(
                   Icons.Filled.CalendarMonth,
                   contentDescription = "select date",
-                  modifier = Modifier.padding(end = STANDARD_PADDING.dp)
-                      .testTag("iconDateCreate"))
+                  modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
               if (dateIsSet)
                   Text(
                       "Selected date: ${dueDate.toDate().toString().take(11)}," +
@@ -235,8 +232,8 @@ fun CreateActivityScreen(
                     dateIsOpen = false
                     dateIsSet = true
                   },
-                  isOpen = dateIsOpen
-              ,null)
+                  isOpen = dateIsOpen,
+                  null)
             }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedButton(
@@ -490,19 +487,13 @@ fun CreateActivityScreen(
                             Toast.LENGTH_SHORT)
                         .show()
                   } else if (price.toDoubleOrNull() == null) {
-                    Toast.makeText(
-                            context, "Invalid price format.", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(context, "Invalid price format.", Toast.LENGTH_SHORT).show()
                   } else if (placesMax.toLongOrNull() == null) {
-                    Toast.makeText(
-                            context, "Invalid places format.", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(context, "Invalid places format.", Toast.LENGTH_SHORT).show()
                   } else if (selectedLocation == null) {
-                    Toast.makeText(
-                            context, "You must select a location.", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT)
                         .show()
-                  }
-                  else {
+                  } else {
                     attendees += profileViewModel.userState.value!!
                     try {
                       uploadActivityImages(

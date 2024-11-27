@@ -2,37 +2,23 @@ package com.android.sample.ui.components
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import com.google.firebase.Timestamp
 import org.junit.Rule
 import org.junit.Test
-import java.time.Instant
 
 class TimePickerTest {
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Test
-    fun testMyTimePicker_isDisplayed() {
-        composeTestRule.setContent {
-            MyTimePicker(
-                onTimeSelected = {},
-                isOpen = true
-            )
-        }
-        // Check if dialog opens with correct title
-        composeTestRule.onNodeWithText("Pick a time").assertExists()
-    }
+  @Test
+  fun testMyTimePicker_isDisplayed() {
+    composeTestRule.setContent { MyTimePicker(onTimeSelected = {}, isOpen = true) }
+    // Check if dialog opens with correct title
+    composeTestRule.onNodeWithText("Pick a time").assertExists()
+  }
 
-    @Test
-    fun testMyPicker_isNotDisplayed() {
-        composeTestRule.setContent {
-            MyTimePicker(
-                onTimeSelected = {},
-                isOpen = false
-            )
-        }
-        // Check if dialog is not displayed
-        composeTestRule.onNodeWithText("Pick a time").assertDoesNotExist()
-    }
+  @Test
+  fun testMyPicker_isNotDisplayed() {
+    composeTestRule.setContent { MyTimePicker(onTimeSelected = {}, isOpen = false) }
+    // Check if dialog is not displayed
+    composeTestRule.onNodeWithText("Pick a time").assertDoesNotExist()
+  }
 }

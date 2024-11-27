@@ -1,7 +1,6 @@
 package com.android.sample.ui.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -18,7 +17,7 @@ fun MyDatePicker(onDateSelected: (Timestamp) -> Unit, isOpen: Boolean, initialDa
         negativeButton("Cancel")
       }) {
         datepicker(
-            initialDate = initialDate?:LocalDate.now(),
+            initialDate = initialDate ?: LocalDate.now(),
             title = "Select a date",
             allowedDateValidator = { date -> date.isAfter(LocalDate.now().minusDays(1)) }) {
               onDateSelected(Timestamp(it.atStartOfDay().toInstant(ZoneOffset.MIN)))
