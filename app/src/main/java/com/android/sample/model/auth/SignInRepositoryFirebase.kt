@@ -1,6 +1,5 @@
 package com.android.sample.model.auth
 
-import com.android.sample.model.profile.ProfilesRepository
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -9,7 +8,7 @@ import kotlinx.coroutines.tasks.await
 
 class SignInRepositoryFirebase
 @Inject
-constructor(private val auth: FirebaseAuth, private val profilesRepository: ProfilesRepository) :
+constructor(private val auth: FirebaseAuth) :
     SignInRepository {
   override suspend fun signInWithEmail(email: String, password: String): AuthResult {
     return auth.signInWithEmailAndPassword(email, password).await()
