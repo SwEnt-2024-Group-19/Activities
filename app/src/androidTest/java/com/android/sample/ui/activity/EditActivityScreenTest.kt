@@ -229,16 +229,14 @@ class EditActivityScreenTest {
 
     composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 
-      composeTestRule.onNodeWithText(categories[1].name).performClick()
+    composeTestRule.onNodeWithText(categories[1].name).performClick()
 
-      composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
-      composeTestRule.onNodeWithText(categories[0].name).performClick()
+    composeTestRule.onNodeWithText(categories[0].name).performClick()
 
-      composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
-
-
+    composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 

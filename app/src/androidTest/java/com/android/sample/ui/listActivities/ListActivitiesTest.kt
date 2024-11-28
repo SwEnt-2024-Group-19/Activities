@@ -4,8 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
-import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.assertIsToggleable
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -181,12 +179,11 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick().assertIsOn()
 
     composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick().assertIsOn()
-      composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick().assertIsOff()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick().assertIsOff()
     composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick().assertIsOn()
 
-      composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick().assertIsOn()
-      composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick().assertIsOff()
-
+    composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick().assertIsOn()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick().assertIsOff()
   }
 
   @Test
@@ -198,7 +195,9 @@ class OverviewScreenTest {
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     composeTestRule.onNodeWithText("CULTURE").performClick()
-    composeTestRule.onNodeWithText("There is no activity of these categories yet.").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText("There is no activity of these categories yet.")
+        .assertIsDisplayed()
   }
 
   @Test
