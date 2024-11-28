@@ -12,6 +12,8 @@ import androidx.compose.ui.test.performScrollToNode
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -35,6 +37,9 @@ class ProfileScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var activitiesRepository: ActivitiesRepository
+
+  private lateinit var mockImageViewModel: ImageViewModel
+  private lateinit var mockImageRepository: ImageRepositoryFirestore
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -63,6 +68,8 @@ class ProfileScreenTest {
     navigationActions = mock(NavigationActions::class.java)
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
     `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
+    mockImageRepository = mock(ImageRepositoryFirestore::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository)
   }
 
   @Test
@@ -72,7 +79,10 @@ class ProfileScreenTest {
 
     composeTestRule.setContent {
       ProfileScreen(
-          userProfileViewModel = userProfileViewModel, navigationActions, listActivitiesViewModel)
+          userProfileViewModel = userProfileViewModel,
+          navigationActions,
+          listActivitiesViewModel,
+          mockImageViewModel)
     }
     composeTestRule.onNodeWithTag("loadingText").assertTextEquals("You do not have a profile")
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
@@ -84,7 +94,8 @@ class ProfileScreenTest {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
-          listActivitiesViewModel)
+          listActivitiesViewModel,
+          mockImageViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
@@ -108,7 +119,8 @@ class ProfileScreenTest {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
-          listActivitiesViewModel = listActivitiesViewModel)
+          listActivitiesViewModel = listActivitiesViewModel,
+          mockImageViewModel)
     }
 
     // Wait until the UI is idle and ready
@@ -133,7 +145,8 @@ class ProfileScreenTest {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
-          listActivitiesViewModel = listActivitiesViewModel)
+          listActivitiesViewModel = listActivitiesViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("profileContentColumn")
@@ -150,7 +163,8 @@ class ProfileScreenTest {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
-          listActivitiesViewModel = listActivitiesViewModel)
+          listActivitiesViewModel = listActivitiesViewModel,
+          mockImageViewModel)
     }
 
     // Wait until the UI is idle and ready

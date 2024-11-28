@@ -13,6 +13,8 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
@@ -38,6 +40,9 @@ class EditActivityScreenTest {
   private lateinit var mockLocationViewModel: LocationViewModel
   private lateinit var mockPermissionChecker: LocationPermissionChecker
 
+  private lateinit var mockImageViewModel: ImageViewModel
+  private lateinit var mockImageRepository: ImageRepositoryFirestore
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -56,12 +61,15 @@ class EditActivityScreenTest {
       val onSuccess = invocation.arguments[1] as (List<Location>) -> Unit
       onSuccess(locationList)
     }
+    mockImageRepository = mock(ImageRepositoryFirestore::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository)
   }
 
   @Test
   fun displayAllComponents() {
     composeTestRule.setContent {
-      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+      EditActivityScreen(
+          listActivitiesViewModel, navigationActions, mockLocationViewModel, mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
@@ -94,7 +102,8 @@ class EditActivityScreenTest {
   @Test
   fun inputsHaveInitialValue() {
     composeTestRule.setContent {
-      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+      EditActivityScreen(
+          listActivitiesViewModel, navigationActions, mockLocationViewModel, mockImageViewModel)
     }
 
     composeTestRule.waitForIdle()
@@ -115,7 +124,8 @@ class EditActivityScreenTest {
   @Test
   fun saveButtonSavesActivity() {
     composeTestRule.setContent {
-      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+      EditActivityScreen(
+          listActivitiesViewModel, navigationActions, mockLocationViewModel, mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
@@ -134,7 +144,8 @@ class EditActivityScreenTest {
   @Test
   fun goBackButtonNavigatesBack() {
     composeTestRule.setContent {
-      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+      EditActivityScreen(
+          listActivitiesViewModel, navigationActions, mockLocationViewModel, mockImageViewModel)
     }
 
     composeTestRule.onNodeWithTag("goBackButton").performClick()
@@ -144,7 +155,8 @@ class EditActivityScreenTest {
   @Test
   fun inputFieldsUpdateViewModel() {
     composeTestRule.setContent {
-      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+      EditActivityScreen(
+          listActivitiesViewModel, navigationActions, mockLocationViewModel, mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
@@ -167,7 +179,8 @@ class EditActivityScreenTest {
   @Test
   fun addAttendeeButton_opensAddUserDialog() {
     composeTestRule.setContent {
-      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+      EditActivityScreen(
+          listActivitiesViewModel, navigationActions, mockLocationViewModel, mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
@@ -179,7 +192,8 @@ class EditActivityScreenTest {
   @Test
   fun simpleUserIsDisplayed() {
     composeTestRule.setContent {
-      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+      EditActivityScreen(
+          listActivitiesViewModel, navigationActions, mockLocationViewModel, mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityEditScreen")
