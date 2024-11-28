@@ -71,10 +71,10 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
 
@@ -132,10 +132,7 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
     composeTestRule.onNodeWithTag("chooseTypeMenu").assertExists()
     composeTestRule.onNodeWithTag("addAttendeeButton").assertExists()
-    composeTestRule.onNodeWithTag("inputTimeCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputDurationCreate").assertExists()
     composeTestRule.onNodeWithTag("createButton").assertExists()
-
     composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()

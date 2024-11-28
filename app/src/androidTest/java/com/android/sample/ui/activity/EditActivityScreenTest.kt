@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
@@ -15,6 +16,7 @@ import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
+import com.android.sample.model.activity.categories
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
@@ -87,10 +89,6 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("inputLocationEdit").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("activityEditScreen")
-        .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputPriceEdit"))
     composeTestRule.onNodeWithTag("inputPriceEdit").assertIsDisplayed()
     composeTestRule
@@ -115,10 +113,6 @@ class EditActivityScreenTest {
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputDescriptionEdit"))
     composeTestRule.onNodeWithTag("inputDescriptionEdit").assertTextContains(activity.description)
-    composeTestRule
-        .onNodeWithTag("activityEditScreen")
-        .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").assertTextContains("1/1/2050")
   }
 
   @Test
@@ -170,10 +164,6 @@ class EditActivityScreenTest {
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputLocationEdit"))
     composeTestRule.onNodeWithTag("inputLocationEdit").performTextInput("Updated Location")
-    composeTestRule
-        .onNodeWithTag("activityEditScreen")
-        .performScrollToNode(hasTestTag("inputDateEdit"))
-    composeTestRule.onNodeWithTag("inputDateEdit").performTextInput("1/1/2050")
   }
 
   @Test
@@ -207,5 +197,110 @@ class EditActivityScreenTest {
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
+  }
+
+  @Test
+  fun buttonDateAndTimeAreDisplayed() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("changeDateButton"))
+    composeTestRule.onNodeWithTag("changeDateButton").assertIsDisplayed()
+
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("changeTimeButton"))
+    composeTestRule.onNodeWithTag("changeTimeButton").assertIsDisplayed()
+
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("changeEndingTimeButton"))
+    composeTestRule.onNodeWithTag("changeEndingTimeButton").assertIsDisplayed()
+  }
+
+  @Test
+  fun buttonDateShowDialog() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("changeDateButton"))
+    composeTestRule.onNodeWithTag("changeDateButton").performClick()
+    composeTestRule.onNodeWithText("Select a date").assertIsDisplayed()
+  }
+
+  @Test
+  fun startTimeButtonSHowDialog() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("changeTimeButton"))
+    composeTestRule.onNodeWithTag("changeTimeButton").performClick()
+    composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
+  }
+
+  @Test
+  fun endTimeButtonShowDialog() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("changeEndingTimeButton"))
+    composeTestRule.onNodeWithTag("changeEndingTimeButton").performClick()
+    composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
+  }
+
+  @Test
+  fun editActivityScreen_dropdownCategoryOpensAndDisplaysOptions() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+    composeTestRule.onNodeWithText(activity.category.toString()).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+    composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
+  }
+
+  @Test
+  fun editActivityScreen_selectsCategoryDropdownOption1() {
+    composeTestRule.setContent {
+      EditActivityScreen(listActivitiesViewModel, navigationActions, mockLocationViewModel)
+    }
+
+    composeTestRule
+        .onNodeWithTag("activityEditScreen")
+        .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+
+    composeTestRule.onNodeWithTag("categoryTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Activity Category").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+    composeTestRule.onNodeWithText(categories[1].name).performClick()
+
+    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+    composeTestRule.onNodeWithText(categories[0].name).performClick()
+
+    composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+    composeTestRule.onNodeWithText(categories[2].name).performClick()
+
+    composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
   }
 }
