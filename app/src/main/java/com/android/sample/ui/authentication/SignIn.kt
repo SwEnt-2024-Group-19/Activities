@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.model.network.NetworkManager
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
@@ -37,6 +38,7 @@ import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
+import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -47,20 +49,24 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewModel) {
   val context = LocalContext.current
+  val networkManager = NetworkManager(context)
   val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
   val token = stringResource(R.string.default_web_client_id)
   val isPasswordVisible = remember { mutableStateOf(false) }
-  val onAuthSuccess = { Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show() }
   val emailErrorState = remember { mutableStateOf<String?>(null) }
-  val onAuthError = { errorMessage: String ->
+  val onProfileExists = { navigationActions.navigateTo(Screen.OVERVIEW) }
+
+  val onProfileMissing = { navigationActions.navigateTo(Screen.CREATE_PROFILE) }
+
+  val onSignInFailure = { errorMessage: String ->
     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
   }
 
   // Google Sign-In Launcher
   val googleSignInLauncher =
-      rememberGoogleSignInLauncher(viewModel, navigationActions, onAuthSuccess, onAuthError)
+      rememberGoogleSignInLauncher(viewModel, onProfileExists, onProfileMissing, onSignInFailure)
 
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
@@ -107,24 +113,31 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             // Sign-In Button
             Button(
                 onClick = {
-                  when {
-                    !isValidEmail(emailState.value) -> {
-                      emailErrorState.value = "Please enter a valid address: example@mail.xx"
-                    }
-                    passwordState.value.isEmpty() -> {
-                      passwordErrorState.value = "Password cannot be empty" // Set external error
-                    }
-                    else -> {
-                      passwordErrorState.value = null // Clear external error if password is valid
-                      viewModel.signInWithEmailAndPassword(
-                          emailState.value,
-                          passwordState.value,
-                          onAuthSuccess,
-                          onAuthError,
-                          navigationActions)
-                    }
-                  }
-                  Log.d("SignInScreen", "Sign in with email/password")
+                  performOfflineAwareAction(
+                      context = context,
+                      networkManager = networkManager,
+                      onPerform = {
+                        when {
+                          !isValidEmail(emailState.value) -> {
+                            emailErrorState.value = "Please enter a valid address: example@mail.xx"
+                          }
+                          passwordState.value.isEmpty() -> {
+                            passwordErrorState.value =
+                                "Password cannot be empty" // Set external error
+                          }
+                          else -> {
+                            passwordErrorState.value =
+                                null // Clear external error if password is valid
+                            viewModel.signInWithEmailAndPassword(
+                                emailState.value,
+                                passwordState.value,
+                                onProfileExists,
+                                onProfileMissing,
+                                onSignInFailure)
+                          }
+                        }
+                        Log.d("SignInScreen", "Sign in with email/password")
+                      })
                 },
                 modifier =
                     Modifier.fillMaxWidth(WIDTH_FRACTION)
@@ -139,7 +152,12 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             // Google Sign-In Button
             GoogleSignInButton(
                 onSignInClick = {
-                  googleSignInLauncher.launch(rememberGoogleSignInIntent(context, token))
+                  performOfflineAwareAction(
+                      context = context,
+                      networkManager = networkManager,
+                      onPerform = {
+                        googleSignInLauncher.launch(rememberGoogleSignInIntent(context, token))
+                      })
                 })
             Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
@@ -147,7 +165,12 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           item {
             // If user already has an account, navigate to the sign-in screen
             TextButton(
-                onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                onClick = {
+                  performOfflineAwareAction(
+                      context = context,
+                      networkManager = networkManager,
+                      onPerform = { navigationActions.navigateTo(Screen.SIGN_UP) })
+                },
                 modifier =
                     Modifier.fillMaxWidth(WIDTH_FRACTION)
                         .height(BUTTON_HEIGHT.dp)
@@ -159,7 +182,12 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           item {
             // Continue as guest
             TextButton(
-                onClick = { navigationActions.navigateTo(Screen.OVERVIEW) },
+                onClick = {
+                  performOfflineAwareAction(
+                      context = context,
+                      networkManager = networkManager,
+                      onPerform = { navigationActions.navigateTo(Screen.OVERVIEW) })
+                },
                 modifier = Modifier.testTag("ContinueAsGuestButton")) {
                   Text("Continue as Guest")
                 }
@@ -171,9 +199,9 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
 @Composable
 fun rememberGoogleSignInLauncher(
     viewModel: SignInViewModel,
-    navigationActions: NavigationActions,
-    onAuthSuccess: () -> Unit,
-    onAuthError: (String) -> Unit
+    onProfileExists: () -> Unit,
+    onProfileMissing: () -> Unit,
+    onFailure: (String) -> Unit
 ): ManagedActivityResultLauncher<Intent, ActivityResult> {
   val scope = rememberCoroutineScope()
   return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -184,12 +212,12 @@ fun rememberGoogleSignInLauncher(
         val account = task.getResult(ApiException::class.java)!!
         val idToken = account.idToken // Extract the actual ID token
         if (idToken != null) {
-          viewModel.handleGoogleSignInResult(idToken, onAuthSuccess, onAuthError, navigationActions)
+          viewModel.handleGoogleSignInResult(idToken, onProfileExists, onProfileMissing, onFailure)
         } else {
-          onAuthError("Google Sign-in failed! Token is null.")
+          onFailure("Google Sign-in failed! Token is null.")
         }
       } catch (e: ApiException) {
-        onAuthError("Google Sign-in failed! ${e.message}")
+        onFailure("Google Sign-in failed! ${e.message}")
       }
     }
   }
@@ -206,8 +234,13 @@ fun rememberGoogleSignInIntent(context: Context, token: String): Intent {
 
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
   Button(
-      onClick = onSignInClick,
+      onClick = {
+        performOfflineAwareAction(
+            context = context, networkManager = networkManager, onPerform = onSignInClick)
+      },
       colors = ButtonDefaults.buttonColors(containerColor = Color.White),
       shape = RoundedCornerShape(50),
       border = BorderStroke(1.dp, Color.LightGray),

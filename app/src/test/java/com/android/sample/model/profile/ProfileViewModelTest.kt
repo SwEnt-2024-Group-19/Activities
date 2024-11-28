@@ -34,7 +34,7 @@ class ProfileViewModelTest {
     firebaseAuth = mock(FirebaseAuth::class.java)
     firebaseFirestore = mock(FirebaseFirestore::class.java)
     profilesRepository = mock(ProfilesRepositoryFirestore::class.java)
-    profileViewModel = ProfileViewModel(repository = profilesRepository)
+    profileViewModel = ProfileViewModel(repository = profilesRepository, mock())
   }
 
   @Test
@@ -129,6 +129,13 @@ class ProfileViewModelTest {
     // Set up user with the activity in likedActivities
     profileViewModel.removeLikedActivity(testUser.id, activity.uid)
     verify(profilesRepository).removeLikedActivity(eq(testUser.id), eq(activity.uid), any(), any())
+  }
+
+  @Test
+  fun removeJoinedActivity() {
+    // Set up user with the activity in activities
+    profileViewModel.removeJoinedActivity(testUser.id, activity.uid)
+    verify(profilesRepository).removeJoinedActivity(eq(testUser.id), eq(activity.uid), any(), any())
   }
 
   @Test

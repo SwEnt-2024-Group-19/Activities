@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.model.activity.ActivitiesRepository
@@ -11,6 +13,7 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.activity
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
@@ -49,20 +52,21 @@ class MapScreenTest {
     mockPermissionChecker = LocationPermissionChecker(context)
     locationViewModel = LocationViewModel(mockRepository, mockPermissionChecker)
     activitiesRepository = mock(ActivitiesRepository::class.java)
-    listActivitiesViewModel = Mockito.spy(ListActivitiesViewModel(activitiesRepository))
+    listActivitiesViewModel =
+        Mockito.spy(
+            ListActivitiesViewModel(mock(ProfilesRepository::class.java), activitiesRepository))
     val activities = listOf(activity)
     val uiState = ListActivitiesViewModel.ActivitiesUiState.Success(activities)
     val stateFlow = MutableStateFlow(uiState)
     Mockito.doReturn(stateFlow).`when`(listActivitiesViewModel).uiState
     `when`(navigationActions.currentRoute()).thenReturn(Screen.MAP)
-    composeTestRule.setContent {
-      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
-    }
   }
 
   @Test
   fun testMapScreenIsDisplayed() {
-
+    composeTestRule.setContent {
+      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+    }
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
     composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
@@ -70,7 +74,34 @@ class MapScreenTest {
 
   @Test
   fun testCenterOnCurrentLocationTriggersGetCurrentLocation() {
-
+    composeTestRule.setContent {
+      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+    }
     verify(mockRepository).getCurrentLocation(any(), any())
+  }
+
+  @Test
+  fun activityDetailsDisplayed() {
+    composeTestRule.setContent { DisplayActivity(activity) }
+    composeTestRule.onNodeWithTag("activityDetails").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityDate").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("calendarIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("calendarText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityLocation").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("locationIcon").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityPrice").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("placesLeft").assertIsDisplayed()
+  }
+
+  @Test
+  fun seeActivityDetails() {
+    composeTestRule.setContent { SeeMoreDetailsButton(navigationActions) }
+    composeTestRule.onNodeWithText("See more details").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("seeMoreDetailsButton").performClick()
+    verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
 }

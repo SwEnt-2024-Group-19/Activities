@@ -5,6 +5,7 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
@@ -46,7 +47,7 @@ class ProfileCreationTest {
     `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
     `when`(mockFirebaseUser.uid).thenReturn(testUserId)
 
-    profileViewModel = ProfileViewModel(repository = mockProfilesRepository)
+    profileViewModel = ProfileViewModel(repository = mockProfilesRepository, mock())
 
     `when`(mockProfilesRepository.getUser(any(), any(), any())).thenAnswer { invocation ->
       val onSuccess = invocation.getArgument<(User?) -> Unit>(1)
@@ -57,6 +58,40 @@ class ProfileCreationTest {
     composeTestRule.setContent {
       ProfileCreationScreen(viewModel = profileViewModel, navigationActions = navigationActions)
     }
+  }
+
+  @Test
+  fun testProfileCreationWithDialogWithCamera() {
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("cameraScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("takePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("switchCamera").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("closeCamera").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("profileCreationScrollColumn").assertIsDisplayed()
+  }
+
+  @Test
+  fun testProfileCreationWithDialogWithGallery() {
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").performClick()
   }
 
   @Test
@@ -72,6 +107,8 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
     composeTestRule.onNodeWithTag("interestsLists")
+    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
+    composeTestRule.onNodeWithText("Sport").performClick()
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Android")
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 

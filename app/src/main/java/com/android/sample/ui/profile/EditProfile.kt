@@ -17,13 +17,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -45,6 +49,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.network.NetworkManager
+import com.android.sample.model.profile.Interest
+import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
@@ -55,6 +62,7 @@ import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.NavigationActions
 
@@ -72,8 +80,10 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
   var isGalleryOpen by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
   var photo by remember { mutableStateOf(profile.photo) }
+  val scrollState = rememberScrollState()
 
   val context = LocalContext.current
+  val networkManager = NetworkManager(context)
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
 
   Scaffold(
@@ -145,7 +155,12 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               })
         } else {
           Column(
-              modifier = Modifier.fillMaxSize().padding(paddingValues).padding(MEDIUM_PADDING.dp),
+              modifier =
+                  Modifier.fillMaxSize()
+                      .padding(paddingValues)
+                      .padding(MEDIUM_PADDING.dp)
+                      .testTag("editProfileContent")
+                      .verticalScroll(scrollState),
               verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
                 ProfileImage(
                     userId = profile.id,
@@ -153,7 +168,13 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                         Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
 
                 Button(
-                    onClick = { showDialogImage = true },
+                    onClick = {
+                      performOfflineAwareAction(
+                          context = context,
+                          networkManager = networkManager,
+                          onPerform = { showDialogImage = true },
+                      )
+                    },
                     modifier = Modifier.testTag("uploadPicture")) {
                       Text("Modify Profile Picture")
                     }
@@ -175,71 +196,45 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                             .testTag("inputProfileSurname"))
 
                 // Interest list and add button
-                var newInterest by remember { mutableStateOf("") }
-                var newListInterests by remember { mutableStateOf(interests) }
 
-                LazyRow(
-                    modifier = Modifier.padding(MEDIUM_PADDING.dp).testTag("interestsList"),
-                    horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
-                      newListInterests?.let {
-                        items(it.size, key = { it }) { index ->
-                          InterestEditBox(
-                              interest = newListInterests!![index],
-                              onRemove = {
-                                newListInterests = newListInterests!! - newListInterests!![index]
-                              })
-                        }
-                      }
-                    }
+                var newListInterests by remember { mutableStateOf(interests ?: emptyList()) }
 
-                OutlinedTextField(
-                    value = newInterest,
-                    onValueChange = { newInterest = it },
-                    label = { Text("New Interest") },
-                    modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
-                Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-                Button(
-                    onClick = {
-                      if (newInterest.isNotBlank()) {
-                        newListInterests = newListInterests?.plus(newInterest)
-                        newInterest = "" // Clear the field after adding
-                      }
-                    },
-                    modifier =
-                        Modifier.padding(end = STANDARD_PADDING.dp)
-                            .clip(RoundedCornerShape(STANDARD_PADDING.dp))
-                            .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
-                            .testTag("addInterestButton")) {
-                      Text("Add")
-                    }
+                ManageInterests(
+                    initialInterests = interests ?: emptyList(),
+                    onUpdateInterests = { newListInterests = it })
 
                 Button(
                     onClick = {
-                      selectedImage?.let { bitmap ->
-                        uploadProfilePicture(
-                            profile.id,
-                            bitmap,
-                            onSuccess = { url ->
-                              photo = url // Update photo URL in profile
-                            },
-                            onFailure = { error ->
-                              Log.e(
-                                  "EditProfileScreen",
-                                  "Failed to upload profile picture: ${error.message}")
-                            })
-                      }
-                      try {
-                        profileViewModel.updateProfile(
-                            User(
-                                id = profile.id,
-                                name = name,
-                                surname = surname,
-                                interests = newListInterests,
-                                activities = profile.activities,
-                                photo = photo,
-                                likedActivities = profile.likedActivities))
-                        navigationActions.goBack()
-                      } catch (_: NumberFormatException) {}
+                      performOfflineAwareAction(
+                          context = context,
+                          networkManager = networkManager,
+                          onPerform = {
+                            selectedImage?.let { bitmap ->
+                              uploadProfilePicture(
+                                  profile.id,
+                                  bitmap,
+                                  onSuccess = { url ->
+                                    photo = url // Update photo URL in profile
+                                  },
+                                  onFailure = { error ->
+                                    Log.e(
+                                        "EditProfileScreen",
+                                        "Failed to upload profile picture: ${error.message}")
+                                  })
+                            }
+                            try {
+                              profileViewModel.updateProfile(
+                                  User(
+                                      id = profile.id,
+                                      name = name,
+                                      surname = surname,
+                                      interests = newListInterests,
+                                      activities = profile.activities,
+                                      photo = photo,
+                                      likedActivities = profile.likedActivities))
+                              navigationActions.goBack()
+                            } catch (_: NumberFormatException) {}
+                          })
                     },
                     modifier = Modifier.fillMaxWidth().testTag("profileSaveButton")) {
                       Text("Save", color = Color.White)
@@ -247,6 +242,92 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               }
         }
       })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<Interest>) -> Unit) {
+
+  var newListInterests by remember { mutableStateOf(initialInterests) }
+  val categories = InterestCategories
+  var selectedCategory by remember { mutableStateOf("") }
+  var expanded by remember { mutableStateOf(false) }
+  var newInterest by remember { mutableStateOf("") }
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
+
+  Row(verticalAlignment = Alignment.CenterVertically) {
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+      OutlinedTextField(
+          value = selectedCategory,
+          onValueChange = { selectedCategory = it },
+          label = { Text("Category") },
+          readOnly = true,
+          modifier = Modifier.menuAnchor().width(LARGE_IMAGE_SIZE.dp).testTag("categoryDropdown"))
+
+      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        categories.forEach { category ->
+          DropdownMenuItem(
+              text = { Text(category) },
+              onClick = {
+                selectedCategory = category
+                expanded = false
+              })
+        }
+      }
+    }
+
+    OutlinedTextField(
+        value = newInterest,
+        onValueChange = { newInterest = it },
+        label = { Text("New Interest") },
+        enabled = selectedCategory.isNotEmpty() && selectedCategory != "None",
+        modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
+  }
+
+  Row(verticalAlignment = Alignment.CenterVertically) {
+    Button(
+        onClick = {
+          performOfflineAwareAction(
+              context = context,
+              networkManager = networkManager,
+              onPerform = {
+                if (newInterest.isNotBlank() &&
+                    selectedCategory.isNotBlank() &&
+                    selectedCategory != "None") {
+                  val updatedList = newListInterests + Interest(selectedCategory, newInterest)
+                  newListInterests = updatedList
+                  newInterest = ""
+                  selectedCategory = ""
+                  onUpdateInterests(updatedList)
+                }
+              })
+        },
+        enabled =
+            newInterest.isNotBlank() && selectedCategory.isNotBlank() && selectedCategory != "None",
+        modifier = Modifier.testTag("addInterestButton")) {
+          Text("Add")
+        }
+  }
+
+  LazyRow(
+      modifier = Modifier.testTag("interestsList"),
+      horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
+        items(newListInterests.size) { interest ->
+          InterestEditBox(
+              interest = newListInterests[interest].interest,
+              onRemove = {
+                performOfflineAwareAction(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerform = {
+                      val updatedList = newListInterests - newListInterests[interest]
+                      newListInterests = updatedList
+                      onUpdateInterests(updatedList)
+                    })
+              })
+        }
+      }
 }
 
 @Composable
@@ -259,7 +340,7 @@ fun InterestEditBox(interest: String, onRemove: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
           Spacer(Modifier.width(STANDARD_PADDING.dp))
-          IconButton(onClick = onRemove) {
+          IconButton(onClick = onRemove, modifier = Modifier.testTag("removeInterest-$interest")) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
           }
         }
