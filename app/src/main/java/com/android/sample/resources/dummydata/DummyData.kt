@@ -59,7 +59,8 @@ val userProfile =
         interests = listOf(),
         surname = "Doe",
         id = "123",
-        activities = listOf(), nbActivitiesCreated = 0)
+        activities = listOf(),
+        nbActivitiesCreated = 0)
 
 const val password = "testPassword"
 
@@ -222,7 +223,8 @@ val pastActivity =
                     interests = listOf(interest1),
                     activities = listOf(),
                     photo = "",
-                    likedActivities = listOf("1"), nbActivitiesCreated = 0),
+                    likedActivities = listOf("1"),
+                    nbActivitiesCreated = 0),
                 User(
                     id = "Rola",
                     name = "Amine",
@@ -230,8 +232,7 @@ val pastActivity =
                     photo = "",
                     interests = listOf(interest2),
                     activities = listOf("pastActivityUID", "1", "123"),
-                    nbActivitiesCreated = 0
-                )),
+                    nbActivitiesCreated = 0)),
         duration = "2 hours",
         startTime = "10:00")
 

@@ -38,12 +38,10 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = { Log.e("error", " not fetching") })
   }
 
-    fun getUserData(userId: String, onSuccess: (User?) -> Unit) {
-        repository.getUser(
-            userId,
-            onSuccess = { onSuccess(it) },
-            onFailure = { Log.e("error", " not fetching") })
-    }
+  fun getUserData(userId: String, onSuccess: (User?) -> Unit) {
+    repository.getUser(
+        userId, onSuccess = { onSuccess(it) }, onFailure = { Log.e("error", " not fetching") })
+  }
 
   fun clearUserData() {
     userState_.value = null

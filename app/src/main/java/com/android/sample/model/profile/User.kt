@@ -8,7 +8,7 @@ data class User(
     val activities: List<String>?,
     val photo: String?, // Optional, could be null if not provided
     val likedActivities: List<String>? = emptyList(),
-    val nbActivitiesCreated : Int
+    val nbActivitiesCreated: Int
 )
 
 data class Interest(val category: String, val interest: String)
