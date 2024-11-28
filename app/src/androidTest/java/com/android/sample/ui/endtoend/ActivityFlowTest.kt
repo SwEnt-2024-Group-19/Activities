@@ -11,6 +11,8 @@ import androidx.test.rule.GrantPermissionRule
 import com.android.sample.MainActivity
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.auth.SignInRepository
+import com.android.sample.model.image.ImageRepository
+import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
@@ -37,6 +39,10 @@ class ActivityFlowTest {
   @Inject lateinit var locationRepository: LocationRepository
 
   @Inject lateinit var permissionChecker: PermissionChecker
+
+  @Inject lateinit var imageRepository: ImageRepository
+
+  @Inject lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
 
   @get:Rule
   val permissionRule: GrantPermissionRule =
@@ -66,10 +72,10 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
 
@@ -127,10 +133,7 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
     composeTestRule.onNodeWithTag("chooseTypeMenu").assertExists()
     composeTestRule.onNodeWithTag("addAttendeeButton").assertExists()
-    composeTestRule.onNodeWithTag("inputTimeCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputDurationCreate").assertExists()
     composeTestRule.onNodeWithTag("createButton").assertExists()
-
     composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()

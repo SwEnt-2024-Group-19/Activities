@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -31,6 +33,9 @@ class ProfileCreationTest {
   private lateinit var mockProfilesRepository: ProfilesRepository
   private lateinit var profileViewModel: ProfileViewModel
 
+  private lateinit var mockImageViewModel: ImageViewModel
+  private lateinit var mockImageRepository: ImageRepositoryFirestore
+
   // Mock or create a fake ProfilesRepository
   // private val mockProfilesRepository: ProfilesRepository = mock()
   @get:Rule val composeTestRule = createComposeRule()
@@ -47,16 +52,18 @@ class ProfileCreationTest {
     `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
     `when`(mockFirebaseUser.uid).thenReturn(testUserId)
 
-    profileViewModel = ProfileViewModel(repository = mockProfilesRepository)
+    profileViewModel = ProfileViewModel(repository = mockProfilesRepository, mock())
 
     `when`(mockProfilesRepository.getUser(any(), any(), any())).thenAnswer { invocation ->
       val onSuccess = invocation.getArgument<(User?) -> Unit>(1)
       onSuccess.invoke(null) // Simulate no existing user found
       null
     }
-
+    mockImageRepository = mock(ImageRepositoryFirestore::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository)
     composeTestRule.setContent {
-      ProfileCreationScreen(viewModel = profileViewModel, navigationActions = navigationActions)
+      ProfileCreationScreen(
+          viewModel = profileViewModel, navigationActions = navigationActions, mockImageViewModel)
     }
   }
 

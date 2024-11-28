@@ -1,5 +1,7 @@
 package com.android.sample.ui.activitydetails
 
+import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,7 +59,9 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -65,7 +69,9 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -81,7 +87,8 @@ fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
@@ -100,20 +107,22 @@ fun ActivityDetailsScreen(
             calendar.time = activity.date.toDate()
           }
           return@let "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
-                calendar.get(
-                    Calendar.YEAR
-                )
-            }"
+                    calendar.get(
+                        Calendar.YEAR
+                    )
+                }"
         })
   }
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
   val distance = locationViewModel.getDistanceFromCurrentLocation(location)
   val context = LocalContext.current
+  val networkManager = NetworkManager(context)
   val startTime by remember { mutableStateOf(activity?.startTime) }
   val duration by remember { mutableStateOf(activity?.duration) }
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
+  var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
   val deleteComment: (Comment) -> Unit = { commentToDelete ->
     // Filter out the main comment and any replies associated with it
     val newComments = comments.filter { it.uid != commentToDelete.uid }
@@ -171,6 +180,11 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
+                    imageViewModel.fetchActivityImagesAsBitmaps(
+                        activity?.uid ?: "",
+                        onSuccess = { urls -> bitmaps = urls },
+                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+                    CarouselNoModif(itemsList = bitmaps)
                     LikeButton(profile, activity, profileViewModel)
                   }
 
@@ -318,7 +332,8 @@ fun ActivityDetailsScreen(
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
+                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape),
+                              imageViewModel = imageViewModel)
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
 
@@ -338,48 +353,56 @@ fun ActivityDetailsScreen(
                 if (activity.creator != profile.id) {
                   Button(
                       onClick = {
-                        if (isUserEnrolled) {
-                          // Logic to leave the activity once enrolled
-                          val updatedActivity =
-                              activity.copy(
-                                  placesLeft = min((placesTaken ?: 0) - 1, maxPlaces ?: 0),
-                                  participants =
-                                      activity.participants.filter { it.id != profile.id })
-                          listActivityViewModel.updateActivity(updatedActivity)
-                          profileViewModel.removeJoinedActivity(profile.id, activity.uid)
-                          Toast.makeText(
-                                  context, "Successfully left the activity", Toast.LENGTH_SHORT)
-                              .show()
-                          navigationActions.navigateTo(Screen.PROFILE)
-                        } else {
-                          // Logic to enroll in the activity
-                          if ((placesTaken ?: 0) < (maxPlaces ?: 0)) {
-                            val theActivity =
-                                activity.copy(
-                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
-                                    participants =
-                                        activity.participants +
-                                            User(
-                                                name = profile.name,
-                                                surname = profile.surname,
-                                                id = profile.id,
-                                                photo = profile.photo,
-                                                interests = profile.interests,
-                                                activities = profile.activities))
+                        performOfflineAwareAction(
+                            context = context,
+                            networkManager = networkManager,
+                            onPerform = {
+                              if (isUserEnrolled) {
+                                // Logic to leave the activity once enrolled
+                                val updatedActivity =
+                                    activity.copy(
+                                        placesLeft = min((placesTaken ?: 0) - 1, maxPlaces ?: 0),
+                                        participants =
+                                            activity.participants.filter { it.id != profile.id })
+                                listActivityViewModel.updateActivity(updatedActivity)
+                                profileViewModel.removeJoinedActivity(profile.id, activity.uid)
+                                Toast.makeText(
+                                        context,
+                                        "Successfully left the activity",
+                                        Toast.LENGTH_SHORT)
+                                    .show()
+                                navigationActions.navigateTo(Screen.PROFILE)
+                              } else {
+                                // Logic to enroll in the activity
+                                if ((placesTaken ?: 0) < (maxPlaces ?: 0)) {
+                                  val theActivity =
+                                      activity.copy(
+                                          placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
+                                          participants =
+                                              activity.participants +
+                                                  User(
+                                                      name = profile.name,
+                                                      surname = profile.surname,
+                                                      id = profile.id,
+                                                      photo = profile.photo,
+                                                      interests = profile.interests,
+                                                      activities = profile.activities))
 
-                            listActivityViewModel.updateActivity(theActivity)
-                            profileViewModel.addActivity(profile.id, theActivity.uid)
-                            Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                            navigationActions.navigateTo(Screen.OVERVIEW)
-                          } else {
-                            Toast.makeText(
-                                    context,
-                                    "Enroll failed, limit of places reached",
-                                    Toast.LENGTH_SHORT)
-                                .show()
-                          }
-                          navigationActions.navigateTo(Screen.OVERVIEW)
-                        }
+                                  listActivityViewModel.updateActivity(theActivity)
+                                  profileViewModel.addActivity(profile.id, theActivity.uid)
+                                  Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT)
+                                      .show()
+                                  navigationActions.navigateTo(Screen.OVERVIEW)
+                                } else {
+                                  Toast.makeText(
+                                          context,
+                                          "Enroll failed, limit of places reached",
+                                          Toast.LENGTH_SHORT)
+                                      .show()
+                                }
+                                navigationActions.navigateTo(Screen.OVERVIEW)
+                              }
+                            })
                       },
                       modifier =
                           Modifier.fillMaxWidth()
@@ -390,7 +413,12 @@ fun ActivityDetailsScreen(
                 } else {
                   // Creator of the activity
                   Button(
-                      onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
+                      onClick = {
+                        performOfflineAwareAction(
+                            context = context,
+                            networkManager = networkManager,
+                            onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
+                      },
                       modifier =
                           Modifier.fillMaxWidth()
                               .padding(horizontal = LARGE_PADDING.dp)
@@ -456,7 +484,7 @@ fun CommentSection(
     onDeleteComment: (Comment) -> Unit
 ) {
   val newCommentText = remember { mutableStateOf("") }
-
+  val context = LocalContext.current
   Column(modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
@@ -487,8 +515,13 @@ fun CommentSection(
 
       Button(
           onClick = {
-            onAddComment(newCommentText.value)
-            newCommentText.value = ""
+            performOfflineAwareAction(
+                context = context,
+                networkManager = NetworkManager(context),
+                onPerform = {
+                  onAddComment(newCommentText.value)
+                  newCommentText.value = ""
+                })
           },
           modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("PostCommentButton")) {
             Text("Post Comment")
@@ -507,6 +540,8 @@ fun CommentItem(
 ) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
 
   Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
     Text(
@@ -521,7 +556,12 @@ fun CommentItem(
       Column {
         if (comment.userId == profileId) {
           Button(
-              onClick = { onDeleteComment(comment) },
+              onClick = {
+                performOfflineAwareAction(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerform = { onDeleteComment(comment) })
+              },
               modifier =
                   Modifier.padding(top = SMALL_PADDING.dp, end = STANDARD_PADDING.dp)
                       .testTag("DeleteButton_${comment.uid}")) {
@@ -551,9 +591,14 @@ fun CommentItem(
 
           Button(
               onClick = {
-                onReplyComment(replyText, comment)
-                replyText = ""
-                showReplyField = false
+                performOfflineAwareAction(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerform = {
+                      onReplyComment(replyText, comment)
+                      replyText = ""
+                      showReplyField = false
+                    })
               },
               modifier =
                   Modifier.padding(top = SMALL_PADDING.dp)
@@ -579,21 +624,28 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
   var isLiked by remember {
     mutableStateOf(activity?.let { profile?.likedActivities?.contains(it.uid) } ?: false)
   }
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
 
   if (profile != null) {
     IconButton(
         modifier = Modifier.testTag("likeButton$isLiked"),
         onClick = {
-          isLiked = !isLiked
-          if (isLiked) {
-            if (activity != null) {
-              profileViewModel.addLikedActivity(profile.id, activity.uid)
-            }
-          } else {
-            if (activity != null) {
-              profileViewModel.removeLikedActivity(profile.id, activity.uid)
-            }
-          }
+          performOfflineAwareAction(
+              context = context,
+              networkManager = networkManager,
+              onPerform = {
+                isLiked = !isLiked
+                if (isLiked) {
+                  if (activity != null) {
+                    profileViewModel.addLikedActivity(profile.id, activity.uid)
+                  }
+                } else {
+                  if (activity != null) {
+                    profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                  }
+                }
+              })
         },
     ) {
       Icon(

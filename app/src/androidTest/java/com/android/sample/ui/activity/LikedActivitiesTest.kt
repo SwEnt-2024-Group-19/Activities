@@ -42,7 +42,7 @@ class LikedActivitiesTest {
     activitiesRepository = mock(ActivitiesRepository::class.java)
     profilesRepository = mock(ProfilesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
-    viewModel = ListActivitiesViewModel(activitiesRepository)
+    viewModel = ListActivitiesViewModel(profilesRepository, activitiesRepository)
 
     // val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)
@@ -127,7 +127,7 @@ class LikedActivitiesTest {
   @Test
   fun likeButtonTogglesCorrectly_whenClicked() {
     // Initially set activity as liked
-    profileViewModel = ProfileViewModel(profilesRepository)
+    profileViewModel = ProfileViewModel(profilesRepository, mock())
     composeTestRule.setContent {
       ActivityCard2(
           activityId = activityBiking.uid,
@@ -156,7 +156,7 @@ class LikedActivitiesTest {
   @Test
   fun navigateToActivityDetails() {
     // Initially set activity as liked
-    profileViewModel = ProfileViewModel(profilesRepository)
+    profileViewModel = ProfileViewModel(profilesRepository, mock())
     composeTestRule.setContent {
       ActivityCard2(
           activityId = activity.uid,

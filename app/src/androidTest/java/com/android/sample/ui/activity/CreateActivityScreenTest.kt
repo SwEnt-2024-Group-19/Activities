@@ -15,7 +15,10 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
@@ -44,6 +47,8 @@ class CreateActivityScreenTest {
   private lateinit var mockLocationViewModel: LocationViewModel
   private lateinit var mockPermissionChecker: LocationPermissionChecker
 
+  private lateinit var mockImageViewModel: ImageViewModel
+  private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var profileViewModel: ProfileViewModel
 
   private val location = Location(46.519962, 6.633597, "EPFL")
@@ -70,13 +75,20 @@ class CreateActivityScreenTest {
     `when`(mockNavigationActions.currentRoute()).thenReturn(Screen.ADD_ACTIVITY)
     profileViewModel = mock(ProfileViewModel::class.java)
     `when`(profileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+
+    mockImageRepository = mock(ImageRepositoryFirestore::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository)
   }
 
   @Test
   fun createActivityAddImagesCamera() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule.onNodeWithTag("addImageButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addImageButton").performClick()
@@ -98,7 +110,11 @@ class CreateActivityScreenTest {
   fun createActivityAddImagesGallery() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule.onNodeWithTag("addImageButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addImageButton").performClick()
@@ -114,7 +130,11 @@ class CreateActivityScreenTest {
 
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -127,7 +147,11 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysDescriptionField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -137,23 +161,14 @@ class CreateActivityScreenTest {
   }
 
   @Test
-  fun createActivityScreen_displaysDateField() {
-    composeTestRule.setContent {
-      CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
-    }
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputDateCreate").assertIsDisplayed()
-  }
-
-  @Test
   fun createActivityScreen_displaysPriceField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -166,7 +181,11 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysPlacesLeftField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -179,7 +198,11 @@ class CreateActivityScreenTest {
   fun createActivityScreen_displaysLocationField() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -192,7 +215,11 @@ class CreateActivityScreenTest {
   fun createButton_isDisabledInitially() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
 
     // Wait for the UI to finish rendering
@@ -214,7 +241,11 @@ class CreateActivityScreenTest {
   fun createButton_isEnabledWhenAllFieldsAreFilled() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -224,10 +255,6 @@ class CreateActivityScreenTest {
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputDescriptionCreate"))
     composeTestRule.onNodeWithTag("inputDescriptionCreate").performTextInput("Description")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputPriceCreate"))
@@ -250,7 +277,11 @@ class CreateActivityScreenTest {
   fun createButton_isDisabledWhenFieldsAreCleared() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -270,10 +301,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("inputDescriptionCreate").performTextInput("Description")
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputPriceCreate"))
     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
     composeTestRule
@@ -291,34 +318,14 @@ class CreateActivityScreenTest {
   }
 
   @Test
-  fun createButton_isDisabledWhenPartialFieldsAreFilled() {
+  fun createActivityScreen_dropdownTypeOpensAndDisplaysOptions() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
-    }
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputTitleCreate"))
-    composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Title")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputDateCreate"))
-    composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("01/01/2022")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("inputPriceCreate"))
-    composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("100")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("createButton"))
-    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
-  }
-
-  @Test
-  fun createActivityScreen_dropdownOpensAndDisplaysOptions() {
-    composeTestRule.setContent {
-      CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -330,19 +337,47 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
     composeTestRule.onNodeWithText(types[0].name).assertIsDisplayed()
     composeTestRule.onNodeWithText(types[1].name).assertIsDisplayed()
-    composeTestRule.onNodeWithText(types[2].name).assertIsDisplayed()
   }
 
   @Test
-  fun createActivityScreen_selectsDropdownOption1() {
+  fun createActivityScreen_dropdownCategoryOpensAndDisplaysOptions() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+    // Simulate a click to open the dropdown
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+    // Verify dropdown is expanded and the first option is displayed
+    composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+  }
+
+  @Test
+  fun createActivityScreen_selectsTypeDropdownOption1() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
 
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("chooseTypeMenu"))
+
+    composeTestRule.onNodeWithTag("typeTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Activity Type").assertIsDisplayed()
     // Open the dropdown
     composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
 
@@ -361,19 +396,54 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithText(types[1].name).assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
+  }
 
-    // Click on the first item in the dropdown
-    composeTestRule.onNodeWithText(types[2].name).performClick()
+  @Test
+  fun createActivityScreen_selectsCategoryDropdownOption1() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
 
-    // Verify that the selected option is now displayed in the TextField
-    composeTestRule.onNodeWithText(types[2].name).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("chooseCategoryMenu"))
+
+    composeTestRule.onNodeWithTag("categoryTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Activity Category").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+    composeTestRule.onNodeWithText(categories[0].name).performClick()
+
+    composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+    composeTestRule.onNodeWithText(categories[1].name).performClick()
+
+    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+
+    composeTestRule.onNodeWithText(categories[2].name).performClick()
+
+    composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
   }
 
   @Test
   fun simpleUserIsDisplayed() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
@@ -387,5 +457,104 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
     composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
+  }
+
+  @Test
+  fun datePickerButtonIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDateCreate"))
+    composeTestRule.onNodeWithTag("inputDateCreate").assertIsDisplayed()
+  }
+
+  @Test
+  fun timePickerButtonIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputStartTimeCreate"))
+    composeTestRule.onNodeWithTag("inputStartTimeCreate").assertIsDisplayed()
+  }
+
+  @Test
+  fun endTimePickerButtonIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputEndTimeCreate"))
+    composeTestRule.onNodeWithTag("inputEndTimeCreate").assertIsDisplayed()
+  }
+
+  @Test
+  fun dateDialogIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputDateCreate"))
+    composeTestRule.onNodeWithTag("inputDateCreate").performClick()
+    composeTestRule.onNodeWithText("Select a date").assertIsDisplayed()
+  }
+
+  @Test
+  fun timeDialogIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputStartTimeCreate"))
+    composeTestRule.onNodeWithTag("inputStartTimeCreate").performClick()
+    composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
+  }
+
+  @Test
+  fun timeEndDialogIsDisplayed() {
+    composeTestRule.setContent {
+      CreateActivityScreen(
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("inputEndTimeCreate"))
+    composeTestRule.onNodeWithTag("inputEndTimeCreate").performClick()
+    composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
   }
 }

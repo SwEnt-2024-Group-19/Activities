@@ -34,7 +34,7 @@ class ProfileViewModelTest {
     firebaseAuth = mock(FirebaseAuth::class.java)
     firebaseFirestore = mock(FirebaseFirestore::class.java)
     profilesRepository = mock(ProfilesRepositoryFirestore::class.java)
-    profileViewModel = ProfileViewModel(repository = profilesRepository)
+    profileViewModel = ProfileViewModel(repository = profilesRepository, mock())
   }
 
   @Test
