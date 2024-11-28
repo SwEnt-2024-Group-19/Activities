@@ -53,6 +53,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
@@ -260,6 +263,16 @@ fun ActivityDetailsScreen(
                                   "${round(distance * 10) / 10}km"
                                 }
                         Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
+                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                        // text field button to navigate to the activity's location on the map
+                        // screen
+                        Text(
+                            text = stringResource(id = R.string.button_to_map),
+                            modifier =
+                                Modifier.testTag("activityToMapText")
+                                    .clickable(
+                                        onClick = { navigationActions.navigateTo(Screen.MAP) }),
+                            style = TextStyle(textDecoration = TextDecoration.Underline))
                       }
                     }
                   }
