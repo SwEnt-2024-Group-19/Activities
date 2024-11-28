@@ -137,7 +137,7 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun aUserTriesToLookAtAnActivity() {
+  fun aUserSignsInAndLooksAtTheirProfile() {
     // Tries to log in but fails
     composeTestRule.onNodeWithTag("SignInButton").performClick()
     composeTestRule.waitForIdle()
@@ -148,6 +148,7 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("SignInButton").performClick()
     composeTestRule.waitForIdle()
 
+    // Checks in the profile that the user is connected
     composeTestRule.onNodeWithTag("Profile").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithText("Alice Smith").assertIsDisplayed()
