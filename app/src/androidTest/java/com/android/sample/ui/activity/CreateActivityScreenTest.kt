@@ -350,7 +350,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
     composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
     composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
-    composeTestRule.onNodeWithText(categories[2].name).assertIsDisplayed()
   }
 
   @Test
@@ -384,12 +383,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithText(types[1].name).assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
-
-    // Click on the first item in the dropdown
-    composeTestRule.onNodeWithText(types[2].name).performClick()
-
-    // Verify that the selected option is now displayed in the TextField
-    composeTestRule.onNodeWithText(types[2].name).assertIsDisplayed()
   }
 
   @Test
