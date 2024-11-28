@@ -17,7 +17,7 @@
     <string name="button_create_activity">Create</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="internet_connection_ask">Please check your connection and try again</string>
-    <string name="button_to_map">See on map</string
+    <string name="button_to_map">See on map</string>
 
 
 </resources>
