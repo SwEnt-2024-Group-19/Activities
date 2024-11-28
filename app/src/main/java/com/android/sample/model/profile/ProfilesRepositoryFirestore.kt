@@ -27,7 +27,6 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
       }
     }
   }
-
   fun documentToUser(document: DocumentSnapshot): User? {
     return try {
       User(
@@ -52,7 +51,9 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           photo = document.getString("photo") ?: return null,
           likedActivities =
               (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>()
-                  ?: return null)
+                  ?: return null,
+          nbActivitiesCreated = document.getLong("nbActivitiesCreated")?.toInt() ?: 0
+      )
     } catch (e: Exception) {
       Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null

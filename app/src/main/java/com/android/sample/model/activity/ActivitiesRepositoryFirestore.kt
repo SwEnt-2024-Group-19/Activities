@@ -71,7 +71,8 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
                   } ?: listOf(),
               activities = (participantData["activities"] as? List<String>) ?: listOf(),
               photo = participantData["photo"] as? String,
-              likedActivities = (participantData["likedActivities"] as? List<String>) ?: listOf())
+              likedActivities = (participantData["likedActivities"] as? List<String>) ?: listOf(),
+              nbActivitiesCreated = participantData["nbActivitiesCreated"] as? Int ?: 0)
         } ?: listOf()
     val activityType =
         data["type"]?.let {
