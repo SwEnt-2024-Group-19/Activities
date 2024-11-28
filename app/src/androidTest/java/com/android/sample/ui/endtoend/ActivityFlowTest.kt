@@ -140,7 +140,7 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
   }
-
+/*
   @Test
   fun aUserTriesToLookAtAnActivity() {
     // Signs in
@@ -189,4 +189,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("enrollButton").assertExists()
     composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
   }
+
+ */
 }

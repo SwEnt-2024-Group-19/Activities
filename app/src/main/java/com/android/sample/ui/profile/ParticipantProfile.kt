@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -34,7 +35,8 @@ import com.android.sample.ui.navigation.NavigationActions
 @Composable
 fun ParticipantProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    imageViewModel: ImageViewModel
 ) {
 
   val selectedParticipant = listActivitiesViewModel.selectedUser.collectAsState().value
@@ -43,7 +45,8 @@ fun ParticipantProfileScreen(
     null ->
         ParticipantLoadingScreen(navigationActions) // Show a loading indicator or a retry button
     else -> {
-      ParticipantProfileContent(user = profile, navigationActions, listActivitiesViewModel)
+      ParticipantProfileContent(
+          user = profile, navigationActions, listActivitiesViewModel, imageViewModel)
     }
   // Proceed with showing profile content
   }
@@ -84,6 +87,7 @@ fun ParticipantProfileContent(
     user: User,
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
+    imageViewModel: ImageViewModel
 ) {
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
@@ -104,7 +108,7 @@ fun ParticipantProfileContent(
         LazyColumn(
             Modifier.fillMaxSize().padding(innerPadding).testTag("ParticipantProfileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              item { ProfileHeader(user) }
+              item { ProfileHeader(user, imageViewModel) }
               item {
                 // Interests Section
                 SectionTitle(title = "Interests", testTag = "interestsSection")

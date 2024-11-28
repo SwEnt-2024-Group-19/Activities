@@ -11,7 +11,10 @@ import androidx.compose.ui.test.performScrollToNode
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
+import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.android.sample.resources.dummydata.listOfActivitiesUid
 import com.android.sample.ui.navigation.NavigationActions
@@ -29,6 +32,8 @@ class ParticipantProfileScreenTest {
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var navigationActions: NavigationActions
   private lateinit var testUser: User
+  private lateinit var mockImageViewModel: ImageViewModel
+  private lateinit var mockImageRepository: ImageRepositoryFirestore
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -38,7 +43,8 @@ class ParticipantProfileScreenTest {
 
     navigationActions = mock(NavigationActions::class.java)
     activitiesRepository = mock(ActivitiesRepositoryFirestore::class.java)
-    listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
+    listActivitiesViewModel =
+        ListActivitiesViewModel(mock(ProfilesRepository::class.java), activitiesRepository)
     `when`(activitiesRepository.getActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(
           com.android.sample.resources.dummydata.activityListWithPastActivity)
@@ -54,14 +60,15 @@ class ParticipantProfileScreenTest {
             activities = listOfActivitiesUid)
 
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PARTICIPANT_PROFILE)
+    mockImageRepository = mock(ImageRepositoryFirestore::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository)
   }
 
   @Test
   fun displayLoadingScreenWhenNoParticipantSelected() {
     // Set up a null selected user to simulate loading
     composeTestRule.setContent {
-      ParticipantProfileScreen(
-          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+      ParticipantProfileScreen(listActivitiesViewModel, navigationActions, mockImageViewModel)
     }
 
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
@@ -75,8 +82,7 @@ class ParticipantProfileScreenTest {
     // Set up a null selected user to simulate loading
     listActivitiesViewModel.selectUser(testUser)
     composeTestRule.setContent {
-      ParticipantProfileScreen(
-          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+      ParticipantProfileScreen(listActivitiesViewModel, navigationActions, mockImageViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
@@ -91,8 +97,7 @@ class ParticipantProfileScreenTest {
   fun displayPastActivities() {
     listActivitiesViewModel.selectUser(testUser)
     composeTestRule.setContent {
-      ParticipantProfileScreen(
-          navigationActions = navigationActions, listActivitiesViewModel = listActivitiesViewModel)
+      ParticipantProfileScreen(listActivitiesViewModel, navigationActions, mockImageViewModel)
     }
     composeTestRule
         .onNodeWithTag("ParticipantProfileContentColumn")
@@ -106,8 +111,7 @@ class ParticipantProfileScreenTest {
   fun displayParticipantActivitiesCreated() {
     listActivitiesViewModel.selectUser(testUser)
     composeTestRule.setContent {
-      ParticipantProfileScreen(
-          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+      ParticipantProfileScreen(listActivitiesViewModel, navigationActions, mockImageViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
@@ -122,8 +126,7 @@ class ParticipantProfileScreenTest {
     listActivitiesViewModel.selectUser(testUser)
 
     composeTestRule.setContent {
-      ParticipantProfileScreen(
-          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+      ParticipantProfileScreen(listActivitiesViewModel, navigationActions, mockImageViewModel)
     }
 
     composeTestRule.onNodeWithTag("ParticipantProfileContentColumn").assertIsDisplayed()
@@ -139,8 +142,7 @@ class ParticipantProfileScreenTest {
     listActivitiesViewModel.selectUser(testUser)
 
     composeTestRule.setContent {
-      ParticipantProfileScreen(
-          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+      ParticipantProfileScreen(listActivitiesViewModel, navigationActions, mockImageViewModel)
     }
 
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()

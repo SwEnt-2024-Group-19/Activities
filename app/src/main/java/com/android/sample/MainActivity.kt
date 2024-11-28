@@ -133,7 +133,7 @@ fun NavGraph(
             imageViewModel)
       }
       composable(Screen.PARTICIPANT_PROFILE) {
-        ParticipantProfileScreen(listActivitiesViewModel, navigationActions)
+        ParticipantProfileScreen(listActivitiesViewModel, navigationActions, imageViewModel)
       }
     }
 
