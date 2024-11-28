@@ -34,10 +34,12 @@ import coil.compose.AsyncImage
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.network.NetworkManager
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
+import com.android.sample.ui.components.NoInternetScreen
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -58,6 +60,7 @@ fun MapScreen(
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
   val context = LocalContext.current
+  val networkManager = NetworkManager(context)
   val currentLocation by locationViewModel.currentLocation.collectAsState()
   val coroutineScope = rememberCoroutineScope()
   val activities by listActivitiesViewModel.uiState.collectAsState()
@@ -102,55 +105,60 @@ fun MapScreen(
 
   Scaffold(
       content = { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
-          GoogleMap(
-              modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
-              cameraPositionState = cameraPositionState) {
-                (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
-                    .activities
-                    .filter { it.location != null }
-                    .forEach { item ->
-                      Marker(
-                          state =
-                              MarkerState(
-                                  position =
-                                      LatLng(item.location!!.latitude, item.location!!.longitude)),
-                          title = item.title,
-                          snippet = item.description,
-                          onClick = {
-                            selectedActivity = item
-                            selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }
-                            showBottomSheet = true
-                            true
-                          })
-                    }
-                currentLocation?.let {
-                  Marker(
-                      state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
-                      title = it.name,
-                      snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                      icon =
-                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                }
-              }
-
-          FloatingActionButton(
-              modifier =
-                  Modifier.align(Alignment.BottomStart)
-                      .padding(MEDIUM_PADDING.dp)
-                      .testTag("centerOnCurrentLocation"),
-              onClick = {
-                coroutineScope.launch {
+        if (!networkManager.isNetworkAvailable()) {
+          NoInternetScreen(padding)
+        } else {
+          Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
+                cameraPositionState = cameraPositionState) {
+                  (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
+                      .activities
+                      .filter { it.location != null }
+                      .forEach { item ->
+                        Marker(
+                            state =
+                                MarkerState(
+                                    position =
+                                        LatLng(
+                                            item.location!!.latitude, item.location!!.longitude)),
+                            title = item.title,
+                            snippet = item.description,
+                            onClick = {
+                              selectedActivity = item
+                              selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }
+                              showBottomSheet = true
+                              true
+                            })
+                      }
                   currentLocation?.let {
-                    val locationLatLng = LatLng(it.latitude, it.longitude)
-                    cameraPositionState.animate(
-                        update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
-                        durationMs = 800)
+                    Marker(
+                        state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
+                        title = it.name,
+                        snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
+                        icon =
+                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                   }
                 }
-              }) {
-                Icon(Icons.Default.MyLocation, contentDescription = "Center on current location")
-              }
+
+            FloatingActionButton(
+                modifier =
+                    Modifier.align(Alignment.BottomStart)
+                        .padding(MEDIUM_PADDING.dp)
+                        .testTag("centerOnCurrentLocation"),
+                onClick = {
+                  coroutineScope.launch {
+                    currentLocation?.let {
+                      val locationLatLng = LatLng(it.latitude, it.longitude)
+                      cameraPositionState.animate(
+                          update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                          durationMs = 800)
+                    }
+                  }
+                }) {
+                  Icon(Icons.Default.MyLocation, contentDescription = "Center on current location")
+                }
+          }
         }
       },
       bottomBar = {
