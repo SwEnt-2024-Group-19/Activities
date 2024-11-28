@@ -197,7 +197,8 @@ class ProfileScreenTest {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
-          listActivitiesViewModel = listActivitiesViewModel)
+          listActivitiesViewModel = listActivitiesViewModel,
+          imageViewModel = mockImageViewModel)
     }
 
     // Wait for the UI to settle
