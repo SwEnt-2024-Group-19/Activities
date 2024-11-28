@@ -72,6 +72,7 @@ import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
@@ -371,8 +372,8 @@ fun CreateActivityScreen(
                             text = {
                               Text(
                                   text =
-                                      location.name.take(30) +
-                                          if (location.name.length > 30) "..."
+                                      location.name.take(TOP_TITLE_SIZE) +
+                                          if (location.name.length > TOP_TITLE_SIZE) "..."
                                           else "", // Limit name length
                                   maxLines = 1 // Ensure name doesn't overflow
                                   )

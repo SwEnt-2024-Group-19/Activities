@@ -28,14 +28,14 @@ fun NoInternetScreen(paddingValues: PaddingValues) {
       modifier = Modifier.fillMaxSize().padding(paddingValues)) {
         Image(
             painter = painterResource(id = R.drawable.no_signal),
-            contentDescription = "No internet connection")
+            contentDescription = R.string.no_internet_connection.toString())
         Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
         Text(
-            text = "No internet connection",
+            text = R.string.no_internet_connection.toString(),
             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = TITLE_FONTSIZE.sp))
         Spacer(modifier = Modifier.padding(MEDIUM_PADDING.dp))
         Text(
-            text = "Please check your connection and try again",
+            text = R.string.internet_connection_ask.toString(),
             style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = SUBTITLE_FONTSIZE.sp))
       }
 }
