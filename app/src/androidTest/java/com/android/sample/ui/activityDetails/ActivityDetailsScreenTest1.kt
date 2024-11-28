@@ -330,7 +330,8 @@ class ActivityDetailsScreenAndroidTest {
   @Test
   fun leaveActivityToast_displays_whenLeftActivity() {
     val mockActivitiesRepo = MockActivitiesRepository()
-    mockViewModel = spy(ListActivitiesViewModel(mockActivitiesRepo))
+    mockViewModel =
+        spy(ListActivitiesViewModel(mock(ProfilesRepository::class.java), mockActivitiesRepo))
 
     val mockProfileRepo = MockProfilesRepository()
     mockProfileViewModel = spy(ProfileViewModel(mockProfileRepo))
