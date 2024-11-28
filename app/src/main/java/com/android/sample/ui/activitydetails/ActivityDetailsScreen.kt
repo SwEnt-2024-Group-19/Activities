@@ -320,26 +320,26 @@ fun ActivityDetailsScreen(
                           Modifier.padding(vertical = SMALL_PADDING.dp)
                               .testTag(participant.name)
                               .clickable {
-                                if (participant.name != profile?.name) {
+                                if (participant.id == profile?.id) {
                                   navigationActions.navigateTo(Screen.PROFILE)
+                                } else {
+                                  listActivityViewModel.selectUser(participant)
+                                  navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                                 }
                               }) {
                         // Placeholder for participant picture
-                        if (participant.name != profile?.name) {
+                        if (participant.photo == null) {
                           Box(
                               modifier =
                                   Modifier.size(BUTTON_HEIGHT.dp)
-                                      .background(
-                                          Color.Gray,
-                                          shape = RoundedCornerShape(STANDARD_PADDING.dp))
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
                                       .padding(STANDARD_PADDING.dp)) {
                                 Image(
                                     painter =
                                         painterResource(id = R.drawable.default_profile_image),
                                     contentDescription = "Participant Image",
                                     modifier =
-                                        Modifier.fillMaxSize()
-                                            .clip(RoundedCornerShape(STANDARD_PADDING.dp)))
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
                               }
                         } else {
                           // Profile Picture
