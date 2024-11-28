@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.PersonRemove
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -266,7 +267,7 @@ fun EditActivityScreen(
                         .testTag("changeTimeButton"),
             ) {
               Icon(
-                  Icons.Default.CalendarMonth,
+                  Icons.Default.Schedule,
                   contentDescription = "Change Time",
                   modifier = Modifier.testTag("changeTimeIcon"),
               )
