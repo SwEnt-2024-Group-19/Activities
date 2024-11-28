@@ -9,7 +9,6 @@ import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.android.sample.model.map.Location
 
 object Route {
     const val AUTH = "Auth"
@@ -32,7 +31,7 @@ object Screen {
     const val EDIT_PROFILE = "EditProfile Screen"
     const val CREATE_PROFILE = "CreateProfile Screen"
     const val LIKED_ACTIVITIES = "LikedActivities Screen"
-    const val MAP = "Map?lat={lat}&lng={lng}"
+    const val MAP = "Map Screen"
     const val CHOOSE_ACCOUNT = "ChooseAccount Screen"
     const val PARTICIPANT_PROFILE = "Participant profile Screen"
 }
@@ -44,18 +43,15 @@ object TopLevelDestinations {
         TopLevelDestination(route = Route.OVERVIEW, icon = Icons.Outlined.Menu, textId = "Overview")
     val PROFILE =
         TopLevelDestination(
-            route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile"
-        )
+            route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
     val ADD_ACTIVITY =
         TopLevelDestination(
             route = Route.ADD_ACTIVITY,
             icon = Icons.Outlined.AddCircleOutline,
-            textId = "Add Activity"
-        )
+            textId = "Add Activity")
     val LIKED_ACTIVITIES =
         TopLevelDestination(
-            route = Route.LIKED_ACTIVITIES, icon = Icons.Outlined.FavoriteBorder, textId = "Liked"
-        )
+            route = Route.LIKED_ACTIVITIES, icon = Icons.Outlined.FavoriteBorder, textId = "Liked")
     val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Map, textId = "Map")
 }
 
@@ -65,8 +61,7 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.MAP,
         TopLevelDestinations.ADD_ACTIVITY,
         TopLevelDestinations.LIKED_ACTIVITIES,
-        TopLevelDestinations.PROFILE
-    )
+        TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
@@ -77,17 +72,8 @@ open class NavigationActions(
      * @param destination The top level destination to navigate to Clear the back stack when
      *   navigating to a new destination This is useful when navigating to a new screen from the
      *   bottom navigation bar as we don't want to keep the previous screen in the back stack
-     *
-     * @param location Optional location to display on the map screen
      */
-    open fun navigateTo(destination: TopLevelDestination, location: Location? = null) {
-        // enables to pass a location parameter to the map screen which will be
-        // the first location displayed
-        val route = if (location != null && destination.route == Route.MAP) {
-            "Map?lat=${location.latitude}&lng=${location.longitude}"
-        } else {
-            destination.route
-        }
+    open fun navigateTo(destination: TopLevelDestination) {
 
         navController.navigate(destination.route) {
             // Pop up to the start destination of the graph to
@@ -130,6 +116,22 @@ open class NavigationActions(
         return navController.currentDestination?.route ?: ""
     }
 
+    /**
+     * Get the previous route of the navigation controller.
+     *
+     * @return The previous route
+     */
+    open fun getPreviousRoute(): String? {
+        return navController.previousBackStackEntry?.destination?.route
+    }
 
+    /**
+     * Check if the navigation was made through the bottom bar.
+     *
+     * @return True if the navigation was made through the bottom bar, false otherwise
+     */
+    open fun isNavigationFromBottomBar(): Boolean {
+        val previousRoute = getPreviousRoute()
+        return LIST_TOP_LEVEL_DESTINATION.any { it.route == previousRoute }
+    }
 }
-

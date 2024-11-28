@@ -65,10 +65,10 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
 
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
 
