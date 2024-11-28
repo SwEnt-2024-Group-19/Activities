@@ -328,7 +328,7 @@ fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
                 contentColor =
                     if (isLiked == true) MaterialTheme.colorScheme.onError
                     else MaterialTheme.colorScheme.onSurface),
-        modifier = Modifier.testTag("likeIconButton")) {
+        modifier = Modifier.testTag("likeIconButton_${isLiked == true}")) {
           Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "Like")
         }
     Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
@@ -343,7 +343,8 @@ fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
                     if (isLiked == false) MaterialTheme.colorScheme.error else Color.Transparent,
                 contentColor =
                     if (isLiked == false) MaterialTheme.colorScheme.onError
-                    else MaterialTheme.colorScheme.onSurface)) {
+                    else MaterialTheme.colorScheme.onSurface),
+        modifier = Modifier.testTag("dislikeIconButton_${isLiked == false}")) {
           Icon(
               imageVector = Icons.Default.ThumbDown,
               contentDescription = "Dislike",
