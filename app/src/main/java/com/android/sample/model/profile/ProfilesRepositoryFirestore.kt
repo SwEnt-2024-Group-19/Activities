@@ -78,11 +78,6 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
             }
           }
         }
-    db.collection("profiles")
-        .document(userId)
-        .update("nbActivitiesCreated", FieldValue.increment(1))
-        .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { exception -> onFailure(exception) }
   }
 
   override fun addLikedActivity(
