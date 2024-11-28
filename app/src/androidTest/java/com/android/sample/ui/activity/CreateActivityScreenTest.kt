@@ -286,7 +286,6 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("chooseTypeMenu").assertIsDisplayed()
     composeTestRule.onNodeWithText(types[0].name).assertIsDisplayed()
     composeTestRule.onNodeWithText(types[1].name).assertIsDisplayed()
-
   }
 
   @Test
