@@ -61,6 +61,7 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.Location
@@ -99,7 +100,6 @@ fun EditActivityScreen(
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
   var selectedLocation by remember { mutableStateOf(Location(0.0, 0.0, "No location")) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
-  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
@@ -111,6 +111,10 @@ fun EditActivityScreen(
     LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
   }
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
+  var expandedType by remember { mutableStateOf(false) }
+  var expandedCategory by remember { mutableStateOf(false) }
+  var selectedOptionType by remember { mutableStateOf(activity?.type.toString()) }
+  var selectedOptionCategory by remember { mutableStateOf(activity?.category.toString()) }
 
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
@@ -331,29 +335,62 @@ fun EditActivityScreen(
             ExposedDropdownMenuBox(
                 modifier =
                     Modifier.testTag("chooseTypeMenu").fillMaxWidth().padding(STANDARD_PADDING.dp),
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }) {
+                expanded = expandedType,
+                onExpandedChange = { expandedType = !expandedType }) {
                   OutlinedTextField(
                       readOnly = true,
-                      value = selectedOption,
+                      value = selectedOptionType,
                       onValueChange = {},
                       label = { Text("Activity Type") },
                       trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
                       modifier = Modifier.menuAnchor().fillMaxWidth())
                   ExposedDropdownMenu(
-                      expanded = expanded,
-                      onDismissRequest = { expanded = false },
+                      expanded = expandedType,
+                      onDismissRequest = { expandedType = false },
                       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
                         types.forEach { selectionOption ->
                           DropdownMenuItem(
                               modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
                               text = { Text(selectionOption.name) },
                               onClick = {
-                                selectedOption = selectionOption.name
-                                expanded = false
+                                selectedOptionType = selectionOption.name
+                                expandedType = false
+                              })
+                        }
+                      }
+                }
+
+            ExposedDropdownMenuBox(
+                modifier =
+                    Modifier.testTag("chooseCategoryMenu")
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
+                expanded = expandedCategory,
+                onExpandedChange = { expandedCategory = !expandedCategory }) {
+                  OutlinedTextField(
+                      readOnly = true,
+                      value = selectedOptionCategory,
+                      onValueChange = {},
+                      label = { Text("Activity Category") },
+                      trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
+                      },
+                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
+                  ExposedDropdownMenu(
+                      expanded = expandedCategory,
+                      onDismissRequest = { expandedCategory = false },
+                      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                        categories.forEach { selectionOption ->
+                          DropdownMenuItem(
+                              modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                              text = { Text(selectionOption.name) },
+                              onClick = {
+                                selectedOptionCategory = selectionOption.name
+                                expandedCategory = false
                               })
                         }
                       }
@@ -506,6 +543,9 @@ fun EditActivityScreen(
                             images = activity?.images ?: listOf(),
                             type = types.find { it.name == selectedOption } ?: types[0],
                             participants = attendees,
+                            category =
+                            categories.find { it.name == selectedOptionCategory }
+                                ?: categories[0]),
                             comments = activity?.comments ?: listOf())
                     listActivityViewModel.updateActivity(updatedActivity)
                     navigationActions.navigateTo(Screen.OVERVIEW)

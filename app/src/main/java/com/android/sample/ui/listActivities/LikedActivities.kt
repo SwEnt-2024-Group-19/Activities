@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
@@ -72,6 +74,8 @@ fun LikedActivitiesScreen(
   val uiState by viewModel.uiState.collectAsState()
   val profile = profileViewModel.userState.collectAsState().value
   val allActivities = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
 
   Scaffold(
       modifier = modifier.testTag("likedActivitiesScreen"),
@@ -82,7 +86,14 @@ fun LikedActivitiesScreen(
             selectedItem = navigationActions.currentRoute())
       }) { paddingValues ->
         Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
-          val likedActivitiesList by remember { mutableStateOf(profile?.likedActivities) }
+          val likedActivitiesList =
+              if (networkManager.isNetworkAvailable()) {
+                profile?.likedActivities
+              } else {
+                // Fetch cached profile from Room if offline
+                remember { mutableStateOf(profileViewModel.loadCachedProfile()?.likedActivities) }
+                    .value
+              }
           when (uiState) {
             is ListActivitiesViewModel.ActivitiesUiState.Success -> {
               if (profile == null) {
