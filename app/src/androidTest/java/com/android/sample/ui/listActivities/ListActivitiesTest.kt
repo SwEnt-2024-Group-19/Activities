@@ -2,7 +2,10 @@ package com.android.sample.ui.listActivities
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertIsToggleable
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -175,25 +178,27 @@ class OverviewScreenTest {
     }
     // Ensure segmented buttons are displayed
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("PRO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithTag("segmentedButtonINDIVIDUAL").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("INDIVIDUAL").performClick().assertIsSelected()
-    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("SOLO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("ALL").performClick().assertIsSelected()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick().assertIsOn()
+
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick().assertIsOn()
+      composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick().assertIsOff()
+    composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick().assertIsOn()
+
+      composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick().assertIsOn()
+      composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick().assertIsOff()
+
   }
 
   @Test
-  fun displayTextWhenNoSolo() {
+  fun displayTextWhenNoCulture() {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
-    composeTestRule.onNodeWithText("SOLO").performClick()
-    composeTestRule.onNodeWithText("There is no activity of this type yet.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CULTURE").performClick()
+    composeTestRule.onNodeWithText("There is no activity of these categories yet.").assertIsDisplayed()
   }
 
   @Test

@@ -221,7 +221,7 @@ class EditActivityScreenTest {
     }
 
     composeTestRule
-        .onNodeWithTag("activityCreateScreen")
+        .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("chooseCategoryMenu"))
 
     composeTestRule.onNodeWithTag("categoryTextField").assertIsDisplayed()
@@ -229,15 +229,16 @@ class EditActivityScreenTest {
 
     composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 
-    composeTestRule.onNodeWithText(categories[0].name).performClick()
+      composeTestRule.onNodeWithText(categories[1].name).performClick()
 
-    composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
+      composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+      composeTestRule.onNodeWithText(categories[0].name).performClick()
 
-    composeTestRule.onNodeWithText(categories[1].name).performClick()
+      composeTestRule.onNodeWithText(categories[0].name).assertIsDisplayed()
 
-    composeTestRule.onNodeWithText(categories[1].name).assertIsDisplayed()
+
 
     composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
 

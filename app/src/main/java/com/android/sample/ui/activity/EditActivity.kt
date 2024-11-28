@@ -320,7 +320,7 @@ fun EditActivityScreen(
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth())
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
                   ExposedDropdownMenu(
                       expanded = expandedCategory,
                       onDismissRequest = { expandedCategory = false },
