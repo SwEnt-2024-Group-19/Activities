@@ -1,6 +1,7 @@
 package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -197,11 +198,11 @@ class ProfileScreenTest {
     pastActivityNode.assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("likeIconButton_false").performClick()
-    composeTestRule.onNodeWithTag("likeIconButton_false").assertDoesNotExist()
+    composeTestRule.onNodeWithTag("likeIconButton_false").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("likeIconButton_true").assertExists()
 
     composeTestRule.onNodeWithTag("dislikeIconButton_false").performClick()
-    composeTestRule.onNodeWithTag("dislikeIconButton_false").assertDoesNotExist()
+    composeTestRule.onNodeWithTag("dislikeIconButton_false").assertIsNotDisplayed()
     composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
   }
 }
