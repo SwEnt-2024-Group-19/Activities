@@ -316,7 +316,13 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     implementation(libs.hilt.navigation.compose)
 
-
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.gson.v210)
+    implementation(libs.converter.gson)
 
 }
 

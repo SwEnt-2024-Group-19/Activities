@@ -1,7 +1,11 @@
 package com.android.sample.model.profile
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "User")
 data class User(
-    val id: String,
+    @PrimaryKey val id: String,
     val name: String,
     val surname: String,
     val interests: List<Interest>?,
