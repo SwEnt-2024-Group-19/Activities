@@ -1,5 +1,6 @@
 package com.android.sample.model.profile
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.sample.model.activity.database.AppDatabase
