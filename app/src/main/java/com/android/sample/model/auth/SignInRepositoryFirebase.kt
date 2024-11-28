@@ -6,9 +6,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
 
-class SignInRepositoryFirebase
-@Inject
-constructor(private val auth: FirebaseAuth) :
+class SignInRepositoryFirebase @Inject constructor(private val auth: FirebaseAuth) :
     SignInRepository {
   override suspend fun signInWithEmail(email: String, password: String): AuthResult {
     return auth.signInWithEmailAndPassword(email, password).await()
