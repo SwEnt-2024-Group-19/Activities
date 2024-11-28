@@ -1,11 +1,14 @@
 package com.android.sample.model.activity
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.User
 import com.google.firebase.Timestamp
 
+@Entity(tableName = "activities")
 data class Activity(
-    val uid: String,
+    @PrimaryKey val uid: String,
     var title: String,
     var description: String,
     var date: Timestamp,
