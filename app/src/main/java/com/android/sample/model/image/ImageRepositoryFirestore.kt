@@ -11,6 +11,7 @@ import javax.inject.Inject
 open class ImageRepositoryFirestore @Inject constructor(private val firestore: FirebaseFirestore) :
     ImageRepository {
   private val storageRef = FirebaseStorage.getInstance().reference
+  private val compressionQuality = 50
 
   override fun uploadProfilePicture(
       userId: String,
@@ -20,7 +21,7 @@ open class ImageRepositoryFirestore @Inject constructor(private val firestore: F
   ) {
     val profilePicRef = storageRef.child("users/$userId/profile_picture.jpg")
     val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+    bitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, baos)
 
     profilePicRef
         .putBytes(baos.toByteArray())
@@ -56,7 +57,7 @@ open class ImageRepositoryFirestore @Inject constructor(private val firestore: F
                 bitmaps.forEach { bitmap ->
                   val fileRef = activityFolderRef.child("image_${System.currentTimeMillis()}.jpg")
                   val baos = ByteArrayOutputStream()
-                  bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+                  bitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, baos)
 
                   fileRef
                       .putBytes(baos.toByteArray())
