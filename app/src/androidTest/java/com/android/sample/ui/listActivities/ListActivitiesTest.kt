@@ -601,6 +601,7 @@ class OverviewScreenTest {
         listActivitiesViewModel.getActivities()
 
         composeTestRule.onNodeWithTag("filterDialog").performClick()
+        composeTestRule.onNodeWithTag("onlyPROCheckboxRow").assertIsDisplayed()
         composeTestRule
             .onNodeWithTag("onlyPROCheckbox")
             .performClick()

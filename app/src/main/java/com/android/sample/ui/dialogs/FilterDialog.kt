@@ -112,6 +112,7 @@ fun FilterDialog(
                 Row(modifier = Modifier.fillMaxWidth()) {
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
+                      modifier= Modifier.testTag("onlyPROCheckboxRow")
 
                   ) {
                     Checkbox(
