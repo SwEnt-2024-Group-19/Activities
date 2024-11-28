@@ -55,6 +55,7 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
 import com.android.sample.model.camera.uploadActivityImages
 import com.android.sample.model.map.Location
@@ -93,6 +94,10 @@ fun CreateActivityScreen(
   val networkManager = NetworkManager(context)
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf("Select a type") }
+  var expandedType by remember { mutableStateOf(false) }
+  var expandedCategory by remember { mutableStateOf(false) }
+  var selectedOptionType by remember { mutableStateOf("Select a type") }
+  var selectedOptionCategory by remember { mutableStateOf("Select a category") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -332,39 +337,73 @@ fun CreateActivityScreen(
               }
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-              ExposedDropdownMenuBox(
-                  modifier =
-                      Modifier.testTag("chooseTypeMenu")
-                          .align(Alignment.CenterHorizontally)
-                          .fillMaxWidth()
-                          .padding(STANDARD_PADDING.dp),
-                  expanded = expanded,
-                  onExpandedChange = { expanded = !expanded }) {
-                    OutlinedTextField(
-                        readOnly = true,
-                        value = selectedOption,
-                        onValueChange = {},
-                        label = { Text("Activity Type") },
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                        },
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier = Modifier.menuAnchor().fillMaxWidth())
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                          types.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                                text = { Text(selectionOption.name) },
-                                onClick = {
-                                  selectedOption = selectionOption.name
-                                  expanded = false
-                                })
-                          }
+            ExposedDropdownMenuBox(
+                modifier =
+                    Modifier.testTag("chooseTypeMenu")
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
+                expanded = expandedType,
+                onExpandedChange = { expandedType = !expandedType }) {
+                  OutlinedTextField(
+                      readOnly = true,
+                      value = selectedOptionType,
+                      onValueChange = {},
+                      label = { Text("Activity Type") },
+                      trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
+                      },
+                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("typeTextField"))
+                  ExposedDropdownMenu(
+                      expanded = expandedType,
+                      onDismissRequest = { expandedType = false },
+                      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                        types.forEach { selectionOption ->
+                          DropdownMenuItem(
+                              modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                              text = { Text(selectionOption.name) },
+                              onClick = {
+                                selectedOptionType = selectionOption.name
+                                expandedType = false
+                              })
                         }
-                  }
+                      }
+                }
+
+            ExposedDropdownMenuBox(
+                modifier =
+                    Modifier.testTag("chooseCategoryMenu")
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
+                expanded = expandedCategory,
+                onExpandedChange = { expandedCategory = !expandedCategory }) {
+                  OutlinedTextField(
+                      readOnly = true,
+                      value = selectedOptionCategory,
+                      onValueChange = {},
+                      label = { Text("Activity Category") },
+                      trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
+                      },
+                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
+                  ExposedDropdownMenu(
+                      expanded = expandedCategory,
+                      onDismissRequest = { expandedCategory = false },
+                      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                        categories.forEach { selectionOption ->
+                          DropdownMenuItem(
+                              modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                              text = { Text(selectionOption.name) },
+                              onClick = {
+                                selectedOptionCategory = selectionOption.name
+                                expandedCategory = false
+                              })
+                        }
+                      }
+                }
 
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
@@ -450,93 +489,92 @@ fun CreateActivityScreen(
                     val calendar = GregorianCalendar()
                     val parts = dueDate.split("/")
 
-                    val activityId = listActivityViewModel.getNewUid()
-                    if (creator == "") {
-                      Toast.makeText(
-                              context,
-                              "You must be logged in to create an activity.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-                    } else if (parts.size == 3 &&
-                        timeFormat.size == 2 &&
-                        durationFormat.size == 2) {
-                      attendees += profileViewModel.userState.value!!
-                      try {
-                        calendar.set(
-                            parts[2].toInt(),
-                            parts[1].toInt() - 1, // Months are 0-based
-                            parts[0].toInt(),
-                            0,
-                            0,
-                            0)
-                        uploadActivityImages(
-                            activityId,
-                            selectedImages,
-                            onSuccess = { imageUrls ->
-                              items.addAll(imageUrls) // Store URLs in items to retrieve later
-                            },
-                            onFailure = { exception ->
-                              Toast.makeText(
-                                      context,
-                                      "Failed to upload images: ${exception.message}",
-                                      Toast.LENGTH_SHORT)
-                                  .show()
-                            })
-                        val activity =
-                            Activity(
-                                uid = activityId,
-                                title = title,
-                                description = description,
-                                date = Timestamp(calendar.time),
-                                startTime = startTime,
-                                duration = duration,
-                                price = price.toDouble(),
-                                placesLeft = attendees.size.toLong(),
-                                maxPlaces = placesMax.toLongOrNull() ?: 0,
-                                creator = creator,
-                                status = ActivityStatus.ACTIVE,
-                                location = selectedLocation,
-                                images = items,
-                                participants = attendees,
-                                type = types.find { it.name == selectedOption } ?: types[0],
-                                comments = listOf())
-                        listActivityViewModel.addActivity(activity)
-                        profileViewModel.addActivity(creator, activity.uid)
-                        navigationActions.navigateTo(Screen.OVERVIEW)
-                      } catch (_: NumberFormatException) {
-                        println("There is an error")
-                      }
+                  val activityId = listActivityViewModel.getNewUid()
+                  if (creator == "") {
+                    Toast.makeText(
+                            context,
+                            "You must be logged in to create an activity.",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (parts.size == 3 && timeFormat.size == 2 && durationFormat.size == 2) {
+                    attendees += profileViewModel.userState.value!!
+                    try {
+                      calendar.set(
+                          parts[2].toInt(),
+                          parts[1].toInt() - 1, // Months are 0-based
+                          parts[0].toInt(),
+                          0,
+                          0,
+                          0)
+                      uploadActivityImages(
+                          activityId,
+                          selectedImages,
+                          onSuccess = { imageUrls ->
+                            items.addAll(imageUrls) // Store URLs in items to retrieve later
+                          },
+                          onFailure = { exception ->
+                            Toast.makeText(
+                                    context,
+                                    "Failed to upload images: ${exception.message}",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          })
+                      val activity =
+                          Activity(
+                              uid = activityId,
+                              title = title,
+                              description = description,
+                              date = Timestamp(calendar.time),
+                              startTime = startTime,
+                              duration = duration,
+                              price = price.toDouble(),
+                              placesLeft = attendees.size.toLong(),
+                              maxPlaces = placesMax.toLongOrNull() ?: 0,
+                              creator = creator,
+                              status = ActivityStatus.ACTIVE,
+                              location = selectedLocation,
+                              images = items,
+                              participants = attendees,
+                              type = types.find { it.name == selectedOptionType } ?: types[0],
+                              comments = listOf(),
+                              category =
+                                  categories.find { it.name == selectedOptionCategory }
+                                      ?: categories[0])
+                      listActivityViewModel.addActivity(activity)
+                      profileViewModel.addActivity(creator, activity.uid)
+                      navigationActions.navigateTo(Screen.OVERVIEW)
+                    } catch (_: NumberFormatException) {
+                      println("There is an error")
                     }
-                    if (parts.size != 3) {
-                      Toast.makeText(
-                              context,
-                              "Invalid format, date must be DD/MM/YYYY.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-                    }
-                  },
-                  modifier =
-                      Modifier.width(BUTTON_WIDTH.dp)
-                          .height(BUTTON_HEIGHT.dp)
-                          .testTag("createButton")
-                          .align(Alignment.CenterHorizontally),
+                  }
+                  if (parts.size != 3) {
+                    Toast.makeText(
+                            context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
+                        .show()
+                  }
+                },
+                modifier =
+                    Modifier.width(BUTTON_WIDTH.dp)
+                        .height(BUTTON_HEIGHT.dp)
+                        .testTag("createButton")
+                        .align(Alignment.CenterHorizontally),
+            ) {
+              Row(
+                  horizontalArrangement =
+                      Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
+                  verticalAlignment = Alignment.CenterVertically,
               ) {
-                Row(
-                    horizontalArrangement =
-                        Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                  Icon(
-                      Icons.Filled.Add,
-                      contentDescription = "add a new activity",
-                  )
-                  Text(text = stringResource(id = R.string.button_create_activity))
-                }
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = "add a new activity",
+                )
+                Text(text = stringResource(id = R.string.button_create_activity))
               }
-              Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
             }
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
         }
+            }
       },
       bottomBar = {
         BottomNavigationMenu(
