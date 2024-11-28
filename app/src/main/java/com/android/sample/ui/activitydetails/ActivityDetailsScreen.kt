@@ -458,7 +458,8 @@ fun ActivityDetailsScreen(
                     comments = comments.map { if (it.uid == comment.uid) comment else it }
                     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
                   },
-                  onDeleteComment = deleteComment)
+                  onDeleteComment = deleteComment,
+                  creatorId = activity?.creator ?: "anonymous")
             }
       }
 }
@@ -469,7 +470,8 @@ fun CommentSection(
     comments: List<Comment>,
     onAddComment: (String) -> Unit,
     onReplyComment: (String, Comment) -> Unit,
-    onDeleteComment: (Comment) -> Unit
+    onDeleteComment: (Comment) -> Unit,
+    creatorId: String
 ) {
   val newCommentText = remember { mutableStateOf("") }
   val context = LocalContext.current
@@ -481,9 +483,11 @@ fun CommentSection(
       CommentItem(
           profileId,
           comment,
+          creatorId,
           onReplyComment,
           onDeleteComment,
-          allowReplies = true) // Set allowReplies to true for top-level comments
+          allowReplies = true,
+          ) // Set allowReplies to true for top-level comments
     }
 
     Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -517,94 +521,139 @@ fun CommentSection(
     }
   }
 }
-
 @Composable
 fun CommentItem(
     profileId: String,
     comment: Comment,
+    creatorId: String, // Pass the creator ID as a parameter
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
     allowReplies: Boolean = true
 ) {
-  var showReplyField by remember { mutableStateOf(false) }
-  var replyText by remember { mutableStateOf("") }
-  val context = LocalContext.current
-  val networkManager = NetworkManager(context)
+    var showReplyField by remember { mutableStateOf(false) }
+    var replyText by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val networkManager = NetworkManager(context)
 
-  Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
-    Text(
-        text = "${comment.userName}: ${comment.content}",
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.testTag("commentUserNameAndContent_${comment.uid}"))
-    Text(
-        text = comment.timestamp.toDate().toString(),
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
-    if (profileId != "anonymous") {
-      Column {
-        if (comment.userId == profileId) {
-          Button(
-              onClick = {
-                performOfflineAwareAction(
-                    context = context,
-                    networkManager = networkManager,
-                    onPerform = { onDeleteComment(comment) })
-              },
-              modifier =
-                  Modifier.padding(top = SMALL_PADDING.dp, end = STANDARD_PADDING.dp)
-                      .testTag("DeleteButton_${comment.uid}")) {
-                Text("Delete")
-              }
+    Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically, // Align items vertically
+            modifier = Modifier.padding(bottom = SMALL_PADDING.dp)
+        ) {
+            // If the user is the creator, display a badge
+            if (comment.userId == creatorId) {
+            Box(
+                modifier = Modifier
+                    .padding(end = SMALL_PADDING.dp)
+                    .background(
+                        color = Color.Gray,
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "Creator",
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
+                    modifier = Modifier.testTag("creatorBadge_${comment.uid}")
+                )
+            }
+        }
+            // Display the user's name
+            Text(
+                text = "${comment.userName}:",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.testTag("commentUserName_${comment.uid}")
+            )
         }
 
-        if (allowReplies) {
-          // Toggle button to show/hide the reply input field
-          Button(
-              onClick = { showReplyField = !showReplyField },
-              modifier =
-                  Modifier.padding(top = SMALL_PADDING.dp)
-                      .testTag(
-                          "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
-                Text(if (showReplyField) "Cancel" else "Reply")
-              }
-        }
+        // Display the comment content
+        Text(
+            text = comment.content,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.testTag("commentContent_${comment.uid}")
+        )
 
-        // Conditionally show the reply input field if the user is logged in
-        if (showReplyField) {
-          OutlinedTextField(
-              value = replyText,
-              onValueChange = { replyText = it },
-              label = { Text("Reply") },
-              modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
+        // Display the timestamp
+        Text(
+            text = comment.timestamp.toDate().toString(),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.testTag("commentTimestamp_${comment.uid}")
+        )
 
-          Button(
-              onClick = {
-                performOfflineAwareAction(
-                    context = context,
-                    networkManager = networkManager,
-                    onPerform = {
-                      onReplyComment(replyText, comment)
-                      replyText = ""
-                      showReplyField = false
-                    })
-              },
-              modifier =
-                  Modifier.padding(top = SMALL_PADDING.dp)
-                      .testTag("postReplyButton_${comment.uid}")) {
-                Text("Post Reply")
-              }
-        }
-      }
+        if (profileId != "anonymous") {
+            Column {
+                if (comment.userId == profileId) {
+                    Button(
+                        onClick = {
+                            performOfflineAwareAction(
+                                context = context,
+                                networkManager = networkManager,
+                                onPerform = { onDeleteComment(comment) }
+                            )
+                        },
+                        modifier =
+                        Modifier.padding(top = SMALL_PADDING.dp, end = STANDARD_PADDING.dp)
+                            .testTag("DeleteButton_${comment.uid}")
+                    ) {
+                        Text("Delete")
+                    }
+                }
 
-      // Show replies for original comments, but do not allow replies on replies
-      comment.replies.forEach { reply ->
-        Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
-          // Pass `allowReplies = false` for replies to prevent nesting
-          CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+                if (allowReplies) {
+                    // Toggle button to show/hide the reply input field
+                    Button(
+                        onClick = { showReplyField = !showReplyField },
+                        modifier =
+                        Modifier.padding(top = SMALL_PADDING.dp)
+                            .testTag(
+                                "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}"
+                            )
+                    ) {
+                        Text(if (showReplyField) "Cancel" else "Reply")
+                    }
+                }
+
+                // Conditionally show the reply input field if the user is logged in
+                if (showReplyField) {
+                    OutlinedTextField(
+                        value = replyText,
+                        onValueChange = { replyText = it },
+                        label = { Text("Reply") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("replyInputField_${comment.uid}")
+                    )
+
+                    Button(
+                        onClick = {
+                            performOfflineAwareAction(
+                                context = context,
+                                networkManager = networkManager,
+                                onPerform = {
+                                    onReplyComment(replyText, comment)
+                                    replyText = ""
+                                    showReplyField = false
+                                }
+                            )
+                        },
+                        modifier =
+                        Modifier.padding(top = SMALL_PADDING.dp)
+                            .testTag("postReplyButton_${comment.uid}")
+                    ) {
+                        Text("Post Reply")
+                    }
+                }
+            }
+
+            // Show replies for original comments, but do not allow replies on replies
+            comment.replies.forEach { reply ->
+                Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
+                    // Pass `allowReplies = false` for replies to prevent nesting
+                    CommentItem(profileId, reply, creatorId, onReplyComment, onDeleteComment, allowReplies = false)
+                }
+            }
         }
-      }
     }
-  }
 }
 
 @Composable
