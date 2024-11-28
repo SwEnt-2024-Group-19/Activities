@@ -72,8 +72,7 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
                         interests = listOf(),
                         activities = listOf(),
                         photo = null,
-                        likedActivities = listOf(),
-                        nbActivitiesCreated = 0))
+                        likedActivities = listOf()))
                 onDismiss()
               }) {
                 Text("Add user")

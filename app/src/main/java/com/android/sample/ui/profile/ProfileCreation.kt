@@ -197,8 +197,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                           interests = newListInterests,
                           activities = emptyList(),
                           photo = photo,
-                          likedActivities = emptyList(),
-                          nbActivitiesCreated = 0)
+                          likedActivities = emptyList())
 
                   viewModel.createUserProfile(
                       userProfile = userProfile,

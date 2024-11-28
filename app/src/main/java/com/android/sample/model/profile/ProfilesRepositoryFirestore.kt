@@ -52,8 +52,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           photo = document.getString("photo") ?: return null,
           likedActivities =
               (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>()
-                  ?: return null,
-          nbActivitiesCreated = document.getLong("nbActivitiesCreated")?.toInt() ?: 0)
+                  ?: return null)
     } catch (e: Exception) {
       Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null
@@ -79,6 +78,11 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
             }
           }
         }
+    db.collection("profiles")
+        .document(userId)
+        .update("nbActivitiesCreated", FieldValue.increment(1))
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { exception -> onFailure(exception) }
   }
 
   override fun addLikedActivity(
