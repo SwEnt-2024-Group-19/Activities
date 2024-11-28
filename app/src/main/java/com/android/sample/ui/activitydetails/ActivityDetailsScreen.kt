@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
@@ -87,7 +88,7 @@ fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
@@ -96,7 +97,7 @@ fun ActivityDetailsScreen(
 
   val creatorID = activity?.creator ?: ""
   var creator by remember {
-    mutableStateOf(User(creatorID, "anonymous", "anonymous", listOf(), listOf(), "", listOf(), 0))
+    mutableStateOf(User(creatorID, "anonymous", "anonymous", listOf(), listOf(), "", listOf()))
   }
 
   LaunchedEffect(activity) {
@@ -107,7 +108,9 @@ fun ActivityDetailsScreen(
       }
     }
   }
-
+  val uiState by listActivityViewModel.uiState.collectAsState()
+  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+  val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
   Log.d("ActivityDetailsScreen", "Creator current state: $creator")
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
@@ -298,7 +301,7 @@ fun ActivityDetailsScreen(
                   }
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               // Creator's informations
-              CreatorRow(creator)
+              CreatorRow(creator, nbActivitiesCreated)
               // Participants section
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               Text(
@@ -393,9 +396,7 @@ fun ActivityDetailsScreen(
                                                       id = profile.id,
                                                       photo = profile.photo,
                                                       interests = profile.interests,
-                                                      activities = profile.activities,
-                                                      nbActivitiesCreated =
-                                                          profile.nbActivitiesCreated))
+                                                      activities = profile.activities))
 
                                   listActivityViewModel.updateActivity(theActivity)
                                   profileViewModel.addActivity(profile.id, theActivity.uid)
@@ -667,23 +668,38 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
 
 @OptIn(ExperimentalLayoutApi::class) // Required for FlowRow
 @Composable
-fun CreatorRow(creator: User) {
+fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
   FlowRow { // manages return to the line when the space is not enough
     // Placeholder for creator name
     Text(
-        text = "Creator : ${creator.name}",
+        text = "Creator : ",
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Text(
+        text = creator.name,
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
     Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
     // Placeholder for creator's rating
     Text(
-        text = "Rating : Blank/10",
+        text = "Rating :",
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Text(
+        text = " Blank/10",
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
     Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
     // Placeholder for creator's number of activities created
     Text(
-        text = "NB activities created : ${creator.nbActivitiesCreated}",
+        text = "NB activities created : ",
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Text(
+        text = "$nbActivitiesCreated",
         style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
   }
