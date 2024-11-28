@@ -16,6 +16,7 @@ class MockActivitiesRepository : ActivitiesRepository {
               date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
               "2021-01-01",
               "09:00",
+              category = Category.SPORT,
               10.0,
               Location(0.0, 0.0, "origin"),
               "10:00",

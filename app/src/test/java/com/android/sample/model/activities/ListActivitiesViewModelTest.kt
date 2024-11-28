@@ -4,6 +4,7 @@ import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
+import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.activityBiking
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -25,6 +26,7 @@ class ListActivitiesViewModelTest {
 
   private lateinit var activitiesRepository: ActivitiesRepository
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
+  private lateinit var profilesRepository: ProfilesRepository
 
   private val location = Location(46.519962, 6.633597, "EPFL")
   private val activity = activityBiking
@@ -32,7 +34,8 @@ class ListActivitiesViewModelTest {
   @Before
   fun setUp() {
     activitiesRepository = mock(ActivitiesRepository::class.java)
-    listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
+    profilesRepository = mock(ProfilesRepository::class.java)
+    listActivitiesViewModel = ListActivitiesViewModel(profilesRepository, activitiesRepository)
   }
 
   @Test

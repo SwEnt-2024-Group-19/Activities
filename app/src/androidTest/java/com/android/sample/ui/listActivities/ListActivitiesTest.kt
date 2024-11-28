@@ -2,7 +2,8 @@ package com.android.sample.ui.listActivities
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -17,6 +18,7 @@ import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationRepository
@@ -99,7 +101,7 @@ class OverviewScreenTest {
     profilesRepository = mock(ProfilesRepository::class.java)
     activitiesRepository = mock(ActivitiesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
-    listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
+    listActivitiesViewModel = ListActivitiesViewModel(profilesRepository, activitiesRepository)
 
     testUser =
         User(
@@ -174,25 +176,28 @@ class OverviewScreenTest {
     }
     // Ensure segmented buttons are displayed
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("PRO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithTag("segmentedButtonINDIVIDUAL").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("INDIVIDUAL").performClick().assertIsSelected()
-    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("SOLO").performClick().assertIsSelected()
-    composeTestRule.onNodeWithText("ALL").performClick().assertIsSelected()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick().assertIsOn()
+
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick().assertIsOn()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick().assertIsOff()
+    composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick().assertIsOn()
+
+    composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick().assertIsOn()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick().assertIsOff()
   }
 
   @Test
-  fun displayTextWhenNoSolo() {
+  fun displayTextWhenNoCulture() {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
-    composeTestRule.onNodeWithText("SOLO").performClick()
-    composeTestRule.onNodeWithText("There is no activity of this type yet.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("CULTURE").performClick()
+    composeTestRule
+        .onNodeWithText("There is no activity of these categories yet.")
+        .assertIsDisplayed()
   }
 
   @Test
@@ -250,31 +255,41 @@ class OverviewScreenTest {
   }
 
   @Test
-  fun filteringWorks() {
+  fun filteringCategoryWorks() {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
-    val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
-    val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
+    val activity1 = activity.copy(title = "Italian cooking", category = Category.CULTURE)
+    val activity2 = activity.copy(title = "dance", category = Category.ENTERTAINMENT)
+    val activity3 = activity.copy(title = "football", category = Category.SPORT)
+    val activity4 = activity.copy(title = "networking", category = Category.SKILLS)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity, activity1, activity2, activity3))
+      it.getArgument<(List<Activity>) -> Unit>(0)(
+          listOf(activity, activity1, activity2, activity3, activity4))
     }
 
     listActivitiesViewModel.getActivities()
-    composeTestRule.onNodeWithTag("segmentedButtonINDIVIDUAL").performClick()
-    composeTestRule.onNodeWithText("cooking").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
     composeTestRule.onNodeWithText("football").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
 
-    composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+    composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
     composeTestRule.onNodeWithText("dance").assertIsDisplayed()
+    composeTestRule.onNodeWithText("football").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("Italian cooking").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("networking").assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonENTERTAINMENT").performClick()
 
-    composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
-    composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
+    composeTestRule.onNodeWithText("Italian cooking").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
+
+    composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick()
+    composeTestRule.onNodeWithText("networking").assertIsDisplayed()
   }
 
   @Test
@@ -308,10 +323,7 @@ class OverviewScreenTest {
       ListActivitiesScreen(
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
-    // composeTestRule.setContent {
 
-    // ListActivitiesScreen(listActivitiesViewModel, navigationActions, userProfileViewModel)
-    // }
     composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
   }
 
@@ -366,7 +378,7 @@ class OverviewScreenTest {
 
   @Test
   fun changeIconWhenActivityIsOnclick() {
-    userProfileViewModel = ProfileViewModel(profilesRepository)
+    userProfileViewModel = ProfileViewModel(profilesRepository, mock())
 
     composeTestRule.setContent {
       ActivityCard(

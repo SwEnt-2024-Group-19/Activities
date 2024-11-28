@@ -14,6 +14,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.android.sample.resources.dummydata.activityListWithPastActivity
 import com.android.sample.resources.dummydata.listOfActivitiesUid
@@ -42,7 +43,8 @@ class ProfileScreenTest {
   fun setUp() {
     activitiesRepository = mock(ActivitiesRepository::class.java)
     userProfileViewModel = mock(ProfileViewModel::class.java)
-    listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
+    listActivitiesViewModel =
+        ListActivitiesViewModel(mock(ProfilesRepository::class.java), activitiesRepository)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(activityListWithPastActivity)
