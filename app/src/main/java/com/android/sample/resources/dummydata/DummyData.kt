@@ -223,8 +223,7 @@ val pastActivity =
                     surname = "A",
                     photo = "",
                     interests = listOf(interest2),
-                    activities = listOf("pastActivityUID", "1", "123"),
-                )),
+                    activities = listOf("pastActivityUID", "1", "123"))),
         duration = "2 hours",
         startTime = "10:00")
 

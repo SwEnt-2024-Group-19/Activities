@@ -1,5 +1,6 @@
 package com.android.sample.ui.activitydetails
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,6 +8,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -39,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
@@ -83,13 +88,30 @@ fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
   // Check if the user is already enrolled in the activity
   val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
 
+  val creatorID = activity?.creator ?: ""
+  var creator by remember {
+    mutableStateOf(User(creatorID, "anonymous", "anonymous", listOf(), listOf(), "", listOf()))
+  }
+
+  LaunchedEffect(activity) {
+    profileViewModel.getUserData(creatorID) { user ->
+      if (user != null) {
+        creator = user
+        Log.d("ActivityDetailsScreen", "Creator updated in callback: $creator")
+      }
+    }
+  }
+  val uiState by listActivityViewModel.uiState.collectAsState()
+  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+  val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
+  Log.d("ActivityDetailsScreen", "Creator current state: $creator")
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
   val location by remember { mutableStateOf(activity?.location) }
@@ -278,15 +300,15 @@ fun ActivityDetailsScreen(
                         modifier = Modifier.testTag("durationText"))
                   }
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
-
+              // Creator's informations
+              CreatorRow(creator, nbActivitiesCreated)
               // Participants section
+              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               Text(
                   text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
                   style = MaterialTheme.typography.bodyLarge,
                   modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
-
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
-
               // List of participants
               Column(modifier = Modifier.testTag("participants")) {
                 activity?.participants?.forEach { participant ->
@@ -641,5 +663,44 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
           contentDescription = if (isLiked) "Liked" else "Not Liked",
           tint = if (isLiked) Color.Black else Color.LightGray)
     }
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class) // Required for FlowRow
+@Composable
+fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
+  FlowRow { // manages return to the line when the space is not enough
+    // Placeholder for creator name
+    Text(
+        text = "Creator : ",
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Text(
+        text = creator.name,
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+    // Placeholder for creator's rating
+    Text(
+        text = "Rating :",
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Text(
+        text = " Blank/10",
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+    // Placeholder for creator's number of activities created
+    Text(
+        text = "NB activities created : ",
+        style = MaterialTheme.typography.bodyLarge,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
+    Text(
+        text = "$nbActivitiesCreated",
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
   }
 }

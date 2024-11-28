@@ -1,5 +1,6 @@
 package com.android.sample.model.profile
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.sample.model.activity.database.AppDatabase
@@ -63,6 +64,11 @@ constructor(private val repository: ProfilesRepository, private val localDatabas
         userState_.value = cachedUser
       }
     }
+  }
+
+  fun getUserData(userId: String, onSuccess: (User?) -> Unit) {
+    repository.getUser(
+        userId, onSuccess = { onSuccess(it) }, onFailure = { Log.e("error", " not fetching") })
   }
 
   fun clearUserData() {
