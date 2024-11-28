@@ -413,7 +413,7 @@ class OverviewScreenTest {
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+    val activity2 = activity.copy(title = "dance", type = ActivityType.PRO)
     val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -437,7 +437,7 @@ class OverviewScreenTest {
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+    val activity2 = activity.copy(title = "dance", type = ActivityType.PRO)
     val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -581,5 +581,32 @@ class OverviewScreenTest {
 
     composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
     composeTestRule.onNodeWithText("Long activity").assertIsDisplayed()
+  }
+
+  @Test
+  fun filterDialogFiltersByOnlyPRO() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+    }
+
+    val activity1 = activity.copy(title = "PRO activity", type = ActivityType.PRO)
+    val activity2 = activity.copy(title = "INDIVIDUAL activity", type = ActivityType.INDIVIDUAL)
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("onlyPROCheckboxRow").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("onlyPROCheckbox").performClick()
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+
+    composeTestRule.onNodeWithText("PRO activity").assertIsDisplayed()
+    composeTestRule.onNodeWithText("INDIVIDUAL activity").assertDoesNotExist()
   }
 }

@@ -1,5 +1,7 @@
 package com.android.sample.ui.activitydetails
 
+import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,6 +59,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
@@ -66,6 +69,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
@@ -83,7 +87,8 @@ fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
@@ -117,6 +122,7 @@ fun ActivityDetailsScreen(
   val duration by remember { mutableStateOf(activity?.duration) }
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
+  var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
   val deleteComment: (Comment) -> Unit = { commentToDelete ->
     // Filter out the main comment and any replies associated with it
     val newComments = comments.filter { it.uid != commentToDelete.uid }
@@ -174,6 +180,11 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
+                    imageViewModel.fetchActivityImagesAsBitmaps(
+                        activity?.uid ?: "",
+                        onSuccess = { urls -> bitmaps = urls },
+                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+                    CarouselNoModif(itemsList = bitmaps)
                     LikeButton(profile, activity, profileViewModel)
                   }
 
@@ -321,7 +332,8 @@ fun ActivityDetailsScreen(
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
+                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape),
+                              imageViewModel = imageViewModel)
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
 

@@ -18,7 +18,7 @@ class FilterDialogTest {
 
   @Test
   fun filterDialog_shouldDisplayAllComponents() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
 
     composeTestRule.onNodeWithTag("FilterDialog").assertIsDisplayed()
     composeTestRule.onNodeWithText("Price Range").assertIsDisplayed()
@@ -48,7 +48,7 @@ class FilterDialogTest {
   */
   @Test
   fun filterDialog_shouldUpdateMembersAvailable() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
 
     val inputText = "10"
     composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput(inputText)
@@ -59,7 +59,7 @@ class FilterDialogTest {
 
   @Test
   fun filterDialog_shouldSetStartDate() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
 
     val startDate = "15/09/2024"
     composeTestRule.onNodeWithTag("minDateTextField").performTextInput(startDate)
@@ -70,7 +70,7 @@ class FilterDialogTest {
 
   @Test
   fun filterDialog_shouldSetDuration() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
 
     val duration = "2 hours"
     composeTestRule.onNodeWithTag("durationTextField").performTextInput(duration)
@@ -84,7 +84,7 @@ class FilterDialogTest {
     var dismissed = false
 
     composeTestRule.setContent {
-      FilterDialog(onDismiss = { dismissed = true }, onFilter = { _, _, _, _ -> })
+      FilterDialog(onDismiss = { dismissed = true }, onFilter = { _, _, _, _, _ -> })
     }
 
     // Perform click on Cancel
@@ -105,7 +105,7 @@ class FilterDialogTest {
     composeTestRule.setContent {
       FilterDialog(
           onDismiss = {},
-          onFilter = { price, members, date, dur ->
+          onFilter = { price, members, date, dur, _ ->
             filterCalled = true
             maxPrice = price
             membersAvailable = members

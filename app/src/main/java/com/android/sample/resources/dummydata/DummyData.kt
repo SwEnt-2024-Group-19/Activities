@@ -270,7 +270,7 @@ val validData =
         "placesLeft" to 5L,
         "maxPlaces" to 20L,
         "status" to "ACTIVE",
-        "type" to "SOLO",
+        "type" to "INDIVIDUAL",
         "participants" to
             listOf(
                 mapOf(

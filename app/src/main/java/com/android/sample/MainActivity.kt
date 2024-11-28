@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C
@@ -94,6 +95,7 @@ fun NavGraph(
     profileViewModel: ProfileViewModel = hiltViewModel<ProfileViewModel>(),
     listActivitiesViewModel: ListActivitiesViewModel = hiltViewModel<ListActivitiesViewModel>(),
     locationViewModel: LocationViewModel = hiltViewModel<LocationViewModel>(),
+    imageViewModel: ImageViewModel = hiltViewModel<ImageViewModel>(),
 ) {
 
   NavHost(navController = navController, startDestination = startDestination) {
@@ -105,7 +107,7 @@ fun NavGraph(
       composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
       composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
       composable(Screen.CREATE_PROFILE) {
-        ProfileCreationScreen(profileViewModel, navigationActions)
+        ProfileCreationScreen(profileViewModel, navigationActions, imageViewModel)
       }
     }
 
@@ -118,11 +120,16 @@ fun NavGraph(
             listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
       }
       composable(Screen.EDIT_ACTIVITY) {
-        EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel)
+        EditActivityScreen(
+            listActivitiesViewModel, navigationActions, locationViewModel, imageViewModel)
       }
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(
-            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+            listActivitiesViewModel,
+            navigationActions,
+            profileViewModel,
+            locationViewModel,
+            imageViewModel)
       }
     }
 
@@ -135,15 +142,21 @@ fun NavGraph(
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
       composable(Screen.ADD_ACTIVITY) {
         CreateActivityScreen(
-            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+            listActivitiesViewModel,
+            navigationActions,
+            profileViewModel,
+            locationViewModel,
+            imageViewModel)
       }
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
-        ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
+        ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel, imageViewModel)
       }
-      composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
+      composable(Screen.EDIT_PROFILE) {
+        EditProfileScreen(profileViewModel, navigationActions, imageViewModel)
+      }
     }
 
     navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
