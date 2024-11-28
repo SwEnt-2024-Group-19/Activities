@@ -172,4 +172,34 @@ class ProfileScreenTest {
     val pastActivity = activityListWithPastActivity.first { it.uid == listOfActivitiesUid.first() }
     verify(navigationActions).navigateTo(Screen.EDIT_ACTIVITY)
   }
+
+  @Test
+  fun reviewPastActivity_updatesReviewStatus() {
+
+    composeTestRule.setContent {
+      ProfileScreen(
+          userProfileViewModel = userProfileViewModel,
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel)
+    }
+
+    // Wait for the UI to settle
+    composeTestRule.waitForIdle()
+
+    // Scroll to the past activity
+    composeTestRule
+        .onNodeWithTag("profileContentColumn")
+        .performScrollToNode(hasTestTag("pastActivitiesTitle"))
+
+    val pastActivityNode = composeTestRule.onAllNodes(hasTestTag("activityPast")).onFirst()
+    pastActivityNode.assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("likeIconButton_false").performClick()
+    composeTestRule.onNodeWithTag("likeIconButton_false").assertDoesNotExist()
+    composeTestRule.onNodeWithTag("likeIconButton_true").assertExists()
+
+    composeTestRule.onNodeWithTag("dislikeIconButton_false").performClick()
+    composeTestRule.onNodeWithTag("dislikeIconButton_false").assertDoesNotExist()
+    composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
+  }
 }
