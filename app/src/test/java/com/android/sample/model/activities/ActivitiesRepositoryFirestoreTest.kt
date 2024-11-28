@@ -211,7 +211,7 @@ class ActivitiesRepositoryFirestoreTest {
     assertEquals(5L, result.placesLeft)
     assertEquals(20L, result.maxPlaces)
     assertEquals(ActivityStatus.ACTIVE, result.status)
-    assertEquals(ActivityType.SOLO, result.type)
+    assertEquals(ActivityType.INDIVIDUAL, result.type)
     assertEquals(1, result.participants.size)
     assertEquals("John", result.participants.first().name)
     assertEquals(1, result.comments.size)
@@ -237,6 +237,6 @@ class ActivitiesRepositoryFirestoreTest {
     assertTrue(result.comments.isEmpty())
     assertEquals("No Location", result.location!!.name)
     assertEquals(ActivityStatus.ACTIVE, result.status)
-    assertEquals(ActivityType.SOLO, result.type)
+    assertEquals(ActivityType.INDIVIDUAL, result.type)
   }
 }

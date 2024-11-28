@@ -78,9 +78,9 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
           try {
             ActivityType.valueOf(it as String)
           } catch (e: IllegalArgumentException) {
-            ActivityType.SOLO
+            ActivityType.INDIVIDUAL
           }
-        } ?: ActivityType.SOLO
+        } ?: ActivityType.INDIVIDUAL
     val comments =
         (data["comments"] as? List<Map<String, Any>>)?.map { commentData ->
           Comment(

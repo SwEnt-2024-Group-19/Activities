@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.PersonRemove
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -43,10 +45,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,6 +66,7 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
 import com.android.sample.model.hour_date.HourDateViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -71,6 +74,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.components.MyDatePicker
 import com.android.sample.ui.components.MyTimePicker
@@ -87,7 +91,8 @@ import com.google.firebase.Timestamp
 fun EditActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
@@ -108,9 +113,6 @@ fun EditActivityScreen(
         hourDateViewModel.addDurationToTime(startTime ?: "00:00", activity?.duration ?: "00:01"))
   }
   var expanded by remember { mutableStateOf(false) }
-  val controller = remember {
-    LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
-  }
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
   var expandedType by remember { mutableStateOf(false) }
   var expandedCategory by remember { mutableStateOf(false) }
@@ -122,16 +124,20 @@ fun EditActivityScreen(
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-  // var items by remember { mutableStateOf(activity?.images ?: listOf()) }
   var isGalleryOpen by remember { mutableStateOf(false) }
-  var selectedImages = remember { mutableStateListOf<Bitmap>() }
-
+  var selectedImages by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
+  var items by remember { mutableStateOf(activity?.images ?: listOf()) }
+  imageViewModel.fetchActivityImagesAsBitmaps(
+      activity?.uid ?: "",
+      { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
+      onFailure = { error ->
+        Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
+      })
   // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember { mutableStateOf(activity?.date ?: Timestamp.now()) }
   var dateIsOpen by remember { mutableStateOf(false) }
   var timeIsOpen by remember { mutableStateOf(false) }
   var durationIsOpen by remember { mutableStateOf(false) }
-
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
@@ -156,7 +162,7 @@ fun EditActivityScreen(
         if (isGalleryOpen) {
           GalleryScreen(
               isGalleryOpen = { isGalleryOpen = false },
-              addImage = { bitmap -> selectedImages.add(bitmap) },
+              addImage = { bitmap -> selectedImages = selectedImages + (bitmap) },
               context = context)
         }
         if (isCamOpen) {
@@ -170,7 +176,7 @@ fun EditActivityScreen(
                   },
               context = context,
               isCamOpen = { isCamOpen = false },
-              addElem = { bitmap -> selectedImages.add(bitmap) })
+              addElem = { bitmap -> selectedImages = selectedImages + (bitmap) })
         } else {
           Column(
               modifier =
@@ -192,8 +198,11 @@ fun EditActivityScreen(
                     isCamOpen = true
                   })
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Carousel(
+                openDialog = { showDialogImage = true },
+                itemsList = selectedImages,
+                deleteImage = { bitmap -> selectedImages = selectedImages.filter { it != bitmap } })
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -258,7 +267,7 @@ fun EditActivityScreen(
                         .testTag("changeTimeButton"),
             ) {
               Icon(
-                  Icons.Default.CalendarMonth,
+                  Icons.Default.Schedule,
                   contentDescription = "Change Time",
                   modifier = Modifier.testTag("changeTimeIcon"),
               )
@@ -525,6 +534,13 @@ fun EditActivityScreen(
                     return@Button
                   }
                   try {
+                    imageViewModel.uploadActivityImages(
+                        activity?.uid ?: "",
+                        selectedImages.toList(),
+                        { urls -> items = urls },
+                        { error ->
+                          Log.e("EditActivityScreen", "Failed to upload images: ${error.message}")
+                        })
                     val updatedActivity =
                         Activity(
                             uid = activity?.uid ?: "",

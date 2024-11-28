@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import com.android.sample.model.camera.flipCamera
-import com.android.sample.model.camera.takePhoto
+import com.android.sample.model.image.flipCamera
+import com.android.sample.model.image.takePhoto
 
 @Composable
 fun CameraScreen(

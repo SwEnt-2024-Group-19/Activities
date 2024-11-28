@@ -60,8 +60,8 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
-import com.android.sample.model.camera.uploadActivityImages
 import com.android.sample.model.hour_date.HourDateViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
@@ -94,7 +94,8 @@ fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
@@ -115,9 +116,6 @@ fun CreateActivityScreen(
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf(Timestamp.now()) }
-  val controller = remember {
-    LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
-  }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
   var startTime by remember { mutableStateOf("") }
@@ -523,101 +521,100 @@ fun CreateActivityScreen(
                 }
               }
 
-              if (showDialogUser) {
-                AddUserDialog(
-                    onDismiss = { showDialogUser = false },
-                    onAddUser = { user -> attendees = attendees + user },
-                )
-              }
-              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
-              Button(
-                  enabled = title.isNotEmpty() && description.isNotEmpty(),
-                  onClick = {
-                    val activityId = listActivityViewModel.getNewUid()
-                    if (creator == "") {
-                      Toast.makeText(
-                              context,
-                              "You must be logged in to create an activity.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-                    } else if (hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
-                      Toast.makeText(
-                              context,
-                              "The start time must be before the end time.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-                    } else if (price.toDoubleOrNull() == null) {
-                      Toast.makeText(context, "Invalid price format.", Toast.LENGTH_SHORT).show()
-                    } else if (placesMax.toLongOrNull() == null) {
-                      Toast.makeText(context, "Invalid places format.", Toast.LENGTH_SHORT).show()
-                    } else if (selectedLocation == null) {
-                      Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT)
-                          .show()
-                    } else {
-                      attendees += profileViewModel.userState.value!!
-                      try {
-                        uploadActivityImages(
-                            activityId,
-                            selectedImages,
-                            onSuccess = { imageUrls ->
-                              items.addAll(imageUrls) // Store URLs in items to retrieve later
-                            },
-                            onFailure = { exception ->
-                              Toast.makeText(
-                                      context,
-                                      "Failed to upload images: ${exception.message}",
-                                      Toast.LENGTH_SHORT)
-                                  .show()
-                            })
-                        val activity =
-                            Activity(
-                                uid = activityId,
-                                title = title,
-                                description = description,
-                                date = dueDate,
-                                startTime = startTime,
-                                duration = hourDateViewModel.calculateDuration(startTime, duration),
-                                price = price.toDouble(),
-                                placesLeft = attendees.size.toLong(),
-                                maxPlaces = placesMax.toLongOrNull() ?: 0,
-                                creator = creator,
-                                status = ActivityStatus.ACTIVE,
-                                location = selectedLocation,
-                                images = items,
-                                participants = attendees,
-                                type = types.find { it.name == selectedOptionType } ?: types[0],
-                                comments = listOf(),
-                                category =
-                                    categories.find { it.name == selectedOptionCategory }
-                                        ?: categories[0])
-                        listActivityViewModel.addActivity(activity)
-                        profileViewModel.addActivity(creator, activity.uid)
-                        navigationActions.navigateTo(Screen.OVERVIEW)
-                      } catch (_: NumberFormatException) {
-                        println("There is an error")
-                      }
-                    }
-                  },
-                  modifier =
-                      Modifier.width(BUTTON_WIDTH.dp)
-                          .height(BUTTON_HEIGHT.dp)
-                          .testTag("createButton")
-                          .align(Alignment.CenterHorizontally),
-              ) {
-                Row(
-                    horizontalArrangement =
-                        Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                  Icon(
-                      Icons.Filled.Add,
-                      contentDescription = "add a new activity",
-                  )
-                  Text(text = stringResource(id = R.string.button_create_activity))
-                }
-              }
-              Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+            if (showDialogUser) {
+              AddUserDialog(
+                  onDismiss = { showDialogUser = false },
+                  onAddUser = { user -> attendees = attendees + user },
+              )
             }
+            Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
+            Button(
+                enabled = title.isNotEmpty() && description.isNotEmpty(),
+                onClick = {
+                  val activityId = listActivityViewModel.getNewUid()
+                  if (creator == "") {
+                    Toast.makeText(
+                            context,
+                            "You must be logged in to create an activity.",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
+                    Toast.makeText(
+                            context,
+                            "The start time must be before the end time.",
+                            Toast.LENGTH_SHORT)
+                        .show()
+                  } else if (price.toDoubleOrNull() == null) {
+                    Toast.makeText(context, "Invalid price format.", Toast.LENGTH_SHORT).show()
+                  } else if (placesMax.toLongOrNull() == null) {
+                    Toast.makeText(context, "Invalid places format.", Toast.LENGTH_SHORT).show()
+                  } else if (selectedLocation == null) {
+                    Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT)
+                        .show()
+                  } else {
+                    attendees += profileViewModel.userState.value!!
+                    try {
+                      imageViewModel.uploadActivityImages(
+                          activityId,
+                          selectedImages,
+                          onSuccess = { imageUrls ->
+                            items.addAll(imageUrls) // Store URLs in items to retrieve later
+                          },
+                          onFailure = { exception ->
+                            Toast.makeText(
+                                    context,
+                                    "Failed to upload images: ${exception.message}",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          })
+                      val activity =
+                          Activity(
+                              uid = activityId,
+                              title = title,
+                              description = description,
+                              date = dueDate,
+                              startTime = startTime,
+                              duration = hourDateViewModel.calculateDuration(startTime, duration),
+                              price = price.toDouble(),
+                              placesLeft = attendees.size.toLong(),
+                              maxPlaces = placesMax.toLongOrNull() ?: 0,
+                              creator = creator,
+                              status = ActivityStatus.ACTIVE,
+                              location = selectedLocation,
+                              images = items,
+                              participants = attendees,
+                              type = types.find { it.name == selectedOptionType } ?: types[0],
+                              comments = listOf(),
+                              category =
+                                  categories.find { it.name == selectedOptionCategory }
+                                      ?: categories[0])
+                      listActivityViewModel.addActivity(activity)
+                      profileViewModel.addActivity(creator, activity.uid)
+                      navigationActions.navigateTo(Screen.OVERVIEW)
+                    } catch (_: NumberFormatException) {
+                      println("There is an error")
+                    }
+                  }
+                },
+                modifier =
+                    Modifier.width(BUTTON_WIDTH.dp)
+                        .height(BUTTON_HEIGHT.dp)
+                        .testTag("createButton")
+                        .align(Alignment.CenterHorizontally),
+            ) {
+              Row(
+                  horizontalArrangement =
+                      Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
+                  verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = "add a new activity",
+                )
+                Text(text = stringResource(id = R.string.button_create_activity))
+              }
+            }
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
         }
       },

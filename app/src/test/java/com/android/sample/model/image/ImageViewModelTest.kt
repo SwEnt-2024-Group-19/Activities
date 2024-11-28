@@ -2,7 +2,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import androidx.camera.core.CameraSelector
-import com.android.sample.model.camera.flipCamera
+import com.android.sample.model.image.flipCamera
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
