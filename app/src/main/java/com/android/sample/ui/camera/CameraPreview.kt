@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.android.sample.model.camera.resize
+import com.android.sample.model.image.resize
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_IMAGE_SIZE
@@ -68,7 +68,7 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
       items(itemsList.size) { bitmap ->
         Card(modifier = Modifier.padding(SMALL_PADDING.dp)) {
           Image(
-              bitmap = itemsList[bitmap].resize(IMAGE_SIZE, IMAGE_SIZE).asImageBitmap(),
+              bitmap = itemsList[bitmap].resize(IMAGE_SIZE).asImageBitmap(),
               contentDescription = "Selected Image",
               modifier = Modifier.size(IMAGE_SIZE.dp))
           IconButton(
@@ -83,6 +83,22 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
                     contentDescription = "Remove Image",
                     tint = Color.Black)
               }
+        }
+      }
+    }
+  }
+}
+
+@Composable
+fun CarouselNoModif(itemsList: List<Bitmap>) {
+  Row(modifier = Modifier.padding(8.dp).height(120.dp)) {
+    LazyRow {
+      items(itemsList.size) { bitmap ->
+        Card(modifier = Modifier.padding(4.dp)) {
+          Image(
+              bitmap = itemsList[bitmap].resize(100).asImageBitmap(),
+              contentDescription = "Selected Image",
+              modifier = Modifier.size(100.dp))
         }
       }
     }

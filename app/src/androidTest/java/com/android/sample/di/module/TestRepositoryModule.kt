@@ -4,6 +4,8 @@ import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.MockActivitiesRepository
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.authentication.MockSignInRepository
+import com.android.sample.model.image.ImageRepository
+import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.MockLocationPermissionChecker
 import com.android.sample.model.map.PermissionChecker
@@ -55,5 +57,17 @@ object TestRepositoryModule {
   @Singleton
   fun provideActivitiesRepository(): ActivitiesRepository {
     return MockActivitiesRepository()
+  }
+
+  @Provides
+  @Singleton
+  fun provideImageRepository(): ImageRepository {
+    return mock(ImageRepository::class.java)
+  }
+
+  @Provides
+  @Singleton
+  fun provideImageRepositoryFirestore(): ImageRepositoryFirestore {
+    return mock(ImageRepositoryFirestore::class.java)
   }
 }

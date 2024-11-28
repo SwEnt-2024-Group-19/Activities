@@ -13,8 +13,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.android.sample.model.camera.fetchProfileImageUrl
-import com.android.sample.model.camera.uriToBitmap
+import com.android.sample.model.image.ImageViewModel
+import com.android.sample.model.image.uriToBitmap
 
 @Composable
 fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context: Context) {
@@ -39,13 +39,13 @@ fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context
 }
 
 @Composable
-fun ProfileImage(userId: String, modifier: Modifier = Modifier) {
+fun ProfileImage(userId: String, modifier: Modifier = Modifier, imageViewModel: ImageViewModel) {
   var imageUrl by remember { mutableStateOf<String?>(null) }
   val context = LocalContext.current
 
   // Fetch the profile image URL from Firebase Storage
   LaunchedEffect(userId) {
-    fetchProfileImageUrl(
+    imageViewModel.fetchProfileImageUrl(
         userId = userId,
         onSuccess = { url -> imageUrl = url },
         onFailure = { error ->

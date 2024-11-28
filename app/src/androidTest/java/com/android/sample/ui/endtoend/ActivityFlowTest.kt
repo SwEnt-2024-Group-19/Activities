@@ -11,6 +11,8 @@ import androidx.test.rule.GrantPermissionRule
 import com.android.sample.MainActivity
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.auth.SignInRepository
+import com.android.sample.model.image.ImageRepository
+import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
@@ -38,6 +40,10 @@ class ActivityFlowTest {
   @Inject lateinit var locationRepository: LocationRepository
 
   @Inject lateinit var permissionChecker: PermissionChecker
+
+  @Inject lateinit var imageRepository: ImageRepository
+
+  @Inject lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
 
   @get:Rule
   val permissionRule: GrantPermissionRule =

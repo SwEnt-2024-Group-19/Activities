@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.dummydata.userProfile
 import com.android.sample.ui.navigation.NavigationActions
@@ -25,6 +27,9 @@ class ChooseAccountScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var signInViewModel: SignInViewModel
   private lateinit var profileViewModel: ProfileViewModel
+
+  private lateinit var mockImageViewModel: ImageViewModel
+  private lateinit var mockImageRepository: ImageRepositoryFirestore
   lateinit var signInRepository: SignInRepository
 
   @Before
@@ -34,6 +39,8 @@ class ChooseAccountScreenTest {
     profileViewModel = mock(ProfileViewModel::class.java)
     signInRepository = mock(SignInRepository::class.java) // Mock the repository
 
+    mockImageRepository = mock(ImageRepositoryFirestore::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository)
     doNothing().whenever(signInRepository).signOut()
   }
 
@@ -44,7 +51,7 @@ class ChooseAccountScreenTest {
 
     // Set the content once for this test
     composeTestRule.setContent {
-      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel)
+      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
     // Check all elements are displayed
@@ -62,7 +69,7 @@ class ChooseAccountScreenTest {
 
     // Set the content once for this test
     composeTestRule.setContent {
-      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel)
+      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
     // Check greeting text and profile image
@@ -77,7 +84,7 @@ class ChooseAccountScreenTest {
 
     // Set the content once for this test
     composeTestRule.setContent {
-      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel)
+      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
     // Check default greeting text
@@ -92,7 +99,7 @@ class ChooseAccountScreenTest {
 
     // Set the content once for this test
     composeTestRule.setContent {
-      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel)
+      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
     // Perform click on "Continue" text and verify navigation
@@ -109,7 +116,7 @@ class ChooseAccountScreenTest {
 
     // Set the content once for this test
     composeTestRule.setContent {
-      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel)
+      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
     // Check that the profile picture node exists, regardless of URL content

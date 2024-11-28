@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.sample.model.auth.SignInViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
@@ -40,7 +41,8 @@ import com.android.sample.ui.navigation.Screen
 fun ChooseAccountScreen(
     navigationActions: NavigationActions,
     signInViewModel: SignInViewModel = hiltViewModel(),
-    profileViewModel: ProfileViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel(),
+    imageViewModel: ImageViewModel = hiltViewModel()
 ) {
   // Collect the user profile data from ProfileViewModel
   val userProfile by profileViewModel.userState.collectAsState()
@@ -74,7 +76,8 @@ fun ChooseAccountScreen(
           userProfile?.id?.let {
             ProfileImage(
                 userId = it,
-                modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+                modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+                imageViewModel = imageViewModel)
           }
         }
 
