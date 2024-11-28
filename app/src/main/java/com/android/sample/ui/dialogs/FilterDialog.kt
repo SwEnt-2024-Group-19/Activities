@@ -112,8 +112,10 @@ fun FilterDialog(
                 Row(modifier = Modifier.fillMaxWidth()) {
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
+
                   ) {
                     Checkbox(
+                        modifier = Modifier.testTag("onlyPROCheckbox"),
                         checked = onlyPRO ?: false,
                         onCheckedChange = { onlyPRO = it },
                         colors =
