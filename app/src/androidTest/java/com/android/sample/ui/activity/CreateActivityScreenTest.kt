@@ -410,7 +410,11 @@ class CreateActivityScreenTest {
   fun createActivityScreen_selectsCategoryDropdownOption1() {
     composeTestRule.setContent {
       CreateActivityScreen(
-          mockViewModel, mockNavigationActions, profileViewModel, mockLocationViewModel)
+          mockViewModel,
+          mockNavigationActions,
+          profileViewModel,
+          mockLocationViewModel,
+          mockImageViewModel)
     }
 
     composeTestRule
