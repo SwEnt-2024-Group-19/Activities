@@ -104,7 +104,8 @@ fun EditActivityScreen(
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember {
-    mutableStateOf(hourDateViewModel.addDurationToTime(startTime ?: "00:00", activity?.duration ?: "00:01"))
+    mutableStateOf(
+        hourDateViewModel.addDurationToTime(startTime ?: "00:00", activity?.duration ?: "00:01"))
   }
   var expanded by remember { mutableStateOf(false) }
   val controller = remember {
