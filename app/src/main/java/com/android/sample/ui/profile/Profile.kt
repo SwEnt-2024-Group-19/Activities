@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
@@ -51,14 +52,19 @@ import com.google.firebase.ktx.Firebase
 fun ProfileScreen(
     userProfileViewModel: ProfileViewModel,
     navigationActions: NavigationActions,
-    listActivitiesViewModel: ListActivitiesViewModel
+    listActivitiesViewModel: ListActivitiesViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val profileState = userProfileViewModel.userState.collectAsState()
   when (val profile = profileState.value) {
     null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
     else -> {
       ProfileContent(
-          user = profile, navigationActions, listActivitiesViewModel, userProfileViewModel)
+          user = profile,
+          navigationActions,
+          listActivitiesViewModel,
+          userProfileViewModel,
+          imageViewModel)
     }
   }
 }
@@ -95,7 +101,8 @@ fun ProfileContent(
     user: User,
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
-    userProfileViewModel: ProfileViewModel
+    userProfileViewModel: ProfileViewModel,
+    imageViewModel: ImageViewModel
 ) {
   var showMenu by remember { mutableStateOf(false) }
   Log.d("ProfileScreen", "User photo: ${user.photo}")
@@ -146,7 +153,7 @@ fun ProfileContent(
         LazyColumn(
             Modifier.fillMaxSize().padding(innerPadding).testTag("profileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              item { ProfileHeader(user) }
+              item { ProfileHeader(user, imageViewModel) }
 
               item { SectionTitle(title = "Interests", testTag = "interestsSection") }
 
@@ -211,7 +218,7 @@ fun SectionTitle(title: String, testTag: String) {
 }
 /** Display the user's profile picture and name */
 @Composable
-fun ProfileHeader(user: User) {
+fun ProfileHeader(user: User, imageViewModel: ImageViewModel) {
   Spacer(Modifier.height(MEDIUM_PADDING.dp))
   Text(
       text = "Profile",
@@ -219,7 +226,8 @@ fun ProfileHeader(user: User) {
       modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
   ProfileImage(
       userId = user.id,
-      modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+      modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+      imageViewModel)
   Text(
       text = "${user.name} ${user.surname}",
       fontSize = TITLE_FONTSIZE.sp,

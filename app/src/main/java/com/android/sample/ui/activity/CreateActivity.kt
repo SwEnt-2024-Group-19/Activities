@@ -56,7 +56,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
-import com.android.sample.model.camera.uploadActivityImages
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -85,7 +85,8 @@ fun CreateActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val context = LocalContext.current
   var expanded by remember { mutableStateOf(false) }
@@ -97,9 +98,6 @@ fun CreateActivityScreen(
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
   var dueDate by remember { mutableStateOf("") }
-  val controller = remember {
-    LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
-  }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
   var startTime by remember { mutableStateOf("") }
@@ -451,7 +449,7 @@ fun CreateActivityScreen(
                           0,
                           0,
                           0)
-                      uploadActivityImages(
+                      imageViewModel.uploadActivityImages(
                           activityId,
                           selectedImages,
                           onSuccess = { imageUrls ->

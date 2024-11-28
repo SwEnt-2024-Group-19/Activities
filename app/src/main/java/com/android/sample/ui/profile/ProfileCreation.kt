@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -53,7 +53,11 @@ import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: NavigationActions) {
+fun ProfileCreationScreen(
+    viewModel: ProfileViewModel,
+    navigationActions: NavigationActions,
+    imageViewModel: ImageViewModel
+) {
   var name by remember { mutableStateOf("") }
   val nameErrorState = remember { mutableStateOf<String?>(null) }
   var surname by remember { mutableStateOf("") }
@@ -87,7 +91,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
         isGalleryOpen = { isGalleryOpen = false },
         addImage = { bitmap ->
           selectedBitmap = bitmap
-          uploadProfilePicture(
+          imageViewModel.uploadProfilePicture(
               uid,
               bitmap,
               onSuccess = { url -> photo = url },
@@ -110,7 +114,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
         isCamOpen = { isCamOpen = false },
         addElem = { bitmap ->
           selectedBitmap = bitmap
-          uploadProfilePicture(
+          imageViewModel.uploadProfilePicture(
               uid,
               bitmap,
               onSuccess = { url -> photo = url },
@@ -138,7 +142,8 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
 
           ProfileImage(
               userId = uid,
-              modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+              modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+              imageViewModel)
 
           Button(
               onClick = { showDialogImage = true }, modifier = Modifier.testTag("uploadPicture")) {
@@ -181,7 +186,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                 // Proceed only if there are no errors
                 if (nameErrorState.value == null && surnameErrorState.value == null) {
                   selectedBitmap?.let { bitmap ->
-                    uploadProfilePicture(
+                    imageViewModel.uploadProfilePicture(
                         uid,
                         bitmap,
                         onSuccess = { url ->

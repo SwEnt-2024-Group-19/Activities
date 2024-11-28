@@ -59,7 +59,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.camera.fetchActivityImagesAsBitmaps
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -85,7 +85,8 @@ fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
@@ -176,11 +177,11 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
-                    fetchActivityImagesAsBitmaps(
+                    imageViewModel.fetchActivityImagesAsBitmaps(
                         activity?.uid ?: "",
                         onSuccess = { urls -> bitmaps = urls },
                         onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
-                    CarouselNoModif(itemsList = bitmaps, deleteImage = {})
+                    CarouselNoModif(itemsList = bitmaps)
                     LikeButton(profile, activity, profileViewModel)
                   }
 
@@ -328,7 +329,8 @@ fun ActivityDetailsScreen(
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
+                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape),
+                              imageViewModel = imageViewModel)
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
 

@@ -48,7 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
@@ -66,7 +66,11 @@ import com.android.sample.ui.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: NavigationActions) {
+fun EditProfileScreen(
+    profileViewModel: ProfileViewModel,
+    navigationActions: NavigationActions,
+    imageViewModel: ImageViewModel
+) {
   val profile =
       profileViewModel.userState.collectAsState().value
           ?: return Text(text = "No profile selected.", color = Color.Red)
@@ -117,7 +121,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               isGalleryOpen = { isGalleryOpen = false },
               addImage = { bitmap ->
                 selectedImage = bitmap
-                uploadProfilePicture(
+                imageViewModel.uploadProfilePicture(
                     profile.id,
                     bitmap,
                     onSuccess = { url -> photo = url },
@@ -141,7 +145,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               isCamOpen = { isCamOpen = false },
               addElem = { bitmap ->
                 selectedImage = bitmap
-                uploadProfilePicture(
+                imageViewModel.uploadProfilePicture(
                     profile.id,
                     bitmap,
                     onSuccess = { url -> photo = url },
@@ -162,7 +166,8 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                 ProfileImage(
                     userId = profile.id,
                     modifier =
-                        Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+                        Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+                    imageViewModel)
 
                 Button(
                     onClick = { showDialogImage = true },
@@ -197,7 +202,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                 Button(
                     onClick = {
                       selectedImage?.let { bitmap ->
-                        uploadProfilePicture(
+                        imageViewModel.uploadProfilePicture(
                             profile.id,
                             bitmap,
                             onSuccess = { url ->

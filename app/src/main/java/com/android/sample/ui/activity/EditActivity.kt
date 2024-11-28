@@ -41,7 +41,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,8 +60,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.types
-import com.android.sample.model.camera.fetchActivityImagesAsBitmaps
-import com.android.sample.model.camera.uploadActivityImages
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -88,7 +86,8 @@ import java.util.GregorianCalendar
 fun EditActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
@@ -100,15 +99,11 @@ fun EditActivityScreen(
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
   var selectedLocation by remember { mutableStateOf(Location(0.0, 0.0, "No location")) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
-  var placesLeft by remember { mutableStateOf(activity?.placesLeft.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration) }
   var expanded by remember { mutableStateOf(false) }
-  val controller = remember {
-    LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
-  }
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
 
   val locationQuery by locationViewModel.query.collectAsState()
@@ -116,12 +111,10 @@ fun EditActivityScreen(
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-  // var items by remember { mutableStateOf(activity?.images ?: listOf()) }
   var isGalleryOpen by remember { mutableStateOf(false) }
-  var selectedImages = remember { mutableStateListOf<Bitmap>() }
+  var selectedImages by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
 
   var items by remember { mutableStateOf(activity?.images ?: listOf()) }
-  // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember {
     mutableStateOf(
         activity?.date.let {
@@ -136,7 +129,7 @@ fun EditActivityScreen(
                 }"
         })
   }
-  fetchActivityImagesAsBitmaps(
+  imageViewModel.fetchActivityImagesAsBitmaps(
       activity?.uid ?: "",
       { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
       onFailure = { error ->
@@ -166,7 +159,7 @@ fun EditActivityScreen(
         if (isGalleryOpen) {
           GalleryScreen(
               isGalleryOpen = { isGalleryOpen = false },
-              addImage = { bitmap -> selectedImages.add(bitmap) },
+              addImage = { bitmap -> selectedImages = selectedImages + (bitmap) },
               context = context)
         }
         if (isCamOpen) {
@@ -180,7 +173,7 @@ fun EditActivityScreen(
                   },
               context = context,
               isCamOpen = { isCamOpen = false },
-              addElem = { bitmap -> selectedImages.add(bitmap) })
+              addElem = { bitmap -> selectedImages = selectedImages + (bitmap) })
         } else {
           Column(
               modifier =
@@ -202,11 +195,10 @@ fun EditActivityScreen(
                     isCamOpen = true
                   })
             }
-
             Carousel(
                 openDialog = { showDialogImage = true },
                 itemsList = selectedImages,
-                deleteImage = { bitmap -> selectedImages.remove(bitmap) })
+                deleteImage = { bitmap -> selectedImages = selectedImages.filter { it != bitmap } })
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             OutlinedTextField(
                 value = title,
@@ -472,7 +464,7 @@ fun EditActivityScreen(
                           0,
                           0)
 
-                      uploadActivityImages(
+                      imageViewModel.uploadActivityImages(
                           activity?.uid ?: "",
                           selectedImages.toList(),
                           { urls -> items = urls },
