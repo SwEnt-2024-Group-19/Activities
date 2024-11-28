@@ -413,7 +413,7 @@ class OverviewScreenTest {
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+    val activity2 = activity.copy(title = "dance", type = ActivityType.PRO)
     val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -437,7 +437,7 @@ class OverviewScreenTest {
           listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
-    val activity2 = activity.copy(title = "dance", type = ActivityType.SOLO)
+    val activity2 = activity.copy(title = "dance", type = ActivityType.PRO)
     val activity3 = activity.copy(title = "football", type = ActivityType.INDIVIDUAL)
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
