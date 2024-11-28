@@ -20,7 +20,7 @@ open class ImageRepositoryFirestore @Inject constructor(private val firestore: F
   ) {
     val profilePicRef = storageRef.child("users/$userId/profile_picture.jpg")
     val baos = ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.JPEG, 25, baos)
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
 
     profilePicRef
         .putBytes(baos.toByteArray())
@@ -56,7 +56,7 @@ open class ImageRepositoryFirestore @Inject constructor(private val firestore: F
                 bitmaps.forEach { bitmap ->
                   val fileRef = activityFolderRef.child("image_${System.currentTimeMillis()}.jpg")
                   val baos = ByteArrayOutputStream()
-                  bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                  bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
 
                   fileRef
                       .putBytes(baos.toByteArray())
