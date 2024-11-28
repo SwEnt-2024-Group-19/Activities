@@ -24,35 +24,26 @@ import org.junit.Test
 @HiltAndroidTest
 class ActivityFlowTest {
 
-  @get:Rule(order = 0)
-  var hiltRule = HiltAndroidRule(this)
+  @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
 
-  @JvmField
-  @Rule(order = 1)
-  val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @JvmField @Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-  @Inject
-  lateinit var authRepository: SignInRepository
+  @Inject lateinit var authRepository: SignInRepository
 
-  @Inject
-  lateinit var profilesRepository: ProfilesRepository
+  @Inject lateinit var profilesRepository: ProfilesRepository
 
-  @Inject
-  lateinit var activitiesRepository: ActivitiesRepository
+  @Inject lateinit var activitiesRepository: ActivitiesRepository
 
-  @Inject
-  lateinit var locationRepository: LocationRepository
+  @Inject lateinit var locationRepository: LocationRepository
 
-  @Inject
-  lateinit var permissionChecker: PermissionChecker
+  @Inject lateinit var permissionChecker: PermissionChecker
 
   @get:Rule
   val permissionRule: GrantPermissionRule =
-    GrantPermissionRule.grant(
-      android.Manifest.permission.ACCESS_FINE_LOCATION,
-      android.Manifest.permission.ACCESS_COARSE_LOCATION,
-      android.Manifest.permission.CAMERA
-    )
+      GrantPermissionRule.grant(
+          android.Manifest.permission.ACCESS_FINE_LOCATION,
+          android.Manifest.permission.ACCESS_COARSE_LOCATION,
+          android.Manifest.permission.CAMERA)
 
   @Before
   fun setUp() {
@@ -169,8 +160,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("createButton").performClick()
     composeTestRule.waitForIdle()
 
-
-
     // check in profile that the activity was added
     composeTestRule.onNodeWithTag("Profile").performClick()
     composeTestRule.waitForIdle()
@@ -178,10 +167,6 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("activityCreated").assertExists()
     composeTestRule.onNodeWithTag("activityCreated").performClick()
     composeTestRule.waitForIdle()
-
-
-
-
 
     // Filters for specific activity types
     composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()

@@ -295,28 +295,26 @@ fun ActivityDetailsScreen(
                               .clickable {
                                 if (participant.name == profile?.name) {
                                   navigationActions.navigateTo(Screen.PROFILE)
-                                }
-                                else {
-                                    listActivityViewModel.selectUser(participant)
-                                    navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
+                                } else {
+                                  listActivityViewModel.selectUser(participant)
+                                  navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                                 }
                               }) {
                         // Placeholder for participant picture
-                      if(participant.photo == null) {
+                        if (participant.photo == null) {
                           Box(
                               modifier =
-                              Modifier.size(BUTTON_HEIGHT.dp)
-                                  .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                  .padding(STANDARD_PADDING.dp)) {
-                              Image(
-                                  painter =
-                                  painterResource(id = R.drawable.default_profile_image),
-                                  contentDescription = "Participant Image",
-                                  modifier =
-                                  Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
-                          }
-                      }
-                      else {
+                                  Modifier.size(BUTTON_HEIGHT.dp)
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                                      .padding(STANDARD_PADDING.dp)) {
+                                Image(
+                                    painter =
+                                        painterResource(id = R.drawable.default_profile_image),
+                                    contentDescription = "Participant Image",
+                                    modifier =
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
+                              }
+                        } else {
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
