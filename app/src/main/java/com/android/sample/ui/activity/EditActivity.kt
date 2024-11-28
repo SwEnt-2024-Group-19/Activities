@@ -47,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -125,12 +126,17 @@ fun EditActivityScreen(
   var isGalleryOpen by remember { mutableStateOf(false) }
   var selectedImages by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
   var items by remember { mutableStateOf(activity?.images ?: listOf()) }
+  imageViewModel.fetchActivityImagesAsBitmaps(
+      activity?.uid ?: "",
+      { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
+      onFailure = { error ->
+        Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
+      })
   // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember { mutableStateOf(activity?.date ?: Timestamp.now()) }
   var dateIsOpen by remember { mutableStateOf(false) }
   var timeIsOpen by remember { mutableStateOf(false) }
   var durationIsOpen by remember { mutableStateOf(false) }
-
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {

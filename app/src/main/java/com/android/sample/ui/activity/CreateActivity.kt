@@ -60,6 +60,7 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
@@ -112,6 +113,7 @@ fun CreateActivityScreen(
   var durationIsSet by remember { mutableStateOf(false) }
   var price by remember { mutableStateOf("") }
   var placesMax by remember { mutableStateOf("") }
+
   var dueDate by remember { mutableStateOf(Timestamp.now()) }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
