@@ -47,7 +47,7 @@ class ProfileCreationTest {
     `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
     `when`(mockFirebaseUser.uid).thenReturn(testUserId)
 
-    profileViewModel = ProfileViewModel(repository = mockProfilesRepository)
+    profileViewModel = ProfileViewModel(repository = mockProfilesRepository, mock())
 
     `when`(mockProfilesRepository.getUser(any(), any(), any())).thenAnswer { invocation ->
       val onSuccess = invocation.getArgument<(User?) -> Unit>(1)

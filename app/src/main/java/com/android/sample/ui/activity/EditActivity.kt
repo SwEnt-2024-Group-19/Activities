@@ -21,7 +21,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
@@ -33,6 +35,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -60,15 +63,17 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
-import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
+import com.android.sample.ui.components.MyDatePicker
+import com.android.sample.ui.components.MyTimePicker
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -76,8 +81,6 @@ import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import java.util.Calendar
-import java.util.GregorianCalendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,6 +89,7 @@ fun EditActivityScreen(
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel
 ) {
+  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
@@ -99,7 +103,15 @@ fun EditActivityScreen(
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
-  var duration by remember { mutableStateOf(activity?.duration) }
+  var duration by remember {
+    mutableStateOf(
+        hourDateViewModel.addDurationToTime(startTime ?: "00:00", activity?.duration ?: "00:01"))
+  }
+  var expanded by remember { mutableStateOf(false) }
+  val controller = remember {
+    LifecycleCameraController(context).apply { setEnabledUseCases(CameraController.IMAGE_CAPTURE) }
+  }
+  var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
   var expandedType by remember { mutableStateOf(false) }
   var expandedCategory by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf(activity?.type.toString()) }
@@ -115,20 +127,11 @@ fun EditActivityScreen(
   var selectedImages = remember { mutableStateListOf<Bitmap>() }
 
   // Handle the error, e.g., show a Toast or log the exception
-  var dueDate by remember {
-    mutableStateOf(
-        activity?.date.let {
-          val calendar = GregorianCalendar()
-          if (activity != null) {
-            calendar.time = activity.date.toDate()
-          }
-          return@let "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
-                    calendar.get(
-                        Calendar.YEAR
-                    )
-                }"
-        })
-  }
+  var dueDate by remember { mutableStateOf(activity?.date ?: Timestamp.now()) }
+  var dateIsOpen by remember { mutableStateOf(false) }
+  var timeIsOpen by remember { mutableStateOf(false) }
+  var durationIsOpen by remember { mutableStateOf(false) }
+
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
@@ -214,38 +217,95 @@ fun EditActivityScreen(
                 },
             )
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            OutlinedTextField(
-                value = dueDate,
-                onValueChange = { dueDate = it },
-                label = { Text("Date") },
+            OutlinedButton(
+                onClick = { dateIsOpen = true },
                 modifier =
-                    Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputDateEdit"),
-                placeholder = {
-                  Text(text = stringResource(id = R.string.request_date_activity_withFormat))
-                },
-                singleLine = true,
-            )
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("changeDateButton"),
+            ) {
+              Icon(
+                  Icons.Default.CalendarMonth,
+                  contentDescription = "Change Date",
+                  modifier = Modifier.testTag("changeDateIcon"),
+              )
+              Text(
+                  "Change Date (Actual: ${dueDate.toDate().toString().take(11)}," +
+                      "${dueDate.toDate().year + 1900})")
+            }
+            if (dateIsOpen) {
+              MyDatePicker(
+                  onDateSelected = { date ->
+                    dueDate = date
+                    dateIsOpen = false
+                  },
+                  isOpen = dateIsOpen,
+                  initialDate =
+                      dueDate
+                          .toDate()
+                          .toInstant()
+                          .atZone(java.time.ZoneId.systemDefault())
+                          .toLocalDate(),
+              )
+            }
+
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-            OutlinedTextField(
-                value = startTime ?: "",
-                onValueChange = { startTime = it },
-                label = { Text("Time") },
-                modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
-                placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
-                singleLine = true,
-            )
+            OutlinedButton(
+                onClick = { timeIsOpen = true },
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("changeTimeButton"),
+            ) {
+              Icon(
+                  Icons.Default.CalendarMonth,
+                  contentDescription = "Change Time",
+                  modifier = Modifier.testTag("changeTimeIcon"),
+              )
+              Text("Change Start Time (Actual: ${startTime})")
+            }
+            if (timeIsOpen) {
+              MyTimePicker(
+                  onTimeSelected = { time ->
+                    startTime =
+                        time
+                            .toInstant()
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalTime()
+                            .toString()
+                    timeIsOpen = false
+                  },
+                  isOpen = timeIsOpen,
+              )
+            }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-            OutlinedTextField(
-                value = duration ?: "",
-                onValueChange = { duration = it },
-                label = { Text("Duration") },
-                modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
-                placeholder = { Text(text = stringResource(id = R.string.hour_min_format)) },
-                singleLine = true,
-            )
-
+            OutlinedButton(
+                onClick = { durationIsOpen = true },
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("changeEndingTimeButton"),
+            ) {
+              Icon(
+                  Icons.Default.HourglassTop,
+                  contentDescription = "Change Ending Time",
+                  modifier = Modifier.testTag("changeEndingTimeIcon"))
+              Text("Change Ending Time (Actual: ${duration})")
+            }
+            if (durationIsOpen) {
+              MyTimePicker(
+                  onTimeSelected = { time ->
+                    duration =
+                        time
+                            .toInstant()
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalTime()
+                            .toString()
+                    durationIsOpen = false
+                  },
+                  isOpen = durationIsOpen,
+              )
+            }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
             OutlinedTextField(
@@ -336,7 +396,6 @@ fun EditActivityScreen(
                         }
                       }
                 }
-
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
             // Location Input with dropdown using ExposedDropdownMenuBox
@@ -390,16 +449,14 @@ fun EditActivityScreen(
                         }
                       }
                 }
-
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
             Button(
                 onClick = { showDialog = true },
                 modifier =
-                    Modifier.width(BUTTON_WIDTH.dp)
-                        .height(BUTTON_HEIGHT.dp)
-                        .testTag("addAttendeeButton")
-                        .align(Alignment.CenterHorizontally),
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("addAttendeeButton"),
             ) {
               Row(
                   horizontalArrangement =
@@ -458,75 +515,45 @@ fun EditActivityScreen(
             Spacer(Modifier.height(MEDIUM_PADDING.dp))
 
             Button(
-                enabled = title.isNotEmpty() && description.isNotEmpty() && dueDate.isNotEmpty(),
+                enabled = title.isNotEmpty() && description.isNotEmpty(),
                 onClick = {
-                  val timeFormat = startTime?.split(":") ?: listOf()
-                  val timePattern = Regex("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")
-
-                  if (timeFormat.size != 2 || !startTime?.let { timePattern.matches(it) }!!) {
-
+                  if (hourDateViewModel.isBeginGreaterThanEnd(
+                      startTime ?: "00:00", duration ?: "00:01")) {
                     Toast.makeText(
-                            context, "Invalid format, time must be HH:MM.", Toast.LENGTH_SHORT)
+                            context, "Start time must be before end time", Toast.LENGTH_SHORT)
                         .show()
+                    return@Button
                   }
-                  val durationFormat = duration?.split(":") ?: listOf()
-                  if (durationFormat.size != 2) {
-                    Toast.makeText(
-                            context, "Invalid format, duration must be HH:MM.", Toast.LENGTH_SHORT)
-                        .show()
-                  }
-                  val calendar = GregorianCalendar()
-                  val parts = dueDate.split("/")
-                  if (parts.size == 3 &&
-                      timeFormat.size == 2 &&
-                      durationFormat.size == 2 &&
-                      startTime?.let { timePattern.matches(it) } == true) {
-                    try {
-                      calendar.set(
-                          parts[2].toInt(),
-                          parts[1].toInt() - 1, // Months are 0-based indexed
-                          parts[0].toInt(),
-                          0,
-                          0,
-                          0)
-
-                      val updatedActivity =
-                          Activity(
-                              uid = activity?.uid ?: "",
-                              title = title,
-                              description = description,
-                              date = Timestamp(calendar.time),
-                              startTime = startTime ?: "",
-                              duration = duration ?: "",
-                              price = price.toDouble(),
-                              placesLeft = attendees.size.toLong(),
-                              maxPlaces = maxPlaces.toLongOrNull() ?: 0,
-                              creator = creator,
-                              status = ActivityStatus.ACTIVE,
-                              location = selectedLocation,
-                              images = activity?.images ?: listOf(),
-                              type = types.find { it.name == selectedOptionType } ?: types[0],
-                              participants = attendees,
-                              comments = activity?.comments ?: listOf(),
-                              category =
-                                  categories.find { it.name == selectedOptionCategory }
-                                      ?: categories[0])
-                      listActivityViewModel.updateActivity(updatedActivity)
-                      navigationActions.navigateTo(Screen.OVERVIEW)
-                    } catch (_: Exception) {}
-                  }
-
-                  if (parts.size != 3) {
-                    Toast.makeText(
-                            context, "Invalid format, date must be DD/MM/YYYY.", Toast.LENGTH_SHORT)
-                        .show()
-                  }
+                  try {
+                    val updatedActivity =
+                        Activity(
+                            uid = activity?.uid ?: "",
+                            title = title,
+                            description = description,
+                            date = dueDate,
+                            startTime = startTime ?: "",
+                            duration =
+                                hourDateViewModel.calculateDuration(
+                                    startTime ?: "", duration ?: ""),
+                            price = price.toDouble(),
+                            placesLeft = attendees.size.toLong(),
+                            maxPlaces = maxPlaces.toLongOrNull() ?: 0,
+                            creator = creator,
+                            status = ActivityStatus.ACTIVE,
+                            location = selectedLocation,
+                            images = activity?.images ?: listOf(),
+                            type = types.find { it.name == selectedOption } ?: types[0],
+                            participants = attendees,
+                            category =
+                                categories.find { it.name == selectedOptionCategory }
+                                    ?: categories[0],
+                            comments = activity?.comments ?: listOf())
+                    listActivityViewModel.updateActivity(updatedActivity)
+                    navigationActions.navigateTo(Screen.OVERVIEW)
+                  } catch (_: Exception) {}
                 },
                 modifier =
-                    Modifier.width(BUTTON_WIDTH.dp)
-                        .height(BUTTON_HEIGHT.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .testTag("editButton"),
+                    Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("editButton"),
             ) {
               Row(
                   horizontalArrangement =
@@ -555,10 +582,7 @@ fun EditActivityScreen(
                   navigationActions.navigateTo(Screen.OVERVIEW)
                 },
                 modifier =
-                    Modifier.width(BUTTON_WIDTH.dp)
-                        .height(BUTTON_HEIGHT.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .testTag("deleteButton"),
+                    Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("deleteButton"),
             ) {
               Row(
                   Modifier.background(Color.Transparent),

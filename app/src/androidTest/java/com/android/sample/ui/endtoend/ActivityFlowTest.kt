@@ -126,10 +126,7 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
     composeTestRule.onNodeWithTag("chooseTypeMenu").assertExists()
     composeTestRule.onNodeWithTag("addAttendeeButton").assertExists()
-    composeTestRule.onNodeWithTag("inputTimeCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputDurationCreate").assertExists()
     composeTestRule.onNodeWithTag("createButton").assertExists()
-
     composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()
