@@ -58,8 +58,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
+import com.android.sample.model.activity.types
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -99,6 +101,7 @@ fun ListActivitiesScreen(
   var availablePlaces by remember { mutableStateOf<Int?>(null) }
   var minDate by remember { mutableStateOf<Timestamp?>(null) }
   var duration by remember { mutableStateOf<String?>(null) }
+    var onlyPRO by remember { mutableStateOf(false) }
 
   val locationPermissionLauncher =
       rememberLauncherForActivityResult(
@@ -145,11 +148,14 @@ fun ListActivitiesScreen(
           if (showFilterDialog) {
             FilterDialog(
                 onDismiss = { showFilterDialog = false },
-                onFilter = { price, placesAvailable, mindateTimestamp, acDuration ->
+                onFilter = { price, placesAvailable, mindateTimestamp, acDuration, seeOnlyPRO ->
                   maxPrice = price?.toDouble() ?: 30000.0
                   availablePlaces = placesAvailable
                   minDate = mindateTimestamp
                   duration = acDuration
+                    if (seeOnlyPRO != null) {
+                        onlyPRO = seeOnlyPRO
+                    }
                 })
           }
           Box(
@@ -217,6 +223,7 @@ fun ListActivitiesScreen(
                             false
                         else if (minDate != null && it.date < minDate!!) false
                         else if (duration != null && it.duration != duration) false
+                        else if(onlyPRO && it.type!= ActivityType.PRO) false
                         else {
                           if (searchText.isEmpty() || searchText.isBlank()) true
                           else {

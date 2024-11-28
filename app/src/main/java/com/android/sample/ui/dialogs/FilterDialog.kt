@@ -28,13 +28,15 @@ import com.google.firebase.Timestamp
 fun FilterDialog(
     onDismiss: () -> Unit,
     onFilter:
-        (price: Double?, membersAvailable: Int?, schedule: Timestamp?, duration: String?) -> Unit
+        (price: Double?, membersAvailable: Int?, schedule: Timestamp?, duration: String?, onlyPRO: Boolean?) -> Unit,
+
 ) {
   var maxPrice by remember { mutableStateOf(DEFAULT_MAX_PRICE) }
   var availablePlaces by remember { mutableStateOf<Int?>(null) }
   var minDate by remember { mutableStateOf<String?>(null) }
   var minDateTimestamp by remember { mutableStateOf<Timestamp?>(null) }
   var duration by remember { mutableStateOf<String?>(null) }
+  var onlyPRO by remember { mutableStateOf<Boolean?>(false) }
 
   Dialog(
       onDismissRequest = { onDismiss() },
@@ -103,12 +105,31 @@ fun FilterDialog(
                     modifier = Modifier.testTag("durationTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+              Row( modifier = Modifier.fillMaxWidth()) {
+                  Row(
+                      verticalAlignment = Alignment.CenterVertically,
+                  ) {
+
+                      Checkbox(
+                          checked = onlyPRO ?: false,
+                          onCheckedChange = { onlyPRO = it },
+                          colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary),
+                      )
+                      Text(
+                           "Only see PRO activities",
+                      )
+                  }
+
+
+              }
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                   TextButton(
                       onClick = { onDismiss() }, modifier = Modifier.testTag("cancelButton")) {
                         Text("Cancel")
                       }
+
                   Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+
                   Button(
                       onClick = {
                         if (minDate != null) {
@@ -123,7 +144,7 @@ fun FilterDialog(
                               0)
                           minDateTimestamp = Timestamp(calendar.time)
                         }
-                        onFilter(maxPrice.toDouble(), availablePlaces, minDateTimestamp, duration)
+                        onFilter(maxPrice.toDouble(), availablePlaces, minDateTimestamp, duration,onlyPRO)
                         onDismiss()
                       },
                       modifier = Modifier.testTag("filterButton")) {
