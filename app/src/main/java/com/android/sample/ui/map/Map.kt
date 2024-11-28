@@ -77,287 +77,220 @@ fun MapScreen(
     locationViewModel: LocationViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
 ) {
-    val context = LocalContext.current
-    val currentLocation by locationViewModel.currentLocation.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val activities by listActivitiesViewModel.uiState.collectAsState()
-    val activityDetail by listActivitiesViewModel.selectedActivity.collectAsState()
-    val defaultLocation = LatLng(46.519962, 6.633597) // EPFL
-    var selectedActivity by remember { mutableStateOf<Activity?>(null) }
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val previousScreen = navigationActions.getPreviousRoute()
-    val isFromBottomNav = navigationActions.isNavigationFromBottomBar()
+  val context = LocalContext.current
+  val currentLocation by locationViewModel.currentLocation.collectAsState()
+  val coroutineScope = rememberCoroutineScope()
+  val activities by listActivitiesViewModel.uiState.collectAsState()
+  val activityDetail by listActivitiesViewModel.selectedActivity.collectAsState()
+  val defaultLocation = LatLng(46.519962, 6.633597) // EPFL
+  var selectedActivity by remember { mutableStateOf<Activity?>(null) }
+  var showBottomSheet by remember { mutableStateOf(false) }
+  val previousScreen = navigationActions.getPreviousRoute()
 
-    val firstLocation =
-        try {
-            // the first location that displays is the last activity detail that was checked
-            // if you don't come from an activity detail, it will be centered around user's position
-            if (previousScreen == Screen.ACTIVITY_DETAILS) {
-                activityDetail?.location?.let {
-                    LatLng(it.latitude, it.longitude)
-
-                } ?: defaultLocation
-            }
-            if (isFromBottomNav) {
-                currentLocation?.let { LatLng(it.latitude, it.longitude) } ?: defaultLocation
-            } else {
-                defaultLocation
-            }
-        } catch (_: NoSuchElementException) {
-            defaultLocation
-        }
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(firstLocation, 10f)
-    }
-
-    // Activity result launcher to request permissions
-    val locationPermissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission(),
-            onResult = { isGranted ->
-                if (isGranted) {
-                    locationViewModel.fetchCurrentLocation()
-                } else {
-                    Log.d("MapScreen", "Location permission denied by the user.")
-                }
-            })
-
-    LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            locationViewModel.fetchCurrentLocation()
+  val firstLocation =
+      try {
+        // the first location that displays is the last activity detail that was checked
+        // if you don't come from an activity detail, it will be centered around user's position
+        if (previousScreen == Screen.ACTIVITY_DETAILS) {
+          activityDetail?.location?.let { LatLng(it.latitude, it.longitude) } ?: defaultLocation
         } else {
-            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+          currentLocation?.let { LatLng(it.latitude, it.longitude) } ?: defaultLocation
         }
+      } catch (_: NoSuchElementException) {
+        defaultLocation
+      }
+
+  val cameraPositionState = rememberCameraPositionState {
+    position = CameraPosition.fromLatLngZoom(firstLocation, 10f)
+  }
+
+  // Activity result launcher to request permissions
+  val locationPermissionLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.RequestPermission(),
+          onResult = { isGranted ->
+            if (isGranted) {
+              locationViewModel.fetchCurrentLocation()
+            } else {
+              Log.d("MapScreen", "Location permission denied by the user.")
+            }
+          })
+
+  LaunchedEffect(Unit) {
+    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+        PackageManager.PERMISSION_GRANTED) {
+      locationViewModel.fetchCurrentLocation()
+    } else {
+      locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
+  }
 
-    Scaffold(
-        content = { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                GoogleMap(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .testTag("mapScreen"),
-                    cameraPositionState = cameraPositionState
-                ) {
-                    (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
-                        .activities
-                        .filter { it.location != null }
-                        .forEach { item ->
-                            Marker(
-                                state =
-                                MarkerState(
-                                    position =
-                                    LatLng(item.location!!.latitude, item.location!!.longitude)
-                                ),
-                                title = item.title,
-                                snippet = item.description,
-                                onClick = {
-                                    selectedActivity = item
-                                    selectedActivity?.let {
-                                        listActivitiesViewModel.selectActivity(
-                                            it
-                                        )
-                                    }
-                                    showBottomSheet = true
-                                    true
-                                })
-                        }
-                    currentLocation?.let {
-                        Marker(
-                            state = rememberMarkerState(
-                                position = LatLng(
-                                    it.latitude,
-                                    it.longitude
-                                )
-                            ),
-                            title = it.name,
-                            snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                            icon =
-                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
-                        )
+  Scaffold(
+      content = { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+          GoogleMap(
+              modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
+              cameraPositionState = cameraPositionState) {
+                (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
+                    .activities
+                    .filter { it.location != null }
+                    .forEach { item ->
+                      Marker(
+                          state =
+                              MarkerState(
+                                  position =
+                                      LatLng(item.location!!.latitude, item.location!!.longitude)),
+                          title = item.title,
+                          snippet = item.description,
+                          onClick = {
+                            selectedActivity = item
+                            selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }
+                            showBottomSheet = true
+                            true
+                          })
                     }
+                currentLocation?.let {
+                  Marker(
+                      state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
+                      title = it.name,
+                      snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
+                      icon =
+                          BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 }
+              }
 
-                FloatingActionButton(
-                    modifier =
-                    Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(MEDIUM_PADDING.dp)
-                        .testTag("centerOnCurrentLocation"),
-                    onClick = {
-                        coroutineScope.launch {
-                            currentLocation?.let {
-                                val locationLatLng = LatLng(it.latitude, it.longitude)
-                                cameraPositionState.animate(
-                                    update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
-                                    durationMs = 800
-                                )
-                            }
-                        }
-                    }) {
-                    Icon(
-                        Icons.Default.MyLocation,
-                        contentDescription = "Center on current location"
-                    )
+          FloatingActionButton(
+              modifier =
+                  Modifier.align(Alignment.BottomStart)
+                      .padding(MEDIUM_PADDING.dp)
+                      .testTag("centerOnCurrentLocation"),
+              onClick = {
+                coroutineScope.launch {
+                  currentLocation?.let {
+                    val locationLatLng = LatLng(it.latitude, it.longitude)
+                    cameraPositionState.animate(
+                        update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                        durationMs = 800)
+                  }
                 }
-            }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { route -> navigationActions.navigateTo(route) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.MAP
-            )
-        })
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = false },
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(MEDIUM_PADDING.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(STANDARD_PADDING.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SeeMoreDetailsButton(navigationActions)
-
-                    IconButton(onClick = { showBottomSheet = false }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-                selectedActivity?.let { DisplayActivity(activity = it) }
-
-                Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-            }
+              }) {
+                Icon(Icons.Default.MyLocation, contentDescription = "Center on current location")
+              }
         }
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.MAP)
+      })
+
+  if (showBottomSheet) {
+    ModalBottomSheet(
+        onDismissRequest = { showBottomSheet = false },
+    ) {
+      Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+              SeeMoreDetailsButton(navigationActions)
+
+              IconButton(onClick = { showBottomSheet = false }) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = MaterialTheme.colorScheme.onSurface)
+              }
+            }
+        selectedActivity?.let { DisplayActivity(activity = it) }
+
+        Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+      }
     }
+  }
 }
 
 @Composable
 fun DisplayActivity(activity: Activity) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(MEDIUM_PADDING.dp)
-            .testTag("activityDetails")
-    ) {
-        if (activity.images.isNotEmpty()) {
-            AsyncImage(
-                model = activity.images.first(),
-                contentDescription = "Activity image",
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(LARGE_IMAGE_SIZE.dp)
-                    .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
-                    .testTag("activityImage"),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
+  Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("activityDetails")) {
+    if (activity.images.isNotEmpty()) {
+      AsyncImage(
+          model = activity.images.first(),
+          contentDescription = "Activity image",
+          modifier =
+              Modifier.fillMaxWidth()
+                  .height(LARGE_IMAGE_SIZE.dp)
+                  .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
+                  .testTag("activityImage"),
+          contentScale = ContentScale.Crop)
+      Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
+    }
+
+    Text(
+        text = activity.title,
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityTitle"),
+    )
+    Text(
+        text = activity.description,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityDescription"),
+    )
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityDate")) {
+          Icon(
+              imageVector = Icons.Default.CalendarToday,
+              contentDescription = "Date",
+              tint = MaterialTheme.colorScheme.primary,
+              modifier = Modifier.testTag("calendarIcon"))
+          Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+          Text(
+              text = "Date: ${activity.date.toDate()}", modifier = Modifier.testTag("calendarText"))
         }
-
-        Text(
-            text = activity.title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .padding(bottom = STANDARD_PADDING.dp)
-                .testTag("activityTitle"),
-        )
-        Text(
-            text = activity.description,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .padding(bottom = STANDARD_PADDING.dp)
-                .testTag("activityDescription"),
-        )
-        Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(bottom = STANDARD_PADDING.dp)
-                .testTag("activityDate")
-        ) {
+    if (activity.location != null) {
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityLocation")) {
             Icon(
-                imageVector = Icons.Default.CalendarToday,
-                contentDescription = "Date",
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = "Location",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.testTag("calendarIcon")
-            )
+                modifier = Modifier.testTag("locationIcon"))
             Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
             Text(
-                text = "Date: ${activity.date.toDate()}",
-                modifier = Modifier.testTag("calendarText")
-            )
-        }
-        if (activity.location != null) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(bottom = STANDARD_PADDING.dp)
-                    .testTag("activityLocation")
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Location",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.testTag("locationIcon")
-                )
-                Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-                Text(
-                    text = "Location: ${activity.location!!.name}",
-                    modifier = Modifier.testTag("locationText")
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("activityPrice")
-        ) {
-            Text(
-                text = "Price: ${activity.price}€",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.testTag("priceText")
-            )
-            Text(
-                text = "Places left: ${activity.placesLeft}/${activity.maxPlaces}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.testTag("placesLeft")
-            )
-        }
-        Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
+                text = "Location: ${activity.location!!.name}",
+                modifier = Modifier.testTag("locationText"))
+          }
     }
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth().testTag("activityPrice")) {
+          Text(
+              text = "Price: ${activity.price}€",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.testTag("priceText"))
+          Text(
+              text = "Places left: ${activity.placesLeft}/${activity.maxPlaces}",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.testTag("placesLeft"))
+        }
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
+  }
 }
 
 @Composable
 fun SeeMoreDetailsButton(navigationActions: NavigationActions) {
-    Button(
-        modifier = Modifier.testTag("seeMoreDetailsButton"),
-        onClick = { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
-    ) {
-        Text(text = "See more details")
-    }
+  Button(
+      modifier = Modifier.testTag("seeMoreDetailsButton"),
+      onClick = { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
+  ) {
+    Text(text = "See more details")
+  }
 }

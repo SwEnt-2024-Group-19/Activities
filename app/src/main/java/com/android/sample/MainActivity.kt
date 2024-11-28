@@ -47,42 +47,42 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val CAMERA_PERMISSION_REQUEST_CODE = 0
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1
+  private val CAMERA_PERMISSION_REQUEST_CODE = 0
+  private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
-    private lateinit var auth: FirebaseAuth
+  private lateinit var auth: FirebaseAuth
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (!hasCameraPermissions(applicationContext)) {
-            ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
-        }
-
-        auth = FirebaseAuth.getInstance()
-        val currentUser = auth.currentUser
-        if (currentUser != null && currentUser.isAnonymous) {
-            auth.signOut()
-        }
-        val startDestination = if (auth.currentUser != null) Route.CHOOSE_ACCOUNT else Route.AUTH
-        // log current user
-        Log.d("MainActivity", "Current user: ${auth.currentUser?.uid}")
-
-        setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
-                color = MaterialTheme.colorScheme.background) {
-                NavGraph(startDestination)
-            }
-        }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    if (!hasCameraPermissions(applicationContext)) {
+      ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
 
-    private fun hasCameraPermissions(context: Context): Boolean {
-        return CAMERAX_PERMISSIONS.all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-        }
+    auth = FirebaseAuth.getInstance()
+    val currentUser = auth.currentUser
+    if (currentUser != null && currentUser.isAnonymous) {
+      auth.signOut()
     }
+    val startDestination = if (auth.currentUser != null) Route.CHOOSE_ACCOUNT else Route.AUTH
+    // log current user
+    Log.d("MainActivity", "Current user: ${auth.currentUser?.uid}")
 
-    private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+    setContent {
+      Surface(
+          modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },
+          color = MaterialTheme.colorScheme.background) {
+            NavGraph(startDestination)
+          }
+    }
+  }
+
+  private fun hasCameraPermissions(context: Context): Boolean {
+    return CAMERAX_PERMISSIONS.all {
+      ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+  }
+
+  private val CAMERAX_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 }
 
 @Composable
@@ -96,60 +96,60 @@ fun NavGraph(
     locationViewModel: LocationViewModel = hiltViewModel<LocationViewModel>(),
 ) {
 
-    NavHost(navController = navController, startDestination = startDestination) {
-        composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
-        navigation(
-            startDestination = Screen.AUTH,
-            route = Route.AUTH,
-        ) {
-            composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
-            composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
-            composable(Screen.CREATE_PROFILE) {
-                ProfileCreationScreen(profileViewModel, navigationActions)
-            }
-        }
-
-        navigation(
-            startDestination = Screen.OVERVIEW,
-            route = Route.OVERVIEW,
-        ) {
-            composable(Screen.OVERVIEW) {
-                ListActivitiesScreen(
-                    listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
-            }
-            composable(Screen.EDIT_ACTIVITY) {
-                EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel)
-            }
-            composable(Screen.ACTIVITY_DETAILS) {
-                ActivityDetailsScreen(
-                    listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
-            }
-        }
-
-        navigation(startDestination = Screen.MAP, route = Route.MAP) {
-            composable(Screen.MAP) {
-                MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
-            }
-        }
-
-        navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
-            composable(Screen.ADD_ACTIVITY) {
-                CreateActivityScreen(
-                    listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
-            }
-        }
-
-        navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-            composable(Screen.PROFILE) {
-                ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
-            }
-            composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
-        }
-
-        navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
-            composable(Screen.LIKED_ACTIVITIES) {
-                LikedActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
-            }
-        }
+  NavHost(navController = navController, startDestination = startDestination) {
+    composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
+    navigation(
+        startDestination = Screen.AUTH,
+        route = Route.AUTH,
+    ) {
+      composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
+      composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
+      composable(Screen.CREATE_PROFILE) {
+        ProfileCreationScreen(profileViewModel, navigationActions)
+      }
     }
+
+    navigation(
+        startDestination = Screen.OVERVIEW,
+        route = Route.OVERVIEW,
+    ) {
+      composable(Screen.OVERVIEW) {
+        ListActivitiesScreen(
+            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+      }
+      composable(Screen.EDIT_ACTIVITY) {
+        EditActivityScreen(listActivitiesViewModel, navigationActions, locationViewModel)
+      }
+      composable(Screen.ACTIVITY_DETAILS) {
+        ActivityDetailsScreen(
+            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+      }
+    }
+
+    navigation(startDestination = Screen.MAP, route = Route.MAP) {
+      composable(Screen.MAP) {
+        MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+      }
+    }
+
+    navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
+      composable(Screen.ADD_ACTIVITY) {
+        CreateActivityScreen(
+            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+      }
+    }
+
+    navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
+      composable(Screen.PROFILE) {
+        ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel)
+      }
+      composable(Screen.EDIT_PROFILE) { EditProfileScreen(profileViewModel, navigationActions) }
+    }
+
+    navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
+      composable(Screen.LIKED_ACTIVITIES) {
+        LikedActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
+      }
+    }
+  }
 }
