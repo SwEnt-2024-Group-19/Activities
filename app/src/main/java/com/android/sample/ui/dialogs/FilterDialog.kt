@@ -112,20 +112,19 @@ fun FilterDialog(
                 Row(modifier = Modifier.fillMaxWidth()) {
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
-                      modifier= Modifier.testTag("onlyPROCheckboxRow")
-
-                  ) {
-                    Checkbox(
-                        modifier = Modifier.testTag("onlyPROCheckbox"),
-                        checked = onlyPRO ?: false,
-                        onCheckedChange = { onlyPRO = it },
-                        colors =
-                            CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary),
-                    )
-                    Text(
-                        "Only see PRO activities",
-                    )
-                  }
+                      modifier = Modifier.testTag("onlyPROCheckboxRow")) {
+                        Checkbox(
+                            modifier = Modifier.testTag("onlyPROCheckbox"),
+                            checked = onlyPRO ?: false,
+                            onCheckedChange = { onlyPRO = it },
+                            colors =
+                                CheckboxDefaults.colors(
+                                    checkedColor = MaterialTheme.colors.primary),
+                        )
+                        Text(
+                            "Only see PRO activities",
+                        )
+                      }
                 }
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                   TextButton(
