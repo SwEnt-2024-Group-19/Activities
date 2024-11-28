@@ -240,7 +240,7 @@ fun EditProfileScreen(
                           networkManager = networkManager,
                           onPerform = {
                             selectedImage?.let { bitmap ->
-                              uploadProfilePicture(
+                              imageViewModel.uploadProfilePicture(
                                   profile.id,
                                   bitmap,
                                   onSuccess = { url ->
@@ -252,6 +252,7 @@ fun EditProfileScreen(
                                         "Failed to upload profile picture: ${error.message}")
                                   })
                             }
+                          })
                     },
                     modifier = Modifier.fillMaxWidth().testTag("profileSaveButton")) {
                       Text("Save", color = Color.White)
