@@ -5,6 +5,8 @@ import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInRepositoryFirebase
+import com.android.sample.model.image.ImageRepository
+import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationPermissionChecker
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.NominatimLocationRepository
@@ -76,5 +78,11 @@ object RepositoryModule {
       firestoreActivitiesRepository: ActivitiesRepositoryFirestore
   ): ActivitiesRepository {
     return firestoreActivitiesRepository
+  }
+  // Provide ImageRepository
+  @Provides
+  @Singleton
+  fun provideImageRepository(firestoreImageRepository: ImageRepositoryFirestore): ImageRepository {
+    return firestoreImageRepository
   }
 }

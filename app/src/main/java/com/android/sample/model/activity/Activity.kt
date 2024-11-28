@@ -39,7 +39,6 @@ data class Comment(
 enum class ActivityType {
   PRO,
   INDIVIDUAL,
-  SOLO,
 }
 
 val types = ActivityType.values().toList()

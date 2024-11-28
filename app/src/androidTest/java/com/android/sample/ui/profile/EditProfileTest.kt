@@ -13,6 +13,8 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.dummydata.testUser
@@ -31,6 +33,9 @@ import org.mockito.kotlin.mock
 class EditProfileScreenTest {
   private lateinit var profileViewModel: ProfileViewModel
   private lateinit var navigationActions: NavigationActions
+
+  private lateinit var mockImageViewModel: ImageViewModel
+  private lateinit var mockImageRepository: ImageRepositoryFirestore
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -42,11 +47,15 @@ class EditProfileScreenTest {
     navigationActions = Mockito.mock(NavigationActions::class.java)
     `when`(navigationActions.currentRoute()).thenReturn(PROFILE)
     `when`(profileViewModel.userState).thenReturn(userStateFlow)
+    mockImageRepository = Mockito.mock(ImageRepositoryFirestore::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository)
   }
 
   @Test
   fun testInitialValuesDisplayedCorrectly() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
 
     composeTestRule.onNodeWithTag("editProfileTitle").assertTextEquals("Edit Profile")
     composeTestRule.onNodeWithTag("inputProfileName").assertIsDisplayed()
@@ -59,7 +68,9 @@ class EditProfileScreenTest {
 
   @Test
   fun testProfileEditionWithDialogWithCamera() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
     composeTestRule
         .onNodeWithTag("editProfileContent")
         .performScrollToNode(hasTestTag("uploadPicture"))
@@ -81,7 +92,9 @@ class EditProfileScreenTest {
 
   @Test
   fun testProfileEditionWithDialogWithGallery() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
     composeTestRule
         .onNodeWithTag("editProfileContent")
         .performScrollToNode(hasTestTag("uploadPicture"))
@@ -95,7 +108,9 @@ class EditProfileScreenTest {
 
   @Test
   fun testAddInterestButtonFunctionality() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
     composeTestRule.onNodeWithTag("categoryDropdown").performClick()
     composeTestRule.onNodeWithText("Indoor Activity").performClick()
     composeTestRule.onNodeWithTag("newInterestInput").performTextInput("New Interest")
@@ -106,7 +121,9 @@ class EditProfileScreenTest {
 
   @Test
   fun testCannotWriteInterestBeforeChoosingCategory() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
 
     // Check if the interest input is initially disabled
     composeTestRule.onNodeWithTag("newInterestInput").assertIsNotEnabled()
@@ -129,7 +146,9 @@ class EditProfileScreenTest {
 
   @Test
   fun testAddButtonEnabledOnlyWithBothFieldsFilled() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
 
     // Initially, both fields are empty, and "Add" button should be disabled.
     composeTestRule.onNodeWithTag("addInterestButton").assertIsNotEnabled()
@@ -150,7 +169,9 @@ class EditProfileScreenTest {
 
   @Test
   fun testAddButtonDisabledWhenCategoryIsNone() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
 
     // Set the category to "None"
     composeTestRule.onNodeWithTag("categoryDropdown").performClick()
@@ -165,7 +186,9 @@ class EditProfileScreenTest {
 
   @Test
   fun testAddButtonDisabledWhenCategoryIsNoneEvenIfThereIsAnInterest() {
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
 
     composeTestRule.onNodeWithTag("categoryDropdown").performClick()
     composeTestRule.onNodeWithText("Sport").performClick()
@@ -186,7 +209,9 @@ class EditProfileScreenTest {
   @Test
   fun testAllCategoriesAppearOnClick() {
 
-    composeTestRule.setContent { EditProfileScreen(profileViewModel, navigationActions) }
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
 
     // Click the dropdown to expand it
     composeTestRule.onNodeWithText("Category").performClick()

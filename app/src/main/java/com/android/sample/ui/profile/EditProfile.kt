@@ -48,7 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.InterestCategories
@@ -68,7 +68,11 @@ import com.android.sample.ui.navigation.NavigationActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: NavigationActions) {
+fun EditProfileScreen(
+    profileViewModel: ProfileViewModel,
+    navigationActions: NavigationActions,
+    imageViewModel: ImageViewModel
+) {
   val profile =
       profileViewModel.userState.collectAsState().value
           ?: return Text(text = "No profile selected.", color = Color.Red)
@@ -120,7 +124,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               isGalleryOpen = { isGalleryOpen = false },
               addImage = { bitmap ->
                 selectedImage = bitmap
-                uploadProfilePicture(
+                imageViewModel.uploadProfilePicture(
                     profile.id,
                     bitmap,
                     onSuccess = { url -> photo = url },
@@ -144,7 +148,7 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
               isCamOpen = { isCamOpen = false },
               addElem = { bitmap ->
                 selectedImage = bitmap
-                uploadProfilePicture(
+                imageViewModel.uploadProfilePicture(
                     profile.id,
                     bitmap,
                     onSuccess = { url -> photo = url },
@@ -165,7 +169,8 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                 ProfileImage(
                     userId = profile.id,
                     modifier =
-                        Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+                        Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+                    imageViewModel)
 
                 Button(
                     onClick = {
@@ -205,12 +210,37 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
 
                 Button(
                     onClick = {
+                      selectedImage?.let { bitmap ->
+                        imageViewModel.uploadProfilePicture(
+                            profile.id,
+                            bitmap,
+                            onSuccess = { url ->
+                              photo = url // Update photo URL in profile
+                            },
+                            onFailure = { error ->
+                              Log.e(
+                                  "EditProfileScreen",
+                                  "Failed to upload profile picture: ${error.message}")
+                            })
+                      }
+                      try {
+                        profileViewModel.updateProfile(
+                            User(
+                                id = profile.id,
+                                name = name,
+                                surname = surname,
+                                interests = newListInterests,
+                                activities = profile.activities,
+                                photo = photo,
+                                likedActivities = profile.likedActivities))
+                        navigationActions.goBack()
+                      } catch (_: NumberFormatException) {}
                       performOfflineAwareAction(
                           context = context,
                           networkManager = networkManager,
                           onPerform = {
                             selectedImage?.let { bitmap ->
-                              uploadProfilePicture(
+                              imageViewModel.uploadProfilePicture(
                                   profile.id,
                                   bitmap,
                                   onSuccess = { url ->
@@ -222,18 +252,6 @@ fun EditProfileScreen(profileViewModel: ProfileViewModel, navigationActions: Nav
                                         "Failed to upload profile picture: ${error.message}")
                                   })
                             }
-                            try {
-                              profileViewModel.updateProfile(
-                                  User(
-                                      id = profile.id,
-                                      name = name,
-                                      surname = surname,
-                                      interests = newListInterests,
-                                      activities = profile.activities,
-                                      photo = photo,
-                                      likedActivities = profile.likedActivities))
-                              navigationActions.goBack()
-                            } catch (_: NumberFormatException) {}
                           })
                     },
                     modifier = Modifier.fillMaxWidth().testTag("profileSaveButton")) {
