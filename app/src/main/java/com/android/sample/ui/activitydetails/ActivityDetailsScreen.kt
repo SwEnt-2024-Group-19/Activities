@@ -293,7 +293,7 @@ fun ActivityDetailsScreen(
                           Modifier.padding(vertical = SMALL_PADDING.dp)
                               .testTag(participant.name)
                               .clickable {
-                                if (participant.name == profile?.name) {
+                                if (participant.id == profile?.id) {
                                   navigationActions.navigateTo(Screen.PROFILE)
                                 } else {
                                   listActivityViewModel.selectUser(participant)

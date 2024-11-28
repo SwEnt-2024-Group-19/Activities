@@ -3,14 +3,11 @@ package com.android.sample.ui.profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,14 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.navigation.NavigationActions
 
 @Composable
@@ -42,7 +38,8 @@ fun ParticipantProfileScreen(
 ) {
 
   val selectedParticipant = listActivitiesViewModel.selectedUser.collectAsState().value
-  when (val profile = selectedParticipant) {
+  val profile = selectedParticipant
+  when (profile) {
     null ->
         ParticipantLoadingScreen(navigationActions) // Show a loading indicator or a retry button
     else -> {
@@ -105,35 +102,17 @@ fun ParticipantProfileContent(
             modifier = Modifier.testTag("topAppBar"))
       }) { innerPadding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(innerPadding),
+            Modifier.fillMaxSize().padding(innerPadding).testTag("ParticipantProfileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              item {
-                Spacer(Modifier.height(16.dp))
-                Text(text = "Profile", fontSize = 30.sp, modifier = Modifier.padding(top = 16.dp))
-
-                // Profile Picture
-                ProfileImage(
-                    userId = user.id,
-                    modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"))
-
-                // User Name and Surname
-                Text(
-                    text = "${user.name} ${user.surname}",
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(top = 8.dp).testTag("userName"))
-              }
+              item { ProfileHeader(user) }
               item {
                 // Interests Section
-                Text(
-                    text = "Interests",
-                    fontSize = 24.sp,
-                    modifier =
-                        Modifier.padding(start = 16.dp, top = 16.dp).testTag("interestsSection"))
+                SectionTitle(title = "Interests", testTag = "interestsSection")
               }
               item {
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)) {
+                    horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+                    contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
                       user.interests?.let { interests ->
                         items(interests.size) { index ->
                           InterestBox(interest = user.interests[index].interest)
@@ -142,54 +121,17 @@ fun ParticipantProfileContent(
                     }
               }
 
-              item {
-
-                // Activities Section
-
-                Text(
-                    text = "Activities Created",
-                    fontSize = 24.sp,
-                    modifier =
-                        Modifier.padding(start = 16.dp, top = 16.dp)
-                            .testTag("activitiesCreatedTitle"))
-              }
-
-              // Activities Created
-
-              user.activities?.let { activities ->
-                items(activities.size) { index ->
-                  ActivityBox(
-                      activities[index],
-                      user,
-                      listActivitiesViewModel,
-                      navigationActions,
-                      "activitiesCreated")
-                }
-              }
-
-              item { // Activities Enrolled in
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Activities Enrolled in",
-                    fontSize = 24.sp,
-                    modifier =
-                        Modifier.padding(start = 16.dp, top = 16.dp)
-                            .testTag("activitiesEnrolledTitle"))
-              }
-
-              // Activities Enrolled
-
-              user.activities?.let { activities ->
-                items(activities.size) { index ->
-                  ActivityBox(
-                      activities[index],
-                      user,
-                      listActivitiesViewModel,
-                      navigationActions,
-                      "activitiesEnrolled")
-                }
-              }
+              // Display activities sections
+              this@LazyColumn.displayActivitySection(
+                  "Activities Created", "created", user, listActivitiesViewModel, navigationActions)
+              this@LazyColumn.displayActivitySection(
+                  "Activities Enrolled in",
+                  "enrolled",
+                  user,
+                  listActivitiesViewModel,
+                  navigationActions)
+              this@LazyColumn.displayActivitySection(
+                  "Past Activities", "past", user, listActivitiesViewModel, navigationActions)
             }
       }
 }

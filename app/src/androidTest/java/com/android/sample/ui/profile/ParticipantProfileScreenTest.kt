@@ -1,104 +1,151 @@
 package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.android.sample.model.activity.ActivitiesRepository
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
+import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.Interest
-import com.android.sample.model.profile.InterestCategories
-import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.resources.dummydata.activityList
-import com.android.sample.resources.dummydata.activityWithParticipants
 import com.android.sample.resources.dummydata.listOfActivitiesUid
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 
 class ParticipantProfileScreenTest {
-
-  private lateinit var userProfileViewModel: ProfileViewModel
-  private lateinit var testUser: User
-    private lateinit var testParticipantUser: User
-    private lateinit var navigationActions: NavigationActions
+  private lateinit var activitiesRepository: ActivitiesRepositoryFirestore
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
-  private lateinit var activitiesRepository: ActivitiesRepository
+  private lateinit var navigationActions: NavigationActions
+  private lateinit var testUser: User
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
-    activitiesRepository = mock(ActivitiesRepository::class.java)
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    listActivitiesViewModel = mock(ListActivitiesViewModel::class.java)
+    // Mock dependencies
 
+    navigationActions = mock(NavigationActions::class.java)
+    activitiesRepository = mock(ActivitiesRepositoryFirestore::class.java)
+    listActivitiesViewModel = ListActivitiesViewModel(activitiesRepository)
     `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(activityList)
+      it.getArgument<(List<Activity>) -> Unit>(0)(
+          com.android.sample.resources.dummydata.activityListWithPastActivity)
     }
-
+    // Set up test user
     testUser =
         User(
-            id = "Rola",
-            name = "Amine",
-            surname = "A",
+            id = "123",
+            name = "John",
+            surname = "Doe",
             photo = "",
-            interests = listOf(Interest(InterestCategories[0],"Cycling")
-                , Interest(InterestCategories[3],"Reading")),
-            activities = listOfActivitiesUid,
-        )
-      testParticipantUser =
-          User(
-              id = "123",
-              name = "daf",
-              surname = "him",
-              photo = "",
-              interests = listOf(Interest(InterestCategories[0],"Cycling")
-                  , Interest(InterestCategories[3],"Reading")),
-              activities = listOfActivitiesUid,
-          )
-    val userStateFlow = MutableStateFlow(testUser)
-    navigationActions = mock(NavigationActions::class.java)
+            interests = listOf(Interest("Music", "Guitar"), Interest("Sport", "Running")),
+            activities = listOfActivitiesUid)
+
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PARTICIPANT_PROFILE)
-    `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
-      `when`(listActivitiesViewModel.selectedActivity).thenReturn(MutableStateFlow(activityWithParticipants))
   }
 
   @Test
-  fun testParticipantProfileScreen_noUserProfileShowsLoadingMessage() {
-    `when`(listActivitiesViewModel.selectedUser).thenReturn(null)
+  fun displayLoadingScreenWhenNoParticipantSelected() {
+    // Set up a null selected user to simulate loading
     composeTestRule.setContent {
       ParticipantProfileScreen(
           listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
     }
 
+    composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("loadingText")
-        .assertIsDisplayed()
-        .assertTextContains("No information available for this participant")
+        .assertTextEquals("No information available for this participant")
   }
 
   @Test
-  fun displayAllProfileComponents() {
-      val participantUser= MutableStateFlow(testParticipantUser)
-      `when`(listActivitiesViewModel.selectedUser).thenReturn(participantUser)
-
-      composeTestRule.setContent {
-      ParticipantProfileScreen(listActivitiesViewModel, navigationActions = navigationActions)
+  fun displayParticipantProfileComponents() {
+    // Set up a null selected user to simulate loading
+    listActivitiesViewModel.selectUser(testUser)
+    composeTestRule.setContent {
+      ParticipantProfileScreen(
+          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
     }
 
-    composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("userName").assertTextContains("John Doe")
+    composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("userName").assertTextEquals("John Doe")
     composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("activitiesCreatedTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("activitiesEnrolledTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Guitar").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Running").assertIsDisplayed()
+  }
+
+  @Test
+  fun displayPastActivities() {
+    listActivitiesViewModel.selectUser(testUser)
+    composeTestRule.setContent {
+      ParticipantProfileScreen(
+          navigationActions = navigationActions, listActivitiesViewModel = listActivitiesViewModel)
+    }
+    composeTestRule
+        .onNodeWithTag("ParticipantProfileContentColumn")
+        .assertIsDisplayed()
+        .performScrollToNode(hasTestTag("pastActivitiesTitle"))
+    composeTestRule.onNodeWithTag("pastActivitiesTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("pastActivitiesTitle").assertTextEquals("Past Activities")
+  }
+
+  @Test
+  fun displayParticipantActivitiesCreated() {
+    listActivitiesViewModel.selectUser(testUser)
+    composeTestRule.setContent {
+      ParticipantProfileScreen(
+          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+    }
+
+    composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("createdActivitiesTitle")
+        .assertTextEquals("Activities Created")
+        .assertIsDisplayed()
+  }
+
+  @Test
+  fun displayParticipantActivitiesEnrolled() {
+    listActivitiesViewModel.selectUser(testUser)
+
+    composeTestRule.setContent {
+      ParticipantProfileScreen(
+          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+    }
+
+    composeTestRule.onNodeWithTag("ParticipantProfileContentColumn").assertIsDisplayed()
+
+    composeTestRule
+        .onNodeWithTag("enrolledActivitiesTitle")
+        .assertIsDisplayed()
+        .assertTextEquals("Activities Enrolled in")
+  }
+
+  @Test
+  fun navigateBackOnClick() {
+    listActivitiesViewModel.selectUser(testUser)
+
+    composeTestRule.setContent {
+      ParticipantProfileScreen(
+          listActivitiesViewModel = listActivitiesViewModel, navigationActions = navigationActions)
+    }
+
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
+
+    verify(navigationActions).goBack()
   }
 }
