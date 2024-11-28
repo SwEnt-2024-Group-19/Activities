@@ -14,7 +14,7 @@ data class Activity(
     var date: Timestamp,
     var startTime: String,
     var duration: String,
-    // var category: Category,
+    var category: Category = Category.SPORT,
     var price: Double,
     var location: Location?,
     var creator: String,
@@ -42,83 +42,18 @@ enum class ActivityType {
   SOLO,
 }
 
-val types =
-    listOf(
-        ActivityType.PRO,
-        ActivityType.INDIVIDUAL,
-        ActivityType.SOLO,
-    )
+val types = ActivityType.values().toList()
 
 enum class ActivityStatus {
   ACTIVE,
   FINISHED,
 }
 
-// enum class Category {
-//  WORKSHOP,
-//  TALK,
-//  KEYNOTE,
-//  BREAK,
-//  LUNCH,
-//  NETWORKING,
-//  SOCIAL,
-//  OTHER,
-// }
-//
-// val categories =
-//    listOf(
-//        Category.WORKSHOP,
-//        Category.TALK,
-//        Category.KEYNOTE,
-//        Category.BREAK,
-//        Category.LUNCH,
-//        Category.NETWORKING,
-//        Category.SOCIAL,
-//        Category.OTHER,
-//    )
+enum class Category {
+  SPORT,
+  CULTURE,
+  SKILLS,
+  ENTERTAINMENT,
+}
 
-// Setup later
-// @Composable
-// fun CategoryDropdown() {
-//  var selectedCategory = remember { mutableStateOf<Category?>(null) }
-//  var open = remember { mutableStateOf(false) }
-//  Column {
-//    OutlinedTextField(
-//        value = CategoryToString(selectedCategory),
-//        onValueChange = { open.value = true },
-//        label = { Text("Enter Location") },
-//        modifier = Modifier.fillMaxWidth().testTag("inputTodoLocation").padding(16.dp),
-//    )
-//
-//    DropdownMenu(
-//        expanded = open.value,
-//        properties = PopupProperties(focusable = false),
-//        onDismissRequest = { open.value = false },
-//        modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-//          categories.forEach { cat ->
-//            DropdownMenuItem(
-//                onClick = {
-//                  selectedCategory = mutableStateOf<Category?>(cat)
-//                  open.value = false
-//                },
-//                text = { Text("") },
-//            )
-//          }
-//        }
-//  }
-// }
-//
-// fun CategoryToString(category: MutableState<Category?>): String {
-//
-//  return when (category.value) {
-//    Category.WORKSHOP -> "Workshop"
-//    Category.TALK -> "Talk"
-//    Category.KEYNOTE -> "Keynote"
-//    Category.BREAK -> "Break"
-//    Category.LUNCH -> "Lunch"
-//    Category.NETWORKING -> "Networking"
-//    Category.SOCIAL -> "Social"
-//    Category.OTHER -> "Other"
-//    null -> ""
-//  }
-// }
+val categories = Category.values().toList()

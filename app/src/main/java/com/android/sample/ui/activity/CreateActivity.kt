@@ -55,6 +55,7 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
 import com.android.sample.model.camera.uploadActivityImages
 import com.android.sample.model.map.Location
@@ -88,8 +89,10 @@ fun CreateActivityScreen(
     locationViewModel: LocationViewModel
 ) {
   val context = LocalContext.current
-  var expanded by remember { mutableStateOf(false) }
-  var selectedOption by remember { mutableStateOf("Select a type") }
+  var expandedType by remember { mutableStateOf(false) }
+  var expandedCategory by remember { mutableStateOf(false) }
+  var selectedOptionType by remember { mutableStateOf("Select a type") }
+  var selectedOptionCategory by remember { mutableStateOf("Select a category") }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -324,29 +327,63 @@ fun CreateActivityScreen(
                         .align(Alignment.CenterHorizontally)
                         .fillMaxWidth()
                         .padding(STANDARD_PADDING.dp),
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }) {
+                expanded = expandedType,
+                onExpandedChange = { expandedType = !expandedType }) {
                   OutlinedTextField(
                       readOnly = true,
-                      value = selectedOption,
+                      value = selectedOptionType,
                       onValueChange = {},
                       label = { Text("Activity Type") },
                       trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
                       },
                       colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth())
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("typeTextField"))
                   ExposedDropdownMenu(
-                      expanded = expanded,
-                      onDismissRequest = { expanded = false },
+                      expanded = expandedType,
+                      onDismissRequest = { expandedType = false },
                       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
                         types.forEach { selectionOption ->
                           DropdownMenuItem(
                               modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
                               text = { Text(selectionOption.name) },
                               onClick = {
-                                selectedOption = selectionOption.name
-                                expanded = false
+                                selectedOptionType = selectionOption.name
+                                expandedType = false
+                              })
+                        }
+                      }
+                }
+
+            ExposedDropdownMenuBox(
+                modifier =
+                    Modifier.testTag("chooseCategoryMenu")
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
+                expanded = expandedCategory,
+                onExpandedChange = { expandedCategory = !expandedCategory }) {
+                  OutlinedTextField(
+                      readOnly = true,
+                      value = selectedOptionCategory,
+                      onValueChange = {},
+                      label = { Text("Activity Category") },
+                      trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
+                      },
+                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
+                  ExposedDropdownMenu(
+                      expanded = expandedCategory,
+                      onDismissRequest = { expandedCategory = false },
+                      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                        categories.forEach { selectionOption ->
+                          DropdownMenuItem(
+                              modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                              text = { Text(selectionOption.name) },
+                              onClick = {
+                                selectedOptionCategory = selectionOption.name
+                                expandedCategory = false
                               })
                         }
                       }
@@ -480,8 +517,11 @@ fun CreateActivityScreen(
                               location = selectedLocation,
                               images = items,
                               participants = attendees,
-                              type = types.find { it.name == selectedOption } ?: types[0],
-                              comments = listOf())
+                              type = types.find { it.name == selectedOptionType } ?: types[0],
+                              comments = listOf(),
+                              category =
+                                  categories.find { it.name == selectedOptionCategory }
+                                      ?: categories[0])
                       listActivityViewModel.addActivity(activity)
                       profileViewModel.addActivity(creator, activity.uid)
                       navigationActions.navigateTo(Screen.OVERVIEW)
