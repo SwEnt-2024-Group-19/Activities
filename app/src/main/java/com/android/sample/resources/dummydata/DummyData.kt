@@ -59,7 +59,7 @@ val userProfile =
         interests = listOf(),
         surname = "Doe",
         id = "123",
-        activities = listOf())
+        activities = listOf(), nbActivitiesCreated = 0)
 
 const val password = "testPassword"
 
@@ -85,7 +85,8 @@ val activityWithParticipants =
                     interests = listOf(interest1),
                     activities = listOf(),
                     photo = "",
-                    likedActivities = listOf("1")),
+                    likedActivities = listOf("1"),
+                    nbActivitiesCreated = 0),
                 User(
                     id = "2",
                     name = "John",
@@ -93,7 +94,8 @@ val activityWithParticipants =
                     interests = listOf(interest2),
                     activities = listOf(),
                     photo = "",
-                    likedActivities = listOf("1"))),
+                    likedActivities = listOf("1"),
+                    nbActivitiesCreated = 0)),
         duration = "02:00",
         startTime = "10:00",
         type = ActivityType.INDIVIDUAL,
@@ -107,7 +109,8 @@ val simpleUser =
         interests = listOf(),
         activities = listOf(),
         photo = null,
-        likedActivities = listOf())
+        likedActivities = listOf(),
+        nbActivitiesCreated = 0)
 
 val emptyUser =
     User(
@@ -117,7 +120,8 @@ val emptyUser =
         interests = listOf(),
         activities = listOf(),
         photo = null,
-        likedActivities = listOf())
+        likedActivities = listOf(),
+        nbActivitiesCreated = 0)
 
 val activityBiking =
     Activity(
@@ -142,7 +146,8 @@ val activityBiking =
                     interests = listOf(interest1),
                     activities = listOf(),
                     photo = "",
-                    likedActivities = listOf("1")),
+                    likedActivities = listOf("1"),
+                    nbActivitiesCreated = 0),
                 User(
                     id = "2",
                     name = "John",
@@ -150,7 +155,8 @@ val activityBiking =
                     interests = listOf(interest2),
                     activities = listOf(),
                     photo = "",
-                    likedActivities = listOf("1"))),
+                    likedActivities = listOf("1"),
+                    nbActivitiesCreated = 0)),
         duration = "2 hours",
         startTime = "10:00")
 
@@ -216,7 +222,7 @@ val pastActivity =
                     interests = listOf(interest1),
                     activities = listOf(),
                     photo = "",
-                    likedActivities = listOf("1")),
+                    likedActivities = listOf("1"), nbActivitiesCreated = 0),
                 User(
                     id = "Rola",
                     name = "Amine",
@@ -224,6 +230,7 @@ val pastActivity =
                     photo = "",
                     interests = listOf(interest2),
                     activities = listOf("pastActivityUID", "1", "123"),
+                    nbActivitiesCreated = 0
                 )),
         duration = "2 hours",
         startTime = "10:00")
@@ -239,7 +246,8 @@ val testUser =
         photo = "",
         interests = interest3,
         activities = listOf(),
-        likedActivities = listOf(activityBiking.uid))
+        likedActivities = listOf(activityBiking.uid),
+        nbActivitiesCreated = 0)
 
 val userWithActivities =
     User(
@@ -249,7 +257,8 @@ val userWithActivities =
         photo = "",
         interests = interest3,
         activities = listOf(),
-        likedActivities = listOf(activityBiking.uid))
+        likedActivities = listOf(activityBiking.uid),
+        nbActivitiesCreated = 0)
 
 const val email = "test@example.com"
 const val idToken = "testGoogleIdToken"

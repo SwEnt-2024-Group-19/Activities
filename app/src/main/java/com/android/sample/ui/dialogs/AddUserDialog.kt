@@ -73,6 +73,7 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
                         activities = listOf(),
                         photo = null,
                         likedActivities = listOf(),
+                        nbActivitiesCreated = 0
                     ))
                 onDismiss()
               }) {
