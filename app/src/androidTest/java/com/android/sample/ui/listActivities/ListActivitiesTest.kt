@@ -582,34 +582,31 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
     composeTestRule.onNodeWithText("Long activity").assertIsDisplayed()
   }
-    @Test
-    fun filterDialogFiltersByOnlyPRO() {
-        userProfileViewModel = mock(ProfileViewModel::class.java)
-        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-        composeTestRule.setContent {
-            ListActivitiesScreen(
-                listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-        }
 
-        val activity1 = activity.copy(title = "PRO activity", type = ActivityType.PRO)
-        val activity2 = activity.copy(title = "INDIVIDUAL activity", type = ActivityType.INDIVIDUAL)
-
-        `when`(activitiesRepository.getActivities(any(), any())).then {
-            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-        }
-
-        listActivitiesViewModel.getActivities()
-
-        composeTestRule.onNodeWithTag("filterDialog").performClick()
-        composeTestRule.onNodeWithTag("onlyPROCheckboxRow").assertIsDisplayed()
-        composeTestRule
-            .onNodeWithTag("onlyPROCheckbox")
-            .performClick()
-        composeTestRule.onNodeWithTag("filterButton").performClick()
-
-        composeTestRule.onNodeWithText("PRO activity").assertIsDisplayed()
-        composeTestRule.onNodeWithText("INDIVIDUAL activity").assertDoesNotExist()
+  @Test
+  fun filterDialogFiltersByOnlyPRO() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
     }
 
-}
+    val activity1 = activity.copy(title = "PRO activity", type = ActivityType.PRO)
+    val activity2 = activity.copy(title = "INDIVIDUAL activity", type = ActivityType.INDIVIDUAL)
 
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("onlyPROCheckboxRow").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("onlyPROCheckbox").performClick()
+    composeTestRule.onNodeWithTag("filterButton").performClick()
+
+    composeTestRule.onNodeWithText("PRO activity").assertIsDisplayed()
+    composeTestRule.onNodeWithText("INDIVIDUAL activity").assertDoesNotExist()
+  }
+}
