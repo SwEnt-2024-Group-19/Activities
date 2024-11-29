@@ -96,11 +96,6 @@ fun ListActivitiesScreen(
   var searchText by remember { mutableStateOf("") }
   var showFilterDialog by remember { mutableStateOf(false) }
   val checkedList = remember { mutableStateListOf<Int>() }
-  var maxPrice by remember { mutableStateOf(30000.0) }
-  var availablePlaces by remember { mutableStateOf<Int?>(null) }
-  var minDate by remember { mutableStateOf<Timestamp?>(null) }
-  var duration by remember { mutableStateOf<String?>(null) }
-  var onlyPRO by remember { mutableStateOf(false) }
 
   val locationPermissionLauncher =
       rememberLauncherForActivityResult(
@@ -147,14 +142,9 @@ fun ListActivitiesScreen(
           if (showFilterDialog) {
             FilterDialog(
                 onDismiss = { showFilterDialog = false },
-                onFilter = { price, placesAvailable, mindateTimestamp, acDuration, seeOnlyPRO ->
-                  maxPrice = price?.toDouble() ?: 30000.0
-                  availablePlaces = placesAvailable
-                  minDate = mindateTimestamp
-                  duration = acDuration
-                  if (seeOnlyPRO != null) {
-                    onlyPRO = seeOnlyPRO
-                  }
+                onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+                  viewModel.updateFilterState(
+                      price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
                 })
           }
           Box(
@@ -216,13 +206,14 @@ fun ListActivitiesScreen(
                 } else {
                   var filteredActivities =
                       activitiesList.filter {
-                        if (it.price > maxPrice) false
-                        else if (availablePlaces != null &&
-                            (it.maxPlaces - it.placesLeft) <= availablePlaces!!)
+                        if (it.price > viewModel.maxPrice) false
+                        else if (viewModel.availablePlaces != null &&
+                            (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
                             false
-                        else if (minDate != null && it.date < minDate!!) false
-                        else if (duration != null && it.duration != duration) false
-                        else if (onlyPRO && it.type != ActivityType.PRO) false
+                        else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
+                        else if (viewModel.duration != null && it.duration != viewModel.duration)
+                            false
+                        else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
                         else {
                           if (searchText.isEmpty() || searchText.isBlank()) true
                           else {
