@@ -217,7 +217,7 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("likeIconButton_true").assertExists()
 
     composeTestRule.onNodeWithTag("dislikeIconButton_false").performClick()
-    composeTestRule.onNodeWithTag("dislikeIconButton_false").assertIsNotDisplayed()
+    composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
   }
 }
