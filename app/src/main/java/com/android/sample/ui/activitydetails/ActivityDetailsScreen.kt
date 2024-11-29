@@ -490,7 +490,8 @@ fun ActivityDetailsScreen(
                     comments = comments.map { if (it.uid == comment.uid) comment else it }
                     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
                   },
-                  onDeleteComment = deleteComment)
+                  onDeleteComment = deleteComment,
+                  creatorId = activity?.creator ?: "anonymous")
             }
       }
 }
@@ -501,7 +502,8 @@ fun CommentSection(
     comments: List<Comment>,
     onAddComment: (String) -> Unit,
     onReplyComment: (String, Comment) -> Unit,
-    onDeleteComment: (Comment) -> Unit
+    onDeleteComment: (Comment) -> Unit,
+    creatorId: String
 ) {
   val newCommentText = remember { mutableStateOf("") }
   val context = LocalContext.current
@@ -513,9 +515,11 @@ fun CommentSection(
       CommentItem(
           profileId,
           comment,
+          creatorId,
           onReplyComment,
           onDeleteComment,
-          allowReplies = true) // Set allowReplies to true for top-level comments
+          allowReplies = true,
+      ) // Set allowReplies to true for top-level comments
     }
 
     Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -554,6 +558,7 @@ fun CommentSection(
 fun CommentItem(
     profileId: String,
     comment: Comment,
+    creatorId: String, // Pass the creator ID as a parameter
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
     allowReplies: Boolean = true
@@ -564,14 +569,41 @@ fun CommentItem(
   val networkManager = NetworkManager(context)
 
   Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically, // Align items vertically
+        modifier = Modifier.padding(bottom = SMALL_PADDING.dp)) {
+          // If the user is the creator, display a badge
+          if (comment.userId == creatorId) {
+            Box(
+                modifier =
+                    Modifier.padding(end = SMALL_PADDING.dp)
+                        .background(color = Color.Gray, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)) {
+                  Text(
+                      text = "Creator",
+                      style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
+                      modifier = Modifier.testTag("creatorBadge_${comment.uid}"))
+                }
+          }
+          // Display the user's name
+          Text(
+              text = "${comment.userName}:",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.testTag("commentUserName_${comment.uid}"))
+        }
+
+    // Display the comment content
     Text(
-        text = "${comment.userName}: ${comment.content}",
+        text = comment.content,
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.testTag("commentUserNameAndContent_${comment.uid}"))
+        modifier = Modifier.testTag("commentContent_${comment.uid}"))
+
+    // Display the timestamp
     Text(
         text = comment.timestamp.toDate().toString(),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
+
     if (profileId != "anonymous") {
       Column {
         if (comment.userId == profileId) {
@@ -632,7 +664,8 @@ fun CommentItem(
       comment.replies.forEach { reply ->
         Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
           // Pass `allowReplies = false` for replies to prevent nesting
-          CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+          CommentItem(
+              profileId, reply, creatorId, onReplyComment, onDeleteComment, allowReplies = false)
         }
       }
     }
