@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
@@ -354,6 +355,12 @@ fun ActivityDetailsScreen(
                         Text(
                             text = participant.name, // Display the participant's name
                             style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.width(LARGE_PADDING.dp))
+                        Text(
+                            text = "Rating : ",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "Blank/10", style = MaterialTheme.typography.bodyMedium)
                       }
                 }
               }
