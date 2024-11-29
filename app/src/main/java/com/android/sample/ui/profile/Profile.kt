@@ -57,12 +57,25 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel
 ) {
-  val profileState = userProfileViewModel.userState.collectAsState()
-  when (val profile = profileState.value) {
-    null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
+
+  // Determine if we should use cached data
+  val profileState by userProfileViewModel.userState.collectAsState()
+  val user =
+      if (networkManager.isNetworkAvailable()) {
+        profileState
+      } else {
+        remember { mutableStateOf(userProfileViewModel.loadCachedProfile()) }.value
+      }
+  when (user) {
+    null -> LoadingScreen(navigationActions)
     else -> {
       ProfileContent(
-          user = profile, navigationActions, listActivitiesViewModel, userProfileViewModel)
+          user = user,
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          userProfileViewModel = userProfileViewModel)
     }
   }
 }
