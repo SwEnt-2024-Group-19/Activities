@@ -143,8 +143,8 @@ fun ListActivitiesScreen(
             FilterDialog(
                 onDismiss = { showFilterDialog = false },
                 onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
-                    viewModel.updateFilterState(price, placesAvailable, minDateTimestamp,
-                        acDuration, seeOnlyPRO)
+                  viewModel.updateFilterState(
+                      price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
                 })
           }
           Box(
@@ -211,7 +211,8 @@ fun ListActivitiesScreen(
                             (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
                             false
                         else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
-                        else if (viewModel.duration != null && it.duration != viewModel.duration) false
+                        else if (viewModel.duration != null && it.duration != viewModel.duration)
+                            false
                         else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
                         else {
                           if (searchText.isEmpty() || searchText.isBlank()) true

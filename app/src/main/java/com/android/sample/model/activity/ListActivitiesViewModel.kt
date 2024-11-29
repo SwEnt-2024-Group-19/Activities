@@ -54,7 +54,13 @@ constructor(
   }
 
   // Function to update filter state
-  fun updateFilterState(price: Double?, placesAvailable: Int?, mindateTimestamp: Timestamp?, acDuration: String?, seeOnlyPRO: Boolean?) {
+  fun updateFilterState(
+      price: Double?,
+      placesAvailable: Int?,
+      mindateTimestamp: Timestamp?,
+      acDuration: String?,
+      seeOnlyPRO: Boolean?
+  ) {
     maxPrice = price ?: Double.MAX_VALUE
     availablePlaces = placesAvailable
     minDate = mindateTimestamp
