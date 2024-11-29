@@ -3,6 +3,7 @@ package com.android.sample.ui.activityDetails
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -188,5 +189,31 @@ class CommentItemTest {
         .onNodeWithText("John: This is a reply")
         .assertIsDisplayed()
         .assertLeftPositionInRootIsEqualTo(40.05.dp)
+  }
+
+  @Test
+  fun CommentOfCreatorHasABadge() {
+    composeTestRule.setContent {
+      CommentItem(
+          profileId = testProfileId,
+          comment = testComment,
+          onReplyComment = { _, _ -> },
+          onDeleteComment = {},
+          creatorId = "123")
+    }
+    composeTestRule.onNodeWithTag("creatorBadge$testProfileId").isDisplayed()
+  }
+
+  @Test
+  fun CommentOfNonCreatorHasNoBadge() {
+    composeTestRule.setContent {
+      CommentItem(
+          profileId = testProfileId,
+          comment = testComment,
+          onReplyComment = { _, _ -> },
+          onDeleteComment = {},
+          creatorId = "124")
+    }
+    composeTestRule.onNodeWithTag("creatorBadge$testProfileId").assertDoesNotExist()
   }
 }
