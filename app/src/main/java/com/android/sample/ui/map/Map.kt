@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.Button
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
@@ -56,6 +58,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.components.NoInternetScreen
+import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
@@ -89,6 +92,7 @@ fun MapScreen(
   var selectedActivity by remember { mutableStateOf<Activity?>(null) }
   var showBottomSheet by remember { mutableStateOf(false) }
   val previousScreen = navigationActions.getPreviousRoute()
+  var showFilterDialog by remember { mutableStateOf(false) }
 
   val firstLocation =
       try {
@@ -139,7 +143,22 @@ fun MapScreen(
                 cameraPositionState = cameraPositionState) {
                   (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
                       .activities
-                      .filter { it.location != null }
+                      .filter {
+                        if (it.price > listActivitiesViewModel.maxPrice) false
+                        else if (listActivitiesViewModel.availablePlaces != null &&
+                            (it.maxPlaces - it.placesLeft) <=
+                                listActivitiesViewModel.availablePlaces!!)
+                            false
+                        else if (listActivitiesViewModel.minDate != null &&
+                            it.date < listActivitiesViewModel.minDate!!)
+                            false
+                        else if (listActivitiesViewModel.duration != null &&
+                            it.duration != listActivitiesViewModel.duration)
+                            false
+                        else if (listActivitiesViewModel.onlyPRO && it.type != ActivityType.PRO)
+                            false
+                        else it.location != null
+                      }
                       .forEach { item ->
                         Marker(
                             state =
@@ -183,6 +202,14 @@ fun MapScreen(
                 }) {
                   Icon(Icons.Default.MyLocation, contentDescription = "Center on current location")
                 }
+            FloatingActionButton(
+                modifier =
+                    Modifier.align(Alignment.BottomEnd)
+                        .padding(MEDIUM_PADDING.dp)
+                        .testTag("filterDialogButton"),
+                onClick = { showFilterDialog = true }) {
+                  Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
+                }
           }
         }
       },
@@ -192,7 +219,14 @@ fun MapScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.MAP)
       })
-
+  if (showFilterDialog) {
+    FilterDialog(
+        onDismiss = { showFilterDialog = false },
+        onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+          listActivitiesViewModel.updateFilterState(
+              price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+        })
+  }
   if (showBottomSheet) {
     ModalBottomSheet(
         onDismissRequest = { showBottomSheet = false },
