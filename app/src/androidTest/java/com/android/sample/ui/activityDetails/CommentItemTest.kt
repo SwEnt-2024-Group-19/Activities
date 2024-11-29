@@ -36,8 +36,9 @@ class CommentItemTest {
     }
 
     composeTestRule
-        .onNodeWithTag("commentUserNameAndContent_${testComment.uid}")
-        .assertTextContains("Amine: This is a comment")
+        .onNodeWithTag("commentContent_${testComment.uid}")
+        .assertTextContains("This is a comment")
+    composeTestRule.onNodeWithText("Amine:").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("commentTimestamp_${testComment.uid}")
         .assertTextContains(timestamp.toDate().toString())
@@ -142,8 +143,8 @@ class CommentItemTest {
           onDeleteComment = {},
           creatorId = "1")
     }
-
-    composeTestRule.onNodeWithText("John: This is a reply").assertIsDisplayed()
+    composeTestRule.onNodeWithText("John:")
+    composeTestRule.onNodeWithText("This is a reply").assertIsDisplayed()
   }
 
   @Test
@@ -178,15 +179,17 @@ class CommentItemTest {
     }
 
     // Ensure the original comment is displayed
-    composeTestRule.onNodeWithText("Amine: This is a comment").assertIsDisplayed()
+    composeTestRule.onNodeWithText("This is a comment").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amine:")
 
     // Ensure the reply is displayed
-    composeTestRule.onNodeWithText("John: This is a reply").assertIsDisplayed()
+    composeTestRule.onNodeWithText("This is a reply").assertIsDisplayed()
+    composeTestRule.onNodeWithText("John:").assertIsDisplayed()
 
     // Check that the reply is well nested, ensuring its indented and positioned under its origin
     // comment
     composeTestRule
-        .onNodeWithText("John: This is a reply")
+        .onNodeWithText("This is a reply")
         .assertIsDisplayed()
         .assertLeftPositionInRootIsEqualTo(40.05.dp)
   }
