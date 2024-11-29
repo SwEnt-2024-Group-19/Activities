@@ -1,5 +1,7 @@
 package com.android.sample.ui.activitydetails
 
+import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -51,13 +53,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
@@ -67,6 +73,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
@@ -84,7 +91,8 @@ fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
@@ -118,6 +126,7 @@ fun ActivityDetailsScreen(
   val duration by remember { mutableStateOf(activity?.duration) }
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
+  var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
   val deleteComment: (Comment) -> Unit = { commentToDelete ->
     // Filter out the main comment and any replies associated with it
     val newComments = comments.filter { it.uid != commentToDelete.uid }
@@ -175,6 +184,11 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
+                    imageViewModel.fetchActivityImagesAsBitmaps(
+                        activity?.uid ?: "",
+                        onSuccess = { urls -> bitmaps = urls },
+                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+                    CarouselNoModif(itemsList = bitmaps)
                     LikeButton(profile, activity, profileViewModel)
                   }
 
@@ -250,6 +264,16 @@ fun ActivityDetailsScreen(
                                   "${round(distance * 10) / 10}km"
                                 }
                         Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
+                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                        // text field button to navigate to the activity's location on the map
+                        // screen
+                        Text(
+                            text = stringResource(id = R.string.button_to_map),
+                            modifier =
+                                Modifier.testTag("activityToMapText")
+                                    .clickable(
+                                        onClick = { navigationActions.navigateTo(Screen.MAP) }),
+                            style = TextStyle(textDecoration = TextDecoration.Underline))
                       }
                     }
                   }
@@ -297,32 +321,33 @@ fun ActivityDetailsScreen(
                           Modifier.padding(vertical = SMALL_PADDING.dp)
                               .testTag(participant.name)
                               .clickable {
-                                if (participant.name != profile?.name) {
+                                if (participant.id == profile?.id) {
                                   navigationActions.navigateTo(Screen.PROFILE)
+                                } else {
+                                  listActivityViewModel.selectUser(participant)
+                                  navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                                 }
                               }) {
                         // Placeholder for participant picture
-                        if (participant.name != profile?.name) {
+                        if (participant.photo == null) {
                           Box(
                               modifier =
                                   Modifier.size(BUTTON_HEIGHT.dp)
-                                      .background(
-                                          Color.Gray,
-                                          shape = RoundedCornerShape(STANDARD_PADDING.dp))
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
                                       .padding(STANDARD_PADDING.dp)) {
                                 Image(
                                     painter =
                                         painterResource(id = R.drawable.default_profile_image),
                                     contentDescription = "Participant Image",
                                     modifier =
-                                        Modifier.fillMaxSize()
-                                            .clip(RoundedCornerShape(STANDARD_PADDING.dp)))
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
                               }
                         } else {
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
+                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape),
+                              imageViewModel = imageViewModel)
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
 
