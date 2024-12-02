@@ -706,7 +706,6 @@ fun PaymentInfoScreen(price: Double) {
                 modifier = Modifier.testTag("infoIconButton"),
                 onClick = { showDialog = true }) {
                 Icon(
-                    modifier = Modifier.testTag("infoIcon"),
                     painter = painterResource(id = android.R.drawable.ic_dialog_info),
                     contentDescription = "Info",
                     tint = Color.Gray
@@ -724,7 +723,6 @@ fun PaymentInfoScreen(price: Double) {
                         modifier = Modifier.testTag("okButton"),
                         onClick = { showDialog = false }) {
                         Text(
-                            modifier = Modifier.testTag("okText"),
                             text = stringResource(id = R.string.ok))
                     }
                 },
