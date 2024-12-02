@@ -1,11 +1,15 @@
 package com.android.sample.model.profile
 
 import androidx.test.core.app.ApplicationProvider
+import com.android.sample.model.activity.database.AppDatabase
+import com.android.sample.model.profile.database.UserDao
 import com.android.sample.resources.dummydata.activity
 import com.android.sample.resources.dummydata.testUser
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -191,5 +195,33 @@ class ProfileViewModelTest {
   fun clearUserDataSetsUserStateToNull() {
     profileViewModel.clearUserData()
     assertEquals(null, profileViewModel.userState.value)
+  }
+  @Test
+  fun fetchUserDataCachesLocallyOnSuccess() = runTest {
+    val mockUser = testUser // Replace with your test user object
+
+    // Mock repository success behavior
+    `when`(profilesRepository.getUser(eq(mockUser.id), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(User?) -> Unit>(1)
+      onSuccess(mockUser)
+    }
+
+    // Mock UserDao and AppDatabase
+    val mockUserDao = mock(UserDao::class.java)
+    val mockDatabase = mock(AppDatabase::class.java)
+    `when`(mockDatabase.userDao()).thenReturn(mockUserDao)
+
+    // Create the ViewModel
+    val profileViewModel =
+      ProfileViewModel(repository = profilesRepository, localDatabase = mockDatabase)
+
+    // Call the method under test
+    profileViewModel.fetchUserData(mockUser.id)
+
+    // Ensure the user state is updated
+    assertEquals(mockUser, profileViewModel.userState.value)
+
+    // Verify that the DAO's insert method was called
+    verify(mockUserDao).insert(mockUser)
   }
 }
