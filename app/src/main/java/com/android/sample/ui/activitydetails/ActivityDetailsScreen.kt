@@ -690,19 +690,23 @@ fun PaymentInfoScreen(price: Double) {
         // Payment Section
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier.testTag("paymentSection")
     ) {
         // Payment Text
         Text(
             text = "Payment info",
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(end = SMALL_PADDING.dp)
+            modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo")
         )
 
 
             // Info Icon with Click
-            IconButton(onClick = { showDialog = true }) {
+            IconButton(
+                modifier = Modifier.testTag("infoIconButton"),
+                onClick = { showDialog = true }) {
                 Icon(
+                    modifier = Modifier.testTag("infoIcon"),
                     painter = painterResource(id = android.R.drawable.ic_dialog_info),
                     contentDescription = "Info",
                     tint = Color.Gray
@@ -713,15 +717,26 @@ fun PaymentInfoScreen(price: Double) {
         // Info Dialog
         if (showDialog) {
             AlertDialog(
+                modifier = Modifier.testTag("paymentInfoDialog"),
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text(stringResource(id = R.string.ok))
+                    TextButton(
+                        modifier = Modifier.testTag("okButton"),
+                        onClick = { showDialog = false }) {
+                        Text(
+                            modifier = Modifier.testTag("okText"),
+                            text = stringResource(id = R.string.ok))
                     }
                 },
-                title = { Text(stringResource(id = R.string.payment_info)) },
-                text = {if (price !=0.0) {Text(stringResource(id = R.string.payment_explanation))}
-                       else {Text(stringResource(id = R.string.free_activity))}},
+                title = { Text(
+                    modifier = Modifier.testTag("paymentInfoTitle"),
+                    text=stringResource(id = R.string.payment_info)) },
+                text = {if (price !=0.0) {Text(
+                    modifier = Modifier.testTag("paymentInfoText"),
+                    text= stringResource(id = R.string.payment_explanation)
+                )}
+                       else {Text(modifier = Modifier.testTag("freeInfoText"), text=
+                    stringResource(id = R.string.free_activity))}},
 
             )
         }
