@@ -139,4 +139,55 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
   }
+  /*
+   @Test
+   fun aUserTriesToLookAtAnActivity() {
+     // Signs in
+     composeTestRule.onNodeWithTag("SignInButton").performClick()
+     composeTestRule.waitForIdle()
+
+     // create an activity
+     composeTestRule.onNodeWithTag("Overview").performClick()
+     composeTestRule.waitForIdle()
+     composeTestRule.onNodeWithTag("Add Activity").performClick()
+     composeTestRule.waitForIdle()
+     composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Activity Title")
+     composeTestRule.onNodeWithTag("Description").performTextInput("Activity Description")
+     composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("12/12/2025")
+     composeTestRule.onNodeWithTag("inputStartTime").performTextInput("15:30")
+     composeTestRule.onNodeWithTag("inputDurationCreate").performTextInput("00:30")
+     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("13")
+     composeTestRule.onNodeWithTag("inputPlacesCreate").performTextInput("7")
+     composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Activity Location")
+     composeTestRule.onNodeWithTag("createButton").performClick()
+     composeTestRule.waitForIdle()
+
+     // check in profile that the activity was added
+     composeTestRule.onNodeWithTag("Profile").performClick()
+     composeTestRule.waitForIdle()
+     composeTestRule.onNodeWithTag("profileScreen").assertExists()
+     composeTestRule.onNodeWithTag("activityCreated").assertExists()
+     composeTestRule.onNodeWithTag("activityCreated").performClick()
+     composeTestRule.waitForIdle()
+
+     // Filters for specific activity types
+     composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
+     composeTestRule.waitForIdle()
+     composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
+
+     composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
+     composeTestRule.waitForIdle()
+     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+
+     // Opens the activity details
+     composeTestRule.onNodeWithTag("activityCard").performClick()
+     composeTestRule.waitForIdle()
+     composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
+
+     // Verifies user-specific options (enrollment, edit, or activity details)
+     composeTestRule.onNodeWithTag("enrollButton").assertExists()
+     composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
+   }
+
+  */
 }
