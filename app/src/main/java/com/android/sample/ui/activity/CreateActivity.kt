@@ -525,7 +525,7 @@ fun CreateActivityScreen(
                             "You must be logged in to create an activity.",
                             Toast.LENGTH_SHORT)
                         .show()
-                  } else if (hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
+                  } else if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
                     Toast.makeText(
                             context,
                             "The start time must be before the end time.",
