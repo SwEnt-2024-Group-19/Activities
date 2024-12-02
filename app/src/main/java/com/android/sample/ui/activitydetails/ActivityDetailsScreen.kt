@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -73,6 +76,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -235,12 +239,16 @@ fun ActivityDetailsScreen(
               // price
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("price")) {
+
+                  modifier = Modifier.testTag("price").fillMaxWidth()) {
                     Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
+                  Spacer(modifier = Modifier.weight(WIDTH_FRACTION))
+                    PaymentInfoScreen()
+
                   }
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -496,6 +504,7 @@ fun ActivityDetailsScreen(
       }
 }
 
+
 @Composable
 fun CommentSection(
     profileId: String,
@@ -671,6 +680,54 @@ fun CommentItem(
     }
   }
 }
+
+
+@Composable
+fun PaymentInfoScreen() {
+    var showDialog by remember { mutableStateOf(false) }
+
+
+        // Payment Section
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        // Payment Text
+        Text(
+            text = "Payment info",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(end = SMALL_PADDING.dp)
+        )
+
+
+            // Info Icon with Click
+            IconButton(onClick = { showDialog = true }) {
+                Icon(
+                    painter = painterResource(id = android.R.drawable.ic_dialog_info),
+                    contentDescription = "Info",
+                    tint = Color.Gray
+                )
+            }}
+
+
+        // Info Dialog
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                confirmButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text(stringResource(id = R.string.ok))
+                    }
+                },
+                title = { Text(stringResource(id = R.string.payment_info)) },
+                text = {Text(stringResource(id = R.string.payment_explanation))},
+
+            )
+        }
+
+}
+
+
 
 @Composable
 fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileViewModel) {
