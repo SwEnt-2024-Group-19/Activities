@@ -8,7 +8,6 @@ import com.android.sample.resources.dummydata.testUser
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -196,6 +195,7 @@ class ProfileViewModelTest {
     profileViewModel.clearUserData()
     assertEquals(null, profileViewModel.userState.value)
   }
+
   @Test
   fun fetchUserDataCachesLocallyOnSuccess() = runTest {
     val mockUser = testUser // Replace with your test user object
@@ -213,7 +213,7 @@ class ProfileViewModelTest {
 
     // Create the ViewModel
     val profileViewModel =
-      ProfileViewModel(repository = profilesRepository, localDatabase = mockDatabase)
+        ProfileViewModel(repository = profilesRepository, localDatabase = mockDatabase)
 
     // Call the method under test
     profileViewModel.fetchUserData(mockUser.id)
