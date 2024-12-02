@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.image.ImageViewModel
+import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -36,7 +37,8 @@ import com.android.sample.ui.navigation.NavigationActions
 fun ParticipantProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+    profileViewModel: ProfileViewModel
 ) {
 
   val selectedParticipant = listActivitiesViewModel.selectedUser.collectAsState().value
@@ -46,7 +48,11 @@ fun ParticipantProfileScreen(
         ParticipantLoadingScreen(navigationActions) // Show a loading indicator or a retry button
     else -> {
       ParticipantProfileContent(
-          user = profile, navigationActions, listActivitiesViewModel, imageViewModel)
+          user = profile,
+          navigationActions,
+          listActivitiesViewModel,
+          imageViewModel,
+          profileViewModel)
     }
   // Proceed with showing profile content
   }
@@ -87,7 +93,8 @@ fun ParticipantProfileContent(
     user: User,
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+    profileViewModel: ProfileViewModel
 ) {
   Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
@@ -127,15 +134,26 @@ fun ParticipantProfileContent(
 
               // Display activities sections
               this@LazyColumn.displayActivitySection(
-                  "Activities Created", "created", user, listActivitiesViewModel, navigationActions)
+                  "Activities Created",
+                  "created",
+                  user,
+                  listActivitiesViewModel,
+                  navigationActions,
+                  profileViewModel)
               this@LazyColumn.displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
                   user,
                   listActivitiesViewModel,
-                  navigationActions)
+                  navigationActions,
+                  profileViewModel)
               this@LazyColumn.displayActivitySection(
-                  "Past Activities", "past", user, listActivitiesViewModel, navigationActions)
+                  "Past Activities",
+                  "past",
+                  user,
+                  listActivitiesViewModel,
+                  navigationActions,
+                  profileViewModel)
             }
       }
 }
