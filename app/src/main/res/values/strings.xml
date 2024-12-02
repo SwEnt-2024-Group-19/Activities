@@ -21,6 +21,7 @@
     <string name="ok">OK</string>
     <string name="payment_info">Payment Information</string>
     <string name="payment_explanation">The payment will be done on-site. Please ensure you have the necessary amount ready.</string>
+    <string name="free_activity">This activity is free. No payment is needed to attend.</string>
 
 
 </resources>

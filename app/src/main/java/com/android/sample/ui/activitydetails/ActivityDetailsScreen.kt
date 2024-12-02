@@ -247,7 +247,7 @@ fun ActivityDetailsScreen(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
                   Spacer(modifier = Modifier.weight(WIDTH_FRACTION))
-                    PaymentInfoScreen()
+                  PaymentInfoScreen(price ?: 0.0)
 
                   }
 
@@ -683,7 +683,7 @@ fun CommentItem(
 
 
 @Composable
-fun PaymentInfoScreen() {
+fun PaymentInfoScreen(price: Double) {
     var showDialog by remember { mutableStateOf(false) }
 
 
@@ -720,7 +720,8 @@ fun PaymentInfoScreen() {
                     }
                 },
                 title = { Text(stringResource(id = R.string.payment_info)) },
-                text = {Text(stringResource(id = R.string.payment_explanation))},
+                text = {if (price !=0.0) {Text(stringResource(id = R.string.payment_explanation))}
+                       else {Text(stringResource(id = R.string.free_activity))}},
 
             )
         }
