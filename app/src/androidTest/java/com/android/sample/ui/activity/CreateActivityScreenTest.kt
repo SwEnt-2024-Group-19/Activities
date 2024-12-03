@@ -456,7 +456,7 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
-    composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
+    composeTestRule.onNodeWithTag("attendeeName0", useUnmergedTree = true).assertTextEquals("John Doe")
   }
 
   @Test
