@@ -481,11 +481,10 @@ fun EditActivityScreen(
                       onProfileClick = {
                         if (attendees[index].id == creator) {
                           navigationActions.navigateTo(Screen.PROFILE)
-                        } else if(attendees[index].id == "") {
+                        } else if (attendees[index].id == "") {
                           Toast.makeText(context, "This user is not registered", Toast.LENGTH_SHORT)
                               .show()
-                        }
-                        else {
+                        } else {
                           listActivityViewModel.selectUser(attendees[index])
                           navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                         }

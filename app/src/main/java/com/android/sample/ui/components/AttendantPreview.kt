@@ -1,12 +1,10 @@
 package com.android.sample.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -44,9 +42,10 @@ fun AttendantPreview(
               .border(LINE_STROKE.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
               .testTag("attendeeRow${index}")) {
         if (user.id == "") {
-            Icon(Icons.Default.Person, contentDescription = "Person",
-                modifier = Modifier.align(Alignment.CenterVertically))
-
+          Icon(
+              Icons.Default.Person,
+              contentDescription = "Person",
+              modifier = Modifier.align(Alignment.CenterVertically))
         } else {
           ProfileImage(
               userId = user.id,
