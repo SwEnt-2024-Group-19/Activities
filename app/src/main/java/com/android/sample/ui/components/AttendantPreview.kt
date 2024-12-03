@@ -53,9 +53,10 @@ fun AttendantPreview(
               imageViewModel = imageViewModel)
         }
         Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
-        Column(modifier = Modifier.testTag("attendeeName${index}")) {
-          Text(text = "${user.name} ${user.surname}", style = MaterialTheme.typography.bodyLarge)
-        }
+
+          Text(text = "${user.name} ${user.surname}", style = MaterialTheme.typography.bodyLarge,
+              modifier = Modifier.testTag("attendeeName${index}").align(Alignment.CenterVertically))
+
         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
         IconButton(
             onClick = { deleteAttendant(user) },
