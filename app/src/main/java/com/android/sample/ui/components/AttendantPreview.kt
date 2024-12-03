@@ -2,7 +2,6 @@ package com.android.sample.ui.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -54,8 +53,10 @@ fun AttendantPreview(
         }
         Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
 
-          Text(text = "${user.name} ${user.surname}", style = MaterialTheme.typography.bodyLarge,
-              modifier = Modifier.testTag("attendeeName${index}").align(Alignment.CenterVertically))
+        Text(
+            text = "${user.name} ${user.surname}",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.testTag("attendeeName${index}").align(Alignment.CenterVertically))
 
         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
         IconButton(
