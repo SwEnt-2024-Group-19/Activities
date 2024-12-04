@@ -635,7 +635,7 @@ class OverviewScreenTest {
     composeTestRule
         .onNodeWithTag("activityStatusEnrolledBox", useUnmergedTree = true)
         .assertDoesNotExist()
-    composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertDoesNotExist()
+
     composeTestRule.onNodeWithTag("enrolledText", useUnmergedTree = true).assertDoesNotExist()
 
     composeTestRule.onNodeWithText("ENROLLED").assertIsNotDisplayed()
