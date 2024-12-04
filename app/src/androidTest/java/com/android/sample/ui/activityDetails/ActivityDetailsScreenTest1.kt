@@ -17,6 +17,7 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.MockActivitiesRepository
+import com.android.sample.model.activity.database.AppDatabase
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
@@ -27,6 +28,7 @@ import com.android.sample.model.profile.MockProfilesRepository
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
+import com.android.sample.model.profile.database.UserDao
 import com.android.sample.resources.dummydata.activityWithParticipants
 import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
@@ -331,11 +333,12 @@ class ActivityDetailsScreenAndroidTest {
   @Test
   fun leaveActivityToast_displays_whenLeftActivity() {
     val mockActivitiesRepo = MockActivitiesRepository()
-    mockViewModel =
-        spy(ListActivitiesViewModel(mock(ProfilesRepository::class.java), mockActivitiesRepo))
-
     val mockProfileRepo = MockProfilesRepository()
-    mockProfileViewModel = spy(ProfileViewModel(mockProfileRepo, mock()))
+    mockViewModel = spy(ListActivitiesViewModel(mockProfileRepo, mockActivitiesRepo))
+    val mockAppDatabase = mock(AppDatabase::class.java)
+    val mockUserDao = mock(UserDao::class.java)
+    `when`(mockAppDatabase.userDao()).thenReturn(mockUserDao)
+    mockProfileViewModel = spy(ProfileViewModel(mockProfileRepo, mockAppDatabase))
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "123")))
 
     val enrolledActivity =
