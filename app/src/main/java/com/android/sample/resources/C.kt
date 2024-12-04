@@ -67,7 +67,6 @@ object C {
 
     const val WIDTH_FRACTION = 0.8f
 
-
     // errors
     const val OFFLINE_TOAST_MESSAGE = "You are offline. Action not allowed."
   }
