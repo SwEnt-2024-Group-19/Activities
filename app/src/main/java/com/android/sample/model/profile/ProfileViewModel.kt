@@ -1,19 +1,29 @@
 package com.android.sample.model.profile
 
-import android.util.Log
+import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.database.AppDatabase
+import com.android.sample.model.network.NetworkManager
+import com.android.sample.ui.components.performOfflineAwareAction
+import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel
-open class ProfileViewModel @Inject constructor(private val repository: ProfilesRepository) :
+open class ProfileViewModel
+@Inject
+constructor(private val repository: ProfilesRepository, private val localDatabase: AppDatabase) :
     ViewModel() {
   private var userState_ = MutableStateFlow<User?>(null)
   open val userState: StateFlow<User?> = userState_.asStateFlow()
@@ -28,17 +38,38 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
       if (currentUser != null) {
         fetchUserData(currentUser.uid)
       } else {
-        Log.d("ProfileViewModel", "No user is authenticated, skipping data fetch.")
         clearUserData()
       }
     }
   }
 
   fun fetchUserData(userId: String) {
-    repository.getUser(
-        userId,
-        onSuccess = { userState_.value = it },
-        onFailure = { Log.e("error", " not fetching") })
+    viewModelScope.launch {
+      try {
+        // Attempt to fetch from Firestore
+        repository.getUser(
+            userId = userId,
+            onSuccess = { user ->
+              user?.let {
+                userState_.value = it
+                viewModelScope.launch {
+                  localDatabase.userDao().insert(it) // Cache locally
+                }
+              }
+            },
+            onFailure = {
+              // If Firestore fails, load from Room
+              viewModelScope.launch {
+                val cachedUser = localDatabase.userDao().getUser(userId)
+                userState_.value = cachedUser
+              }
+            })
+      } catch (e: Exception) {
+        // If unexpected exception occurs, fallback to Room
+        val cachedUser = localDatabase.userDao().getUser(userId)
+        userState_.value = cachedUser
+      }
+    }
   }
 
   fun clearUserData() {
@@ -76,17 +107,36 @@ open class ProfileViewModel @Inject constructor(private val repository: Profiles
         onFailure = {})
   }
 
+  fun removeJoinedActivity(userId: String, activityId: String) {
+    repository.removeJoinedActivity(
+        userId = userId,
+        activityId = activityId,
+        onSuccess = { fetchUserData(userId) },
+        onFailure = {})
+  }
+
   fun updateProfile(user: User) {
     repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
   }
 
-  companion object {
-    fun Factory(): ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ProfileViewModel(ProfilesRepositoryFirestore(Firebase.firestore)) as T
-          }
-        }
+  fun loadCachedProfile(): User? {
+    return runBlocking { localDatabase.userDao().getUser(Firebase.auth.currentUser?.uid ?: "") }
+  }
+  /** Check if the activity should be displayed based on the category and the user's role in the */
+  fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
+    return when (category) {
+      "created" -> activity.creator == user.id && activity.date > Timestamp.now()
+      "enrolled" -> activity.creator != user.id && activity.date > Timestamp.now()
+      "past" -> activity.date < Timestamp.now()
+      else -> false
+    }
+  }
+  /** Navigate to the appropriate screen based on the category */
+  fun navigateToActivity(navigationActions: NavigationActions, context: Context) {
+    val networkManager = NetworkManager(context)
+    performOfflineAwareAction(
+        context,
+        networkManager,
+        onPerform = { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) })
   }
 }

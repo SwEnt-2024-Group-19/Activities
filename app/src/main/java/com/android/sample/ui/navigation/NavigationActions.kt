@@ -115,4 +115,13 @@ open class NavigationActions(
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""
   }
+
+  /**
+   * Get the previous route of the navigation controller.
+   *
+   * @return The previous route
+   */
+  open fun getPreviousRoute(): String? {
+    return navController.previousBackStackEntry?.destination?.route
+  }
 }

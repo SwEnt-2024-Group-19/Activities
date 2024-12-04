@@ -1,7 +1,6 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -12,15 +11,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,11 +32,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.model.camera.uploadProfilePicture
+import com.android.sample.model.image.ImageViewModel
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
-import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -55,20 +51,23 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: NavigationActions) {
+fun ProfileCreationScreen(
+    viewModel: ProfileViewModel,
+    navigationActions: NavigationActions,
+    imageViewModel: ImageViewModel
+) {
   var name by remember { mutableStateOf("") }
   val nameErrorState = remember { mutableStateOf<String?>(null) }
   var surname by remember { mutableStateOf("") }
   val surnameErrorState = remember { mutableStateOf<String?>(null) }
-  var interests by remember { mutableStateOf(listOf<String>()) }
+  var interests by remember { mutableStateOf(listOf<Interest>()) }
   var photo by remember { mutableStateOf("") }
   var errorMessage by remember { mutableStateOf<String?>(null) }
-  var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
   var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
-  var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
   val context = LocalContext.current
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -92,12 +91,12 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
         isGalleryOpen = { isGalleryOpen = false },
         addImage = { bitmap ->
           selectedBitmap = bitmap
-          uploadProfilePicture(
+          imageViewModel.uploadProfilePicture(
               uid,
               bitmap,
               onSuccess = { url -> photo = url },
               onFailure = { error ->
-                Log.e("EditProfileScreen", "Failed to upload profile picture: ${error.message}")
+                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
               })
         },
         context = context)
@@ -115,12 +114,12 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
         isCamOpen = { isCamOpen = false },
         addElem = { bitmap ->
           selectedBitmap = bitmap
-          uploadProfilePicture(
+          imageViewModel.uploadProfilePicture(
               uid,
               bitmap,
               onSuccess = { url -> photo = url },
               onFailure = { error ->
-                Log.e("EditProfileScreen", "Failed to upload profile picture: ${error.message}")
+                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
               })
         })
   } else {
@@ -143,7 +142,8 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
 
           ProfileImage(
               userId = uid,
-              modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"))
+              modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+              imageViewModel)
 
           Button(
               onClick = { showDialogImage = true }, modifier = Modifier.testTag("uploadPicture")) {
@@ -171,43 +171,10 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
               errorTestTag = "surnameError")
           Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
 
-          var newInterest by remember { mutableStateOf("") }
           var newListInterests by remember { mutableStateOf(interests) }
 
-          LazyRow(
-              modifier = Modifier.padding(MEDIUM_PADDING.dp).testTag("interestsList"),
-              horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
-                newListInterests.let {
-                  items(it.size, key = { it }) { index ->
-                    InterestEditBox(
-                        interest = newListInterests[index],
-                        onRemove = {
-                          newListInterests = newListInterests - newListInterests[index]
-                        })
-                  }
-                }
-              }
-
-          OutlinedTextField(
-              value = newInterest,
-              onValueChange = { newInterest = it },
-              label = { Text("New Interest") },
-              modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
-          Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-          Button(
-              onClick = {
-                if (newInterest.isNotBlank()) {
-                  newListInterests = newListInterests.plus(newInterest)
-                  newInterest = "" // Clear the field after adding
-                }
-              },
-              modifier =
-                  Modifier.padding(end = STANDARD_PADDING.dp)
-                      .clip(RoundedCornerShape(STANDARD_PADDING.dp))
-                      .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
-                      .testTag("addInterestButton")) {
-                Text("Add")
-              }
+          ManageInterests(
+              initialInterests = interests, onUpdateInterests = { newListInterests = it })
 
           Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
           Button(
@@ -219,7 +186,7 @@ fun ProfileCreationScreen(viewModel: ProfileViewModel, navigationActions: Naviga
                 // Proceed only if there are no errors
                 if (nameErrorState.value == null && surnameErrorState.value == null) {
                   selectedBitmap?.let { bitmap ->
-                    uploadProfilePicture(
+                    imageViewModel.uploadProfilePicture(
                         uid,
                         bitmap,
                         onSuccess = { url ->

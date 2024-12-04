@@ -1,10 +1,13 @@
 package com.android.sample.ui.activitydetails
 
+import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +31,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -51,12 +56,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageViewModel
+import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
@@ -64,7 +76,10 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -72,13 +87,16 @@ import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.UUID
 import kotlin.math.min
+import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    locationViewModel: LocationViewModel,
+    imageViewModel: ImageViewModel
 ) {
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
@@ -105,11 +123,14 @@ fun ActivityDetailsScreen(
   }
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
+  val distance = locationViewModel.getDistanceFromCurrentLocation(location)
   val context = LocalContext.current
+  val networkManager = NetworkManager(context)
   val startTime by remember { mutableStateOf(activity?.startTime) }
   val duration by remember { mutableStateOf(activity?.duration) }
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
+  var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
   val deleteComment: (Comment) -> Unit = { commentToDelete ->
     // Filter out the main comment and any replies associated with it
     val newComments = comments.filter { it.uid != commentToDelete.uid }
@@ -167,6 +188,11 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
+                    imageViewModel.fetchActivityImagesAsBitmaps(
+                        activity?.uid ?: "",
+                        onSuccess = { urls -> bitmaps = urls },
+                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+                    CarouselNoModif(itemsList = bitmaps)
                     LikeButton(profile, activity, profileViewModel)
                   }
 
@@ -213,12 +239,14 @@ fun ActivityDetailsScreen(
               // price
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("price")) {
+                  modifier = Modifier.testTag("price").fillMaxWidth()) {
                     Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
+                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION))
+                    PaymentInfoScreen(price ?: 0.0)
                   }
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -229,10 +257,33 @@ fun ActivityDetailsScreen(
                   modifier = Modifier.testTag("location")) {
                     Icon(Icons.Default.LocationOn, contentDescription = "Location")
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-                    Text(
-                        text = location?.name ?: "No location",
-                        modifier = Modifier.testTag("locationText"))
+                    Column {
+                      Text(
+                          text = location?.name ?: "No location",
+                          modifier = Modifier.testTag("locationText"))
+                      if (distance != null) {
+                        val distanceString =
+                            "Distance : " +
+                                if (distance < 1) {
+                                  "${round(distance * 1000).toInt()}m"
+                                } else {
+                                  "${round(distance * 10) / 10}km"
+                                }
+                        Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
+                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                        // text field button to navigate to the activity's location on the map
+                        // screen
+                        Text(
+                            text = stringResource(id = R.string.button_to_map),
+                            modifier =
+                                Modifier.testTag("activityToMapText")
+                                    .clickable(
+                                        onClick = { navigationActions.navigateTo(Screen.MAP) }),
+                            style = TextStyle(textDecoration = TextDecoration.Underline))
+                      }
+                    }
                   }
+
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
               // schedule
@@ -265,6 +316,8 @@ fun ActivityDetailsScreen(
                   style = MaterialTheme.typography.bodyLarge,
                   modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
 
+              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
+
               // List of participants
               Column(modifier = Modifier.testTag("participants")) {
                 activity?.participants?.forEach { participant ->
@@ -274,32 +327,33 @@ fun ActivityDetailsScreen(
                           Modifier.padding(vertical = SMALL_PADDING.dp)
                               .testTag(participant.name)
                               .clickable {
-                                if (participant.name != profile?.name) {
+                                if (participant.id == profile?.id) {
                                   navigationActions.navigateTo(Screen.PROFILE)
+                                } else {
+                                  listActivityViewModel.selectUser(participant)
+                                  navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                                 }
                               }) {
                         // Placeholder for participant picture
-                        if (participant.name != profile?.name) {
+                        if (participant.photo == null) {
                           Box(
                               modifier =
                                   Modifier.size(BUTTON_HEIGHT.dp)
-                                      .background(
-                                          Color.Gray,
-                                          shape = RoundedCornerShape(STANDARD_PADDING.dp))
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
                                       .padding(STANDARD_PADDING.dp)) {
                                 Image(
                                     painter =
                                         painterResource(id = R.drawable.default_profile_image),
                                     contentDescription = "Participant Image",
                                     modifier =
-                                        Modifier.fillMaxSize()
-                                            .clip(RoundedCornerShape(STANDARD_PADDING.dp)))
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
                               }
                         } else {
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape))
+                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape),
+                              imageViewModel = imageViewModel)
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
 
@@ -307,6 +361,12 @@ fun ActivityDetailsScreen(
                         Text(
                             text = participant.name, // Display the participant's name
                             style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.width(LARGE_PADDING.dp))
+                        Text(
+                            text = "Rating : ",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "Blank/10", style = MaterialTheme.typography.bodyMedium)
                       }
                 }
               }
@@ -315,51 +375,76 @@ fun ActivityDetailsScreen(
 
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
+
                 if (activity.creator != profile.id) {
                   Button(
                       onClick = {
-                        if (((placesTaken ?: 0) >= 0) && ((placesTaken ?: 0) < (maxPlaces ?: 0))) {
-                          if (isUserEnrolled) {
-                            Toast.makeText(
-                                    context,
-                                    "You are already enrolled in this activity",
-                                    Toast.LENGTH_SHORT)
-                                .show()
-                          } else {
-                            val theActivity =
-                                activity.copy(
-                                    placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
-                                    participants =
-                                        activity.participants +
-                                            User(
-                                                name = profile.name,
-                                                surname = profile.surname,
-                                                id = profile.id,
-                                                photo = profile.photo,
-                                                interests = profile.interests,
-                                                activities = profile.activities))
-                            listActivityViewModel.updateActivity(theActivity)
-                            profileViewModel.addActivity(profile.id, theActivity.uid)
-                            Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT).show()
-                            navigationActions.navigateTo(Screen.OVERVIEW)
-                          }
-                        } else {
-                          Toast.makeText(
-                                  context,
-                                  "Enroll failed, limit of places reached",
-                                  Toast.LENGTH_SHORT)
-                              .show()
-                        }
+                        performOfflineAwareAction(
+                            context = context,
+                            networkManager = networkManager,
+                            onPerform = {
+                              if (isUserEnrolled) {
+                                // Logic to leave the activity once enrolled
+                                val updatedActivity =
+                                    activity.copy(
+                                        placesLeft = min((placesTaken ?: 0) - 1, maxPlaces ?: 0),
+                                        participants =
+                                            activity.participants.filter { it.id != profile.id })
+                                listActivityViewModel.updateActivity(updatedActivity)
+                                profileViewModel.removeJoinedActivity(profile.id, activity.uid)
+                                Toast.makeText(
+                                        context,
+                                        "Successfully left the activity",
+                                        Toast.LENGTH_SHORT)
+                                    .show()
+                                navigationActions.navigateTo(Screen.PROFILE)
+                              } else {
+                                // Logic to enroll in the activity
+                                if ((placesTaken ?: 0) < (maxPlaces ?: 0)) {
+                                  val theActivity =
+                                      activity.copy(
+                                          placesLeft = min((placesTaken ?: 0) + 1, maxPlaces ?: 0),
+                                          participants =
+                                              activity.participants +
+                                                  User(
+                                                      name = profile.name,
+                                                      surname = profile.surname,
+                                                      id = profile.id,
+                                                      photo = profile.photo,
+                                                      interests = profile.interests,
+                                                      activities = profile.activities))
+
+                                  listActivityViewModel.updateActivity(theActivity)
+                                  profileViewModel.addActivity(profile.id, theActivity.uid)
+                                  Toast.makeText(context, "Enroll Successful", Toast.LENGTH_SHORT)
+                                      .show()
+                                  navigationActions.navigateTo(Screen.OVERVIEW)
+                                } else {
+                                  Toast.makeText(
+                                          context,
+                                          "Enroll failed, limit of places reached",
+                                          Toast.LENGTH_SHORT)
+                                      .show()
+                                }
+                                navigationActions.navigateTo(Screen.OVERVIEW)
+                              }
+                            })
                       },
                       modifier =
                           Modifier.fillMaxWidth()
                               .padding(horizontal = LARGE_PADDING.dp)
                               .testTag("enrollButton")) {
-                        Text(text = "Enroll")
+                        if (isUserEnrolled) Text(text = "Leave") else Text(text = "Enroll")
                       }
                 } else {
+                  // Creator of the activity
                   Button(
-                      onClick = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) },
+                      onClick = {
+                        performOfflineAwareAction(
+                            context = context,
+                            networkManager = networkManager,
+                            onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
+                      },
                       modifier =
                           Modifier.fillMaxWidth()
                               .padding(horizontal = LARGE_PADDING.dp)
@@ -382,6 +467,7 @@ fun ActivityDetailsScreen(
                       Text(text = "Login/Register")
                     }
               }
+
               CommentSection(
                   profileId = profile?.id ?: "anonymous",
                   comments = comments,
@@ -410,7 +496,8 @@ fun ActivityDetailsScreen(
                     comments = comments.map { if (it.uid == comment.uid) comment else it }
                     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
                   },
-                  onDeleteComment = deleteComment)
+                  onDeleteComment = deleteComment,
+                  creatorId = activity?.creator ?: "anonymous")
             }
       }
 }
@@ -421,10 +508,11 @@ fun CommentSection(
     comments: List<Comment>,
     onAddComment: (String) -> Unit,
     onReplyComment: (String, Comment) -> Unit,
-    onDeleteComment: (Comment) -> Unit
+    onDeleteComment: (Comment) -> Unit,
+    creatorId: String
 ) {
   val newCommentText = remember { mutableStateOf("") }
-
+  val context = LocalContext.current
   Column(modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
@@ -433,9 +521,11 @@ fun CommentSection(
       CommentItem(
           profileId,
           comment,
+          creatorId,
           onReplyComment,
           onDeleteComment,
-          allowReplies = true) // Set allowReplies to true for top-level comments
+          allowReplies = true,
+      ) // Set allowReplies to true for top-level comments
     }
 
     Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -455,8 +545,13 @@ fun CommentSection(
 
       Button(
           onClick = {
-            onAddComment(newCommentText.value)
-            newCommentText.value = ""
+            performOfflineAwareAction(
+                context = context,
+                networkManager = NetworkManager(context),
+                onPerform = {
+                  onAddComment(newCommentText.value)
+                  newCommentText.value = ""
+                })
           },
           modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("PostCommentButton")) {
             Text("Post Comment")
@@ -469,27 +564,62 @@ fun CommentSection(
 fun CommentItem(
     profileId: String,
     comment: Comment,
+    creatorId: String, // Pass the creator ID as a parameter
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
     allowReplies: Boolean = true
 ) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
 
   Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically, // Align items vertically
+        modifier = Modifier.padding(bottom = SMALL_PADDING.dp)) {
+          // If the user is the creator, display a badge
+          if (comment.userId == creatorId) {
+            Box(
+                modifier =
+                    Modifier.padding(end = SMALL_PADDING.dp)
+                        .background(color = Color.Gray, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)) {
+                  Text(
+                      text = "Creator",
+                      style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
+                      modifier = Modifier.testTag("creatorBadge_${comment.uid}"))
+                }
+          }
+          // Display the user's name
+          Text(
+              text = "${comment.userName}:",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.testTag("commentUserName_${comment.uid}"))
+        }
+
+    // Display the comment content
     Text(
-        text = "${comment.userName}: ${comment.content}",
+        text = comment.content,
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.testTag("commentUserNameAndContent_${comment.uid}"))
+        modifier = Modifier.testTag("commentContent_${comment.uid}"))
+
+    // Display the timestamp
     Text(
         text = comment.timestamp.toDate().toString(),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
+
     if (profileId != "anonymous") {
-      Row {
+      Column {
         if (comment.userId == profileId) {
           Button(
-              onClick = { onDeleteComment(comment) },
+              onClick = {
+                performOfflineAwareAction(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerform = { onDeleteComment(comment) })
+              },
               modifier =
                   Modifier.padding(top = SMALL_PADDING.dp, end = STANDARD_PADDING.dp)
                       .testTag("DeleteButton_${comment.uid}")) {
@@ -519,9 +649,14 @@ fun CommentItem(
 
           Button(
               onClick = {
-                onReplyComment(replyText, comment)
-                replyText = ""
-                showReplyField = false
+                performOfflineAwareAction(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerform = {
+                      onReplyComment(replyText, comment)
+                      replyText = ""
+                      showReplyField = false
+                    })
               },
               modifier =
                   Modifier.padding(top = SMALL_PADDING.dp)
@@ -535,10 +670,65 @@ fun CommentItem(
       comment.replies.forEach { reply ->
         Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
           // Pass `allowReplies = false` for replies to prevent nesting
-          CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+          CommentItem(
+              profileId, reply, creatorId, onReplyComment, onDeleteComment, allowReplies = false)
         }
       }
     }
+  }
+}
+
+@Composable
+fun PaymentInfoScreen(price: Double) {
+  var showDialog by remember { mutableStateOf(false) }
+
+  // Payment Section
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Start,
+      modifier = Modifier.testTag("paymentSection")) {
+        // Payment Text
+        Text(
+            text = "Payment info",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo"))
+
+        // Info Icon with Click
+        IconButton(modifier = Modifier.testTag("infoIconButton"), onClick = { showDialog = true }) {
+          Icon(
+              painter = painterResource(id = android.R.drawable.ic_dialog_info),
+              contentDescription = "Info",
+              tint = Color.Gray)
+        }
+      }
+
+  // Info Dialog
+  if (showDialog) {
+    AlertDialog(
+        modifier = Modifier.testTag("paymentInfoDialog"),
+        onDismissRequest = { showDialog = false },
+        confirmButton = {
+          TextButton(modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
+            Text(text = stringResource(id = R.string.ok))
+          }
+        },
+        title = {
+          Text(
+              modifier = Modifier.testTag("paymentInfoTitle"),
+              text = stringResource(id = R.string.payment_info))
+        },
+        text = {
+          if (price != 0.0) {
+            Text(
+                modifier = Modifier.testTag("paymentInfoText"),
+                text = stringResource(id = R.string.payment_explanation))
+          } else {
+            Text(
+                modifier = Modifier.testTag("freeInfoText"),
+                text = stringResource(id = R.string.free_activity))
+          }
+        },
+    )
   }
 }
 
@@ -547,21 +737,28 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
   var isLiked by remember {
     mutableStateOf(activity?.let { profile?.likedActivities?.contains(it.uid) } ?: false)
   }
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
 
   if (profile != null) {
     IconButton(
         modifier = Modifier.testTag("likeButton$isLiked"),
         onClick = {
-          isLiked = !isLiked
-          if (isLiked) {
-            if (activity != null) {
-              profileViewModel.addLikedActivity(profile.id, activity.uid)
-            }
-          } else {
-            if (activity != null) {
-              profileViewModel.removeLikedActivity(profile.id, activity.uid)
-            }
-          }
+          performOfflineAwareAction(
+              context = context,
+              networkManager = networkManager,
+              onPerform = {
+                isLiked = !isLiked
+                if (isLiked) {
+                  if (activity != null) {
+                    profileViewModel.addLikedActivity(profile.id, activity.uid)
+                  }
+                } else {
+                  if (activity != null) {
+                    profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                  }
+                }
+              })
         },
     ) {
       Icon(

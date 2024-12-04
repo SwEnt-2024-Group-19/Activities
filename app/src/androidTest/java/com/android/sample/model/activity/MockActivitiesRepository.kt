@@ -2,6 +2,8 @@ package com.android.sample.model.activity
 
 import com.android.sample.model.map.Location
 import com.google.firebase.Timestamp
+import java.util.Calendar
+import java.util.GregorianCalendar
 
 class MockActivitiesRepository : ActivitiesRepository {
 
@@ -11,9 +13,10 @@ class MockActivitiesRepository : ActivitiesRepository {
               "uid0",
               "Activity 1",
               "Description 1",
-              Timestamp.now(),
+              date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
               "2021-01-01",
               "09:00",
+              category = Category.SPORT,
               10.0,
               Location(0.0, 0.0, "origin"),
               "10:00",
@@ -24,6 +27,7 @@ class MockActivitiesRepository : ActivitiesRepository {
               type = ActivityType.PRO,
               participants = listOf(),
               comments = listOf()))
+
   private var currentId = 0
 
   override fun getNewUid(): String {

@@ -16,11 +16,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
         if (document != null) {
           val user = documentToUser(document) // Convert document to User
           onSuccess(user)
-          Log.d("ProfilesRepository: Get User", "User profile fetched successfully")
-          Log.d("ProfilesRepository: Get User", "User profile name: ${user?.name}")
-          Log.d("ProfilesRepository: Get User", "User profile surname: ${user?.surname}")
         } else {
-          Log.d("ProfilesRepository: Get User", "No user profile found")
           onSuccess(null) // No document found, return null
         }
       } else {
@@ -32,32 +28,31 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     }
   }
 
-  private fun documentToUser(document: DocumentSnapshot): User? {
+  fun documentToUser(document: DocumentSnapshot): User? {
     return try {
-      val id = document.id
-      Log.d("ProfilesRepositoryFirestore", "User profile id: $id")
-      val name = document.getString("name") ?: return null
-      Log.d("ProfilesRepositoryFirestore", "User profile name: $name")
-      val surname = document.getString("surname") ?: return null
-      Log.d("ProfilesRepositoryFirestore", "User profile surname: $surname")
-      val photo = document.getString("photo") ?: return null
-      Log.d("ProfilesRepositoryFirestore", "User profile photo: $photo")
-      val interests =
-          (document.get("interests") as? List<*>)?.filterIsInstance<String>() ?: return null
-      val activities =
-          (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null
-
-      val likedActivities =
-          (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>() ?: return null
-
       User(
-          id = id,
-          name = name,
-          surname = surname,
-          interests = interests,
-          activities = activities,
-          photo = photo,
-          likedActivities = likedActivities)
+          id = document.id,
+          name = document.getString("name") ?: return null,
+          surname = document.getString("surname") ?: return null,
+          interests =
+              (document.get("interests") as? List<*>)?.mapNotNull { interestData ->
+                // Ensure interestData is a map and extract category and interest
+                (interestData as? Map<*, *>)?.let {
+                  val category = it["category"] as? String
+                  val interest = it["interest"] as? String
+                  if (category != null && interest != null) {
+                    Interest(category, interest)
+                  } else {
+                    null
+                  }
+                }
+              },
+          activities =
+              (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null,
+          photo = document.getString("photo") ?: return null,
+          likedActivities =
+              (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>()
+                  ?: return null)
     } catch (e: Exception) {
       Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null
@@ -127,6 +122,27 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
         }
   }
 
+  override fun removeJoinedActivity(
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    db.collection("profiles")
+        .document(userId)
+        .update("activities", FieldValue.arrayRemove(activityId))
+        .addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            task.exception?.let { e ->
+              Log.e("ProfilesRepository", "Error adding activity to profile", e)
+              onFailure(e)
+            }
+          }
+        }
+  }
+
   override fun addProfileToDatabase(
       userProfile: User,
       onSuccess: () -> Unit,
@@ -135,10 +151,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
     db.collection("profiles")
         .document(userProfile.id)
         .set(userProfile)
-        .addOnSuccessListener {
-          onSuccess()
-          Log.d("ProfilesRepository", "User profile added successfully")
-        }
+        .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { exception ->
           Log.e("ProfilesRepository", "Error adding user profile")
           onFailure(exception)

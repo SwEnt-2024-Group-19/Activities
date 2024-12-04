@@ -9,7 +9,7 @@ class MockProfilesRepository : ProfilesRepository {
                   id = "u1",
                   name = "Alice",
                   surname = "Smith",
-                  interests = listOf("Hiking", "Cycling"),
+                  interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
                   activities = listOf("a1", "a2"),
                   photo = null,
                   likedActivities = listOf("a1")))
@@ -61,6 +61,20 @@ class MockProfilesRepository : ProfilesRepository {
       onFailure: (Exception) -> Unit
   ) {
     TODO("Not yet implemented")
+  }
+
+  override fun removeJoinedActivity(
+      userId: String,
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    if (userProfiles.containsKey(userId)) {
+      activitiesList[userId]?.remove(activityId)
+      onSuccess()
+    } else {
+      onFailure(Exception("User not found"))
+    }
   }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {

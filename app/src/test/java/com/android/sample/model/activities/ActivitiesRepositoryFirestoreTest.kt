@@ -3,9 +3,14 @@ package com.android.sample.model.activities
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
+import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.resources.dummydata.activityBiking
+import com.android.sample.resources.dummydata.documentId
+import com.android.sample.resources.dummydata.validData
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -13,6 +18,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
 import junit.framework.TestCase.fail
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -151,5 +159,84 @@ class ActivitiesRepositoryFirestoreTest {
     shadowOf(Looper.getMainLooper()).idle()
 
     assert(failureCalled)
+  }
+
+  @Test
+  fun performFirestoreOperation_callsOnSuccess() {
+    val mockTask = Tasks.forResult<Void>(null)
+
+    var successCalled = false
+    activitiesRepositoryFirestore.performFirestoreOperation(
+        mockTask,
+        onSuccess = { successCalled = true },
+        onFailure = { fail("Failure callback should not be called") })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(successCalled)
+  }
+
+  @Test
+  fun performFirestoreOperation_callsOnFailure() {
+    val exception = FirebaseFirestoreException("Error", FirebaseFirestoreException.Code.ABORTED)
+    val mockTask = Tasks.forException<Void>(exception)
+
+    var failureCalled = false
+    activitiesRepositoryFirestore.performFirestoreOperation(
+        mockTask,
+        onSuccess = { fail("Success callback should not be called") },
+        onFailure = { failureCalled = true })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assert(failureCalled)
+  }
+
+  @Test
+  fun `documentToActivity should return a valid Activity when data is valid`() {
+    val result = activitiesRepositoryFirestore.documentToActivity(validData, documentId)
+
+    assertNotNull(result)
+    assertEquals(documentId, result!!.uid)
+    assertEquals("Sample Title", result.title)
+    assertEquals("Sample Description", result.description)
+    assertEquals("10:00", result.startTime)
+    assertEquals("2 hours", result.duration)
+    assertEquals(15.0, result.price, 0.0001)
+    assertEquals(12.34, result.location!!.latitude, 0.0001)
+    assertEquals(56.78, result.location!!.longitude, 0.0001)
+    assertEquals("Sample Location", result.location!!.name)
+    assertEquals("creatorUserId", result.creator)
+    assertEquals(listOf("image1.jpg", "image2.jpg"), result.images)
+    assertEquals(5L, result.placesLeft)
+    assertEquals(20L, result.maxPlaces)
+    assertEquals(ActivityStatus.ACTIVE, result.status)
+    assertEquals(ActivityType.INDIVIDUAL, result.type)
+    assertEquals(1, result.participants.size)
+    assertEquals("John", result.participants.first().name)
+    assertEquals(1, result.comments.size)
+    assertEquals("Nice activity!", result.comments.first().content)
+    assertEquals(1, result.comments.first().replies.size)
+  }
+
+  @Test
+  fun `documentToActivity should handle missing optional fields gracefully`() {
+    val minimalData =
+        mapOf(
+            "title" to "Minimal Title",
+            "description" to "Minimal Description",
+            "date" to Timestamp.now())
+
+    val result = activitiesRepositoryFirestore.documentToActivity(minimalData, documentId)
+
+    assertNotNull(result)
+    assertEquals("Minimal Title", result!!.title)
+    assertEquals("Minimal Description", result.description)
+    assertTrue(result.images.isEmpty())
+    assertTrue(result.participants.isEmpty())
+    assertTrue(result.comments.isEmpty())
+    assertEquals("No Location", result.location!!.name)
+    assertEquals(ActivityStatus.ACTIVE, result.status)
+    assertEquals(ActivityType.INDIVIDUAL, result.type)
   }
 }

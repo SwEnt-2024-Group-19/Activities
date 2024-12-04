@@ -15,6 +15,7 @@ composeActivity = "1.8.2"
 composeViewModel = "2.7.0"
 
 
+mockitoCoreVersion = "5.7.0"
 sonar = "4.4.1.3373"
 gms = "4.4.2"
 hilt = "2.48"
@@ -88,6 +89,11 @@ playServicesLocation = "21.0.1"
 firebaseStorageKtx = "21.0.1"
 playServicesCastFramework = "22.0.0"
 
+roomRuntime = "2.6.1"
+gson = "2.10.1.1"
+gsonVersion = "2.10"
+converterGson = "2.9.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -146,6 +152,7 @@ maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", ve
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockito-core-v570 = { module = "org.mockito:mockito-core", version.ref = "mockitoCoreVersion" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin" , version.ref="mockitoKotlin"}
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
@@ -164,7 +171,12 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hilt" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
-
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+gson-v210 = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
 
 
 

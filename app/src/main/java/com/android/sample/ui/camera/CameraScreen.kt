@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import com.android.sample.model.camera.flipCamera
-import com.android.sample.model.camera.takePhoto
+import com.android.sample.model.image.flipCamera
+import com.android.sample.model.image.takePhoto
 
 @Composable
 fun CameraScreen(
@@ -30,9 +30,10 @@ fun CameraScreen(
 ) {
   Box(modifier = Modifier.fillMaxSize().padding(paddingValues).testTag("cameraScreen")) {
     CameraPreview(controller, Modifier.fillMaxSize())
-    IconButton(onClick = isCamOpen, modifier = Modifier.align(Alignment.TopEnd)) {
-      Icon(Icons.Default.ArrowBack, contentDescription = "Close camera")
-    }
+    IconButton(
+        onClick = isCamOpen, modifier = Modifier.align(Alignment.TopEnd).testTag("closeCamera")) {
+          Icon(Icons.Default.ArrowBack, contentDescription = "Close camera")
+        }
     IconButton(
         onClick = {
           takePhoto(

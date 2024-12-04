@@ -41,6 +41,7 @@ android {
 
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
     }
 
 
@@ -166,6 +167,9 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 
 dependencies {
 
+    implementation ("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:1.1.6")
+
     implementation(libs.firebase.storage.ktx)
     implementation(libs.play.services.cast.framework)
     testImplementation("androidx.arch.core:core-testing:2.2.0")
@@ -200,9 +204,7 @@ dependencies {
     // JUnit for unit testing
     testImplementation("junit:junit:4.13.2")
 
-    // MockK for mocking
-    testImplementation("io.mockk:mockk:1.13.2")
-    androidTestImplementation("io.mockk:mockk-android:1.13.2")
+
     // Or replace with Mockito if preferred:
     // testImplementation("org.mockito:mockito-core:5.5.0")
 
@@ -248,9 +250,7 @@ dependencies {
 
     // Testing Unit
     testImplementation(libs.junit)
-    androidTestImplementation(libs.mockk)
-    androidTestImplementation(libs.mockk.android)
-    androidTestImplementation(libs.mockk.agent)
+
     //testImplementation("io.mockk:mockk:1.12.0")
     testImplementation(libs.json)
 
@@ -260,13 +260,13 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    testImplementation(libs.mockito.core)
 
-
-    testImplementation(libs.mockito.inline)
+    // Added for consistent Mockito usage across tests
+    testImplementation(libs.mockito.core.v570)
     testImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation("org.mockito:mockito-android:5.7.0")
+
     testImplementation(libs.robolectric)
     androidTestImplementation(libs.kaspresso)
     androidTestImplementation(libs.kaspresso.allure.support)
@@ -319,7 +319,13 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     implementation(libs.hilt.navigation.compose)
 
-
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
+    implementation(libs.gson.v210)
+    implementation(libs.converter.gson)
 
 }
 

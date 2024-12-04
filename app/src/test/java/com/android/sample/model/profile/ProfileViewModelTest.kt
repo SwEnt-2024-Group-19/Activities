@@ -1,11 +1,15 @@
 package com.android.sample.model.profile
 
 import androidx.test.core.app.ApplicationProvider
+import com.android.sample.model.activity.database.AppDatabase
+import com.android.sample.model.profile.database.UserDao
 import com.android.sample.resources.dummydata.activity
 import com.android.sample.resources.dummydata.testUser
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,7 +37,7 @@ class ProfileViewModelTest {
     firebaseAuth = mock(FirebaseAuth::class.java)
     firebaseFirestore = mock(FirebaseFirestore::class.java)
     profilesRepository = mock(ProfilesRepositoryFirestore::class.java)
-    profileViewModel = ProfileViewModel(repository = profilesRepository)
+    profileViewModel = ProfileViewModel(repository = profilesRepository, mock())
   }
 
   @Test
@@ -128,5 +132,95 @@ class ProfileViewModelTest {
     // Set up user with the activity in likedActivities
     profileViewModel.removeLikedActivity(testUser.id, activity.uid)
     verify(profilesRepository).removeLikedActivity(eq(testUser.id), eq(activity.uid), any(), any())
+  }
+
+  @Test
+  fun removeJoinedActivity() {
+    // Set up user with the activity in activities
+    profileViewModel.removeJoinedActivity(testUser.id, activity.uid)
+    verify(profilesRepository).removeJoinedActivity(eq(testUser.id), eq(activity.uid), any(), any())
+  }
+
+  @Test
+  fun fetchUserDataFailureLogsError() {
+    val exception = Exception("Error fetching user data")
+    `when`(profilesRepository.getUser(eq(testUser.id), any(), any())).thenAnswer {
+      val onFailure = it.getArgument<(Exception) -> Unit>(2)
+      onFailure(exception)
+    }
+
+    profileViewModel.fetchUserData(testUser.id)
+
+    verify(profilesRepository).getUser(eq(testUser.id), any(), any())
+    // Here you would check if the Log.e has been called (use Log wrapper or Mockito verification
+    // for logging)
+  }
+
+  @Test
+  fun addActivitySuccessCallsFetchUserData() {
+    val userId = testUser.id
+    val activityId = activity.uid
+
+    `when`(profilesRepository.addActivity(eq(userId), eq(activityId), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<() -> Unit>(2)
+      onSuccess()
+    }
+
+    profileViewModel.addActivity(userId, activityId)
+
+    verify(profilesRepository).addActivity(eq(userId), eq(activityId), any(), any())
+    verify(profilesRepository).getUser(eq(userId), any(), any())
+  }
+
+  @Test
+  fun addLikedActivityFailure() {
+    val userId = testUser.id
+    val activityId = activity.uid
+    val exception = Exception("Error adding liked activity")
+
+    `when`(profilesRepository.addLikedActivity(eq(userId), eq(activityId), any(), any()))
+        .thenAnswer {
+          val onFailure = it.getArgument<(Exception) -> Unit>(3)
+          onFailure(exception)
+        }
+
+    profileViewModel.addLikedActivity(userId, activityId)
+
+    verify(profilesRepository).addLikedActivity(eq(userId), eq(activityId), any(), any())
+    // Verify if any specific log or error handling function is called
+  }
+
+  @Test
+  fun clearUserDataSetsUserStateToNull() {
+    profileViewModel.clearUserData()
+    assertEquals(null, profileViewModel.userState.value)
+  }
+
+  @Test
+  fun fetchUserDataCachesLocallyOnSuccess() = runTest {
+
+    // Mock repository success behavior
+    `when`(profilesRepository.getUser(eq(testUser.id), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(User?) -> Unit>(1)
+      onSuccess(testUser)
+    }
+
+    // Mock UserDao and AppDatabase
+    val mockUserDao = mock(UserDao::class.java)
+    val mockDatabase = mock(AppDatabase::class.java)
+    `when`(mockDatabase.userDao()).thenReturn(mockUserDao)
+
+    // Create the ViewModel
+    val profileViewModel =
+        ProfileViewModel(repository = profilesRepository, localDatabase = mockDatabase)
+
+    // Call the method under test
+    profileViewModel.fetchUserData(testUser.id)
+
+    // Ensure the user state is updated
+    assertEquals(testUser, profileViewModel.userState.value)
+
+    // Verify that the DAO's insert method was called
+    verify(mockUserDao).insert(testUser)
   }
 }
