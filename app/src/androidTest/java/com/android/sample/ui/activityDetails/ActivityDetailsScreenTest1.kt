@@ -570,60 +570,57 @@ class ActivityDetailsScreenAndroidTest {
     activityWithParticipants.participants.forEach { participant ->
       composeTestRule.onNodeWithText(participant.name).assertIsDisplayed()
     }
-
-
-
   }
-    @Test
-    fun changeIconWhenActivityIsLiked() {
-        mockProfileViewModel = ProfileViewModel(mockRepository, mock())
 
-        composeTestRule.setContent {
-            LikeButton(testUser, activityWithParticipants, mockProfileViewModel)
-        }
+  @Test
+  fun changeIconWhenActivityIsLiked() {
+    mockProfileViewModel = ProfileViewModel(mockRepository, mock())
 
-        composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
-
-        // Click on the like button
-        composeTestRule.onNodeWithTag("likeButtonfalse").performClick()
-
-        // Verify that the like button is toggled
-        composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("likeButtontrue").performClick()
-
-        // Verify that the like button is toggled
-        composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
-    }
-    @Test
-    fun paymentInfoPin(){
-
-        composeTestRule.setContent { PaymentInfoScreen(10.0) }
-        composeTestRule.onNodeWithTag("paymentSection").assertExists()
-        composeTestRule.onNodeWithTag("paymentInfo").assertExists()
-        composeTestRule.onNodeWithTag("infoIconButton").assertExists()
-
-
+    composeTestRule.setContent {
+      LikeButton(testUser, activityWithParticipants, mockProfileViewModel)
     }
 
-    @Test
-    fun paymentInfoDialog(){
-        composeTestRule.setContent { PaymentInfoScreen(10.0) }
-        composeTestRule.onNodeWithTag("infoIconButton").performClick()
-        composeTestRule.onNodeWithTag("paymentInfoDialog").assertExists()
-        composeTestRule.onNodeWithTag("paymentInfoTitle").assertExists()
-        composeTestRule.onNodeWithTag("paymentInfoText").assertExists()
-        composeTestRule.onNodeWithTag("okButton").performClick()
-        composeTestRule.onNodeWithTag("infoDialog").assertDoesNotExist()
-    }
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
 
-    @Test
-    fun paymentInfoDialogFree(){
-        composeTestRule.setContent { PaymentInfoScreen(0.0) }
-        composeTestRule.onNodeWithTag("infoIconButton").performClick()
-        composeTestRule.onNodeWithTag("paymentInfoDialog").assertExists()
-        composeTestRule.onNodeWithTag("paymentInfoTitle").assertExists()
-        composeTestRule.onNodeWithTag("freeInfoText").assertExists()
-        composeTestRule.onNodeWithTag("okButton").performClick()
-        composeTestRule.onNodeWithTag("infoDialog").assertDoesNotExist()
-    }
+    // Click on the like button
+    composeTestRule.onNodeWithTag("likeButtonfalse").performClick()
+
+    // Verify that the like button is toggled
+    composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("likeButtontrue").performClick()
+
+    // Verify that the like button is toggled
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+  }
+
+  @Test
+  fun paymentInfoPin() {
+
+    composeTestRule.setContent { PaymentInfoScreen(10.0) }
+    composeTestRule.onNodeWithTag("paymentSection").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfo").assertExists()
+    composeTestRule.onNodeWithTag("infoIconButton").assertExists()
+  }
+
+  @Test
+  fun paymentInfoDialog() {
+    composeTestRule.setContent { PaymentInfoScreen(10.0) }
+    composeTestRule.onNodeWithTag("infoIconButton").performClick()
+    composeTestRule.onNodeWithTag("paymentInfoDialog").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfoTitle").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfoText").assertExists()
+    composeTestRule.onNodeWithTag("okButton").performClick()
+    composeTestRule.onNodeWithTag("infoDialog").assertDoesNotExist()
+  }
+
+  @Test
+  fun paymentInfoDialogFree() {
+    composeTestRule.setContent { PaymentInfoScreen(0.0) }
+    composeTestRule.onNodeWithTag("infoIconButton").performClick()
+    composeTestRule.onNodeWithTag("paymentInfoDialog").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfoTitle").assertExists()
+    composeTestRule.onNodeWithTag("freeInfoText").assertExists()
+    composeTestRule.onNodeWithTag("okButton").performClick()
+    composeTestRule.onNodeWithTag("infoDialog").assertDoesNotExist()
+  }
 }
