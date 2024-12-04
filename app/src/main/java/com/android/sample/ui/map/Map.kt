@@ -2,6 +2,8 @@ package com.android.sample.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,6 +50,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
+import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
@@ -132,6 +135,13 @@ fun MapScreen(
     }
   }
 
+  val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.current_location)
+  val scaledBitmap =
+      Bitmap.createScaledBitmap(
+          originalBitmap,
+          (originalBitmap.width * 0.05).toInt(), // Adjust the scale factor as needed
+          (originalBitmap.height * 0.05).toInt(),
+          false)
   Scaffold(
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
@@ -180,8 +190,7 @@ fun MapScreen(
                         state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
                         title = it.name,
                         snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                        icon =
-                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                        icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap))
                   }
                 }
 
