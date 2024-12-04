@@ -185,7 +185,7 @@ class ProfileScreenTest {
     composeTestRule.waitForIdle()
 
     // Verify navigation based on whether the user is the creator
-    val pastActivity = activityListWithPastActivity.first { it.uid == listOfActivitiesUid.first() }
+    activityListWithPastActivity.first { it.uid == listOfActivitiesUid.first() }
     verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
 
