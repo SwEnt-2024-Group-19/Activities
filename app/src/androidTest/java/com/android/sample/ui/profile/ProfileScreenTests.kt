@@ -185,7 +185,7 @@ class ProfileScreenTest {
     composeTestRule.waitForIdle()
 
     // Verify navigation based on whether the user is the creator
-    val pastActivity = activityListWithPastActivity.first { it.uid == listOfActivitiesUid.first() }
+    activityListWithPastActivity.first { it.uid == listOfActivitiesUid.first() }
     verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
 
@@ -217,8 +217,8 @@ class ProfileScreenTest {
 
     composeTestRule.onNodeWithTag("dislikeIconButton_false").performClick()
     composeTestRule.waitForIdle()
-    //following fails on the CI but not in the local environment. Is expected to pass.
-    //composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
-    //composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
+    // following fails on the CI but not in the local environment. Is expected to pass.
+    // composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
+    // composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
   }
 }
