@@ -526,7 +526,7 @@ fun EditActivityScreen(
             Button(
                 enabled = title.isNotEmpty() && description.isNotEmpty(),
                 onClick = {
-                  if (hourDateViewModel.isBeginGreaterThanEnd(
+                  if (!hourDateViewModel.isBeginGreaterThanEnd(
                       startTime ?: "00:00", duration ?: "00:01")) {
                     Toast.makeText(
                             context, "Start time must be before end time", Toast.LENGTH_SHORT)
