@@ -1,6 +1,5 @@
 package com.android.sample.ui.profile
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,7 +49,6 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -61,16 +59,22 @@ fun ProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel,
     imageViewModel: ImageViewModel
 ) {
-  val profileState = userProfileViewModel.userState.collectAsState()
-  when (val profile = profileState.value) {
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
+
+  // Determine if we should use cached data
+  val profileState by userProfileViewModel.userState.collectAsState()
+  val user =
+      if (networkManager.isNetworkAvailable()) {
+        profileState
+      } else {
+        remember { mutableStateOf(userProfileViewModel.loadCachedProfile()) }.value
+      }
+  when (user) {
     null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
     else -> {
       ProfileContent(
-          user = profile,
-          navigationActions,
-          listActivitiesViewModel,
-          userProfileViewModel,
-          imageViewModel)
+          user, navigationActions, listActivitiesViewModel, userProfileViewModel, imageViewModel)
     }
   }
 }
@@ -184,15 +188,26 @@ fun ProfileContent(
 
               // Display activities sections
               displayActivitySection(
-                  "Activities Created", "created", user, listActivitiesViewModel, navigationActions)
+                  "Activities Created",
+                  "created",
+                  user,
+                  listActivitiesViewModel,
+                  navigationActions,
+                  userProfileViewModel)
               displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
                   user,
                   listActivitiesViewModel,
-                  navigationActions)
+                  navigationActions,
+                  userProfileViewModel)
               displayActivitySection(
-                  "Past Activities", "past", user, listActivitiesViewModel, navigationActions)
+                  "Past Activities",
+                  "past",
+                  user,
+                  listActivitiesViewModel,
+                  navigationActions,
+                  userProfileViewModel)
             }
       }
 }
@@ -202,7 +217,8 @@ fun LazyListScope.displayActivitySection(
     category: String,
     user: User,
     listActivitiesViewModel: ListActivitiesViewModel,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    userProfileViewModel: ProfileViewModel
 ) {
   item {
     Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
@@ -216,7 +232,8 @@ fun LazyListScope.displayActivitySection(
           user = user,
           listActivitiesViewModel = listActivitiesViewModel,
           navigationActions = navigationActions,
-          category = category)
+          category = category,
+          userProfileViewModel = userProfileViewModel)
     }
   }
 }
@@ -253,14 +270,15 @@ fun ActivityBox(
     user: User,
     listActivitiesViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
-    category: String
+    category: String,
+    userProfileViewModel: ProfileViewModel
 ) {
   val uiState by listActivitiesViewModel.uiState.collectAsState()
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val thisActivity = activitiesList.find { it.uid == activityId }
   val context = LocalContext.current
   thisActivity?.let { activity ->
-    if (shouldShowActivity(activity, user, category)) {
+    if (userProfileViewModel.shouldShowActivity(activity, user, category)) {
       ActivityRow(
           activity = activity,
           listActivitiesViewModel = listActivitiesViewModel,
@@ -273,32 +291,6 @@ fun ActivityBox(
   }
 }
 
-/** Check if the activity should be displayed based on the category and the user's role in the */
-fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
-  return when (category) {
-    "created" -> activity.creator == user.id && activity.date > Timestamp.now()
-    "enrolled" -> activity.creator != user.id && activity.date > Timestamp.now()
-    "past" -> activity.date < Timestamp.now()
-    else -> false
-  }
-}
-/** Navigate to the appropriate screen based on the category */
-fun navigateToActivity(category: String, navigationActions: NavigationActions, context: Context) {
-  val networkManager = NetworkManager(context)
-  when (category) {
-    "created" ->
-        performOfflineAwareAction(
-            context,
-            networkManager,
-            onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
-    "past" ->
-        performOfflineAwareAction(
-            context,
-            networkManager,
-            onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
-    "enrolled" -> navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-  }
-}
 /** Display a single activity in a row */
 @Composable
 fun ActivityRow(
@@ -307,7 +299,6 @@ fun ActivityRow(
     navigationActions: NavigationActions,
     category: String,
     userId: String,
-    context: Context,
     testTag: String
 ) {
   Row(
@@ -318,8 +309,7 @@ fun ActivityRow(
               .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
               .clickable {
                 listActivitiesViewModel.selectActivity(activity)
-                navigateToActivity(category, navigationActions, context)
-              },
+                userProfileViewModel.navigateToActivity(navigationActions, context)              },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = painterResource(id = R.drawable.foot),

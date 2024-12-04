@@ -104,4 +104,20 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("seeMoreDetailsButton").performClick()
     verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
+
+  @Test
+  fun testFilterFabOpensFilterDialog() {
+    composeTestRule.setContent {
+      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
+    }
+
+    // Check if the filter FAB is displayed
+    composeTestRule.onNodeWithTag("filterDialogButton").assertIsDisplayed()
+
+    // Perform click on the filter FAB
+    composeTestRule.onNodeWithTag("filterDialogButton").performClick()
+
+    // Check if the filter dialog is displayed
+    composeTestRule.onNodeWithTag("FilterDialog").assertIsDisplayed()
+  }
 }

@@ -1,5 +1,8 @@
 package com.android.sample.model.activity
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.sample.model.map.Location
@@ -25,8 +28,18 @@ constructor(
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
   open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
+  private val selectedUser_ = MutableStateFlow<User?>(null)
+  open val selectedUser: StateFlow<User?> = selectedUser_.asStateFlow()
+
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
   open val uiState: StateFlow<ActivitiesUiState> = _uiState
+
+  // Filter state variables
+  var maxPrice by mutableStateOf(Double.MAX_VALUE)
+  var availablePlaces by mutableStateOf<Int?>(null)
+  var minDate by mutableStateOf<Timestamp?>(null)
+  var duration by mutableStateOf<String?>(null)
+  var onlyPRO by mutableStateOf(false)
 
   /** Set the UI state to a new value For testing purposes only */
   open fun setUiState(state: ActivitiesUiState) {
@@ -38,6 +51,21 @@ constructor(
 
   init {
     repository.init { viewModelScope.launch { getActivities() } }
+  }
+
+  // Function to update filter state
+  fun updateFilterState(
+      price: Double?,
+      placesAvailable: Int?,
+      mindateTimestamp: Timestamp?,
+      acDuration: String?,
+      seeOnlyPRO: Boolean?
+  ) {
+    maxPrice = price ?: Double.MAX_VALUE
+    availablePlaces = placesAvailable
+    minDate = mindateTimestamp
+    duration = acDuration
+    onlyPRO = seeOnlyPRO ?: false
   }
 
   fun getNewUid(): String {
@@ -58,6 +86,10 @@ constructor(
 
   fun selectActivity(activity: Activity) {
     selectedActivity_.value = activity
+  }
+
+  fun selectUser(user: User) {
+    selectedUser_.value = user
   }
 
   fun getActivities(onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit = {}) {

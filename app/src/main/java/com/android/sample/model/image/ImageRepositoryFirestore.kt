@@ -8,9 +8,11 @@ import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
-open class ImageRepositoryFirestore @Inject constructor(private val firestore: FirebaseFirestore) :
+open class ImageRepositoryFirestore
+@Inject
+constructor(private val firestore: FirebaseFirestore, private val storage: FirebaseStorage) :
     ImageRepository {
-  private val storageRef = FirebaseStorage.getInstance().reference
+  private val storageRef = storage.reference
   private val compressionQuality = 50
 
   override fun uploadProfilePicture(
@@ -99,13 +101,8 @@ open class ImageRepositoryFirestore @Inject constructor(private val firestore: F
       onSuccess: (List<String>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    val firestore = FirebaseFirestore.getInstance()
+    val firestore = firestore
     val collection = firestore.collection("activities")
-
-    if (collection.document(activityId) == null) {
-      onFailure(IllegalStateException("Firestore collection reference is null"))
-      return
-    }
 
     collection
         .document(activityId)

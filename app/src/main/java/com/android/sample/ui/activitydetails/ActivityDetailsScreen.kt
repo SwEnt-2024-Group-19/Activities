@@ -53,6 +53,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
@@ -260,6 +264,16 @@ fun ActivityDetailsScreen(
                                   "${round(distance * 10) / 10}km"
                                 }
                         Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
+                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                        // text field button to navigate to the activity's location on the map
+                        // screen
+                        Text(
+                            text = stringResource(id = R.string.button_to_map),
+                            modifier =
+                                Modifier.testTag("activityToMapText")
+                                    .clickable(
+                                        onClick = { navigationActions.navigateTo(Screen.MAP) }),
+                            style = TextStyle(textDecoration = TextDecoration.Underline))
                       }
                     }
                   }
@@ -307,26 +321,26 @@ fun ActivityDetailsScreen(
                           Modifier.padding(vertical = SMALL_PADDING.dp)
                               .testTag(participant.name)
                               .clickable {
-                                if (participant.name != profile?.name) {
+                                if (participant.id == profile?.id) {
                                   navigationActions.navigateTo(Screen.PROFILE)
+                                } else {
+                                  listActivityViewModel.selectUser(participant)
+                                  navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                                 }
                               }) {
                         // Placeholder for participant picture
-                        if (participant.name != profile?.name) {
+                        if (participant.photo == null) {
                           Box(
                               modifier =
                                   Modifier.size(BUTTON_HEIGHT.dp)
-                                      .background(
-                                          Color.Gray,
-                                          shape = RoundedCornerShape(STANDARD_PADDING.dp))
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
                                       .padding(STANDARD_PADDING.dp)) {
                                 Image(
                                     painter =
                                         painterResource(id = R.drawable.default_profile_image),
                                     contentDescription = "Participant Image",
                                     modifier =
-                                        Modifier.fillMaxSize()
-                                            .clip(RoundedCornerShape(STANDARD_PADDING.dp)))
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
                               }
                         } else {
                           // Profile Picture
@@ -341,6 +355,12 @@ fun ActivityDetailsScreen(
                         Text(
                             text = participant.name, // Display the participant's name
                             style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.width(LARGE_PADDING.dp))
+                        Text(
+                            text = "Rating : ",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "Blank/10", style = MaterialTheme.typography.bodyMedium)
                       }
                 }
               }
@@ -470,7 +490,8 @@ fun ActivityDetailsScreen(
                     comments = comments.map { if (it.uid == comment.uid) comment else it }
                     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
                   },
-                  onDeleteComment = deleteComment)
+                  onDeleteComment = deleteComment,
+                  creatorId = activity?.creator ?: "anonymous")
             }
       }
 }
@@ -481,7 +502,8 @@ fun CommentSection(
     comments: List<Comment>,
     onAddComment: (String) -> Unit,
     onReplyComment: (String, Comment) -> Unit,
-    onDeleteComment: (Comment) -> Unit
+    onDeleteComment: (Comment) -> Unit,
+    creatorId: String
 ) {
   val newCommentText = remember { mutableStateOf("") }
   val context = LocalContext.current
@@ -493,9 +515,11 @@ fun CommentSection(
       CommentItem(
           profileId,
           comment,
+          creatorId,
           onReplyComment,
           onDeleteComment,
-          allowReplies = true) // Set allowReplies to true for top-level comments
+          allowReplies = true,
+      ) // Set allowReplies to true for top-level comments
     }
 
     Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -534,6 +558,7 @@ fun CommentSection(
 fun CommentItem(
     profileId: String,
     comment: Comment,
+    creatorId: String, // Pass the creator ID as a parameter
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
     allowReplies: Boolean = true
@@ -544,14 +569,41 @@ fun CommentItem(
   val networkManager = NetworkManager(context)
 
   Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically, // Align items vertically
+        modifier = Modifier.padding(bottom = SMALL_PADDING.dp)) {
+          // If the user is the creator, display a badge
+          if (comment.userId == creatorId) {
+            Box(
+                modifier =
+                    Modifier.padding(end = SMALL_PADDING.dp)
+                        .background(color = Color.Gray, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)) {
+                  Text(
+                      text = "Creator",
+                      style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
+                      modifier = Modifier.testTag("creatorBadge_${comment.uid}"))
+                }
+          }
+          // Display the user's name
+          Text(
+              text = "${comment.userName}:",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.testTag("commentUserName_${comment.uid}"))
+        }
+
+    // Display the comment content
     Text(
-        text = "${comment.userName}: ${comment.content}",
+        text = comment.content,
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.testTag("commentUserNameAndContent_${comment.uid}"))
+        modifier = Modifier.testTag("commentContent_${comment.uid}"))
+
+    // Display the timestamp
     Text(
         text = comment.timestamp.toDate().toString(),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
+
     if (profileId != "anonymous") {
       Column {
         if (comment.userId == profileId) {
@@ -612,7 +664,8 @@ fun CommentItem(
       comment.replies.forEach { reply ->
         Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
           // Pass `allowReplies = false` for replies to prevent nesting
-          CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+          CommentItem(
+              profileId, reply, creatorId, onReplyComment, onDeleteComment, allowReplies = false)
         }
       }
     }

@@ -35,11 +35,10 @@ import org.mockito.kotlin.any
 class ProfileScreenTest {
 
   private lateinit var userProfileViewModel: ProfileViewModel
-  private lateinit var testUser: User
   private lateinit var navigationActions: NavigationActions
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var activitiesRepository: ActivitiesRepository
-
+  private lateinit var testUser: User
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
 
@@ -47,16 +46,6 @@ class ProfileScreenTest {
 
   @Before
   fun setUp() {
-    activitiesRepository = mock(ActivitiesRepository::class.java)
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    listActivitiesViewModel =
-        ListActivitiesViewModel(mock(ProfilesRepository::class.java), activitiesRepository)
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(activityListWithPastActivity)
-    }
-
-    listActivitiesViewModel.getActivities()
     testUser =
         User(
             id = "Rola",
@@ -67,6 +56,16 @@ class ProfileScreenTest {
                 listOf(Interest("Sport", "Cycling"), Interest("Indoor Activity", "Reading")),
             activities = listOfActivitiesUid,
         )
+    activitiesRepository = mock(ActivitiesRepository::class.java)
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    listActivitiesViewModel =
+        ListActivitiesViewModel(mock(ProfilesRepository::class.java), activitiesRepository)
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(activityListWithPastActivity)
+    }
+
+    listActivitiesViewModel.getActivities()
     val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
@@ -117,7 +116,7 @@ class ProfileScreenTest {
   }
 
   @Test
-  fun goesToEditOnClick() {
+  fun goesToDetailsOnClick() {
     composeTestRule.setContent {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
@@ -139,7 +138,7 @@ class ProfileScreenTest {
     composeTestRule.waitForIdle()
 
     // Verify that the navigation action was triggered
-    verify(navigationActions).navigateTo(Screen.EDIT_ACTIVITY)
+    verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
 
   @Test
@@ -161,7 +160,7 @@ class ProfileScreenTest {
   }
 
   @Test
-  fun navigateToPastActivityDetailsOrEdit() {
+  fun navigateToPastActivityDetails() {
     composeTestRule.setContent {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
@@ -187,7 +186,7 @@ class ProfileScreenTest {
 
     // Verify navigation based on whether the user is the creator
     val pastActivity = activityListWithPastActivity.first { it.uid == listOfActivitiesUid.first() }
-    verify(navigationActions).navigateTo(Screen.EDIT_ACTIVITY)
+    verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
 
   @Test

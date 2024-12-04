@@ -41,6 +41,7 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.android.sample.ui.profile.EditProfileScreen
+import com.android.sample.ui.profile.ParticipantProfileScreen
 import com.android.sample.ui.profile.ProfileCreationScreen
 import com.android.sample.ui.profile.ProfileScreen
 import com.google.firebase.auth.FirebaseAuth
@@ -130,6 +131,10 @@ fun NavGraph(
             profileViewModel,
             locationViewModel,
             imageViewModel)
+      }
+      composable(Screen.PARTICIPANT_PROFILE) {
+        ParticipantProfileScreen(
+            listActivitiesViewModel, navigationActions, imageViewModel, profileViewModel)
       }
     }
 
