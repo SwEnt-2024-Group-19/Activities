@@ -188,7 +188,6 @@ fun ListActivitiesScreen(
                 }
                 activitiesList =
                     activitiesList.filter {
-                      Log.d("OverviewScreen", "Activity: $it")
                       val activityTimestamp =
                           hourDateViewModel.combineDateAndTime(
                               it.date, it.startTime) // Combine date and startTime
