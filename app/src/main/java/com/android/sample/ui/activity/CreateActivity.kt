@@ -351,20 +351,6 @@ fun CreateActivityScreen(
                   expanded = showDropdown && locationSuggestions.isNotEmpty(),
                   onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
               ) {
-                OutlinedTextField(
-                    value = locationQuery,
-                    onValueChange = {
-                      locationViewModel.setQuery(it)
-                      showDropdown = true // Show dropdown when user starts typing
-                    },
-                    label = { Text("Location") },
-                    placeholder = { Text("Enter an Address or Location") },
-                    modifier =
-                        Modifier.menuAnchor() // Anchor the dropdown to this text field
-                            .padding(STANDARD_PADDING.dp)
-                            .fillMaxWidth()
-                            .testTag("inputLocationCreate"),
-                    singleLine = true)
                 Box {
                   OutlinedTextField(
                       value = locationQuery,
