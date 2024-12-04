@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -282,6 +283,7 @@ fun ActivityBox(
       ActivityRow(
           activity = activity,
           listActivitiesViewModel = listActivitiesViewModel,
+          userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           category = category,
           userId = user.id,
@@ -296,9 +298,11 @@ fun ActivityBox(
 fun ActivityRow(
     activity: Activity,
     listActivitiesViewModel: ListActivitiesViewModel,
+    userProfileViewModel: ProfileViewModel,
     navigationActions: NavigationActions,
     category: String,
     userId: String,
+    context: Context,
     testTag: String
 ) {
   Row(
@@ -309,7 +313,8 @@ fun ActivityRow(
               .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
               .clickable {
                 listActivitiesViewModel.selectActivity(activity)
-                userProfileViewModel.navigateToActivity(navigationActions, context)              },
+                userProfileViewModel.navigateToActivity(navigationActions, context)
+             },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = painterResource(id = R.drawable.foot),
