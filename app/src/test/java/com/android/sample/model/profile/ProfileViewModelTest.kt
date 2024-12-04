@@ -198,12 +198,11 @@ class ProfileViewModelTest {
 
   @Test
   fun fetchUserDataCachesLocallyOnSuccess() = runTest {
-    val mockUser = testUser // Replace with your test user object
 
     // Mock repository success behavior
-    `when`(profilesRepository.getUser(eq(mockUser.id), any(), any())).thenAnswer {
+    `when`(profilesRepository.getUser(eq(testUser.id), any(), any())).thenAnswer {
       val onSuccess = it.getArgument<(User?) -> Unit>(1)
-      onSuccess(mockUser)
+      onSuccess(testUser)
     }
 
     // Mock UserDao and AppDatabase
@@ -216,12 +215,12 @@ class ProfileViewModelTest {
         ProfileViewModel(repository = profilesRepository, localDatabase = mockDatabase)
 
     // Call the method under test
-    profileViewModel.fetchUserData(mockUser.id)
+    profileViewModel.fetchUserData(testUser.id)
 
     // Ensure the user state is updated
-    assertEquals(mockUser, profileViewModel.userState.value)
+    assertEquals(testUser, profileViewModel.userState.value)
 
     // Verify that the DAO's insert method was called
-    verify(mockUserDao).insert(mockUser)
+    verify(mockUserDao).insert(testUser)
   }
 }
