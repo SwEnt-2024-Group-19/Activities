@@ -189,12 +189,12 @@ fun PROinfo() {
       androidx.compose.material3.Text(
           text = "PRO info",
           style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-          modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo"))
+          modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("PROInfo"))
       }
 
   if (showDialog) {
     androidx.compose.material3.AlertDialog(
-        modifier = Modifier.testTag("paymentInfoDialog"),
+        modifier = Modifier.testTag("PROInfoDialog"),
         onDismissRequest = { showDialog = false },
         confirmButton = {
           androidx.compose.material3.TextButton(
