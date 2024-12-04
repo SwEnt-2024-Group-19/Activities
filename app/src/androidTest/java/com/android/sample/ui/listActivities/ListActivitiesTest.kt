@@ -609,4 +609,125 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithText("PRO activity").assertIsDisplayed()
     composeTestRule.onNodeWithText("INDIVIDUAL activity").assertDoesNotExist()
   }
+    @Test
+    fun displaysYourActivityBox() {
+
+        val creatorProfile = testUser.copy(id = activity.creator)
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(creatorProfile))
+        composeTestRule.setContent {
+            ListActivitiesScreen(
+                listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+        }
+
+        `when`(activitiesRepository.getActivities(any(), any())).then {
+            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity))
+        }
+
+        listActivitiesViewModel.getActivities()
+
+        composeTestRule.onNodeWithTag("yourActivityStatus", useUnmergedTree = true)
+            .assertExists()
+        composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("activityStatusPresent", useUnmergedTree = true).assertExists()
+
+        composeTestRule.onNodeWithText("YOUR ACTIVITY").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("activityStatusEnrolledBox", useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("enrolledText", useUnmergedTree = true).assertDoesNotExist()
+
+        composeTestRule.onNodeWithText("ENROLLED").assertIsNotDisplayed()
+    }
+
+    @Test
+    fun displaysEnrolledBox() {
+
+        val activity1 = activity.copy(participants = listOf(testUser))
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+        composeTestRule.setContent {
+            ListActivitiesScreen(
+                listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+        }
+
+        `when`(activitiesRepository.getActivities(any(), any())).then {
+            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1))
+        }
+
+        listActivitiesViewModel.getActivities()
+
+        composeTestRule.onNodeWithTag("activityStatusEnrolledBox", useUnmergedTree = true)
+            .assertExists()
+        composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("enrolledText", useUnmergedTree = true).assertExists()
+
+        composeTestRule.onNodeWithText("ENROLLED").assertIsDisplayed()
+    }
+    @Test
+    fun enrolledAndYourActivityBoxNotDisplayed() {
+
+        val user= testUser.copy(activities = listOf())
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(user))
+        composeTestRule.setContent {
+            ListActivitiesScreen(
+                listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel
+            )
+        }
+
+        `when`(activitiesRepository.getActivities(any(), any())).then {
+            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity))
+        }
+
+        listActivitiesViewModel.getActivities()
+
+        composeTestRule.onNodeWithTag("yourActivityStatus", useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("activityStatusPresent", useUnmergedTree = true)
+            .assertDoesNotExist()
+
+        composeTestRule.onNodeWithText("YOUR ACTIVITY").assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag("activityStatusEnrolledBox", useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag("enrolledText", useUnmergedTree = true).assertDoesNotExist()
+
+        composeTestRule.onNodeWithText("ENROLLED").assertIsNotDisplayed()
+    }
+
+    @Test
+    fun displaysYourActivityBoxAndEnrolledBox() {
+        val creatorProfile = testUser.copy(id = activity.creator)
+        val activity1 = activity.copy(participants = listOf(creatorProfile))
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(creatorProfile))
+        composeTestRule.setContent {
+            ListActivitiesScreen(
+                listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel
+            )
+        }
+
+        `when`(activitiesRepository.getActivities(any(), any())).then {
+            it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1))
+        }
+
+        listActivitiesViewModel.getActivities()
+
+        composeTestRule.onNodeWithTag("yourActivityStatus", useUnmergedTree = true)
+            .assertExists()
+        composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("activityStatusPresent", useUnmergedTree = true)
+            .assertExists()
+
+        composeTestRule.onNodeWithText("YOUR ACTIVITY").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("activityStatusEnrolledBox", useUnmergedTree = true)
+            .assertExists()
+        composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("enrolledText", useUnmergedTree = true).assertExists()
+
+        composeTestRule.onNodeWithText("ENROLLED").assertIsDisplayed()
+
+    }
 }
