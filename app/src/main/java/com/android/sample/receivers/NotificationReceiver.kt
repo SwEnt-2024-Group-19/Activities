@@ -1,3 +1,5 @@
+package com.android.sample.receivers
+
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
