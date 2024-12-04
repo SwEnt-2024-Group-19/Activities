@@ -394,7 +394,6 @@ fun RemainingTime(activity: Activity) {
         activity.date.toDate().time
     val remainingTimeMillis = activityTimeMillis - currentTimeMillis
 
-
     val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
     val minutes = remainingTimeMillis / (1000 * 60) % 60
     val days = remainingTimeMillis / (1000 * 60 * 60 * 24)
@@ -412,13 +411,14 @@ fun RemainingTime(activity: Activity) {
     Text(
         text = when {
             months > 1 -> "In $months months"
-            days in 6..30 -> "In  $days days"
+            days in 6..30 -> "In $days days"
             days in 1..5 -> "In $days days and $hours hours"
-            days < 1 -> "In $hours h  $minutes min"
+            days < 1 -> "In $hours h $minutes min"
             else -> ""
         },
         fontSize = SUBTITLE_FONTSIZE.sp,
-        color = textColor
+        color = textColor,
+        modifier = Modifier.testTag("remainingTime")
     )
 
 }
