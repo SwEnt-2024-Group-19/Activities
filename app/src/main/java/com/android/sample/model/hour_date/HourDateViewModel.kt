@@ -8,8 +8,6 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.time.temporal.ChronoField
 
 open class HourDateViewModel : ViewModel() {
 
@@ -52,18 +50,16 @@ open class HourDateViewModel : ViewModel() {
   fun combineDateAndTime(date: Timestamp, time: String): Timestamp {
     // Convert Firebase Timestamp to LocalDate
     val localDate = date.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-    lateinit var formatter : DateTimeFormatter
 
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
 
-      formatter = DateTimeFormatter.ofPattern("HH:mm")
-
-    val localTime = LocalTime.parse(time,formatter) // Assuming "hh:mm" format
+    val localTime = LocalTime.parse(time, formatter) // Assuming "hh:mm" format
 
     // Combine LocalDate and LocalTime to LocalDateTime
     val combinedDateTime = LocalDateTime.of(localDate, localTime)
 
     // Convert back to Firebase Timestamp
-    return Timestamp(combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000, 0)
+    return Timestamp(
+        combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000, 0)
   }
-
 }
