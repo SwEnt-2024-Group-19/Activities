@@ -346,88 +346,77 @@ fun CreateActivityScreen(
               )
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-              // Location Input with dropdown using ExposedDropdownMenuBox
-              ExposedDropdownMenuBox(
-                  expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                  onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
-              ) {
-                Box {
-                  OutlinedTextField(
-                      value = locationQuery,
-                      onValueChange = {
-                        locationViewModel.setQuery(it)
-                        showDropdown = it != "" // Show dropdown when user starts typing
+              Box {
+                OutlinedTextField(
+                    value = locationQuery,
+                    onValueChange = {
+                      locationViewModel.setQuery(it)
+                      showDropdown = it != "" // Show dropdown when user starts typing
+                    },
+                    label = { Text("Location") },
+                    placeholder = { Text("Enter an Address or Location") },
+                    modifier =
+                        Modifier.padding(STANDARD_PADDING.dp)
+                            .fillMaxWidth()
+                            .testTag("inputLocationCreate"),
+                    singleLine = true)
+
+                locationSuggestions.filterNotNull().take(3).forEach { location ->
+                  DropdownMenuItem(
+                      text = {
+                        Text(
+                            text =
+                                location.name.take(TOP_TITLE_SIZE) +
+                                    if (location.name.length > TOP_TITLE_SIZE) "..."
+                                    else "", // Limit name length
+                            maxLines = 1 // Ensure name doesn't overflow
+                            )
                       },
-                      label = { Text("Location") },
-                      placeholder = { Text("Enter an Address or Location") },
-                      modifier =
-                          Modifier.padding(STANDARD_PADDING.dp)
-                              .fillMaxWidth()
-                              .testTag("inputLocationCreate"),
-                      singleLine = true)
-
-                  // Dropdown menu for location suggestions
-                  ExposedDropdownMenu(
-                      expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                      onDismissRequest = { showDropdown = false }) {
-                        locationSuggestions.filterNotNull().take(3).forEach { location ->
-                          DropdownMenuItem(
-                              text = {
-                                Text(
-                                    text =
-                                        location.name.take(TOP_TITLE_SIZE) +
-                                            if (location.name.length > TOP_TITLE_SIZE) "..."
-                                            else "", // Limit name length
-                                    maxLines = 1 // Ensure name doesn't overflow
-                                    )
-                              },
-                              onClick = {
-                                locationViewModel.setQuery(location.name)
-                                selectedLocation = location
-                                showDropdown = false // Close dropdown on selection
-                              },
-                              modifier = Modifier.padding(STANDARD_PADDING.dp))
-                        }
-                        // Dropdown menu for location suggestions
-                        DropdownMenu(
-                            expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                            onDismissRequest = { showDropdown = false },
-                            properties = PopupProperties(focusable = false)) {
-                              locationSuggestions.filterNotNull().take(3).forEach { location ->
-                                DropdownMenuItem(
-                                    text = {
-                                      Text(
-                                          text =
-                                              location.name.take(30) +
-                                                  if (location.name.length > 30) "..."
-                                                  else "", // Limit name length
-                                          maxLines = 1 // Ensure name doesn't overflow
-                                          )
-                                    },
-                                    onClick = {
-                                      locationViewModel.setQuery(location.name)
-                                      selectedLocation = location
-                                      showDropdown = false // Close dropdown on selection
-                                    },
-                                    modifier = Modifier.padding(STANDARD_PADDING.dp))
-                              }
-
-                              if (locationSuggestions.size > 3) {
-                                DropdownMenuItem(
-                                    text = { Text("More...") },
-                                    onClick = {},
-                                    modifier = Modifier.padding(STANDARD_PADDING.dp))
-                              }
-                            }
-                      }
-                  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                  if (locationSuggestions.size > 3) {
-                    DropdownMenuItem(
-                        text = { Text("More...") },
-                        onClick = { /* TODO: Define behavior for 'More...' */},
-                        modifier = Modifier.padding(STANDARD_PADDING.dp))
-                  }
+                      onClick = {
+                        locationViewModel.setQuery(location.name)
+                        selectedLocation = location
+                        showDropdown = false // Close dropdown on selection
+                      },
+                      modifier = Modifier.padding(STANDARD_PADDING.dp))
                 }
+                // Dropdown menu for location suggestions
+                DropdownMenu(
+                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                    onDismissRequest = { showDropdown = false },
+                    properties = PopupProperties(focusable = false)) {
+                      locationSuggestions.filterNotNull().take(3).forEach { location ->
+                        DropdownMenuItem(
+                            text = {
+                              Text(
+                                  text =
+                                      location.name.take(30) +
+                                          if (location.name.length > 30) "..."
+                                          else "", // Limit name length
+                                  maxLines = 1 // Ensure name doesn't overflow
+                                  )
+                            },
+                            onClick = {
+                              locationViewModel.setQuery(location.name)
+                              selectedLocation = location
+                              showDropdown = false // Close dropdown on selection
+                            },
+                            modifier = Modifier.padding(STANDARD_PADDING.dp))
+                      }
+
+                      if (locationSuggestions.size > 3) {
+                        DropdownMenuItem(
+                            text = { Text("More...") },
+                            onClick = {},
+                            modifier = Modifier.padding(STANDARD_PADDING.dp))
+                      }
+                    }
+              }
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              if (locationSuggestions.size > 3) {
+                DropdownMenuItem(
+                    text = { Text("More...") },
+                    onClick = { /* TODO: Define behavior for 'More...' */},
+                    modifier = Modifier.padding(STANDARD_PADDING.dp))
               }
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
