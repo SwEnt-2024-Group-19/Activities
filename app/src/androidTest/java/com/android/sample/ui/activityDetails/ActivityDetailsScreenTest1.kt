@@ -31,6 +31,7 @@ import com.android.sample.resources.dummydata.activityWithParticipants
 import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.activitydetails.LikeButton
+import com.android.sample.ui.activitydetails.PaymentInfoScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
@@ -569,25 +570,57 @@ class ActivityDetailsScreenAndroidTest {
     activityWithParticipants.participants.forEach { participant ->
       composeTestRule.onNodeWithText(participant.name).assertIsDisplayed()
     }
+  }
 
-    fun changeIconWhenActivityIsLiked() {
-      mockProfileViewModel = ProfileViewModel(mockRepository, mock())
+  @Test
+  fun changeIconWhenActivityIsLiked() {
+    mockProfileViewModel = ProfileViewModel(mockRepository, mock())
 
-      composeTestRule.setContent {
-        LikeButton(testUser, activityWithParticipants, mockProfileViewModel)
-      }
-
-      composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
-
-      // Click on the like button
-      composeTestRule.onNodeWithTag("likeButtonfalse").performClick()
-
-      // Verify that the like button is toggled
-      composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("likeButtontrue").performClick()
-
-      // Verify that the like button is toggled
-      composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+    composeTestRule.setContent {
+      LikeButton(testUser, activityWithParticipants, mockProfileViewModel)
     }
+
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+
+    // Click on the like button
+    composeTestRule.onNodeWithTag("likeButtonfalse").performClick()
+
+    // Verify that the like button is toggled
+    composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("likeButtontrue").performClick()
+
+    // Verify that the like button is toggled
+    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsDisplayed()
+  }
+
+  @Test
+  fun paymentInfoPin() {
+
+    composeTestRule.setContent { PaymentInfoScreen(10.0) }
+    composeTestRule.onNodeWithTag("paymentSection").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfo").assertExists()
+    composeTestRule.onNodeWithTag("infoIconButton").assertExists()
+  }
+
+  @Test
+  fun paymentInfoDialog() {
+    composeTestRule.setContent { PaymentInfoScreen(10.0) }
+    composeTestRule.onNodeWithTag("infoIconButton").performClick()
+    composeTestRule.onNodeWithTag("paymentInfoDialog").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfoTitle").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfoText").assertExists()
+    composeTestRule.onNodeWithTag("okButton").performClick()
+    composeTestRule.onNodeWithTag("infoDialog").assertDoesNotExist()
+  }
+
+  @Test
+  fun paymentInfoDialogFree() {
+    composeTestRule.setContent { PaymentInfoScreen(0.0) }
+    composeTestRule.onNodeWithTag("infoIconButton").performClick()
+    composeTestRule.onNodeWithTag("paymentInfoDialog").assertExists()
+    composeTestRule.onNodeWithTag("paymentInfoTitle").assertExists()
+    composeTestRule.onNodeWithTag("freeInfoText").assertExists()
+    composeTestRule.onNodeWithTag("okButton").performClick()
+    composeTestRule.onNodeWithTag("infoDialog").assertDoesNotExist()
   }
 }

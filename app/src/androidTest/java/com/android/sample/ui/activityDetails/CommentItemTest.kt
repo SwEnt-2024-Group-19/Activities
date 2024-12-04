@@ -3,6 +3,7 @@ package com.android.sample.ui.activityDetails
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -30,12 +31,14 @@ class CommentItemTest {
           profileId = testProfileId,
           comment = testComment,
           onReplyComment = { _, _ -> },
-          onDeleteComment = {})
+          onDeleteComment = {},
+          creatorId = "1")
     }
 
     composeTestRule
-        .onNodeWithTag("commentUserNameAndContent_${testComment.uid}")
-        .assertTextContains("Amine: This is a comment")
+        .onNodeWithTag("commentContent_${testComment.uid}")
+        .assertTextContains("This is a comment")
+    composeTestRule.onNodeWithText("Amine:").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("commentTimestamp_${testComment.uid}")
         .assertTextContains(timestamp.toDate().toString())
@@ -48,7 +51,8 @@ class CommentItemTest {
           profileId = testProfileId,
           comment = testComment,
           onReplyComment = { _, _ -> },
-          onDeleteComment = {})
+          onDeleteComment = {},
+          creatorId = "1")
     }
 
     composeTestRule.onNodeWithText("Delete").assertIsDisplayed()
@@ -62,7 +66,8 @@ class CommentItemTest {
           profileId = nonCreatorProfileId,
           comment = testComment,
           onReplyComment = { _, _ -> },
-          onDeleteComment = {})
+          onDeleteComment = {},
+          creatorId = "1")
     }
 
     composeTestRule.onNodeWithText("Delete").assertDoesNotExist()
@@ -75,7 +80,8 @@ class CommentItemTest {
           profileId = testProfileId,
           comment = testComment,
           onReplyComment = { _, _ -> },
-          onDeleteComment = {})
+          onDeleteComment = {},
+          creatorId = "1")
     }
 
     composeTestRule.onNodeWithTag("ReplyButton_${testComment.uid}").assertIsDisplayed()
@@ -90,7 +96,8 @@ class CommentItemTest {
           comments = listOf(testComment),
           onReplyComment = { _, _ -> },
           onDeleteComment = {},
-          onAddComment = {})
+          onAddComment = {},
+          creatorId = "1")
     }
 
     composeTestRule.onNodeWithTag("notLoggedInMessage").assertIsDisplayed()
@@ -103,7 +110,8 @@ class CommentItemTest {
           profileId = testProfileId,
           comment = testComment,
           onReplyComment = { _, _ -> },
-          onDeleteComment = {})
+          onDeleteComment = {},
+          creatorId = "1")
     }
 
     composeTestRule.onNodeWithTag("ReplyButton_${testComment.uid}").performClick()
@@ -118,7 +126,8 @@ class CommentItemTest {
           profileId = anonymousProfileId,
           comment = testComment,
           onReplyComment = { _, _ -> },
-          onDeleteComment = {})
+          onDeleteComment = {},
+          creatorId = "1")
     }
 
     composeTestRule.onNodeWithText("Reply").assertDoesNotExist()
@@ -131,10 +140,11 @@ class CommentItemTest {
           profileId = testProfileId,
           comment = testComment,
           onReplyComment = { _, _ -> },
-          onDeleteComment = {})
+          onDeleteComment = {},
+          creatorId = "1")
     }
-
-    composeTestRule.onNodeWithText("John: This is a reply").assertIsDisplayed()
+    composeTestRule.onNodeWithText("John:")
+    composeTestRule.onNodeWithText("This is a reply").assertIsDisplayed()
   }
 
   @Test
@@ -147,7 +157,8 @@ class CommentItemTest {
           onReplyComment = { _, _ -> },
           onDeleteComment = {},
           allowReplies = false // Disable replies for this test
-          )
+          ,
+          creatorId = "1")
     }
 
     // Ensure that the reply button is not displayed for replies
@@ -163,20 +174,49 @@ class CommentItemTest {
           comments = listOf(testComment), // Pass in the comment with its reply
           onReplyComment = { _, _ -> },
           onDeleteComment = {},
-          onAddComment = {})
+          onAddComment = {},
+          creatorId = "1")
     }
 
     // Ensure the original comment is displayed
-    composeTestRule.onNodeWithText("Amine: This is a comment").assertIsDisplayed()
+    composeTestRule.onNodeWithText("This is a comment").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amine:")
 
     // Ensure the reply is displayed
-    composeTestRule.onNodeWithText("John: This is a reply").assertIsDisplayed()
+    composeTestRule.onNodeWithText("This is a reply").assertIsDisplayed()
+    composeTestRule.onNodeWithText("John:").assertIsDisplayed()
 
     // Check that the reply is well nested, ensuring its indented and positioned under its origin
     // comment
     composeTestRule
-        .onNodeWithText("John: This is a reply")
+        .onNodeWithText("This is a reply")
         .assertIsDisplayed()
         .assertLeftPositionInRootIsEqualTo(40.05.dp)
+  }
+
+  @Test
+  fun CommentOfCreatorHasABadge() {
+    composeTestRule.setContent {
+      CommentItem(
+          profileId = testProfileId,
+          comment = testComment,
+          onReplyComment = { _, _ -> },
+          onDeleteComment = {},
+          creatorId = "123")
+    }
+    composeTestRule.onNodeWithTag("creatorBadge$testProfileId").isDisplayed()
+  }
+
+  @Test
+  fun CommentOfNonCreatorHasNoBadge() {
+    composeTestRule.setContent {
+      CommentItem(
+          profileId = testProfileId,
+          comment = testComment,
+          onReplyComment = { _, _ -> },
+          onDeleteComment = {},
+          creatorId = "124")
+    }
+    composeTestRule.onNodeWithTag("creatorBadge$testProfileId").assertDoesNotExist()
   }
 }

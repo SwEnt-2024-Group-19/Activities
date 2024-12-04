@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -53,6 +56,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
@@ -69,6 +76,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -231,12 +239,14 @@ fun ActivityDetailsScreen(
               // price
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("price")) {
+                  modifier = Modifier.testTag("price").fillMaxWidth()) {
                     Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
+                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION))
+                    PaymentInfoScreen(price ?: 0.0)
                   }
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -260,6 +270,16 @@ fun ActivityDetailsScreen(
                                   "${round(distance * 10) / 10}km"
                                 }
                         Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
+                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                        // text field button to navigate to the activity's location on the map
+                        // screen
+                        Text(
+                            text = stringResource(id = R.string.button_to_map),
+                            modifier =
+                                Modifier.testTag("activityToMapText")
+                                    .clickable(
+                                        onClick = { navigationActions.navigateTo(Screen.MAP) }),
+                            style = TextStyle(textDecoration = TextDecoration.Underline))
                       }
                     }
                   }
@@ -307,26 +327,26 @@ fun ActivityDetailsScreen(
                           Modifier.padding(vertical = SMALL_PADDING.dp)
                               .testTag(participant.name)
                               .clickable {
-                                if (participant.name != profile?.name) {
+                                if (participant.id == profile?.id) {
                                   navigationActions.navigateTo(Screen.PROFILE)
+                                } else {
+                                  listActivityViewModel.selectUser(participant)
+                                  navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                                 }
                               }) {
                         // Placeholder for participant picture
-                        if (participant.name != profile?.name) {
+                        if (participant.photo == null) {
                           Box(
                               modifier =
                                   Modifier.size(BUTTON_HEIGHT.dp)
-                                      .background(
-                                          Color.Gray,
-                                          shape = RoundedCornerShape(STANDARD_PADDING.dp))
+                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
                                       .padding(STANDARD_PADDING.dp)) {
                                 Image(
                                     painter =
                                         painterResource(id = R.drawable.default_profile_image),
                                     contentDescription = "Participant Image",
                                     modifier =
-                                        Modifier.fillMaxSize()
-                                            .clip(RoundedCornerShape(STANDARD_PADDING.dp)))
+                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
                               }
                         } else {
                           // Profile Picture
@@ -341,6 +361,12 @@ fun ActivityDetailsScreen(
                         Text(
                             text = participant.name, // Display the participant's name
                             style = MaterialTheme.typography.bodyMedium)
+                        Spacer(modifier = Modifier.width(LARGE_PADDING.dp))
+                        Text(
+                            text = "Rating : ",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyMedium)
+                        Text(text = "Blank/10", style = MaterialTheme.typography.bodyMedium)
                       }
                 }
               }
@@ -470,7 +496,8 @@ fun ActivityDetailsScreen(
                     comments = comments.map { if (it.uid == comment.uid) comment else it }
                     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
                   },
-                  onDeleteComment = deleteComment)
+                  onDeleteComment = deleteComment,
+                  creatorId = activity?.creator ?: "anonymous")
             }
       }
 }
@@ -481,7 +508,8 @@ fun CommentSection(
     comments: List<Comment>,
     onAddComment: (String) -> Unit,
     onReplyComment: (String, Comment) -> Unit,
-    onDeleteComment: (Comment) -> Unit
+    onDeleteComment: (Comment) -> Unit,
+    creatorId: String
 ) {
   val newCommentText = remember { mutableStateOf("") }
   val context = LocalContext.current
@@ -493,9 +521,11 @@ fun CommentSection(
       CommentItem(
           profileId,
           comment,
+          creatorId,
           onReplyComment,
           onDeleteComment,
-          allowReplies = true) // Set allowReplies to true for top-level comments
+          allowReplies = true,
+      ) // Set allowReplies to true for top-level comments
     }
 
     Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -534,6 +564,7 @@ fun CommentSection(
 fun CommentItem(
     profileId: String,
     comment: Comment,
+    creatorId: String, // Pass the creator ID as a parameter
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
     allowReplies: Boolean = true
@@ -544,14 +575,41 @@ fun CommentItem(
   val networkManager = NetworkManager(context)
 
   Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically, // Align items vertically
+        modifier = Modifier.padding(bottom = SMALL_PADDING.dp)) {
+          // If the user is the creator, display a badge
+          if (comment.userId == creatorId) {
+            Box(
+                modifier =
+                    Modifier.padding(end = SMALL_PADDING.dp)
+                        .background(color = Color.Gray, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)) {
+                  Text(
+                      text = "Creator",
+                      style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
+                      modifier = Modifier.testTag("creatorBadge_${comment.uid}"))
+                }
+          }
+          // Display the user's name
+          Text(
+              text = "${comment.userName}:",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.testTag("commentUserName_${comment.uid}"))
+        }
+
+    // Display the comment content
     Text(
-        text = "${comment.userName}: ${comment.content}",
+        text = comment.content,
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.testTag("commentUserNameAndContent_${comment.uid}"))
+        modifier = Modifier.testTag("commentContent_${comment.uid}"))
+
+    // Display the timestamp
     Text(
         text = comment.timestamp.toDate().toString(),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
+
     if (profileId != "anonymous") {
       Column {
         if (comment.userId == profileId) {
@@ -612,10 +670,65 @@ fun CommentItem(
       comment.replies.forEach { reply ->
         Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
           // Pass `allowReplies = false` for replies to prevent nesting
-          CommentItem(profileId, reply, onReplyComment, onDeleteComment, allowReplies = false)
+          CommentItem(
+              profileId, reply, creatorId, onReplyComment, onDeleteComment, allowReplies = false)
         }
       }
     }
+  }
+}
+
+@Composable
+fun PaymentInfoScreen(price: Double) {
+  var showDialog by remember { mutableStateOf(false) }
+
+  // Payment Section
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Start,
+      modifier = Modifier.testTag("paymentSection")) {
+        // Payment Text
+        Text(
+            text = "Payment info",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo"))
+
+        // Info Icon with Click
+        IconButton(modifier = Modifier.testTag("infoIconButton"), onClick = { showDialog = true }) {
+          Icon(
+              painter = painterResource(id = android.R.drawable.ic_dialog_info),
+              contentDescription = "Info",
+              tint = Color.Gray)
+        }
+      }
+
+  // Info Dialog
+  if (showDialog) {
+    AlertDialog(
+        modifier = Modifier.testTag("paymentInfoDialog"),
+        onDismissRequest = { showDialog = false },
+        confirmButton = {
+          TextButton(modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
+            Text(text = stringResource(id = R.string.ok))
+          }
+        },
+        title = {
+          Text(
+              modifier = Modifier.testTag("paymentInfoTitle"),
+              text = stringResource(id = R.string.payment_info))
+        },
+        text = {
+          if (price != 0.0) {
+            Text(
+                modifier = Modifier.testTag("paymentInfoText"),
+                text = stringResource(id = R.string.payment_explanation))
+          } else {
+            Text(
+                modifier = Modifier.testTag("freeInfoText"),
+                text = stringResource(id = R.string.free_activity))
+          }
+        },
+    )
   }
 }
 
