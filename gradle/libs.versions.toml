@@ -93,6 +93,7 @@ roomRuntime = "2.6.1"
 gson = "2.10.1.1"
 gsonVersion = "2.10"
 converterGson = "2.9.0"
+uiDesktop = "1.7.0"
 
 
 [libraries]
@@ -177,6 +178,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-v210 = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
+androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
 
 
 

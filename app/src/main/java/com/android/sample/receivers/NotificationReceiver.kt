@@ -11,10 +11,11 @@ class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val activityId = intent.getIntExtra("activityId", 0)
         val activityName = intent.getStringExtra("activityName") ?: "Activity"
+        val title = intent.getStringExtra("notificationTitle") ?: "Activity Reminder"
 
         val notification = NotificationCompat.Builder(context, "activity_reminders")
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Upcoming Activity Tomorrow")
+            .setContentTitle(title)
             .setContentText("Reminder: $activityName")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)

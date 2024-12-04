@@ -33,10 +33,16 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    fun scheduleNotification(activityId: Int, activityName: String, activityDate: Long) {
+    fun scheduleNotification(
+        activityId: Int,
+        activityName: String,
+        activityDate: Long,
+        notificationTitle: String
+    ) {
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             putExtra("activityId", activityId)
             putExtra("activityName", activityName)
+            putExtra("notificationTitle", notificationTitle)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
