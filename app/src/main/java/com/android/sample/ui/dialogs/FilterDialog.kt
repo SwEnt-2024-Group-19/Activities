@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -109,10 +110,10 @@ fun FilterDialog(
                     modifier = Modifier.testTag("durationTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-                Row(modifier = Modifier.fillMaxWidth()) {
-                  Row(
-                      verticalAlignment = Alignment.CenterVertically,
-                      modifier = Modifier.testTag("onlyPROCheckboxRow")) {
+                Row(modifier = Modifier.fillMaxWidth().testTag("onlyPROCheckboxRow"),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+
                         Checkbox(
                             modifier = Modifier.testTag("onlyPROCheckbox"),
                             checked = onlyPRO ?: false,
@@ -124,8 +125,12 @@ fun FilterDialog(
                         Text(
                             "Only see PRO activities",
                         )
-                      }
+
+
                 }
+                Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+              PROinfo()
+
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                   TextButton(
                       onClick = { onDismiss() }, modifier = Modifier.testTag("cancelButton")) {
@@ -163,4 +168,49 @@ fun FilterDialog(
               }
         }
       }
+}
+
+@Composable
+fun PROinfo() {
+  var showDialog by remember { mutableStateOf(false) }
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth().testTag("PROSection")) {
+
+
+
+        androidx.compose.material3.IconButton(
+            modifier = Modifier.testTag("infoIconButton"), onClick = { showDialog = true }) {
+              androidx.compose.material3.Icon(
+                  painter = painterResource(id = android.R.drawable.ic_dialog_info),
+                  contentDescription = "Info",
+                  tint = Color.Gray)
+            }
+      androidx.compose.material3.Text(
+          text = "PRO info",
+          style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+          modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo"))
+      }
+
+  if (showDialog) {
+    androidx.compose.material3.AlertDialog(
+        modifier = Modifier.testTag("paymentInfoDialog"),
+        onDismissRequest = { showDialog = false },
+        confirmButton = {
+          androidx.compose.material3.TextButton(
+              modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
+                androidx.compose.material3.Text(text = stringResource(id = R.string.ok))
+              }
+        },
+        title = {
+          androidx.compose.material3.Text(
+              modifier = Modifier.testTag("PROInfoTitle"),
+              text = stringResource(id = R.string.PRO_info))
+        },
+        text = {
+          androidx.compose.material3.Text(
+              modifier = Modifier.testTag("PROInfoText"),
+              text = stringResource(id = R.string.PRO_explanation))
+        })
+  }
 }
