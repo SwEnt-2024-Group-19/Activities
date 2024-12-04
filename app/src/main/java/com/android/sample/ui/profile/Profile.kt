@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -34,13 +35,16 @@ import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LIGHT_PURPLE_COLOR
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -283,14 +287,15 @@ fun ActivityBox(
             listActivitiesViewModel.selectActivity(activity)
             userProfileViewModel.navigateToActivity(navigationActions, context)
           },
-          testTag = "activity${category.capitalize()}")
+          testTag = "activity${category.capitalize()}",
+          category=category)
     }
   }
 }
 
 /** Display a single activity in a row */
 @Composable
-fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) {
+fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String, category: String) {
   Row(
       modifier =
           Modifier.fillMaxWidth()
@@ -305,13 +310,54 @@ fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) 
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
-          Text(
-              text = activity.title,
-              fontSize = SUBTITLE_FONTSIZE.sp,
-              fontWeight = FontWeight.Bold,
-              color = Color.Black)
+        Column(modifier = Modifier.weight(WIDTH_FRACTION)) {
+            Row( modifier=Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+                Text(
+                    text = activity.title,
+                    fontSize = SUBTITLE_FONTSIZE.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                if (category != "past") {
+
+                    val currentTimeMillis = System.currentTimeMillis()
+                    val activityTimeMillis =
+                        activity.date.toDate().time
+                    val remainingTimeMillis = activityTimeMillis - currentTimeMillis
+
+
+                    val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
+                    val minutes = remainingTimeMillis / (1000 * 60) % 60
+                    val days = remainingTimeMillis / (1000 * 60 * 60 * 24)
+                    val months = days / 30
+
+                    fun calculateColor(remainingTimeMillis: Long): Color {
+                        val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
+                        val fraction = (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
+                        return lerp(Color(DARK_BLUE_COLOR), Color(LIGHT_PURPLE_COLOR), 1 - fraction)
+                    }
+
+                    val textColor = calculateColor(remainingTimeMillis)
+
+                    Text(
+                        text = when {
+                            months > 1 -> "In $months months"
+                            days in 6..30 -> "In  $days days"
+                            days in 1..5 -> "In $days days and $hours hours"
+                            days < 1 -> "In $hours h  $minutes min"
+                            else -> ""
+                        },
+                        fontSize = SUBTITLE_FONTSIZE.sp,
+                        color = textColor
+                    )
+
+                }
+            }
           Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
+
+
+
         }
       }
 }

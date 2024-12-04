@@ -43,6 +43,8 @@ object C {
     const val SUBTITLE_FONTSIZE = 16
 
     const val WHITE_COLOR = 0xFFFFFFFF
+    const val DARK_BLUE_COLOR = 0xFFD1C4E9
+    const val LIGHT_PURPLE_COLOR = 0xFF4A148C
 
     const val BLACK_COLOR = 0xFF000000
     const val PURPLE_COLOR = 0xFF6200EE
@@ -64,6 +66,7 @@ object C {
     const val TEXT_FONTSIZE = 12
 
     const val WIDTH_FRACTION = 0.8f
+
 
     // errors
     const val OFFLINE_TOAST_MESSAGE = "You are offline. Action not allowed."
