@@ -61,6 +61,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -96,6 +97,7 @@ fun ListActivitiesScreen(
   var searchText by remember { mutableStateOf("") }
   var showFilterDialog by remember { mutableStateOf(false) }
   val checkedList = remember { mutableStateListOf<Int>() }
+  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
 
   val locationPermissionLauncher =
       rememberLauncherForActivityResult(
@@ -184,7 +186,14 @@ fun ListActivitiesScreen(
                         checkedList.contains(categories.indexOf(it.category))
                       }
                 }
-                activitiesList = activitiesList.filter { it.date >= Timestamp.now() }
+                activitiesList =
+                    activitiesList.filter {
+                      Log.d("OverviewScreen", "Activity: $it")
+                      val activityTimestamp =
+                          hourDateViewModel.combineDateAndTime(
+                              it.date, it.startTime) // Combine date and startTime
+                      activityTimestamp >= Timestamp.now() // Compare with current time
+                    }
                 if (activitiesList.isEmpty()) {
                   if (checkedList.isEmpty()) {
                     Text(
