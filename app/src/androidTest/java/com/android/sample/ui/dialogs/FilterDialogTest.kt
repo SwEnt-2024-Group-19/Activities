@@ -2,7 +2,6 @@ package com.android.sample.ui.dialogs
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -128,36 +127,28 @@ class FilterDialogTest {
     assertEquals("2 hours", duration)
     assert(schedule != null) // Check timestamp is parsed
   }
+
   @Test
   fun test_PROInfo_initialState() {
 
-    composeTestRule.setContent {
-      PROinfo()
-    }
-
+    composeTestRule.setContent { PROinfo() }
 
     composeTestRule.onNodeWithTag("PROSection").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("infoIconButton").assertIsDisplayed()
 
-
     composeTestRule.onNodeWithTag("PROInfo").assertTextContains("PRO info")
-
 
     composeTestRule.onNodeWithTag("PROInfoDialog").assertDoesNotExist()
   }
+
   @Test
   fun test_PROInfo_dialogOpensOnClick() {
-    composeTestRule.setContent {
-      PROinfo()
-    }
-
+    composeTestRule.setContent { PROinfo() }
 
     composeTestRule.onNodeWithTag("infoIconButton").performClick()
 
-
     composeTestRule.onNodeWithTag("PROInfoDialog").assertIsDisplayed()
-
 
     composeTestRule.onNodeWithTag("PROInfoTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("PROInfoText").assertIsDisplayed()
@@ -165,10 +156,7 @@ class FilterDialogTest {
 
   @Test
   fun test_PROInfo_dialogClosesOnOkClick() {
-    composeTestRule.setContent {
-      PROinfo()
-    }
-
+    composeTestRule.setContent { PROinfo() }
 
     composeTestRule.onNodeWithTag("infoIconButton").performClick()
 
@@ -176,8 +164,6 @@ class FilterDialogTest {
 
     composeTestRule.onNodeWithTag("okButton").performClick()
 
-
     composeTestRule.onNodeWithTag("PRODialog").assertDoesNotExist()
   }
-
 }

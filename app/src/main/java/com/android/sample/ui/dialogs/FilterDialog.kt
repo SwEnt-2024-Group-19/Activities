@@ -110,26 +110,22 @@ fun FilterDialog(
                     modifier = Modifier.testTag("durationTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-                Row(modifier = Modifier.fillMaxWidth().testTag("onlyPROCheckboxRow"),
+                Row(
+                    modifier = Modifier.fillMaxWidth().testTag("onlyPROCheckboxRow"),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-
-                        Checkbox(
-                            modifier = Modifier.testTag("onlyPROCheckbox"),
-                            checked = onlyPRO ?: false,
-                            onCheckedChange = { onlyPRO = it },
-                            colors =
-                                CheckboxDefaults.colors(
-                                    checkedColor = MaterialTheme.colors.primary),
-                        )
-                        Text(
-                            "Only see PRO activities",
-                        )
-
-
+                  Checkbox(
+                      modifier = Modifier.testTag("onlyPROCheckbox"),
+                      checked = onlyPRO ?: false,
+                      onCheckedChange = { onlyPRO = it },
+                      colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary),
+                  )
+                  Text(
+                      "Only see PRO activities",
+                  )
                 }
                 Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
-              PROinfo()
+                PROinfo()
 
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                   TextButton(
@@ -176,9 +172,6 @@ fun PROinfo() {
   Row(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.fillMaxWidth().testTag("PROSection")) {
-
-
-
         androidx.compose.material3.IconButton(
             modifier = Modifier.testTag("infoIconButton"), onClick = { showDialog = true }) {
               androidx.compose.material3.Icon(
@@ -186,10 +179,10 @@ fun PROinfo() {
                   contentDescription = "Info",
                   tint = Color.Gray)
             }
-      androidx.compose.material3.Text(
-          text = "PRO info",
-          style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-          modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("PROInfo"))
+        androidx.compose.material3.Text(
+            text = "PRO info",
+            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("PROInfo"))
       }
 
   if (showDialog) {
