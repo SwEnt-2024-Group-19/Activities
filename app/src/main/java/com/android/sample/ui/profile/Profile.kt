@@ -41,6 +41,7 @@ import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
@@ -349,7 +350,7 @@ fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
         },
         colors =
             IconButtonDefaults.iconButtonColors(
-                containerColor = if (isLiked == true) Color(0xFF048531) else Color.Transparent,
+                containerColor = if (isLiked == true) Color(SUCCESS_COLOR) else Color.Transparent,
                 contentColor =
                     if (isLiked == true) MaterialTheme.colorScheme.onError
                     else MaterialTheme.colorScheme.onSurface),
