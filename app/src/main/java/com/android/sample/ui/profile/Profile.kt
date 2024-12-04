@@ -314,7 +314,7 @@ fun ActivityRow(
               .clickable {
                 listActivitiesViewModel.selectActivity(activity)
                 userProfileViewModel.navigateToActivity(navigationActions, context)
-             },
+              },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = painterResource(id = R.drawable.foot),
