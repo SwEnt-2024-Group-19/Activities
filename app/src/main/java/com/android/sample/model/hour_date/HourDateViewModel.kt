@@ -2,9 +2,14 @@ package com.android.sample.model.hour_date
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Timestamp
 import java.time.Duration
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.temporal.ChronoField
 
 open class HourDateViewModel : ViewModel() {
 
@@ -43,4 +48,22 @@ open class HourDateViewModel : ViewModel() {
     val resultTime = startTime.plusHours(hoursToAdd).plusMinutes(minutesToAdd)
     return resultTime.format(formatter)
   }
+
+  fun combineDateAndTime(date: Timestamp, time: String): Timestamp {
+    // Convert Firebase Timestamp to LocalDate
+    val localDate = date.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    lateinit var formatter : DateTimeFormatter
+
+
+      formatter = DateTimeFormatter.ofPattern("HH:mm")
+
+    val localTime = LocalTime.parse(time,formatter) // Assuming "hh:mm" format
+
+    // Combine LocalDate and LocalTime to LocalDateTime
+    val combinedDateTime = LocalDateTime.of(localDate, localTime)
+
+    // Convert back to Firebase Timestamp
+    return Timestamp(combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000, 0)
+  }
+
 }
