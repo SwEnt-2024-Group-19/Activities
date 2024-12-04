@@ -45,6 +45,7 @@ object C {
     const val WHITE_COLOR = 0xFFFFFFFF
 
     const val BLACK_COLOR = 0xFF000000
+    const val PURPLE_COLOR = 0xFF6200EE
 
     const val IMAGE_SIZE = 100
 

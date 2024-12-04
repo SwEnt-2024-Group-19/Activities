@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,8 +68,10 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.PURPLE_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.components.SearchBar
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -89,172 +92,204 @@ fun ListActivitiesScreen(
     locationViewModel: LocationViewModel,
     modifier: Modifier = Modifier
 ) {
-  val context = LocalContext.current
-  val uiState by viewModel.uiState.collectAsState()
-  val options = categories.map { it.name }
-  val profile = profileViewModel.userState.collectAsState().value
-  var searchText by remember { mutableStateOf("") }
-  var showFilterDialog by remember { mutableStateOf(false) }
-  val checkedList = remember { mutableStateListOf<Int>() }
+    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
+    val options = categories.map { it.name }
+    val profile = profileViewModel.userState.collectAsState().value
+    var searchText by remember { mutableStateOf("") }
+    var showFilterDialog by remember { mutableStateOf(false) }
+    val checkedList = remember { mutableStateListOf<Int>() }
 
-  val locationPermissionLauncher =
-      rememberLauncherForActivityResult(
-          contract = ActivityResultContracts.RequestPermission(),
-          onResult = { isGranted ->
-            if (isGranted) {
-              locationViewModel.fetchCurrentLocation()
-            } else {
-              Log.d("OverviewScreen", "Location permission denied by the user.")
-            }
-          })
-
-  LaunchedEffect(Unit) {
-    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_GRANTED) {
-      locationViewModel.fetchCurrentLocation()
-    } else {
-      locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
-
-    if (profile != null) {
-      viewModel.sortActivitiesByScore(profile) {
-        locationViewModel.getDistanceFromCurrentLocation(it)
-      }
-    }
-  }
-
-  Scaffold(
-      modifier = modifier.testTag("listActivitiesScreen"),
-      topBar = { SearchBar(onValueChange = { searchText = it }, value = searchText) },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
-      },
-      floatingActionButton = {
-        FloatingActionButton(
-            onClick = { showFilterDialog = true }, modifier = Modifier.testTag("filterDialog")) {
-              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
-            }
-      }) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-          if (showFilterDialog) {
-            FilterDialog(
-                onDismiss = { showFilterDialog = false },
-                onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
-                  viewModel.updateFilterState(
-                      price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
-                })
-          }
-          Box(
-              modifier =
-                  Modifier.height(BUTTON_HEIGHT.dp)
-                      .testTag("segmentedButtonRow")
-                      .fillMaxWidth()
-                      .padding(horizontal = STANDARD_PADDING.dp)) {
-                MultiChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                  options.forEachIndexed { index, label ->
-                    SegmentedButton(
-                        modifier = Modifier.testTag("segmentedButton$label").fillMaxWidth(),
-                        shape =
-                            SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                        onCheckedChange = {
-                          if (index in checkedList) {
-                            checkedList.remove(index)
-                          } else {
-                            checkedList.add(index)
-                          }
-                        },
-                        checked = index in checkedList) {
-                          Text(label)
-                        }
-                  }
-                }
-              }
-          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-          Box(modifier = modifier.fillMaxWidth()) {
-            when (uiState) {
-              is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-                var activitiesList =
-                    (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-                if (checkedList.isNotEmpty()) {
-                  activitiesList =
-                      activitiesList.filter {
-                        checkedList.contains(categories.indexOf(it.category))
-                      }
-                }
-                activitiesList = activitiesList.filter { it.date >= Timestamp.now() }
-                if (activitiesList.isEmpty()) {
-                  if (checkedList.isEmpty()) {
-                    Text(
-                        text = "There is no activity yet.",
-                        modifier =
-                            Modifier.padding(STANDARD_PADDING.dp)
-                                .align(Alignment.Center)
-                                .testTag("emptyActivityPrompt"),
-                        color = MaterialTheme.colorScheme.onSurface)
-                  } else {
-                    Text(
-                        text = "There is no activity of these categories yet.",
-                        modifier =
-                            Modifier.padding(STANDARD_PADDING.dp)
-                                .align(Alignment.Center)
-                                .testTag("emptyActivityPrompt"),
-                        color = MaterialTheme.colorScheme.onSurface)
-                  }
+    val locationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    locationViewModel.fetchCurrentLocation()
                 } else {
-                  var filteredActivities =
-                      activitiesList.filter {
-                        if (it.price > viewModel.maxPrice) false
-                        else if (viewModel.availablePlaces != null &&
-                            (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
-                            false
-                        else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
-                        else if (viewModel.duration != null && it.duration != viewModel.duration)
-                            false
-                        else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
-                        else {
-                          if (searchText.isEmpty() || searchText.isBlank()) true
-                          else {
-                            it.title.contains(searchText, ignoreCase = true) ||
-                                it.description.contains(searchText, ignoreCase = true) ||
-                                it.location?.name?.contains(searchText, ignoreCase = true) ?: false
-                          }
-                        }
-                      }
-                  LazyColumn(
-                      modifier =
-                          Modifier.fillMaxSize()
-                              .padding(horizontal = STANDARD_PADDING.dp)
-                              .testTag("lazyColumn"),
-                      verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
-                        // Use LazyColumn to efficiently display the list of activities
-
-                        items(filteredActivities) { activity ->
-                          if (activity.participants.size < activity.maxPlaces) {
-                            ActivityCard(
-                                activity = activity,
-                                navigationActions,
-                                viewModel,
-                                profileViewModel,
-                                profile,
-                                locationViewModel.getDistanceFromCurrentLocation(activity.location))
-                          }
-                        }
-                      }
+                    Log.d("OverviewScreen", "Location permission denied by the user.")
                 }
-              }
-              is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-                val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-                Text(
-                    text = "Error: ${error.message}",
-                    modifier = Modifier.padding(STANDARD_PADDING.dp))
-              }
-            }
-          }
+            })
+
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            locationViewModel.fetchCurrentLocation()
+        } else {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
-      }
+
+        if (profile != null) {
+            viewModel.sortActivitiesByScore(profile) {
+                locationViewModel.getDistanceFromCurrentLocation(it)
+            }
+        }
+    }
+
+    Scaffold(
+        modifier = modifier.testTag("listActivitiesScreen"),
+        topBar = { SearchBar(onValueChange = { searchText = it }, value = searchText) },
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { route -> navigationActions.navigateTo(route) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = navigationActions.currentRoute()
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showFilterDialog = true }, modifier = Modifier.testTag("filterDialog")
+            ) {
+                Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
+            }
+        }) { paddingValues ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
+            if (showFilterDialog) {
+                FilterDialog(
+                    onDismiss = { showFilterDialog = false },
+                    onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+                        viewModel.updateFilterState(
+                            price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO
+                        )
+                    })
+            }
+            Box(
+                modifier =
+                Modifier
+                    .height(BUTTON_HEIGHT.dp)
+                    .testTag("segmentedButtonRow")
+                    .fillMaxWidth()
+                    .padding(horizontal = STANDARD_PADDING.dp)
+            ) {
+                MultiChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    options.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            modifier = Modifier
+                                .testTag("segmentedButton$label")
+                                .fillMaxWidth(),
+                            shape =
+                            SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                            onCheckedChange = {
+                                if (index in checkedList) {
+                                    checkedList.remove(index)
+                                } else {
+                                    checkedList.add(index)
+                                }
+                            },
+                            checked = index in checkedList
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            Box(modifier = modifier.fillMaxWidth()) {
+                when (uiState) {
+                    is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+                        var activitiesList =
+                            (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+                        if (checkedList.isNotEmpty()) {
+                            activitiesList =
+                                activitiesList.filter {
+                                    checkedList.contains(categories.indexOf(it.category))
+                                }
+                        }
+                        activitiesList = activitiesList.filter { it.date >= Timestamp.now() }
+                        if (activitiesList.isEmpty()) {
+                            if (checkedList.isEmpty()) {
+                                Text(
+                                    text = "There is no activity yet.",
+                                    modifier =
+                                    Modifier
+                                        .padding(STANDARD_PADDING.dp)
+                                        .align(Alignment.Center)
+                                        .testTag("emptyActivityPrompt"),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            } else {
+                                Text(
+                                    text = "There is no activity of these categories yet.",
+                                    modifier =
+                                    Modifier
+                                        .padding(STANDARD_PADDING.dp)
+                                        .align(Alignment.Center)
+                                        .testTag("emptyActivityPrompt"),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        } else {
+                            var filteredActivities =
+                                activitiesList.filter {
+                                    if (it.price > viewModel.maxPrice) false
+                                    else if (viewModel.availablePlaces != null &&
+                                        (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!
+                                    )
+                                        false
+                                    else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
+                                    else if (viewModel.duration != null && it.duration != viewModel.duration)
+                                        false
+                                    else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
+                                    else {
+                                        if (searchText.isEmpty() || searchText.isBlank()) true
+                                        else {
+                                            it.title.contains(searchText, ignoreCase = true) ||
+                                                    it.description.contains(
+                                                        searchText,
+                                                        ignoreCase = true
+                                                    ) ||
+                                                    it.location?.name?.contains(
+                                                        searchText,
+                                                        ignoreCase = true
+                                                    ) ?: false
+                                        }
+                                    }
+                                }
+                            LazyColumn(
+                                modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = STANDARD_PADDING.dp)
+                                    .testTag("lazyColumn"),
+                                verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)
+                            ) {
+                                // Use LazyColumn to efficiently display the list of activities
+
+                                items(filteredActivities) { activity ->
+                                    if (activity.participants.size < activity.maxPlaces) {
+                                        ActivityCard(
+                                            activity = activity,
+                                            navigationActions,
+                                            viewModel,
+                                            profileViewModel,
+                                            profile,
+                                            locationViewModel.getDistanceFromCurrentLocation(
+                                                activity.location
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+                        val error =
+                            (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+                        Text(
+                            text = "Error: ${error.message}",
+                            modifier = Modifier.padding(STANDARD_PADDING.dp)
+                        )
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -266,135 +301,222 @@ fun ActivityCard(
     profile: User?,
     distance: Float? = null
 ) {
-  val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-  val formattedDate = dateFormat.format(activity.date.toDate())
+    val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+    val formattedDate = dateFormat.format(activity.date.toDate())
 
-  var isLiked by remember {
-    mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
-  }
+    var isLiked by remember {
+        mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
+    }
 
-  Card(
-      modifier =
-          Modifier.fillMaxWidth()
-              .testTag("activityCard")
-              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable {
+    Card(
+        modifier =
+        Modifier
+            .fillMaxWidth()
+            .testTag("activityCard")
+            .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+            .clickable {
                 listActivitiesViewModel.selectActivity(activity)
                 navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-              },
-      elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)) {
+            },
+        elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)
+    ) {
         Column {
-          // Box for overlaying the title on the image
-          Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
-            // Display the activity image
-            Image(
-                painter = painterResource(R.drawable.foot),
-                contentDescription = activity.title,
-                modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
-                contentScale = ContentScale.Crop)
+            // Box for overlaying the title on the image
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(LARGE_IMAGE_SIZE.dp)) {
+                // Display the activity image
+                Image(
+                    painter = painterResource(R.drawable.foot),
+                    contentDescription = activity.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(LARGE_IMAGE_SIZE.dp),
+                    contentScale = ContentScale.Crop
+                )
 
-            // Display the activity name on top of the image
-            Text(
-                text = activity.title,
-                style =
+                // Display the activity name on top of the image
+                Text(
+                    text = activity.title,
+                    style =
                     MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = Color.White // Title color set to black
-                        ),
-                modifier =
-                    Modifier.align(Alignment.BottomStart)
+                    ),
+                    modifier =
+                    Modifier
+                        .align(Alignment.BottomStart)
                         .padding(MEDIUM_PADDING.dp)
-                        .testTag("titleActivity"))
-          }
+                        .testTag("titleActivity")
+                )
 
-          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-          Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically) {
+                if (profile != null) {
+                    if (profile.activities?.contains(activity.uid) == true) {
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(SMALL_PADDING.dp).testTag("activityStatus"),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (profile.id == activity.creator) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(SMALL_PADDING.dp).testTag("activityStatusPresent")
+                                        .background(
+                                            Color(PURPLE_COLOR),
+                                            shape = RoundedCornerShape(TEXT_FONTSIZE.dp)
+                                        ) // Purple background with rounded corners
+                                        .padding(
+                                            horizontal = SMALL_PADDING.dp,
+                                            vertical = SMALL_PADDING.dp
+                                        )
+                                ) {
+
+                                    Text(
+                                        text = "YOUR ACTIVITY",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = Color.White,
+                                            fontStyle = FontStyle.Italic,
+                                            fontWeight = FontWeight.SemiBold
+                                        ),
+                                        modifier = Modifier.testTag("yourActivityStatus")
+                                    )
+                                }
+                            }
+                            if (profile.id != activity.creator || activity.participants.find { it.id == profile.id } != null
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(TEXT_FONTSIZE.dp).testTag("activityStatusEnrolledBox")
+                                        .background(
+                                            Color(PURPLE_COLOR),
+                                            shape = RoundedCornerShape(12.dp)
+                                        ) // Purple background with rounded corners
+                                        .padding(
+                                            horizontal = 8.dp,
+                                            vertical = 4.dp
+                                        ) // Inner padding for text
+                                ) {
+
+                                    Text(
+                                        text = "ENROLLED",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = Color.White,
+                                            fontStyle = FontStyle.Italic,
+                                            fontWeight = FontWeight.SemiBold
+                                        ),
+                                        modifier = Modifier.testTag("enrolledText")
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = MEDIUM_PADDING.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 // Display the date
                 Text(
                     text = formattedDate,
                     style =
-                        MaterialTheme.typography.bodySmall.copy(
-                            color = Color.Gray, // Light gray color for the date
-                            fontStyle = FontStyle.Italic),
+                    MaterialTheme.typography.bodySmall.copy(
+                        color = Color.Gray, // Light gray color for the date
+                        fontStyle = FontStyle.Italic
+                    ),
                     modifier = Modifier.weight(1f) // Takes up remaining space
-                    )
+                )
 
                 if (profile != null) {
-                  IconButton(
-                      onClick = {
-                        isLiked = !isLiked
-                        if (isLiked) {
-                          profileViewModel.addLikedActivity(profile.id, activity.uid)
-                        } else {
-                          profileViewModel.removeLikedActivity(profile.id, activity.uid)
-                        }
-                      },
-                      modifier = Modifier.testTag("likeButton$isLiked"),
-                  ) {
-                    Icon(
-                        imageVector =
+                    IconButton(
+                        onClick = {
+                            isLiked = !isLiked
+                            if (isLiked) {
+                                profileViewModel.addLikedActivity(profile.id, activity.uid)
+                            } else {
+                                profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                            }
+                        },
+                        modifier = Modifier.testTag("likeButton$isLiked"),
+                    ) {
+                        Icon(
+                            imageVector =
                             if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color.Black else Color.Gray,
-                    )
-                  }
+                            contentDescription = if (isLiked) "Liked" else "Not Liked",
+                            tint = if (isLiked) Color.Black else Color.Gray,
+                        )
+                    }
                 }
-              }
+            }
 
-          Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
-              verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = MEDIUM_PADDING.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 // Location on the left
                 Text(
                     text = activity.location?.name ?: "No location",
                     style =
-                        MaterialTheme.typography.bodySmall.copy(
-                            fontStyle = FontStyle.Italic, color = Color.Gray),
+                    MaterialTheme.typography.bodySmall.copy(
+                        fontStyle = FontStyle.Italic, color = Color.Gray
+                    ),
                     modifier = Modifier.weight(1f) // Takes up remaining space
-                    )
+                )
 
                 Text(
                     text = "${activity.participants.size}/${activity.maxPlaces}",
                     style =
-                        MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray,
-                            fontSize = MEDIUM_PADDING.sp),
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.Gray,
+                        fontSize = MEDIUM_PADDING.sp
+                    ),
                     modifier =
-                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
-              }
+                    Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = MEDIUM_PADDING.dp)
+                )
+            }
 
-          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+            Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-          if (distance != null) {
-            val distanceString =
-                "Distance : " +
-                    if (distance < 1) {
-                      "${round(distance * 1000).toInt()}m"
-                    } else {
-                      "${round(distance * 10) / 10}km"
-                    }
-            Text(
-                text = distanceString,
-                modifier =
-                    Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+            if (distance != null) {
+                val distanceString =
+                    "Distance : " +
+                            if (distance < 1) {
+                                "${round(distance * 1000).toInt()}m"
+                            } else {
+                                "${round(distance * 10) / 10}km"
+                            }
+                Text(
+                    text = distanceString,
+                    modifier =
+                    Modifier
+                        .padding(horizontal = MEDIUM_PADDING.dp)
                         .testTag("distanceText") // Takes up remaining space
                 )
-          }
+            }
 
-          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+            Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-          // Display the activity description
-          Text(
-              text = activity.description,
-              style =
-                  MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
-          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            // Display the activity description
+            Text(
+                text = activity.description,
+                style =
+                MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
+                modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+            )
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
         }
-      }
+    }
 }
