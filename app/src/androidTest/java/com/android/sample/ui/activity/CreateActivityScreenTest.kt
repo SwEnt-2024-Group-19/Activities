@@ -2,7 +2,6 @@ package com.android.sample.ui.activity
 
 import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
@@ -238,7 +237,7 @@ class CreateActivityScreenTest {
   }
 
   @Test
-  fun createButton_isEnabledWhenAllFieldsAreFilled() {
+  fun createButton_isDisabledWhenAllFieldsAreFilledButNotTheDateAndTime() {
     composeTestRule.setContent {
       CreateActivityScreen(
           mockViewModel,
@@ -270,7 +269,7 @@ class CreateActivityScreenTest {
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("createButton"))
-    composeTestRule.onNodeWithTag("createButton").assertIsEnabled()
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
   @Test
@@ -314,7 +313,23 @@ class CreateActivityScreenTest {
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("createButton"))
-    composeTestRule.onNodeWithTag("createButton").assertIsEnabled()
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+
+    composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
+    composeTestRule.onNodeWithText(types[0].name).performClick()
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
+
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+    composeTestRule.onNodeWithText(categories[0].name).performClick()
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
+
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
   @Test
@@ -456,7 +471,9 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("nameTextFieldUser").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextFieldUser").performTextInput("Doe")
     composeTestRule.onNodeWithTag("addUserButton").performClick()
-    composeTestRule.onNodeWithTag("attendeeName0").assertTextEquals("John Doe")
+    composeTestRule
+        .onNodeWithTag("attendeeName0", useUnmergedTree = true)
+        .assertTextEquals("John Doe")
   }
 
   @Test
@@ -556,5 +573,27 @@ class CreateActivityScreenTest {
         .performScrollToNode(hasTestTag("inputEndTimeCreate"))
     composeTestRule.onNodeWithTag("inputEndTimeCreate").performClick()
     composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
+  }
+
+  @Test
+  fun remainingTimeTextIsDisplayedCorrectly() {
+    val field = "Hello"
+    val maxLength = 20
+    composeTestRule.setContent { RemainingPlace(field = field, maxLength = maxLength) }
+
+    composeTestRule
+        .onNodeWithTag("remainingPlaceText")
+        .assertIsDisplayed()
+        .assertTextEquals("${field.length}/$maxLength characters")
+  }
+
+  @Test
+  fun remainingTimeComponentsArePresent() {
+    composeTestRule.setContent { RemainingPlace(field = "Hello", maxLength = 20) }
+
+    composeTestRule.onNodeWithTag("remainingPlace").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("remainingPlaceColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("remainingPlaceText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("remainingPlaceProgress").assertIsDisplayed()
   }
 }

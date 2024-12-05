@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,12 +24,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.HourglassTop
-import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -55,10 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -69,13 +63,12 @@ import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.resources.C.Tag.WHITE_COLOR
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
+import com.android.sample.ui.components.AttendantPreview
 import com.android.sample.ui.components.MyDatePicker
 import com.android.sample.ui.components.MyTimePicker
 import com.android.sample.ui.dialogs.AddImageDialog
@@ -118,7 +111,8 @@ fun EditActivityScreen(
   var expandedCategory by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf(activity?.type.toString()) }
   var selectedOptionCategory by remember { mutableStateOf(activity?.category.toString()) }
-
+  val maxDescriptionLength = 500
+  val maxTitleLength = 50
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
   val locationSuggestions by
@@ -203,6 +197,7 @@ fun EditActivityScreen(
                 itemsList = selectedImages,
                 deleteImage = { bitmap -> selectedImages = selectedImages.filter { it != bitmap } })
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            RemainingPlace(title, maxTitleLength)
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -213,6 +208,7 @@ fun EditActivityScreen(
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            RemainingPlace(description, maxDescriptionLength)
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -484,34 +480,22 @@ fun EditActivityScreen(
                   modifier = Modifier.fillMaxHeight().height(85.dp).padding(STANDARD_PADDING.dp),
               ) {
                 items(attendees.size) { index ->
-                  Card(
-                      modifier =
-                          Modifier.padding(STANDARD_PADDING.dp)
-                              .background(Color(WHITE_COLOR))
-                              .testTag("attendeeRow${index}"),
-                  ) {
-                    Row {
-                      Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
-                        Text(
-                            text = "${attendees[index].name} ${attendees[index].surname}",
-                            modifier = Modifier.testTag("attendeeName${index}"),
-                            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                        )
-                      }
-                      IconButton(
-                          onClick = { attendees = attendees.filter { it != attendees[index] } },
-                          modifier =
-                              Modifier.width(BUTTON_HEIGHT.dp)
-                                  .height(BUTTON_HEIGHT.dp)
-                                  .testTag("removeAttendeeButton"),
-                      ) {
-                        Icon(
-                            Icons.Filled.PersonRemove,
-                            contentDescription = "remove attendee",
-                        )
-                      }
-                    }
-                  }
+                  AttendantPreview(
+                      onProfileClick = {
+                        if (attendees[index].id == creator) {
+                          navigationActions.navigateTo(Screen.PROFILE)
+                        } else if (attendees[index].id == "") {
+                          Toast.makeText(context, "This user is not registered", Toast.LENGTH_SHORT)
+                              .show()
+                        } else {
+                          listActivityViewModel.selectUser(attendees[index])
+                          navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
+                        }
+                      },
+                      imageViewModel = imageViewModel,
+                      deleteAttendant = { user -> attendees = attendees.filter { it != user } },
+                      user = attendees[index],
+                      index = index)
                 }
               }
             }
@@ -524,7 +508,15 @@ fun EditActivityScreen(
             Spacer(Modifier.height(MEDIUM_PADDING.dp))
 
             Button(
-                enabled = title.isNotEmpty() && description.isNotEmpty(),
+                enabled =
+                    title.isNotEmpty() &&
+                        description.isNotEmpty() &&
+                        price.isNotEmpty() &&
+                        maxPlaces.isNotEmpty() &&
+                        selectedOptionType != "Select a type" &&
+                        selectedOptionCategory != "Select a category" &&
+                        startTime?.isNotEmpty() ?: false &&
+                        duration.isNotEmpty(),
                 onClick = {
                   if (!hourDateViewModel.isBeginGreaterThanEnd(
                       startTime ?: "00:00", duration ?: "00:01")) {
