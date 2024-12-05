@@ -33,7 +33,6 @@ fun BottomNavigationMenu(
         tabList.forEach { tab ->
           BottomNavigationItem(
               icon = { Icon(tab.icon, contentDescription = null) },
-              label = { Text(tab.textId) },
               selected = tab.route == selectedItem,
               onClick = { onTabSelect(tab) },
               modifier = Modifier.clip(RoundedCornerShape(BOTTOM_CORNER.dp)).testTag(tab.textId))
