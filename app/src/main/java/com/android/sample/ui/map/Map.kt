@@ -1,11 +1,6 @@
 package com.android.sample.ui.map
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,12 +42,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
@@ -74,7 +69,6 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,6 +89,7 @@ fun MapScreen(
   var showBottomSheet by remember { mutableStateOf(false) }
   val previousScreen = navigationActions.getPreviousRoute()
   var showFilterDialog by remember { mutableStateOf(false) }
+  HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
 
   val firstLocation =
       try {
@@ -111,27 +106,6 @@ fun MapScreen(
 
   val cameraPositionState = rememberCameraPositionState {
     position = CameraPosition.fromLatLngZoom(firstLocation, 10f)
-  }
-
-  // Activity result launcher to request permissions
-  val locationPermissionLauncher =
-      rememberLauncherForActivityResult(
-          contract = ActivityResultContracts.RequestPermission(),
-          onResult = { isGranted ->
-            if (isGranted) {
-              locationViewModel.fetchCurrentLocation()
-            } else {
-              Log.d("MapScreen", "Location permission denied by the user.")
-            }
-          })
-
-  LaunchedEffect(Unit) {
-    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_GRANTED) {
-      locationViewModel.fetchCurrentLocation()
-    } else {
-      locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
   }
 
   Scaffold(
@@ -178,8 +152,15 @@ fun MapScreen(
                             })
                       }
                   currentLocation?.let {
+                    val currentLocationMarkerState = remember {
+                      MarkerState(position = LatLng(it.latitude, it.longitude))
+                    }
+                    LaunchedEffect(it) {
+                      currentLocationMarkerState.position = LatLng(it.latitude, it.longitude)
+                    }
+
                     Marker(
-                        state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
+                        state = currentLocationMarkerState,
                         title = it.name,
                         snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
                         icon =
