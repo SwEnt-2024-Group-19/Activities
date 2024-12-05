@@ -2,15 +2,37 @@ package com.android.sample
 
 import android.app.Application
 import com.android.sample.helper.NotificationHelper
+import com.android.sample.model.activity.Activity
 import dagger.hilt.android.HiltAndroidApp
 
-@HiltAndroidApp class App : Application() {
-    lateinit var notificationHelper: NotificationHelper
+@HiltAndroidApp
+class App : Application() {
+  lateinit var notificationHelper: NotificationHelper
 
-    override fun onCreate() {
-        super.onCreate()
-        notificationHelper = NotificationHelper(this)
+  companion object {
+    private lateinit var instance: App
+
+    fun getInstance(): App {
+      return instance
     }
+  }
+
+  override fun onCreate() {
+    super.onCreate()
+    instance = this
+    notificationHelper = NotificationHelper(this)
+  }
+
+  fun scheduleNotification(activity: Activity, isCreator: Boolean) {
+    val title = if (isCreator) "Your Activity Tomorrow" else "Joined Activity Tomorrow"
+
+    notificationHelper.scheduleNotification(
+      activityId = activity.uid.toIntOrNull() ?: 0,
+      activityName = activity.title,
+      activityDate = activity.date.toDate().time,
+      notificationTitle = title
+    )
+  }
 
 }
 

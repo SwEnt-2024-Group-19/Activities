@@ -168,7 +168,7 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 dependencies {
 
     implementation ("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
-    implementation(libs.androidx.ui.desktop)
+   // implementation(libs.androidx.ui.desktop)
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:1.1.6")
 
     implementation(libs.firebase.storage.ktx)
@@ -286,6 +286,9 @@ dependencies {
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+
+    //notifications
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 
 
     // ------------- Jetpack Compose ------------------

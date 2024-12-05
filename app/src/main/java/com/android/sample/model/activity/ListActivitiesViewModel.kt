@@ -1,16 +1,14 @@
 package com.android.sample.model.activity
 
-import android.app.Application
-import android.content.Context
+
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.sample.App
 import com.android.sample.model.map.Location
-import com.android.sample.model.notifications.NotificationViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.google.firebase.Timestamp
@@ -21,6 +19,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+
 
 @HiltViewModel
 open class ListActivitiesViewModel
@@ -28,7 +29,6 @@ open class ListActivitiesViewModel
 constructor(
     private val profilesRepository: ProfilesRepository,
     private val repository: ActivitiesRepository,
-    private val notificationViewModel: NotificationViewModel
 ) : ViewModel() {
 
   private val selectedActivity_ = MutableStateFlow<Activity?>(null)
@@ -61,11 +61,11 @@ constructor(
 
   // Function to update filter state
   fun updateFilterState(
-    price: Double?,
-    placesAvailable: Int?,
-    mindateTimestamp: Timestamp?,
-    acDuration: String?,
-    seeOnlyPRO: Boolean?
+      price: Double?,
+      placesAvailable: Int?,
+      mindateTimestamp: Timestamp?,
+      acDuration: String?,
+      seeOnlyPRO: Boolean?
   ) {
     maxPrice = price ?: Double.MAX_VALUE
     availablePlaces = placesAvailable
@@ -79,9 +79,34 @@ constructor(
   }
 
   fun addActivity(activity: Activity) {
+    Log.d("ListActivitiesViewModel", "Starting addActivity")
     repository.addActivity(activity, {
+      Log.d("ListActivitiesViewModel", "Activity added successfully")
       getActivities()
-      notificationViewModel.scheduleNotification(activity)
+      try {
+        Firebase.auth.currentUser?.uid?.let { currentUserId ->
+          profilesRepository.getUser(
+            userId = currentUserId,
+            onSuccess = { currentUser ->
+              try {
+                if (currentUser != null) {
+                  App.getInstance().scheduleNotification(
+                    activity = activity,
+                    isCreator = activity.creator == currentUser.id
+                  )
+                }
+              } catch (e: Exception) {
+                Log.e("ListActivitiesViewModel", "Error scheduling notification: ${e.message}", e)
+              }
+            },
+            onFailure = { e ->
+              Log.e("ListActivitiesViewModel", "Failed to get user for notification: ${e.message}", e)
+            }
+          )
+        }
+      } catch (e: Exception) {
+        Log.e("ListActivitiesViewModel", "Error in addActivity notification flow: ${e.message}", e)
+      }
     }, {})
   }
 
@@ -116,22 +141,21 @@ constructor(
 
   fun sortActivitiesByScore(user: User, distanceTo: (Location?) -> Float?) {
     val activities =
-      (_uiState.value as? ActivitiesUiState.Success)?.activities?.sortedByDescending {
-        calculateActivityScore(it, user, distanceTo)
-      }
+        (_uiState.value as? ActivitiesUiState.Success)?.activities?.sortedByDescending {
+          calculateActivityScore(it, user, distanceTo)
+        }
 
     if (activities != null) _uiState.value = ActivitiesUiState.Success(activities)
   }
 
   open fun getWeights(): Map<String, Double> {
     return mapOf(
-      "distance" to 0.2,
-      "date" to 0.15,
-      "interest" to 0.25,
-      "participation" to 0.15,
-      "completion" to 0.1,
-      "price" to 0.15
-    )
+        "distance" to 0.2,
+        "date" to 0.15,
+        "interest" to 0.25,
+        "participation" to 0.15,
+        "completion" to 0.1,
+        "price" to 0.15)
   }
 
   open fun calculateDistanceScore(distance: Float?): Double {
@@ -167,19 +191,19 @@ constructor(
     var participationScore = 0.0
     if (userActivities.isNullOrEmpty() || creator.isEmpty()) return participationScore
     profilesRepository.getUser(
-      creator,
-      { creatorLambda ->
-        val matchingActivities =
-          creatorLambda?.activities?.count { userActivities.contains(it) } ?: 0
-        participationScore = (matchingActivities.toDouble() / 10).coerceAtMost(1.0)
-      },
-      { participationScore = 0.0 })
+        creator,
+        { creatorLambda ->
+          val matchingActivities =
+              creatorLambda?.activities?.count { userActivities.contains(it) } ?: 0
+          participationScore = (matchingActivities.toDouble() / 10).coerceAtMost(1.0)
+        },
+        { participationScore = 0.0 })
     return participationScore
   }
 
   open fun calculateCompletionScore(numberParticipants: Int, maxPlaces: Long): Double {
     if (maxPlaces == 0L || numberParticipants == 0 || numberParticipants > maxPlaces.toInt())
-      return 0.0
+        return 0.0
     return (numberParticipants.toDouble() / maxPlaces).coerceAtMost(1.0)
   }
 
@@ -189,9 +213,9 @@ constructor(
   }
 
   open fun calculateActivityScore(
-    activity: Activity,
-    user: User,
-    distanceTo: (Location?) -> Float?
+      activity: Activity,
+      user: User,
+      distanceTo: (Location?) -> Float?
   ): Double {
     val weights = getWeights()
     val totalWeights = weights.values.sum()
@@ -206,12 +230,12 @@ constructor(
     val priceScore = calculatePriceScore(activity.price)
 
     val score =
-      (distanceScore * weights["distance"]!! +
-              dateScore * weights["date"]!! +
-              interestScore * weights["interest"]!! +
-              participationScore * weights["participation"]!! +
-              completionScore * weights["completion"]!! +
-              priceScore * weights["price"]!!) / totalWeights
+        (distanceScore * weights["distance"]!! +
+            dateScore * weights["date"]!! +
+            interestScore * weights["interest"]!! +
+            participationScore * weights["participation"]!! +
+            completionScore * weights["completion"]!! +
+            priceScore * weights["price"]!!) / totalWeights
 
     cachedScores_[activity.uid] = score
     return score
@@ -222,5 +246,4 @@ constructor(
 
     data class Error(val exception: Exception) : ActivitiesUiState()
   }
-
 }
