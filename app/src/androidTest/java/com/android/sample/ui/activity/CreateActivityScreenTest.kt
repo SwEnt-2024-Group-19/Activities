@@ -238,7 +238,7 @@ class CreateActivityScreenTest {
   }
 
   @Test
-  fun createButton_isEnabledWhenAllFieldsAreFilled() {
+  fun createButton_isDisabledWhenAllFieldsAreFilledButNotTheDateAndTime() {
     composeTestRule.setContent {
       CreateActivityScreen(
           mockViewModel,
@@ -270,7 +270,7 @@ class CreateActivityScreenTest {
     composeTestRule
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("createButton"))
-    composeTestRule.onNodeWithTag("createButton").assertIsEnabled()
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
   @Test
@@ -311,10 +311,28 @@ class CreateActivityScreenTest {
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputLocationCreate"))
     composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Location")
-    composeTestRule
-        .onNodeWithTag("activityCreateScreen")
-        .performScrollToNode(hasTestTag("createButton"))
-    composeTestRule.onNodeWithTag("createButton").assertIsEnabled()
+      composeTestRule
+          .onNodeWithTag("activityCreateScreen")
+          .performScrollToNode(hasTestTag("createButton"))
+      composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+
+      composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
+      composeTestRule.onNodeWithText(types[0].name).performClick()
+      composeTestRule
+          .onNodeWithTag("activityCreateScreen")
+          .performScrollToNode(hasTestTag("createButton"))
+
+        composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+
+        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+        composeTestRule.onNodeWithText(categories[0].name).performClick()
+        composeTestRule
+            .onNodeWithTag("activityCreateScreen")
+            .performScrollToNode(hasTestTag("createButton"))
+
+        composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+
+
   }
 
   @Test
@@ -561,7 +579,7 @@ class CreateActivityScreenTest {
   }
 
     @Test
-    fun testTextIsDisplayedCorrectly() {
+    fun remainingTimeTextIsDisplayedCorrectly() {
         val field = "Hello"
         val maxLength = 20
         composeTestRule.setContent {
@@ -577,7 +595,7 @@ class CreateActivityScreenTest {
 
 
     @Test
-    fun componentsArePresent() {
+    fun remainingTimeComponentsArePresent() {
         composeTestRule.setContent {
             RemainingPlace(field = "Hello", maxLength = 20)
         }
