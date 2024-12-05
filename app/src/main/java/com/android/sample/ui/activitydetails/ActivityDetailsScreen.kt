@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -73,6 +76,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -235,12 +239,14 @@ fun ActivityDetailsScreen(
               // price
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("price")) {
+                  modifier = Modifier.testTag("price").fillMaxWidth()) {
                     Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Text(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
+                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION))
+                    PaymentInfoScreen(price ?: 0.0)
                   }
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -669,6 +675,60 @@ fun CommentItem(
         }
       }
     }
+  }
+}
+
+@Composable
+fun PaymentInfoScreen(price: Double) {
+  var showDialog by remember { mutableStateOf(false) }
+
+  // Payment Section
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Start,
+      modifier = Modifier.testTag("paymentSection")) {
+        // Payment Text
+        Text(
+            text = "Payment info",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo"))
+
+        // Info Icon with Click
+        IconButton(modifier = Modifier.testTag("infoIconButton"), onClick = { showDialog = true }) {
+          Icon(
+              painter = painterResource(id = android.R.drawable.ic_dialog_info),
+              contentDescription = "Info",
+              tint = Color.Gray)
+        }
+      }
+
+  // Info Dialog
+  if (showDialog) {
+    AlertDialog(
+        modifier = Modifier.testTag("paymentInfoDialog"),
+        onDismissRequest = { showDialog = false },
+        confirmButton = {
+          TextButton(modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
+            Text(text = stringResource(id = R.string.ok))
+          }
+        },
+        title = {
+          Text(
+              modifier = Modifier.testTag("paymentInfoTitle"),
+              text = stringResource(id = R.string.payment_info))
+        },
+        text = {
+          if (price != 0.0) {
+            Text(
+                modifier = Modifier.testTag("paymentInfoText"),
+                text = stringResource(id = R.string.payment_explanation))
+          } else {
+            Text(
+                modifier = Modifier.testTag("freeInfoText"),
+                text = stringResource(id = R.string.free_activity))
+          }
+        },
+    )
   }
 }
 
