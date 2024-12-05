@@ -144,6 +144,12 @@ constructor(
     repository.getActivities(onS, onF)
   }
 
+  fun reviewActivity(activity: Activity, userId: String, review: Boolean?) {
+    val newLikes = activity.likes.plus(userId to review)
+    val newActivity = activity.copy(likes = newLikes)
+    updateActivity(newActivity)
+  }
+
   fun sortActivitiesByScore(user: User, distanceTo: (Location?) -> Float?) {
     val activities =
         (_uiState.value as? ActivitiesUiState.Success)?.activities?.sortedByDescending {

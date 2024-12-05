@@ -18,6 +18,12 @@
     <string name="no_internet_connection">No internet connection</string>
     <string name="internet_connection_ask">Please check your connection and try again</string>
     <string name="button_to_map">See on map</string>
+    <string name="ok">OK</string>
+    <string name="payment_info">Payment Information</string>
+    <string name="PRO_info">PRO Information</string>
+    <string name="payment_explanation">The payment will be done on-site. Please ensure you have the necessary amount ready.</string>
+    <string name="PRO_explanation">A PRO activity is organized by an official institution that is susceptible to make profit from the activity.</string>
+    <string name="free_activity">This activity is free. No payment is needed to attend.</string>
 
 
 </resources>
