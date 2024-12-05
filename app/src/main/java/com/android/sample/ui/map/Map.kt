@@ -136,34 +136,34 @@ fun MapScreen(
 
   Scaffold(
       floatingActionButton = {
-          Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(horizontal = MEDIUM_PADDING.dp),
-              horizontalArrangement = Arrangement.SpaceBetween
-          ){
-          FloatingActionButton(
-              modifier =
-              Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("centerOnCurrentLocation"),
-              onClick = {
-                  coroutineScope.launch {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
+            horizontalArrangement = Arrangement.SpaceBetween) {
+              FloatingActionButton(
+                  modifier =
+                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                          .testTag("centerOnCurrentLocation"),
+                  onClick = {
+                    coroutineScope.launch {
                       currentLocation?.let {
-                          val locationLatLng = LatLng(it.latitude, it.longitude)
-                          cameraPositionState.animate(
-                              update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
-                              durationMs = 800)
+                        val locationLatLng = LatLng(it.latitude, it.longitude)
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                            durationMs = 800)
                       }
+                    }
+                  }) {
+                    Icon(
+                        Icons.Default.MyLocation, contentDescription = "Center on current location")
                   }
-              }) {
-              Icon(Icons.Default.MyLocation, contentDescription = "Center on current location")
-          }
-          FloatingActionButton(
-              modifier =
-              Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("filterDialogButton"),
-              onClick = { showFilterDialog = true }) {
-              Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
-          }
-              }
+              FloatingActionButton(
+                  modifier =
+                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                          .testTag("filterDialogButton"),
+                  onClick = { showFilterDialog = true }) {
+                    Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
+                  }
+            }
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
