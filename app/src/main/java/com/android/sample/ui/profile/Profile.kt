@@ -133,7 +133,11 @@ fun ProfileContent(
       },
       topBar = {
         TopAppBar(
-            title = { Text("Profile") },
+            title = {
+              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Profile")
+              }
+            },
             actions = {
               IconButton(
                   onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
