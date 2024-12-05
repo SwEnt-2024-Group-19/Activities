@@ -35,6 +35,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import java.util.Calendar
 
 class ProfileScreenTest {
 
@@ -195,17 +196,20 @@ class ProfileScreenTest {
 
   @Test
   fun test_RemainingTime_ForMonths() {
-    composeTestRule.setContent { RemainingTime(activity = activity1) }
-    sleep(5000)
-    composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
-    composeTestRule.onNodeWithText("In 305 months").assertIsDisplayed()
+      val futureDate = com.google.firebase.Timestamp(Date(System.currentTimeMillis() + 305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
+      val activity = activity1.copy(date = futureDate, startTime = "12:00") // Start time is noon
+
+      composeTestRule.setContent { RemainingTime(activity = activity) }
+      sleep(5000)
+      composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
+      composeTestRule.onNodeWithText("In 304 months").assertIsDisplayed()
   }
 
   @Test
   fun test_RemainingTime_ForDays() {
     val futureDate =
         com.google.firebase.Timestamp(
-            Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000)) // 7 days from now
+            Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000))
     val activity = activity1.copy(date = futureDate)
 
     composeTestRule.setContent { RemainingTime(activity = activity) }
@@ -215,14 +219,18 @@ class ProfileScreenTest {
 
   @Test
   fun test_RemainingTime_ForHours() {
-    val futureDate =
-        com.google.firebase.Timestamp(
-            Date(System.currentTimeMillis() + 2L * 60 * 60 * 1000)) // 2 hours from now
-    val activity = activity1.copy(date = futureDate)
+      val currentTime = System.currentTimeMillis()
+      val futureDate = com.google.firebase.Timestamp(Date(currentTime))
+      val calendar = Calendar.getInstance().apply { timeInMillis = currentTime }
+      calendar.add(Calendar.MINUTE, 30)
+      val futureStartTime = "${calendar.get(Calendar.HOUR_OF_DAY)}:${calendar.get(Calendar.MINUTE)}"
 
-    composeTestRule.setContent { RemainingTime(activity = activity) }
+      val activity = activity1.copy(date = futureDate, startTime = futureStartTime)
 
-    composeTestRule.onNodeWithText("In 1 h 59 min").assertIsDisplayed()
+      composeTestRule.setContent { RemainingTime(activity = activity) }
+      sleep(5000)
+      composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
+      composeTestRule.onNodeWithText("In 0 h 29 min").assertIsDisplayed()
   }
 
   @Test
