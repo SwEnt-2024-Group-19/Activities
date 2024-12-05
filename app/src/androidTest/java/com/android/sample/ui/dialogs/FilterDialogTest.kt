@@ -127,4 +127,43 @@ class FilterDialogTest {
     assertEquals("2 hours", duration)
     assert(schedule != null) // Check timestamp is parsed
   }
+
+  @Test
+  fun test_PROInfo_initialState() {
+
+    composeTestRule.setContent { PROinfo() }
+
+    composeTestRule.onNodeWithTag("PROSection").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("infoIconButton").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("PROInfo").assertTextContains("PRO info")
+
+    composeTestRule.onNodeWithTag("PROInfoDialog").assertDoesNotExist()
+  }
+
+  @Test
+  fun test_PROInfo_dialogOpensOnClick() {
+    composeTestRule.setContent { PROinfo() }
+
+    composeTestRule.onNodeWithTag("infoIconButton").performClick()
+
+    composeTestRule.onNodeWithTag("PROInfoDialog").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("PROInfoTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("PROInfoText").assertIsDisplayed()
+  }
+
+  @Test
+  fun test_PROInfo_dialogClosesOnOkClick() {
+    composeTestRule.setContent { PROinfo() }
+
+    composeTestRule.onNodeWithTag("infoIconButton").performClick()
+
+    composeTestRule.onNodeWithTag("PROInfoDialog").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("okButton").performClick()
+
+    composeTestRule.onNodeWithTag("PRODialog").assertDoesNotExist()
+  }
 }

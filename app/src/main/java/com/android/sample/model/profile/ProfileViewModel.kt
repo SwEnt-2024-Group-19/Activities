@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.database.AppDatabase
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
@@ -118,10 +119,12 @@ constructor(private val repository: ProfilesRepository, private val localDatabas
   }
   /** Check if the activity should be displayed based on the category and the user's role in the */
   fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
+    val hourDateViewModel = HourDateViewModel()
+    val activityTimestamp = hourDateViewModel.combineDateAndTime(activity.date, activity.startTime)
     return when (category) {
-      "created" -> activity.creator == user.id && activity.date > Timestamp.now()
-      "enrolled" -> activity.creator != user.id && activity.date > Timestamp.now()
-      "past" -> activity.date < Timestamp.now()
+      "created" -> activity.creator == user.id && activityTimestamp > Timestamp.now()
+      "enrolled" -> activity.creator != user.id && activityTimestamp > Timestamp.now()
+      "past" -> activityTimestamp < Timestamp.now()
       else -> false
     }
   }
