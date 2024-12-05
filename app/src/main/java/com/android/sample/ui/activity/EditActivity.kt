@@ -204,20 +204,7 @@ fun EditActivityScreen(
                 itemsList = selectedImages,
                 deleteImage = { bitmap -> selectedImages = selectedImages.filter { it != bitmap } })
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-              Text(
-                  text = "${title.length}/$maxTitleLength characters",
-                  fontSize = MEDIUM_PADDING.sp,
-                  color = Color.Gray,
-                  modifier = Modifier.align(Alignment.End).padding(end=STANDARD_PADDING.dp)
-              )
-              LinearProgressIndicator(
-                  progress = title.length / maxTitleLength.toFloat(),
-                  modifier = Modifier
-                      .height(STANDARD_PADDING.dp).width(130.dp).align(Alignment.End)
-                      .clip(RoundedCornerShape(SMALL_PADDING.dp)).padding(end = STANDARD_PADDING.dp),
-                  color = Color(DARK_BLUE_COLOR),
-                  backgroundColor = Color.LightGray
-              )
+              RemainingPlace(title, maxTitleLength)
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -228,20 +215,7 @@ fun EditActivityScreen(
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-              Text(
-                  text = "${description.length}/$maxDescriptionLength characters",
-                  fontSize = MEDIUM_PADDING.sp,
-                  color = Color.Gray,
-                  modifier = Modifier.align(Alignment.End).padding(end = STANDARD_PADDING.dp)
-              )
-              LinearProgressIndicator(
-                  progress = description.length / maxDescriptionLength.toFloat(),
-                  modifier = Modifier
-                      .height(STANDARD_PADDING.dp).width(130.dp).align(Alignment.End)
-                      .clip(RoundedCornerShape(SMALL_PADDING.dp)).padding(end = STANDARD_PADDING.dp),
-                  color = Color(DARK_BLUE_COLOR),
-                  backgroundColor = Color.LightGray
-              )
+              RemainingPlace(description, maxDescriptionLength)
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },

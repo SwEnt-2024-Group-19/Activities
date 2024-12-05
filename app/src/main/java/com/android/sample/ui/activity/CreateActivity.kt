@@ -6,6 +6,7 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -198,20 +199,7 @@ fun CreateActivityScreen(
                   deleteImage = { bitmap -> selectedImages.remove(bitmap) })
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-                Text(
-                    text = "${title.length}/$maxTitleLength characters",
-                    fontSize = MEDIUM_PADDING.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.End).padding(end=STANDARD_PADDING.dp)
-                )
-                LinearProgressIndicator(
-                    progress = title.length / maxTitleLength.toFloat(),
-                    modifier = Modifier
-                        .height(STANDARD_PADDING.dp).width(130.dp).align(Alignment.End)
-                        .clip(RoundedCornerShape(SMALL_PADDING.dp)).padding(end = STANDARD_PADDING.dp),
-                    color = Color(DARK_BLUE_COLOR),
-                    backgroundColor = Color.LightGray
-                )
+                RemainingPlace(title, maxTitleLength)
               OutlinedTextField(
                   value = title,
                   onValueChange = { if (it.length <= maxTitleLength) {
@@ -229,20 +217,7 @@ fun CreateActivityScreen(
 
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                Text(
-                    text = "${description.length}/$maxDescriptionLength characters",
-                    fontSize = MEDIUM_PADDING.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.End).padding(end = STANDARD_PADDING.dp)
-                )
-                LinearProgressIndicator(
-                    progress = description.length / maxDescriptionLength.toFloat(),
-                    modifier = Modifier
-                        .height(STANDARD_PADDING.dp).width(130.dp).align(Alignment.End)
-                        .clip(RoundedCornerShape(SMALL_PADDING.dp)).padding(end = STANDARD_PADDING.dp),
-                    color = Color(DARK_BLUE_COLOR),
-                    backgroundColor = Color.LightGray
-                )
+                RemainingPlace(description, maxDescriptionLength)
               OutlinedTextField(
                   value = description,
                   onValueChange = {  if (it.length <= maxDescriptionLength) {
@@ -643,4 +618,34 @@ fun CreateActivityScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.ADD_ACTIVITY)
       })
+}
+@Composable
+fun RemainingPlace(field: String, maxLength: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp).testTag("remainingPlace"),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.testTag("remainingPlaceColumn")
+        ) {
+            Text(
+                text = "${field.length}/$maxLength characters",
+                fontSize = MEDIUM_PADDING.sp,
+                color = Color.Gray,
+                modifier = Modifier.testTag("remainingPlaceText")
+            )
+            LinearProgressIndicator(
+                progress = field.length / maxLength.toFloat(),
+                modifier = Modifier
+                    .height(STANDARD_PADDING.dp)
+                    .width(130.dp)
+                    .clip(RoundedCornerShape(SMALL_PADDING.dp)).testTag("remainingPlaceProgress")
+                    ,
+                color = Color(DARK_BLUE_COLOR),
+                backgroundColor = Color.LightGray
+            )
+        }
+    }
+
 }
