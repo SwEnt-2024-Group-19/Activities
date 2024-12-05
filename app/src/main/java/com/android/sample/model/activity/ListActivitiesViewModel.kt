@@ -79,26 +79,19 @@ constructor(
   }
 
   fun addActivity(activity: Activity) {
-    Log.d("ListActivitiesViewModel", "Starting addActivity")
     repository.addActivity(activity, {
-      Log.d("ListActivitiesViewModel", "Activity added successfully")
       getActivities()
-      Log.d("ListActivitiesViewModel", "Got activities")
       viewModelScope.launch {
-        Log.d("ListActivitiesViewModel", "Starting notification scheduling")
         try {
           Firebase.auth.currentUser?.uid?.let { currentUserId ->
-            Log.d("ListActivitiesViewModel", "Got current user ID: $currentUserId")
             profilesRepository.getUser(
               userId = currentUserId,
               onSuccess = { currentUser ->
-                Log.d("ListActivitiesViewModel", "Got user profile")
                 if (currentUser != null) {
                   App.getInstance().scheduleNotification(
                     activity = activity,
                     isCreator = activity.creator == currentUser.id
                   )
-                  Log.d("ListActivitiesViewModel", "Notification scheduled")
                 }
               },
               onFailure = { e ->
@@ -116,7 +109,26 @@ constructor(
   }
 
   fun updateActivity(activity: Activity) {
-    repository.updateActivity(activity, { getActivities() }, {})
+    repository.updateActivity(activity, {
+      getActivities()
+      // notification scheduling
+      Firebase.auth.currentUser?.uid?.let { currentUserId ->
+        profilesRepository.getUser(
+          userId = currentUserId,
+          onSuccess = { currentUser ->
+            if (currentUser != null) {
+              App.getInstance().scheduleNotification(
+                activity = activity,
+                isCreator = activity.creator == currentUser.id
+              )
+            }
+          },
+          onFailure = { e ->
+            Log.e("ListActivitiesViewModel", "Failed to schedule notification for update", e)
+          }
+        )
+      }
+    }, {})
   }
 
   fun deleteActivityById(id: String) {

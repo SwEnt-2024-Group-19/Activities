@@ -1,6 +1,7 @@
 package com.android.sample
 
 import android.app.Application
+import android.util.Log
 import com.android.sample.helper.NotificationHelper
 import com.android.sample.model.activity.Activity
 import dagger.hilt.android.HiltAndroidApp
@@ -26,14 +27,17 @@ class App : Application() {
   }
 
   fun scheduleNotification(activity: Activity, isCreator: Boolean) {
-    val title = if (isCreator) "Your Activity Tomorrow" else "Joined Activity Tomorrow"
+    val title = if (isCreator) "Your Activity is Tomorrow!" else "The Activity you joined is Tomorrow"
 
     val activityDate = activity.date.toDate().time
+    Log.e("inApp", "activityDate: $activityDate")
     val activityTime = LocalTime.parse(activity.startTime)
+    Log.e("inApp", "activityTime: $activityTime")
 
     val activityDateTime = activityDate +
             TimeUnit.HOURS.toMillis(activityTime.hour.toLong()) +
             TimeUnit.MINUTES.toMillis(activityTime.minute.toLong())
+    Log.e("inApp", "activityDateTime: $activityDateTime")
 
     notificationHelper.scheduleNotification(
       activityId = activity.uid.toIntOrNull() ?: 0,
