@@ -135,13 +135,6 @@ fun MapScreen(
     }
   }
 
-  val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.current_location)
-  val scaledBitmap =
-      Bitmap.createScaledBitmap(
-          originalBitmap,
-          (originalBitmap.width * 0.05).toInt(), // Adjust the scale factor as needed
-          (originalBitmap.height * 0.05).toInt(),
-          false)
   Scaffold(
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
@@ -190,7 +183,7 @@ fun MapScreen(
                         state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
                         title = it.name,
                         snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                        icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap))
+                        icon = BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(context.resources, R.drawable.current_location)))
                   }
                 }
 
