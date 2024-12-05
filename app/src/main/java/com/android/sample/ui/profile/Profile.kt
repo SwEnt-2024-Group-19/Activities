@@ -90,9 +90,7 @@ fun ProfileScreen(
 @Composable
 fun LoadingScreen(navigationActions: NavigationActions) {
   Scaffold(
-      modifier = Modifier
-          .fillMaxSize()
-          .testTag("loadingScreen"),
+      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
@@ -100,9 +98,7 @@ fun LoadingScreen(navigationActions: NavigationActions) {
             selectedItem = navigationActions.currentRoute())
       }) { innerPadding ->
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            Modifier.fillMaxSize().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
                   "You do not have a profile",
@@ -132,9 +128,7 @@ fun ProfileContent(
   var showMenu by remember { mutableStateOf(false) }
   Log.d("ProfileScreen", "User photo: ${user.photo}")
   Scaffold(
-      modifier = Modifier
-          .fillMaxSize()
-          .testTag("profileScreen"),
+      modifier = Modifier.fillMaxSize().testTag("profileScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
@@ -183,10 +177,7 @@ fun ProfileContent(
         }
       }) { innerPadding ->
         LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .testTag("profileContentColumn"),
+            Modifier.fillMaxSize().padding(innerPadding).testTag("profileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
               item { ProfileHeader(user, imageViewModel) }
 
@@ -217,7 +208,8 @@ fun ProfileContent(
                   navigationActions,
                   userProfileViewModel,
                   listActivitiesViewModel,
-                  false)
+                  false,
+                  user)
               displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
@@ -225,7 +217,8 @@ fun ProfileContent(
                   navigationActions,
                   userProfileViewModel,
                   listActivitiesViewModel,
-                  false)
+                  false,
+                  user)
               displayActivitySection(
                   "Past Activities",
                   "past",
@@ -233,7 +226,8 @@ fun ProfileContent(
                   navigationActions,
                   userProfileViewModel,
                   listActivitiesViewModel,
-                  false)
+                  false,
+                  user)
             }
       }
 }
@@ -246,7 +240,8 @@ fun LazyListScope.displayActivitySection(
     navigationActions: NavigationActions,
     userProfileViewModel: ProfileViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
-    isParticipantProfile: Boolean
+    isParticipantProfile: Boolean,
+    user: User
 ) {
   item {
     Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
@@ -259,21 +254,17 @@ fun LazyListScope.displayActivitySection(
           listActivitiesViewModel = listActivitiesViewModel,
           navigationActions = navigationActions,
           category = category,
-          userProfileViewModel = userProfileViewModel)
+          userProfileViewModel = userProfileViewModel,
+          user = user)
     }
   } else {
-      if(!isParticipantProfile) {
-          item {
-              PlusButtonToCreate(navigationActions = navigationActions)
-          }
-      }else {
-          item{
-              Text(
-                  "This participant has no activities",
-                  modifier = Modifier.padding(MEDIUM_PADDING.dp)
-              )
-          }
+    if (!isParticipantProfile) {
+      item { PlusButtonToCreate(navigationActions = navigationActions) }
+    } else {
+      item {
+        Text("This participant has no activities", modifier = Modifier.padding(MEDIUM_PADDING.dp))
       }
+    }
   }
 }
 
@@ -283,9 +274,7 @@ fun SectionTitle(title: String, testTag: String) {
       text = title,
       fontSize = TITLE_FONTSIZE.sp,
       modifier =
-      Modifier
-          .padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
-          .testTag(testTag))
+          Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp).testTag(testTag))
 }
 
 /** Display the user's profile picture and name */
@@ -298,17 +287,12 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel) {
       modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
   ProfileImage(
       userId = user.id,
-      modifier = Modifier
-          .size(IMAGE_SIZE.dp)
-          .clip(CircleShape)
-          .testTag("profilePicture"),
+      modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
       imageViewModel)
   Text(
       text = "${user.name} ${user.surname}",
       fontSize = TITLE_FONTSIZE.sp,
-      modifier = Modifier
-          .padding(top = STANDARD_PADDING.dp)
-          .testTag("userName"))
+      modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
 }
 
 /** Display a single activity in a box, the same box is used for all categories */
@@ -318,29 +302,19 @@ fun ActivityBox(
     listActivitiesViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     category: String,
-    userProfileViewModel: ProfileViewModel
+    userProfileViewModel: ProfileViewModel,
+    user: User
 ) {
   val context = LocalContext.current
   ActivityRow(
       activity = activity,
-      onClickAction = {
-        listActivitiesViewModel.selectActivity(activity)
-        userProfileViewModel.navigateToActivity(navigationActions, context)
-      },
+      listActivitiesViewModel = listActivitiesViewModel,
+      userProfileViewModel = userProfileViewModel,
+      navigationActions = navigationActions,
+      category = category,
+      userId = user.id,
+      context = context,
       testTag = "activity${category.capitalize()}")
-  thisActivity?.let { activity ->
-    if (userProfileViewModel.shouldShowActivity(activity, user, category)) {
-      ActivityRow(
-          activity = activity,
-          listActivitiesViewModel = listActivitiesViewModel,
-          userProfileViewModel = userProfileViewModel,
-          navigationActions = navigationActions,
-          category = category,
-          userId = user.id,
-          context = context,
-          testTag = "activity${category.capitalize()}")
-    }
-  }
 }
 
 /** Display a single activity in a row */
@@ -370,9 +344,7 @@ fun ActivityRow(
             painter = painterResource(id = R.drawable.foot),
             contentDescription = "Activity Image",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(MEDIUM_PADDING.dp)
-                .padding(end = MEDIUM_PADDING.dp))
+            modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
         Column(modifier = Modifier.weight(WIDTH_FRACTION)) {
           Row(
@@ -478,10 +450,9 @@ fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
 fun InterestBox(interest: String) {
   Box(
       modifier =
-      Modifier
-          .background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
-          .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-          .testTag(interest),
+          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+              .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
+              .testTag(interest),
       contentAlignment = Alignment.Center) {
         Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
       }

@@ -97,8 +97,8 @@ fun ParticipantProfileContent(
     imageViewModel: ImageViewModel,
     profileViewModel: ProfileViewModel
 ) {
-    val uiState by listActivitiesViewModel.uiState.collectAsState()
-    Scaffold(
+  val uiState by listActivitiesViewModel.uiState.collectAsState()
+  Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
       topBar = {
         TopAppBar(
@@ -134,35 +134,39 @@ fun ParticipantProfileContent(
                     }
               }
 
-            val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-            val usersActivity =
-                activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
+              val activitiesList =
+                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+              val usersActivity =
+                  activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
 
-            // Display activities sections
-            displayActivitySection(
-                "Activities Created",
-                "created",
-                usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
-                navigationActions,
-                profileViewModel,
-                listActivitiesViewModel,
-            true )
-            displayActivitySection(
-                "Activities Enrolled in",
-                "enrolled",
-                usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
-                navigationActions,
-                profileViewModel,
-                listActivitiesViewModel,
-                true)
-            displayActivitySection(
-                "Past Activities",
-                "past",
-                usersActivity.filter { it.date < Timestamp.now() },
-                navigationActions,
-                profileViewModel,
-                listActivitiesViewModel,
-                true)
+              // Display activities sections
+              displayActivitySection(
+                  "Activities Created",
+                  "created",
+                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
+                  navigationActions,
+                  profileViewModel,
+                  listActivitiesViewModel,
+                  true,
+                  user)
+              displayActivitySection(
+                  "Activities Enrolled in",
+                  "enrolled",
+                  usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
+                  navigationActions,
+                  profileViewModel,
+                  listActivitiesViewModel,
+                  true,
+                  user)
+              displayActivitySection(
+                  "Past Activities",
+                  "past",
+                  usersActivity.filter { it.date < Timestamp.now() },
+                  navigationActions,
+                  profileViewModel,
+                  listActivitiesViewModel,
+                  true,
+                  user)
             }
       }
 }
