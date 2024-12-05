@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,15 +22,12 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.HourglassTop
-import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -46,14 +42,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -76,6 +68,7 @@ import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
+import com.android.sample.ui.components.AttendantPreview
 import com.android.sample.ui.components.MyDatePicker
 import com.android.sample.ui.components.MyTimePicker
 import com.android.sample.ui.components.NoInternetScreen
@@ -492,36 +485,15 @@ fun CreateActivityScreen(
                     modifier = Modifier.fillMaxHeight().height(85.dp).padding(STANDARD_PADDING.dp),
                 ) {
                   items(attendees.size) { index ->
-                    Card(
-                        modifier =
-                            Modifier.padding(STANDARD_PADDING.dp)
-                                .background(Color(0xFFFFFFFF))
-                                .testTag("attendeeRow${index}"),
-                    ) {
-                      Row {
-                        Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
-                          Text(
-                              text = "${attendees[index].name} ${attendees[index].surname}",
-                              modifier = Modifier.testTag("attendeeName${index}"),
-                              style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 12.sp),
-                          )
-                        }
-                        IconButton(
-                            onClick = { attendees = attendees.filter { it != attendees[index] } },
-                            modifier =
-                                Modifier.width(40.dp).height(40.dp).testTag("removeAttendeeButton"),
-                        ) {
-                          Icon(
-                              Icons.Filled.PersonRemove,
-                              contentDescription = "remove attendee",
-                          )
-                        }
-                      }
-                    }
+                    AttendantPreview(
+                        onProfileClick = {},
+                        imageViewModel = imageViewModel,
+                        deleteAttendant = { user -> attendees = attendees.filter { it != user } },
+                        user = attendees[index],
+                        index = index)
                   }
                 }
               }
-
               if (showDialogUser) {
                 AddUserDialog(
                     onDismiss = { showDialogUser = false },
