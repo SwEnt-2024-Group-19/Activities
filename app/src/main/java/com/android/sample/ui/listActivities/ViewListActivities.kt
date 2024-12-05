@@ -363,8 +363,8 @@ fun ActivityCard(
                                             RoundedCornerShape(
                                                 12.dp)) // Purple background with rounded corners
                                     .padding(
-                                        horizontal = 8.dp,
-                                        vertical = 4.dp) // Inner padding for text
+                                        horizontal = STANDARD_PADDING.dp,
+                                        vertical = SMALL_PADDING.dp) // Inner padding for text
                             ) {
                               Text(
                                   text = "ENROLLED",
