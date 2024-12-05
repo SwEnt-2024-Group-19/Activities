@@ -52,6 +52,7 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
               value = name,
               onValueChange = { name = it },
               label = { Text("Name") },
+              singleLine = true,
           )
 
           OutlinedTextField(
@@ -59,6 +60,7 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
               value = surname,
               onValueChange = { surname = it },
               label = { Text("Surname") },
+              singleLine = true,
           )
           Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           Button(
