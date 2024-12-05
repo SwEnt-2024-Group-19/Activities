@@ -69,11 +69,11 @@ fun FilterDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
                       // Minimum Price Display
-                      Text(text = "€ 0,0", modifier = Modifier.testTag("minPriceDisplay"))
+                      Text(text = "CHF 0,0", modifier = Modifier.testTag("minPriceDisplay"))
 
                       // Maximum Price Display
                       Text(
-                          text = "€ ${"%.2f".format(maxPrice)}",
+                          text = "CHF ${"%.2f".format(maxPrice)}",
                           modifier = Modifier.testTag("maxPriceDisplay"))
                     }
                 Spacer(modifier = Modifier.height(8.dp))
