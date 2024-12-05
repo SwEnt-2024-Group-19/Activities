@@ -34,4 +34,10 @@ interface ImageRepository {
       onSuccess: (List<Bitmap>) -> Unit,
       onFailure: (Exception) -> Unit
   )
+
+  fun removeAllActivityImages(
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  )
 }
