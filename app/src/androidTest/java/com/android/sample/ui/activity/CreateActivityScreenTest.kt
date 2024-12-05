@@ -559,4 +559,33 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithTag("inputEndTimeCreate").performClick()
     composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
   }
+
+    @Test
+    fun testTextIsDisplayedCorrectly() {
+        val field = "Hello"
+        val maxLength = 20
+        composeTestRule.setContent {
+            RemainingPlace(field = field, maxLength = maxLength)
+        }
+
+
+        composeTestRule.onNodeWithTag("remainingPlaceText")
+            .assertIsDisplayed()
+            .assertTextEquals("${field.length}/$maxLength characters")
+    }
+
+
+
+    @Test
+    fun componentsArePresent() {
+        composeTestRule.setContent {
+            RemainingPlace(field = "Hello", maxLength = 20)
+        }
+
+        composeTestRule.onNodeWithTag("remainingPlace").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("remainingPlaceColumn").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("remainingPlaceText").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("remainingPlaceProgress").assertIsDisplayed()
+    }
 }
+
