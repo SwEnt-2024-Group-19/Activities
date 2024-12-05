@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,8 +69,10 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.PURPLE_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.components.SearchBar
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -259,6 +262,7 @@ fun ListActivitiesScreen(
                     text = "Error: ${error.message}",
                     modifier = Modifier.padding(STANDARD_PADDING.dp))
               }
+              else -> {}
             }
           }
         }
@@ -313,6 +317,68 @@ fun ActivityCard(
                     Modifier.align(Alignment.BottomStart)
                         .padding(MEDIUM_PADDING.dp)
                         .testTag("titleActivity"))
+
+            if (profile != null) {
+              if (profile.activities?.contains(activity.uid) == true) {
+                Row(
+                    modifier =
+                        Modifier.align(Alignment.TopEnd)
+                            .padding(SMALL_PADDING.dp)
+                            .testTag("activityStatus"),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                      if (profile.id == activity.creator) {
+                        Box(
+                            modifier =
+                                Modifier.padding(SMALL_PADDING.dp)
+                                    .testTag("activityStatusPresent")
+                                    .background(
+                                        Color(PURPLE_COLOR),
+                                        shape =
+                                            RoundedCornerShape(
+                                                TEXT_FONTSIZE
+                                                    .dp)) // Purple background with rounded corners
+                                    .padding(
+                                        horizontal = SMALL_PADDING.dp,
+                                        vertical = SMALL_PADDING.dp)) {
+                              Text(
+                                  text = "YOUR ACTIVITY",
+                                  style =
+                                      MaterialTheme.typography.bodySmall.copy(
+                                          color = Color.White,
+                                          fontStyle = FontStyle.Italic,
+                                          fontWeight = FontWeight.SemiBold),
+                                  modifier = Modifier.testTag("yourActivityStatus"))
+                            }
+                      }
+                      if (profile.id != activity.creator ||
+                          activity.participants.find { it.id == profile.id } != null) {
+                        Box(
+                            modifier =
+                                Modifier.padding(TEXT_FONTSIZE.dp)
+                                    .testTag("activityStatusEnrolledBox")
+                                    .background(
+                                        Color(PURPLE_COLOR),
+                                        shape =
+                                            RoundedCornerShape(
+                                                12.dp)) // Purple background with rounded corners
+                                    .padding(
+                                        horizontal = STANDARD_PADDING.dp,
+                                        vertical = SMALL_PADDING.dp) // Inner padding for text
+                            ) {
+                              Text(
+                                  text = "ENROLLED",
+                                  style =
+                                      MaterialTheme.typography.bodySmall.copy(
+                                          color = Color.White,
+                                          fontStyle = FontStyle.Italic,
+                                          fontWeight = FontWeight.SemiBold),
+                                  modifier = Modifier.testTag("enrolledText"))
+                            }
+                      }
+                    }
+              }
+            }
           }
 
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))

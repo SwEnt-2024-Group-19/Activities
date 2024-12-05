@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
+import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
@@ -526,7 +527,8 @@ fun CreateActivityScreen(
                       Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT)
                           .show()
                     } else {
-                      attendees += profileViewModel.userState.value!!
+                      if (selectedOptionType == ActivityType.INDIVIDUAL.name)
+                          profileViewModel.userState.value?.let { user -> attendees += user }
                       try {
                         imageViewModel.uploadActivityImages(
                             activityId,
