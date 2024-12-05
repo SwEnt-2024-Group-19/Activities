@@ -56,10 +56,8 @@ class NotificationHelper(private val context: Context) {
             )
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        // val notificationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1) // 1 mn before activty
+
         val notificationTime = activityDate - TimeUnit.HOURS.toMillis(24) // 24h before
-        Log.d("NotificationHelper", "Activity scheduled for: ${Date(activityDate)}")
-        Log.d("NotificationHelper", "Notification set for: ${Date(notificationTime)}")
 
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,

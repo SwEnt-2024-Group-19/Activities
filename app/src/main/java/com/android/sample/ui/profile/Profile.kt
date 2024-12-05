@@ -12,8 +12,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
@@ -134,15 +132,10 @@ fun ProfileContent(
       },
       topBar = {
         TopAppBar(
-            title = { Text("Profile") },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back")
-                  }
+            title = {
+              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Profile")
+              }
             },
             actions = {
               IconButton(
@@ -165,13 +158,11 @@ fun ProfileContent(
                           })
                     },
                     enabled = Firebase.auth.currentUser?.isAnonymous == false)
+                DropdownMenuItem(
+                    text = { Text("Edit profile") },
+                    onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
               }
             })
-      },
-      floatingActionButton = {
-        FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
-          Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
-        }
       }) { innerPadding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(innerPadding).testTag("profileContentColumn"),
@@ -368,7 +359,7 @@ fun RemainingTime(activity: Activity) {
     val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
     val fraction =
         (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
-    return lerp(Color(DARK_BLUE_COLOR), Color(LIGHT_PURPLE_COLOR), 1 - fraction)
+    return lerp(Color(LIGHT_PURPLE_COLOR), Color(DARK_BLUE_COLOR), 1 - fraction)
   }
 
   val textColor = calculateColor(remainingTimeMillis)
