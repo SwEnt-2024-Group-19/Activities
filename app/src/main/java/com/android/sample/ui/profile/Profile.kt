@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,6 +44,7 @@ import com.android.sample.resources.C.Tag.LIGHT_PURPLE_COLOR
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
@@ -286,26 +290,39 @@ fun ActivityBox(
     if (userProfileViewModel.shouldShowActivity(activity, user, category)) {
       ActivityRow(
           activity = activity,
-          onClickAction = {
-            listActivitiesViewModel.selectActivity(activity)
-            userProfileViewModel.navigateToActivity(navigationActions, context)
-          },
-          testTag = "activity${category.capitalize()}",
-          category = category)
+          listActivitiesViewModel = listActivitiesViewModel,
+          userProfileViewModel = userProfileViewModel,
+          navigationActions = navigationActions,
+          category = category,
+          userId = user.id,
+          context = context,
+          testTag = "activity${category.capitalize()}")
     }
   }
 }
 
 /** Display a single activity in a row */
 @Composable
-fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String, category: String) {
+fun ActivityRow(
+    activity: Activity,
+    listActivitiesViewModel: ListActivitiesViewModel,
+    userProfileViewModel: ProfileViewModel,
+    navigationActions: NavigationActions,
+    category: String,
+    userId: String,
+    context: Context,
+    testTag: String
+) {
   Row(
       modifier =
           Modifier.fillMaxWidth()
               .testTag(testTag)
               .padding(STANDARD_PADDING.dp)
               .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable { onClickAction() },
+              .clickable {
+                listActivitiesViewModel.selectActivity(activity)
+                userProfileViewModel.navigateToActivity(navigationActions, context)
+              },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = painterResource(id = R.drawable.foot),
@@ -327,6 +344,11 @@ fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String, 
                 }
               }
           Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
+        }
+        if (category == "past") {
+          ReviewActivityButtons(activity.likes[userId]) { review ->
+            listActivitiesViewModel.reviewActivity(activity, userId, review)
+          }
         }
       }
 }
@@ -363,6 +385,49 @@ fun RemainingTime(activity: Activity) {
       fontSize = SUBTITLE_FONTSIZE.sp,
       color = textColor,
       modifier = Modifier.testTag("remainingTime"))
+}
+
+
+@Composable
+fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
+  var isLiked: Boolean? by remember { mutableStateOf(currentReview) }
+  Row {
+    IconButton(
+        onClick = {
+          isLiked = if (isLiked == true) null else true
+          review(isLiked)
+        },
+        colors =
+            IconButtonDefaults.iconButtonColors(
+                containerColor = if (isLiked == true) Color(SUCCESS_COLOR) else Color.Transparent,
+                contentColor =
+                    if (isLiked == true) MaterialTheme.colorScheme.onError
+                    else MaterialTheme.colorScheme.onSurface),
+        modifier = Modifier.testTag("likeIconButton_${isLiked == true}")) {
+          Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "Like")
+        }
+    Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
+    IconButton(
+        onClick = {
+          isLiked = if (isLiked == false) null else false
+          review(isLiked)
+        },
+        colors =
+            IconButtonDefaults.iconButtonColors(
+                containerColor =
+                    if (isLiked == false) MaterialTheme.colorScheme.error else Color.Transparent,
+                contentColor =
+                    if (isLiked == false) MaterialTheme.colorScheme.onError
+                    else MaterialTheme.colorScheme.onSurface),
+        modifier = Modifier.testTag("dislikeIconButton_${isLiked == false}")) {
+          Icon(
+              imageVector = Icons.Default.ThumbDown,
+              contentDescription = "Dislike",
+              tint =
+                  if (isLiked == false) MaterialTheme.colorScheme.onError
+                  else MaterialTheme.colorScheme.onSurface)
+        }
+  }
 }
 
 /** Display a single interest in a box */

@@ -76,4 +76,17 @@ class Converters {
     val listType = object : TypeToken<List<Interest>>() {}.type
     return Gson().fromJson(value, listType)
   }
+
+  @TypeConverter
+  fun fromLikesMap(likes: Map<String, Boolean?>?): String? {
+    return Gson().toJson(likes)
+  }
+
+  @TypeConverter
+  fun toLikesMap(likes: String?): Map<String, Boolean?>? {
+    return likes?.let {
+      val mapType = object : TypeToken<Map<String, Boolean?>>() {}.type
+      Gson().fromJson(it, mapType)
+    }
+  }
 }

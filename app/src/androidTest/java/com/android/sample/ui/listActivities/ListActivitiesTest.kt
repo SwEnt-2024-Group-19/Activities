@@ -611,6 +611,34 @@ class OverviewScreenTest {
   }
 
   @Test
+  fun pastActivitiesRemoved() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    composeTestRule.setContent {
+      ListActivitiesScreen(
+          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+    }
+
+    val activity1 =
+        activity.copy(
+            title = "Past activity",
+            date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time))
+    val activity2 =
+        activity.copy(
+            title = "Future activity",
+            date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time))
+
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    composeTestRule.onNodeWithText("Past activity").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Future activity").assertIsDisplayed()
+  }
+
+  @Test
   fun displaysYourActivityBox() {
 
     val creatorProfile = testUser.copy(id = activity.creator)

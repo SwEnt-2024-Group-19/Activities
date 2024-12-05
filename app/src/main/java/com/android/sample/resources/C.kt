@@ -49,6 +49,8 @@ object C {
     const val BLACK_COLOR = 0xFF000000
     const val PURPLE_COLOR = 0xFF6200EE
 
+    const val SUCCESS_COLOR = 0xFF048531
+
     const val IMAGE_SIZE = 100
 
     const val LARGE_IMAGE_SIZE = 200
@@ -66,6 +68,8 @@ object C {
     const val TEXT_FONTSIZE = 12
 
     const val WIDTH_FRACTION = 0.8f
+
+    const val LINE_STROKE = 1
 
     // errors
     const val OFFLINE_TOAST_MESSAGE = "You are offline. Action not allowed."
