@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.sample.R
-import com.android.sample.R.drawable
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.image.uriToBitmap
 
@@ -142,14 +141,14 @@ fun randomDefaultProfileImage(): Int {
   val defaultImages =
       listOf(
           R.drawable.dog_avatar,
-          R.drawable.algeria_president_avatar,
+          R.drawable.cat_avatar,
           R.drawable.fox_avatar,
           R.drawable.bull_avatar,
-          R.drawable.candea_avatar,
+          R.drawable.pig_avatar,
           R.drawable.chicken_avatar,
           R.drawable.panda_avatar,
-          R.drawable.chopper_avatar,
-          R.drawable.vinicius_avatar)
+          R.drawable.reindeer_avatar,
+          R.drawable.monkey_avatar)
 
   // Remember a random default image ID when recomposed
   val defaultImageId = defaultImages.random()
