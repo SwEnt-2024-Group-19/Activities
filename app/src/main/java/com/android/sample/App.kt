@@ -27,22 +27,20 @@ class App : Application() {
   }
 
   fun scheduleNotification(activity: Activity, isCreator: Boolean) {
-    val title = if (isCreator) "Your Activity is Tomorrow!" else "The Activity you joined is Tomorrow"
+    val title = if (isCreator) "Your Activity is in less than 24h!" else "The Activity you joined is in less than 24h!"
 
     val activityDate = activity.date.toDate().time
-    Log.e("inApp", "activityDate: $activityDate")
     val activityTime = LocalTime.parse(activity.startTime)
-    Log.e("inApp", "activityTime: $activityTime")
 
+    //keeping this for future use
     val activityDateTime = activityDate +
             TimeUnit.HOURS.toMillis(activityTime.hour.toLong()) +
             TimeUnit.MINUTES.toMillis(activityTime.minute.toLong())
-    Log.e("inApp", "activityDateTime: $activityDateTime")
 
     notificationHelper.scheduleNotification(
       activityId = activity.uid.toIntOrNull() ?: 0,
       activityName = activity.title,
-      activityDate = activityDateTime,
+      activityDate = activityDate,
       notificationTitle = title
     )
   }
