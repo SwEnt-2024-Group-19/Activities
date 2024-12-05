@@ -112,11 +112,7 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("Cycling").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Reading").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("goBackButton")
-        .performClick() // test for if on click it goes back
   }
 
   @Test
