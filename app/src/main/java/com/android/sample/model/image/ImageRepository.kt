@@ -35,11 +35,15 @@ interface ImageRepository {
       onFailure: (Exception) -> Unit
   )
 
+
   fun deleteProfilePicture(userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+
+
 
   fun removeAllActivityImages(
       activityId: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   )
+
 }
