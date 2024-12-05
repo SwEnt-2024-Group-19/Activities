@@ -194,7 +194,7 @@ fun ActivityDetailsScreen(
                         onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
                     if (activity !=
                         null) { // to avoid setting a default category in the case where activity is
-                                // null which should never be the case
+                      // null which should never be the case
                       CarouselNoModif(itemsList = bitmaps, category = activity.category)
                     }
                     LikeButton(profile, activity, profileViewModel)
