@@ -169,6 +169,7 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
               }
         }
         .addOnFailureListener { exception ->
+        Log.e("ImageRepositoryFirestore", "Failed to delete images for activity: $activityId", exception)
           // Handle failure to list files
           onFailure(exception)
         }
