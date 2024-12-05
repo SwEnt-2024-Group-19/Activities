@@ -13,6 +13,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.android.sample.R
+import com.android.sample.model.activity.Category
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.image.uriToBitmap
 
@@ -73,4 +75,13 @@ fun ProfileImage(userId: String, modifier: Modifier = Modifier, imageViewModel: 
       contentDescription = "Profile Image",
       modifier = modifier,
       contentScale = ContentScale.Crop)
+}
+
+fun getImageResourceIdForCategory(category: Category): Int {
+  return when (category) {
+    Category.SPORT -> R.drawable.sports_image
+    Category.CULTURE -> R.drawable.culture_image
+    Category.ENTERTAINMENT -> R.drawable.entertainment_image
+    Category.SKILLS -> R.drawable.skills_image // Fallback image
+  }
 }
