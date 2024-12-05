@@ -2,6 +2,7 @@ package com.android.sample.model.image
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -152,5 +153,43 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         .delete()
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { onFailure(it) }
+
+  override fun removeAllActivityImages(
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    val activityFolderRef = storageRef.child("activities/$activityId")
+
+    // List all files in the activity's folder
+    activityFolderRef
+        .listAll()
+        .addOnSuccessListener { listResult ->
+          Log.d(
+              "ImageRepositoryFirestore",
+              "Starting deletion of ${listResult.items.size} images for activity: activityId")
+
+          // Create deletion tasks for each file
+          val deletionTasks = listResult.items.map { it.delete() }
+
+          // Execute all deletion tasks
+          Tasks.whenAll(deletionTasks)
+              .addOnSuccessListener {
+                // Once all files are successfully deleted
+                onSuccess()
+              }
+              .addOnFailureListener { exception ->
+                // Handle any failure in the deletion process
+                onFailure(exception)
+              }
+        }
+        .addOnFailureListener { exception ->
+          Log.e(
+              "ImageRepositoryFirestore",
+              "Failed to delete images for activity: $activityId",
+              exception)
+          // Handle failure to list files
+          onFailure(exception)
+        }
   }
 }
