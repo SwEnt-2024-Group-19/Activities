@@ -152,7 +152,9 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
     activityFolderRef
         .listAll()
         .addOnSuccessListener { listResult ->
-                Log.d("ImageRepositoryFirestore", "Starting deletion of ${listResult.items.size} images for activity: activityId")
+          Log.d(
+              "ImageRepositoryFirestore",
+              "Starting deletion of ${listResult.items.size} images for activity: activityId")
 
           // Create deletion tasks for each file
           val deletionTasks = listResult.items.map { it.delete() }
@@ -169,7 +171,10 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
               }
         }
         .addOnFailureListener { exception ->
-        Log.e("ImageRepositoryFirestore", "Failed to delete images for activity: $activityId", exception)
+          Log.e(
+              "ImageRepositoryFirestore",
+              "Failed to delete images for activity: $activityId",
+              exception)
           // Handle failure to list files
           onFailure(exception)
         }
