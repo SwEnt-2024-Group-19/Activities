@@ -32,6 +32,7 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.navigation.NavigationActions
+import com.google.firebase.Timestamp
 
 @Composable
 fun ParticipantProfileScreen(
@@ -96,7 +97,8 @@ fun ParticipantProfileContent(
     imageViewModel: ImageViewModel,
     profileViewModel: ProfileViewModel
 ) {
-  Scaffold(
+    val uiState by listActivitiesViewModel.uiState.collectAsState()
+    Scaffold(
       modifier = Modifier.fillMaxSize().testTag("profileScreen"),
       topBar = {
         TopAppBar(
@@ -132,28 +134,35 @@ fun ParticipantProfileContent(
                     }
               }
 
-              // Display activities sections
-              this@LazyColumn.displayActivitySection(
-                  "Activities Created",
-                  "created",
-                  user,
-                  listActivitiesViewModel,
-                  navigationActions,
-                  profileViewModel)
-              this@LazyColumn.displayActivitySection(
-                  "Activities Enrolled in",
-                  "enrolled",
-                  user,
-                  listActivitiesViewModel,
-                  navigationActions,
-                  profileViewModel)
-              this@LazyColumn.displayActivitySection(
-                  "Past Activities",
-                  "past",
-                  user,
-                  listActivitiesViewModel,
-                  navigationActions,
-                  profileViewModel)
+            val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+            val usersActivity =
+                activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
+
+            // Display activities sections
+            displayActivitySection(
+                "Activities Created",
+                "created",
+                usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
+                navigationActions,
+                profileViewModel,
+                listActivitiesViewModel,
+            true )
+            displayActivitySection(
+                "Activities Enrolled in",
+                "enrolled",
+                usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
+                navigationActions,
+                profileViewModel,
+                listActivitiesViewModel,
+                true)
+            displayActivitySection(
+                "Past Activities",
+                "past",
+                usersActivity.filter { it.date < Timestamp.now() },
+                navigationActions,
+                profileViewModel,
+                listActivitiesViewModel,
+                true)
             }
       }
 }

@@ -42,11 +42,13 @@ import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.components.PlusButtonToCreate
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -80,7 +82,9 @@ fun ProfileScreen(
 @Composable
 fun LoadingScreen(navigationActions: NavigationActions) {
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+      modifier = Modifier
+          .fillMaxSize()
+          .testTag("loadingScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
@@ -88,7 +92,9 @@ fun LoadingScreen(navigationActions: NavigationActions) {
             selectedItem = navigationActions.currentRoute())
       }) { innerPadding ->
         Column(
-            Modifier.fillMaxSize().padding(innerPadding),
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
                   "You do not have a profile",
@@ -112,12 +118,15 @@ fun ProfileContent(
     userProfileViewModel: ProfileViewModel,
     imageViewModel: ImageViewModel
 ) {
+  val uiState by listActivitiesViewModel.uiState.collectAsState()
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   var showMenu by remember { mutableStateOf(false) }
   Log.d("ProfileScreen", "User photo: ${user.photo}")
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("profileScreen"),
+      modifier = Modifier
+          .fillMaxSize()
+          .testTag("profileScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
@@ -166,7 +175,10 @@ fun ProfileContent(
         }
       }) { innerPadding ->
         LazyColumn(
-            Modifier.fillMaxSize().padding(innerPadding).testTag("profileContentColumn"),
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .testTag("profileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
               item { ProfileHeader(user, imageViewModel) }
 
@@ -184,28 +196,36 @@ fun ProfileContent(
                     }
               }
 
+              val activitiesList =
+                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+              val usersActivity =
+                  activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
+
               // Display activities sections
               displayActivitySection(
                   "Activities Created",
                   "created",
-                  user,
-                  listActivitiesViewModel,
+                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
                   navigationActions,
-                  userProfileViewModel)
+                  userProfileViewModel,
+                  listActivitiesViewModel,
+                  false)
               displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
-                  user,
-                  listActivitiesViewModel,
+                  usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
                   navigationActions,
-                  userProfileViewModel)
+                  userProfileViewModel,
+                  listActivitiesViewModel,
+                  false)
               displayActivitySection(
                   "Past Activities",
                   "past",
-                  user,
-                  listActivitiesViewModel,
+                  usersActivity.filter { it.date < Timestamp.now() },
                   navigationActions,
-                  userProfileViewModel)
+                  userProfileViewModel,
+                  listActivitiesViewModel,
+                  false)
             }
       }
 }
@@ -213,26 +233,38 @@ fun ProfileContent(
 fun LazyListScope.displayActivitySection(
     sectionTitle: String,
     category: String,
-    user: User,
-    listActivitiesViewModel: ListActivitiesViewModel,
+    listActivities: List<Activity>,
     navigationActions: NavigationActions,
-    userProfileViewModel: ProfileViewModel
+    userProfileViewModel: ProfileViewModel,
+    listActivitiesViewModel: ListActivitiesViewModel,
+    isParticipantProfile: Boolean
 ) {
   item {
     Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
     SectionTitle(title = sectionTitle, testTag = "${category}ActivitiesTitle")
   }
-
-  user.activities?.let { activities ->
-    items(activities.size) { index ->
+  if (listActivities.isNotEmpty()) {
+    items(listActivities.size) { index ->
       ActivityBox(
-          activityId = activities[index],
-          user = user,
+          activity = listActivities[index],
           listActivitiesViewModel = listActivitiesViewModel,
           navigationActions = navigationActions,
           category = category,
           userProfileViewModel = userProfileViewModel)
     }
+  } else {
+      if(!isParticipantProfile) {
+          item {
+              PlusButtonToCreate(navigationActions = navigationActions)
+          }
+      }else {
+          item{
+              Text(
+                  "This participant has no activities",
+                  modifier = Modifier.padding(MEDIUM_PADDING.dp)
+              )
+          }
+      }
   }
 }
 
@@ -242,7 +274,9 @@ fun SectionTitle(title: String, testTag: String) {
       text = title,
       fontSize = TITLE_FONTSIZE.sp,
       modifier =
-          Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp).testTag(testTag))
+      Modifier
+          .padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
+          .testTag(testTag))
 }
 /** Display the user's profile picture and name */
 @Composable
@@ -254,38 +288,35 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel) {
       modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
   ProfileImage(
       userId = user.id,
-      modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+      modifier = Modifier
+          .size(IMAGE_SIZE.dp)
+          .clip(CircleShape)
+          .testTag("profilePicture"),
       imageViewModel)
   Text(
       text = "${user.name} ${user.surname}",
       fontSize = TITLE_FONTSIZE.sp,
-      modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
+      modifier = Modifier
+          .padding(top = STANDARD_PADDING.dp)
+          .testTag("userName"))
 }
 /** Display a single activity in a box, the same box is used for all categories */
 @Composable
 fun ActivityBox(
-    activityId: String,
-    user: User,
+    activity: Activity,
     listActivitiesViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     category: String,
     userProfileViewModel: ProfileViewModel
 ) {
-  val uiState by listActivitiesViewModel.uiState.collectAsState()
-  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-  val thisActivity = activitiesList.find { it.uid == activityId }
   val context = LocalContext.current
-  thisActivity?.let { activity ->
-    if (userProfileViewModel.shouldShowActivity(activity, user, category)) {
-      ActivityRow(
-          activity = activity,
-          onClickAction = {
-            listActivitiesViewModel.selectActivity(activity)
-            userProfileViewModel.navigateToActivity(navigationActions, context)
-          },
-          testTag = "activity${category.capitalize()}")
-    }
-  }
+  ActivityRow(
+      activity = activity,
+      onClickAction = {
+        listActivitiesViewModel.selectActivity(activity)
+        userProfileViewModel.navigateToActivity(navigationActions, context)
+      },
+      testTag = "activity${category.capitalize()}")
 }
 
 /** Display a single activity in a row */
@@ -293,17 +324,20 @@ fun ActivityBox(
 fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) {
   Row(
       modifier =
-          Modifier.fillMaxWidth()
-              .testTag(testTag)
-              .padding(STANDARD_PADDING.dp)
-              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable { onClickAction() },
+      Modifier
+          .fillMaxWidth()
+          .testTag(testTag)
+          .padding(STANDARD_PADDING.dp)
+          .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+          .clickable { onClickAction() },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = painterResource(id = R.drawable.foot),
             contentDescription = "Activity Image",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
+            modifier = Modifier
+                .size(MEDIUM_PADDING.dp)
+                .padding(end = MEDIUM_PADDING.dp))
 
         Column(modifier = Modifier.weight(1f)) {
           Text(
@@ -320,9 +354,10 @@ fun ActivityRow(activity: Activity, onClickAction: () -> Unit, testTag: String) 
 fun InterestBox(interest: String) {
   Box(
       modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
-              .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-              .testTag("$interest"),
+      Modifier
+          .background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+          .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
+          .testTag(interest),
       contentAlignment = Alignment.Center) {
         Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
       }
