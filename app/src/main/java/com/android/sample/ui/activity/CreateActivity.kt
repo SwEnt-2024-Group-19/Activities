@@ -502,7 +502,8 @@ fun CreateActivityScreen(
               }
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               Button(
-                  enabled = title.isNotEmpty() && description.isNotEmpty(),
+                  enabled = title.isNotEmpty() && description.isNotEmpty()&& price.isNotEmpty() && placesMax.isNotEmpty() && selectedLocation != null && selectedOptionType != "Select a type" && selectedOptionCategory != "Select a category" && startTime.isNotEmpty() && duration.isNotEmpty()  && dueDate.toDate().after(Timestamp.now().toDate())
+                  ,
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
                     if (creator == "") {
@@ -556,7 +557,7 @@ fun CreateActivityScreen(
                                 location = selectedLocation,
                                 images = items,
                                 participants = attendees,
-                                type = types.find { it.name == selectedOptionType } ?: types[0],
+                                type = types.find { it.name == selectedOptionType } ?: types[1],
                                 comments = listOf(),
                                 category =
                                     categories.find { it.name == selectedOptionCategory }
