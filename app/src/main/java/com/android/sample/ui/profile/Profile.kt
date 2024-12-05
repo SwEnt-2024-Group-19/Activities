@@ -261,7 +261,7 @@ fun LazyListScope.displayActivitySection(
     }
   } else {
     if (!isParticipantProfile) {
-      item { PlusButtonToCreate(navigationActions = navigationActions) }
+      item { PlusButtonToCreate(navigationActions = navigationActions, category) }
     } else {
       item {
         Text("This participant has no activities", modifier = Modifier.padding(MEDIUM_PADDING.dp))

@@ -22,7 +22,9 @@ class PlusButtonToCreateTest {
   @Before
   fun setUp() {
     mockNavigationActions = Mockito.mock(NavigationActions::class.java)
-    composeTestRule.setContent { PlusButtonToCreate(navigationActions = mockNavigationActions) }
+    composeTestRule.setContent {
+      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+    }
   }
 
   @Test
