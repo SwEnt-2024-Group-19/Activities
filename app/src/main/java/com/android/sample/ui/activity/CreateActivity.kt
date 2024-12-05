@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
@@ -42,10 +44,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -62,8 +67,10 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.CameraScreen
@@ -82,6 +89,7 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,6 +126,8 @@ fun CreateActivityScreen(
   var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
 
+  val maxTitleLength = 50
+  val maxDescriptionLength = 500
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
   //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
@@ -187,9 +197,15 @@ fun CreateActivityScreen(
                   itemsList = selectedImages,
                   deleteImage = { bitmap -> selectedImages.remove(bitmap) })
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              RemainingPlace(title, maxTitleLength)
               OutlinedTextField(
                   value = title,
-                  onValueChange = { title = it },
+                  onValueChange = {
+                    if (it.length <= maxTitleLength) {
+                      title = it
+                    }
+                  },
                   label = { Text("Title") },
                   modifier =
                       Modifier.padding(STANDARD_PADDING.dp)
@@ -200,11 +216,16 @@ fun CreateActivityScreen(
                   },
                   singleLine = true,
               )
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              RemainingPlace(description, maxDescriptionLength)
               OutlinedTextField(
                   value = description,
-                  onValueChange = { description = it },
+                  onValueChange = {
+                    if (it.length <= maxDescriptionLength) {
+                      description = it
+                    }
+                  },
                   label = { Text("Description") },
                   modifier =
                       Modifier.padding(STANDARD_PADDING.dp)
@@ -262,11 +283,7 @@ fun CreateActivityScreen(
                 MyTimePicker(
                     onTimeSelected = { time ->
                       startTime =
-                          time
-                              .toInstant()
-                              .atZone(java.time.ZoneId.systemDefault())
-                              .toLocalTime()
-                              .toString()
+                          time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
                       startTimeIsOpen = false
                       startTimeIsSet = true
                     },
@@ -295,11 +312,7 @@ fun CreateActivityScreen(
                 MyTimePicker(
                     onTimeSelected = { time ->
                       duration =
-                          time
-                              .toInstant()
-                              .atZone(java.time.ZoneId.systemDefault())
-                              .toLocalTime()
-                              .toString()
+                          time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
                       durationIsOpen = false
                       durationIsSet = true
                     },
@@ -503,7 +516,17 @@ fun CreateActivityScreen(
               }
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               Button(
-                  enabled = title.isNotEmpty() && description.isNotEmpty(),
+                  enabled =
+                      title.isNotEmpty() &&
+                          description.isNotEmpty() &&
+                          price.isNotEmpty() &&
+                          placesMax.isNotEmpty() &&
+                          selectedLocation != null &&
+                          selectedOptionType != "Select a type" &&
+                          selectedOptionCategory != "Select a category" &&
+                          startTime.isNotEmpty() &&
+                          duration.isNotEmpty() &&
+                          dueDate.toDate().after(Timestamp.now().toDate()),
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
                     if (creator == "") {
@@ -558,7 +581,7 @@ fun CreateActivityScreen(
                                 location = selectedLocation,
                                 images = items,
                                 participants = attendees,
-                                type = types.find { it.name == selectedOptionType } ?: types[0],
+                                type = types.find { it.name == selectedOptionType } ?: types[1],
                                 comments = listOf(),
                                 category =
                                     categories.find { it.name == selectedOptionCategory }
@@ -600,4 +623,31 @@ fun CreateActivityScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.ADD_ACTIVITY)
       })
+}
+
+@Composable
+fun RemainingPlace(field: String, maxLength: Int) {
+  Row(
+      modifier =
+          Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp).testTag("remainingPlace"),
+      horizontalArrangement = Arrangement.End) {
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.testTag("remainingPlaceColumn")) {
+              Text(
+                  text = "${field.length}/$maxLength characters",
+                  fontSize = MEDIUM_PADDING.sp,
+                  color = Color.Gray,
+                  modifier = Modifier.testTag("remainingPlaceText"))
+              LinearProgressIndicator(
+                  progress = field.length / maxLength.toFloat(),
+                  modifier =
+                      Modifier.height(STANDARD_PADDING.dp)
+                          .width(130.dp)
+                          .clip(RoundedCornerShape(SMALL_PADDING.dp))
+                          .testTag("remainingPlaceProgress"),
+                  color = Color(DARK_BLUE_COLOR),
+                  backgroundColor = Color.LightGray)
+            }
+      }
 }
