@@ -2,7 +2,6 @@ package com.android.sample.ui.activity
 
 import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
@@ -311,28 +310,26 @@ class CreateActivityScreenTest {
         .onNodeWithTag("activityCreateScreen")
         .performScrollToNode(hasTestTag("inputLocationCreate"))
     composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Location")
-      composeTestRule
-          .onNodeWithTag("activityCreateScreen")
-          .performScrollToNode(hasTestTag("createButton"))
-      composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
 
-      composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
-      composeTestRule.onNodeWithText(types[0].name).performClick()
-      composeTestRule
-          .onNodeWithTag("activityCreateScreen")
-          .performScrollToNode(hasTestTag("createButton"))
+    composeTestRule.onNodeWithTag("chooseTypeMenu").performClick()
+    composeTestRule.onNodeWithText(types[0].name).performClick()
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
 
-        composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
 
-        composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
-        composeTestRule.onNodeWithText(categories[0].name).performClick()
-        composeTestRule
-            .onNodeWithTag("activityCreateScreen")
-            .performScrollToNode(hasTestTag("createButton"))
+    composeTestRule.onNodeWithTag("chooseCategoryMenu").performClick()
+    composeTestRule.onNodeWithText(categories[0].name).performClick()
+    composeTestRule
+        .onNodeWithTag("activityCreateScreen")
+        .performScrollToNode(hasTestTag("createButton"))
 
-        composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
-
-
+    composeTestRule.onNodeWithTag("createButton").assertIsNotEnabled()
   }
 
   @Test
@@ -578,32 +575,25 @@ class CreateActivityScreenTest {
     composeTestRule.onNodeWithText("Pick a time").assertIsDisplayed()
   }
 
-    @Test
-    fun remainingTimeTextIsDisplayedCorrectly() {
-        val field = "Hello"
-        val maxLength = 20
-        composeTestRule.setContent {
-            RemainingPlace(field = field, maxLength = maxLength)
-        }
+  @Test
+  fun remainingTimeTextIsDisplayedCorrectly() {
+    val field = "Hello"
+    val maxLength = 20
+    composeTestRule.setContent { RemainingPlace(field = field, maxLength = maxLength) }
 
+    composeTestRule
+        .onNodeWithTag("remainingPlaceText")
+        .assertIsDisplayed()
+        .assertTextEquals("${field.length}/$maxLength characters")
+  }
 
-        composeTestRule.onNodeWithTag("remainingPlaceText")
-            .assertIsDisplayed()
-            .assertTextEquals("${field.length}/$maxLength characters")
-    }
+  @Test
+  fun remainingTimeComponentsArePresent() {
+    composeTestRule.setContent { RemainingPlace(field = "Hello", maxLength = 20) }
 
-
-
-    @Test
-    fun remainingTimeComponentsArePresent() {
-        composeTestRule.setContent {
-            RemainingPlace(field = "Hello", maxLength = 20)
-        }
-
-        composeTestRule.onNodeWithTag("remainingPlace").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("remainingPlaceColumn").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("remainingPlaceText").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("remainingPlaceProgress").assertIsDisplayed()
-    }
+    composeTestRule.onNodeWithTag("remainingPlace").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("remainingPlaceColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("remainingPlaceText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("remainingPlaceProgress").assertIsDisplayed()
+  }
 }
-

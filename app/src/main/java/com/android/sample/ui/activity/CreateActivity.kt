@@ -6,7 +6,6 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -126,9 +125,9 @@ fun CreateActivityScreen(
   var duration by remember { mutableStateOf("") }
   var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
-    
-    val maxTitleLength =50
-    val maxDescriptionLength = 500
+
+  val maxTitleLength = 50
+  val maxDescriptionLength = 500
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
   //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
@@ -199,11 +198,14 @@ fun CreateActivityScreen(
                   deleteImage = { bitmap -> selectedImages.remove(bitmap) })
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-                RemainingPlace(title, maxTitleLength)
+              RemainingPlace(title, maxTitleLength)
               OutlinedTextField(
                   value = title,
-                  onValueChange = { if (it.length <= maxTitleLength) {
-                      title = it }},
+                  onValueChange = {
+                    if (it.length <= maxTitleLength) {
+                      title = it
+                    }
+                  },
                   label = { Text("Title") },
                   modifier =
                       Modifier.padding(STANDARD_PADDING.dp)
@@ -215,13 +217,15 @@ fun CreateActivityScreen(
                   singleLine = true,
               )
 
-
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                RemainingPlace(description, maxDescriptionLength)
+              RemainingPlace(description, maxDescriptionLength)
               OutlinedTextField(
                   value = description,
-                  onValueChange = {  if (it.length <= maxDescriptionLength) {
-                      description = it  }},
+                  onValueChange = {
+                    if (it.length <= maxDescriptionLength) {
+                      description = it
+                    }
+                  },
                   label = { Text("Description") },
                   modifier =
                       Modifier.padding(STANDARD_PADDING.dp)
@@ -279,11 +283,7 @@ fun CreateActivityScreen(
                 MyTimePicker(
                     onTimeSelected = { time ->
                       startTime =
-                          time
-                              .toInstant()
-                              .atZone(ZoneId.systemDefault())
-                              .toLocalTime()
-                              .toString()
+                          time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
                       startTimeIsOpen = false
                       startTimeIsSet = true
                     },
@@ -312,11 +312,7 @@ fun CreateActivityScreen(
                 MyTimePicker(
                     onTimeSelected = { time ->
                       duration =
-                          time
-                              .toInstant()
-                              .atZone(ZoneId.systemDefault())
-                              .toLocalTime()
-                              .toString()
+                          time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
                       durationIsOpen = false
                       durationIsSet = true
                     },
@@ -520,8 +516,17 @@ fun CreateActivityScreen(
               }
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               Button(
-                  enabled = title.isNotEmpty() && description.isNotEmpty()&& price.isNotEmpty() && placesMax.isNotEmpty() && selectedLocation != null && selectedOptionType != "Select a type" && selectedOptionCategory != "Select a category" && startTime.isNotEmpty() && duration.isNotEmpty()  && dueDate.toDate().after(Timestamp.now().toDate())
-                  ,
+                  enabled =
+                      title.isNotEmpty() &&
+                          description.isNotEmpty() &&
+                          price.isNotEmpty() &&
+                          placesMax.isNotEmpty() &&
+                          selectedLocation != null &&
+                          selectedOptionType != "Select a type" &&
+                          selectedOptionCategory != "Select a category" &&
+                          startTime.isNotEmpty() &&
+                          duration.isNotEmpty() &&
+                          dueDate.toDate().after(Timestamp.now().toDate()),
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
                     if (creator == "") {
@@ -619,33 +624,30 @@ fun CreateActivityScreen(
             selectedItem = Route.ADD_ACTIVITY)
       })
 }
+
 @Composable
 fun RemainingPlace(field: String, maxLength: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp).testTag("remainingPlace"),
-        horizontalArrangement = Arrangement.End
-    ) {
+  Row(
+      modifier =
+          Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp).testTag("remainingPlace"),
+      horizontalArrangement = Arrangement.End) {
         Column(
             horizontalAlignment = Alignment.End,
-            modifier = Modifier.testTag("remainingPlaceColumn")
-        ) {
-            Text(
-                text = "${field.length}/$maxLength characters",
-                fontSize = MEDIUM_PADDING.sp,
-                color = Color.Gray,
-                modifier = Modifier.testTag("remainingPlaceText")
-            )
-            LinearProgressIndicator(
-                progress = field.length / maxLength.toFloat(),
-                modifier = Modifier
-                    .height(STANDARD_PADDING.dp)
-                    .width(130.dp)
-                    .clip(RoundedCornerShape(SMALL_PADDING.dp)).testTag("remainingPlaceProgress")
-                    ,
-                color = Color(DARK_BLUE_COLOR),
-                backgroundColor = Color.LightGray
-            )
-        }
-    }
-
+            modifier = Modifier.testTag("remainingPlaceColumn")) {
+              Text(
+                  text = "${field.length}/$maxLength characters",
+                  fontSize = MEDIUM_PADDING.sp,
+                  color = Color.Gray,
+                  modifier = Modifier.testTag("remainingPlaceText"))
+              LinearProgressIndicator(
+                  progress = field.length / maxLength.toFloat(),
+                  modifier =
+                      Modifier.height(STANDARD_PADDING.dp)
+                          .width(130.dp)
+                          .clip(RoundedCornerShape(SMALL_PADDING.dp))
+                          .testTag("remainingPlaceProgress"),
+                  color = Color(DARK_BLUE_COLOR),
+                  backgroundColor = Color.LightGray)
+            }
+      }
 }

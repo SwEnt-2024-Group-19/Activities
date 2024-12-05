@@ -15,12 +15,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -51,13 +48,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -68,9 +63,7 @@ import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
-import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
-import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
@@ -118,8 +111,8 @@ fun EditActivityScreen(
   var expandedCategory by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf(activity?.type.toString()) }
   var selectedOptionCategory by remember { mutableStateOf(activity?.category.toString()) }
-    val maxDescriptionLength = 500
-    val maxTitleLength=50
+  val maxDescriptionLength = 500
+  val maxTitleLength = 50
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
   val locationSuggestions by
@@ -204,7 +197,7 @@ fun EditActivityScreen(
                 itemsList = selectedImages,
                 deleteImage = { bitmap -> selectedImages = selectedImages.filter { it != bitmap } })
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-              RemainingPlace(title, maxTitleLength)
+            RemainingPlace(title, maxTitleLength)
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -215,7 +208,7 @@ fun EditActivityScreen(
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-              RemainingPlace(description, maxDescriptionLength)
+            RemainingPlace(description, maxDescriptionLength)
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -515,7 +508,15 @@ fun EditActivityScreen(
             Spacer(Modifier.height(MEDIUM_PADDING.dp))
 
             Button(
-                enabled = title.isNotEmpty() && description.isNotEmpty()&& price.isNotEmpty() && maxPlaces.isNotEmpty() && selectedOptionType != "Select a type" && selectedOptionCategory != "Select a category" && startTime?.isNotEmpty() ?: false && duration.isNotEmpty()  ,
+                enabled =
+                    title.isNotEmpty() &&
+                        description.isNotEmpty() &&
+                        price.isNotEmpty() &&
+                        maxPlaces.isNotEmpty() &&
+                        selectedOptionType != "Select a type" &&
+                        selectedOptionCategory != "Select a category" &&
+                        startTime?.isNotEmpty() ?: false &&
+                        duration.isNotEmpty(),
                 onClick = {
                   if (!hourDateViewModel.isBeginGreaterThanEnd(
                       startTime ?: "00:00", duration ?: "00:01")) {
