@@ -356,7 +356,7 @@ fun ActivityCard(
                                                 12.dp)) // Purple background with rounded corners
                                     .padding(
                                         horizontal = 8.dp,
-                                        vertical = 4.dp) // Inner padding for text
+                                        vertical = SMALL_PADDING.dp) // Inner padding for text
                             ) {
                               Text(
                                   text = "ENROLLED",
