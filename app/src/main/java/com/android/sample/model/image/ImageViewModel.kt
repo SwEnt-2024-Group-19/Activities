@@ -50,4 +50,12 @@ class ImageViewModel @Inject constructor(private val repository: ImageRepository
   ) {
     repository.fetchActivityImagesAsBitmaps(activityId, onSuccess, onFailure)
   }
+
+  fun removeAllActivityImages(
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    repository.removeAllActivityImages(activityId, onSuccess, onFailure)
+  }
 }
