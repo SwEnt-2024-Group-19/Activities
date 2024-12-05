@@ -198,7 +198,9 @@ fun ProfileContent(
               val activitiesList =
                   (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
               val usersActivity =
-                  activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
+                  activitiesList.filter { it.creator == user.id || it.participants.map {
+                      it.id }.contains(user.id) }
+
 
               // Display activities sections
               displayActivitySection(
@@ -222,7 +224,7 @@ fun ProfileContent(
               displayActivitySection(
                   "Past Activities",
                   "past",
-                  usersActivity.filter { it.date < Timestamp.now() },
+                  usersActivity.filter { it.date <= Timestamp.now() },
                   navigationActions,
                   userProfileViewModel,
                   listActivitiesViewModel,

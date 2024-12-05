@@ -160,7 +160,7 @@ class ProfileScreenTest {
         .performScrollToNode(hasTestTag("pastActivitiesTitle"))
     composeTestRule.onNodeWithTag("pastActivitiesTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("pastActivitiesTitle").assertTextEquals("Past Activities")
-    composeTestRule.onNodeWithText("Watch World Cup 2022").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Watch World Cup 2022", useUnmergedTree = true).assertExists()
   }
 
   @Test

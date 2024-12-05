@@ -172,7 +172,7 @@ val activity1 =
         status = ActivityStatus.ACTIVE,
         type = ActivityType.PRO,
         participants = listOf(),
-        duration = "2 hours",
+        duration = "02:00",
         startTime = "10:00",
     )
 val activity2 =
@@ -190,7 +190,7 @@ val activity2 =
         status = ActivityStatus.ACTIVE,
         type = ActivityType.PRO,
         participants = listOf(),
-        duration = "2 hours",
+        duration = "02:00",
         startTime = "10:00",
     )
 val pastActivity =
@@ -225,7 +225,7 @@ val pastActivity =
                     interests = listOf(interest2),
                     activities = listOf("pastActivityUID", "1", "123"),
                 )),
-        duration = "2 hours",
+        duration = "02:00",
         startTime = "10:00")
 
 val activityList = listOf(activity1, activity2)
