@@ -387,7 +387,6 @@ fun RemainingTime(activity: Activity) {
       modifier = Modifier.testTag("remainingTime"))
 }
 
-
 @Composable
 fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
   var isLiked: Boolean? by remember { mutableStateOf(currentReview) }
