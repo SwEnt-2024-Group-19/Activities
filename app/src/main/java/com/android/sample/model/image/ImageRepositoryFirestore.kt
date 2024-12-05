@@ -140,4 +140,35 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         },
         onFailure)
   }
+
+  override fun removeAllActivityImages(
+      activityId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    val activityFolderRef = storageRef.child("activities/$activityId")
+
+    // List all files in the activity's folder
+    activityFolderRef
+        .listAll()
+        .addOnSuccessListener { listResult ->
+          // Create deletion tasks for each file
+          val deletionTasks = listResult.items.map { it.delete() }
+
+          // Execute all deletion tasks
+          Tasks.whenAll(deletionTasks)
+              .addOnSuccessListener {
+                // Once all files are successfully deleted
+                onSuccess()
+              }
+              .addOnFailureListener { exception ->
+                // Handle any failure in the deletion process
+                onFailure(exception)
+              }
+        }
+        .addOnFailureListener { exception ->
+          // Handle failure to list files
+          onFailure(exception)
+        }
+  }
 }
