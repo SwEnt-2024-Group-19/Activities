@@ -142,7 +142,6 @@ fun ProfileContent(
                   onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
                     Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
                   }
-
               DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(
                     text = { Text("Logout") },
