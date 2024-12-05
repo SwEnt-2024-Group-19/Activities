@@ -152,6 +152,8 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
     activityFolderRef
         .listAll()
         .addOnSuccessListener { listResult ->
+                Log.d("ImageRepositoryFirestore", "Starting deletion of ${listResult.items.size} images for activity: activityId")
+
           // Create deletion tasks for each file
           val deletionTasks = listResult.items.map { it.delete() }
 
