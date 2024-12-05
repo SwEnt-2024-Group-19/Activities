@@ -576,6 +576,13 @@ fun EditActivityScreen(
                     ),
                 onClick = {
                   listActivityViewModel.deleteActivityById(activity?.uid ?: "")
+                  imageViewModel.removeAllActivityImages(
+                      activity?.uid ?: "",
+                      { Log.d("EditActivityScreen", "Images removed") },
+                      { error ->
+                        Log.e("EditActivityScreen", "Failed to remove images: ${error.message}")
+                      })
+
                   navigationActions.navigateTo(Screen.OVERVIEW)
                 },
                 modifier =
