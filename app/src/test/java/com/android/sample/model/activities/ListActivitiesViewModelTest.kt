@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -179,5 +180,27 @@ class ListActivitiesViewModelTest {
     val exception = Exception("Error")
     val errorState = ListActivitiesViewModel.ActivitiesUiState.Error(exception)
     assertThat(errorState.exception, `is`(exception))
+  }
+
+  @Test
+  fun `should update activity with new likes when review is added`() {
+    val initialLikes = mapOf("user1" to true, "user2" to false, "user3" to null)
+    val activity = activityBiking.copy(likes = initialLikes)
+    val userId = "user3"
+    val review = true
+
+    val expectedLikes = initialLikes.plus(userId to review)
+    val expectedActivity = activity.copy(likes = expectedLikes)
+    var capturedActivity: Activity? = null
+
+    `when`(activitiesRepository.updateActivity(any(), any(), any())).thenAnswer {
+      capturedActivity = it.getArgument(0)
+      it.getArgument<() -> Unit>(1).invoke()
+    }
+
+    listActivitiesViewModel.reviewActivity(activity, userId, review)
+    verify(activitiesRepository).updateActivity(any(), any(), any())
+
+    assertEquals(expectedActivity, capturedActivity)
   }
 }
