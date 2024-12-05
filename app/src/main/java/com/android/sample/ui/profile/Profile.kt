@@ -198,9 +198,9 @@ fun ProfileContent(
               val activitiesList =
                   (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
               val usersActivity =
-                  activitiesList.filter { it.creator == user.id || it.participants.map {
-                      it.id }.contains(user.id) }
-
+                  activitiesList.filter {
+                    it.creator == user.id || it.participants.map { it.id }.contains(user.id)
+                  }
 
               // Display activities sections
               displayActivitySection(
