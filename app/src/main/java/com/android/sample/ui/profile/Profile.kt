@@ -356,24 +356,24 @@ fun ActivityRow(
 
 @Composable
 fun RemainingTime(activity: Activity) {
-    val currentTimeMillis = System.currentTimeMillis()
+  val currentTimeMillis = System.currentTimeMillis()
 
-    val startTimeParts = activity.startTime.split(":")
-    val activityHour = startTimeParts[0].toInt()
-    val activityMinute = startTimeParts[1].toInt()
+  val startTimeParts = activity.startTime.split(":")
+  val activityHour = startTimeParts[0].toInt()
+  val activityMinute = startTimeParts[1].toInt()
 
-
-    val activityDate = activity.date.toDate()
-    val calendar = Calendar.getInstance().apply {
+  val activityDate = activity.date.toDate()
+  val calendar =
+      Calendar.getInstance().apply {
         time = activityDate
         set(Calendar.HOUR_OF_DAY, activityHour)
         set(Calendar.MINUTE, activityMinute)
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
-    }
-    val activityTimeMillis = calendar.timeInMillis
+      }
+  val activityTimeMillis = calendar.timeInMillis
 
-    val remainingTimeMillis = activityTimeMillis - currentTimeMillis
+  val remainingTimeMillis = activityTimeMillis - currentTimeMillis
 
   val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
   val minutes = remainingTimeMillis / (1000 * 60) % 60
