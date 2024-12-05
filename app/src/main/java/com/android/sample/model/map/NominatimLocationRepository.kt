@@ -3,6 +3,11 @@ package com.android.sample.model.map
 import android.annotation.SuppressLint
 import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import java.io.IOException
 import javax.inject.Inject
 import okhttp3.Call
@@ -20,6 +25,41 @@ constructor(
     private val client: OkHttpClient,
     private val fusedLocationClient: FusedLocationProviderClient
 ) : LocationRepository {
+  private val locationRequest =
+      LocationRequest.Builder(10000) // 10 seconds
+          .setMinUpdateIntervalMillis(5000) // 5 seconds
+          .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+          .build()
+
+  private val locationCallback =
+      object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+          val location = locationResult.lastLocation
+          if (location != null) {
+            // Update the ViewModel or any listener with the new location
+            Log.d(
+                "NominatimLocationRepository",
+                "Updated location: ${location.latitude}, ${location.longitude}")
+            // You could notify the ViewModel here, for example:
+            onLocationUpdate?.invoke(
+                Location(location.latitude, location.longitude, "Current Location"))
+          }
+        }
+      }
+
+  private var onLocationUpdate: ((Location) -> Unit)? = null
+
+  @SuppressLint("MissingPermission")
+  fun startLocationUpdates(onLocationUpdate: (Location) -> Unit) {
+    this.onLocationUpdate = onLocationUpdate
+    fusedLocationClient.requestLocationUpdates(
+        locationRequest, locationCallback, null // Pass Looper.getMainLooper() if needed
+        )
+  }
+
+  fun stopLocationUpdates() {
+    fusedLocationClient.removeLocationUpdates(locationCallback)
+  }
 
   private fun parseBody(body: String): List<Location> {
     return try {
@@ -91,9 +131,28 @@ constructor(
 
   @SuppressLint("MissingPermission")
   override fun getCurrentLocation(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
-    fusedLocationClient.lastLocation
+      // Attempt to get the last known location from the fused location provider
+      fusedLocationClient.lastLocation
         .addOnSuccessListener { location ->
-          location?.let { onSuccess(Location(it.latitude, it.longitude, "Current Location")) }
+            // If a valid location is found, invoke the success callback
+            location?.let {
+            Log.d("NominatimLocationRepository", "Location: $location")
+            onSuccess(Location(it.latitude, it.longitude, "Current Location"))
+          }
+            // If no location is available, request a fresh location update
+                ?: requestLocationUpdate(onSuccess, onFailure)
+        }
+        .addOnFailureListener { onFailure(it) }
+  }
+
+  @SuppressLint("MissingPermission")
+  private fun requestLocationUpdate(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
+    val cancellationTokenSource = CancellationTokenSource()
+    fusedLocationClient
+        .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
+        .addOnSuccessListener { location ->
+          Log.d("NominatimLocationRepository", "Location: $location")
+          location?.let { onSuccess(Location(it.latitude, it.longitude, "Updated Location")) }
               ?: onFailure(Exception("Location not available"))
         }
         .addOnFailureListener { onFailure(it) }
