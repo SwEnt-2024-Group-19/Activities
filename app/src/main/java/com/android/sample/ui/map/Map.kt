@@ -2,7 +2,6 @@ package com.android.sample.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -183,7 +182,10 @@ fun MapScreen(
                         state = rememberMarkerState(position = LatLng(it.latitude, it.longitude)),
                         title = it.name,
                         snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
-                        icon = BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(context.resources, R.drawable.current_location)))
+                        icon =
+                            BitmapDescriptorFactory.fromBitmap(
+                                BitmapFactory.decodeResource(
+                                    context.resources, R.drawable.current_location)))
                   }
                 }
 
