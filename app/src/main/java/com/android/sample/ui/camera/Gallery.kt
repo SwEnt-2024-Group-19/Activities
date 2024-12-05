@@ -64,12 +64,14 @@ fun ProfileImage(
   var isImageRemoved by remember { mutableStateOf(false) }
   val context = LocalContext.current
   // Fetch the profile image URL from Firebase Storage
-  // LaunchedEffect(userId) {
-  imageViewModel.fetchProfileImageUrl(
-      userId = userId,
-      onSuccess = { url -> imageUrl = url },
-      onFailure = { error -> Log.e("ProfileImage", "Failed to fetch image URL: ${error.message}") })
-  // }
+  LaunchedEffect(userId) {
+    imageViewModel.fetchProfileImageUrl(
+        userId = userId,
+        onSuccess = { url -> imageUrl = url },
+        onFailure = { error ->
+          Log.e("ProfileImage", "Failed to fetch image URL: ${error.message}")
+        })
+  }
 
   LaunchedEffect(bitmap) {
     if (bitmap != null && editing) {
@@ -84,7 +86,6 @@ fun ProfileImage(
     }
   }
 
-  Log.d("ProfileImage", "imageUrl: $imageUrl")
   val defaultImageId = remember(userId) { randomDefaultProfileImage() }
   // Determine which painter to use
   val painter =
@@ -109,7 +110,7 @@ fun ProfileImage(
         }
       }
 
-  Box(modifier = modifier) {
+  Box() {
     Image(
         painter = painter,
         contentDescription = "Profile Image",
