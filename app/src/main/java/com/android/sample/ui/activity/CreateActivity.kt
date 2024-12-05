@@ -555,7 +555,7 @@ fun CreateActivityScreen(
                           .show()
                     } else {
                       if (selectedOptionType == ActivityType.INDIVIDUAL.name)
-                          attendees += profileViewModel.userState.value!!
+                          profileViewModel.userState.value?.let { user -> attendees += user }
                       try {
                         imageViewModel.uploadActivityImages(
                             activityId,
