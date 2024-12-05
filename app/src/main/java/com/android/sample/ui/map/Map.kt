@@ -135,11 +135,41 @@ fun MapScreen(
   }
 
   Scaffold(
+      floatingActionButton = {
+          Row(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = MEDIUM_PADDING.dp),
+              horizontalArrangement = Arrangement.SpaceBetween
+          ){
+          FloatingActionButton(
+              modifier =
+              Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("centerOnCurrentLocation"),
+              onClick = {
+                  coroutineScope.launch {
+                      currentLocation?.let {
+                          val locationLatLng = LatLng(it.latitude, it.longitude)
+                          cameraPositionState.animate(
+                              update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                              durationMs = 800)
+                      }
+                  }
+              }) {
+              Icon(Icons.Default.MyLocation, contentDescription = "Center on current location")
+          }
+          FloatingActionButton(
+              modifier =
+              Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("filterDialogButton"),
+              onClick = { showFilterDialog = true }) {
+              Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
+          }
+              }
+      },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
           NoInternetScreen(padding)
         } else {
-          Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+          Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
                 cameraPositionState = cameraPositionState) {
@@ -187,32 +217,6 @@ fun MapScreen(
                                 BitmapFactory.decodeResource(
                                     context.resources, R.drawable.current_location)))
                   }
-                }
-
-            FloatingActionButton(
-                modifier =
-                    Modifier.align(Alignment.BottomStart)
-                        .padding(MEDIUM_PADDING.dp)
-                        .testTag("centerOnCurrentLocation"),
-                onClick = {
-                  coroutineScope.launch {
-                    currentLocation?.let {
-                      val locationLatLng = LatLng(it.latitude, it.longitude)
-                      cameraPositionState.animate(
-                          update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
-                          durationMs = 800)
-                    }
-                  }
-                }) {
-                  Icon(Icons.Default.MyLocation, contentDescription = "Center on current location")
-                }
-            FloatingActionButton(
-                modifier =
-                    Modifier.align(Alignment.BottomEnd)
-                        .padding(MEDIUM_PADDING.dp)
-                        .testTag("filterDialogButton"),
-                onClick = { showFilterDialog = true }) {
-                  Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
                 }
           }
         }
