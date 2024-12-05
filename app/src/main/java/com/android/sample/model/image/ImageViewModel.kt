@@ -58,4 +58,8 @@ class ImageViewModel @Inject constructor(private val repository: ImageRepository
   ) {
     repository.removeAllActivityImages(activityId, onSuccess, onFailure)
   }
+
+  fun deleteProfilePicture(userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    repository.deleteProfilePicture(userId, onSuccess, onFailure)
+  }
 }
