@@ -368,7 +368,7 @@ fun RemainingTime(activity: Activity) {
     val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
     val fraction =
         (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
-    return lerp(Color(DARK_BLUE_COLOR), Color(LIGHT_PURPLE_COLOR), 1 - fraction)
+    return lerp(Color(LIGHT_PURPLE_COLOR), Color(DARK_BLUE_COLOR), 1 - fraction)
   }
 
   val textColor = calculateColor(remainingTimeMillis)

@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
@@ -42,10 +44,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -62,8 +67,10 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.CameraScreen
@@ -82,6 +89,7 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,7 +125,9 @@ fun CreateActivityScreen(
   var duration by remember { mutableStateOf("") }
   var showDialogUser by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
-
+    
+    val maxTitleLength =50
+    val maxDescriptionLength = 500
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
   //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
@@ -187,9 +197,25 @@ fun CreateActivityScreen(
                   itemsList = selectedImages,
                   deleteImage = { bitmap -> selectedImages.remove(bitmap) })
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+                Text(
+                    text = "${title.length}/$maxTitleLength characters",
+                    fontSize = MEDIUM_PADDING.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.End).padding(end=STANDARD_PADDING.dp)
+                )
+                LinearProgressIndicator(
+                    progress = title.length / maxTitleLength.toFloat(),
+                    modifier = Modifier
+                        .height(STANDARD_PADDING.dp).width(130.dp).align(Alignment.End)
+                        .clip(RoundedCornerShape(SMALL_PADDING.dp)).padding(end = STANDARD_PADDING.dp),
+                    color = Color(DARK_BLUE_COLOR),
+                    backgroundColor = Color.LightGray
+                )
               OutlinedTextField(
                   value = title,
-                  onValueChange = { title = it },
+                  onValueChange = { if (it.length <= maxTitleLength) {
+                      title = it }},
                   label = { Text("Title") },
                   modifier =
                       Modifier.padding(STANDARD_PADDING.dp)
@@ -200,11 +226,27 @@ fun CreateActivityScreen(
                   },
                   singleLine = true,
               )
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
+
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                Text(
+                    text = "${description.length}/$maxDescriptionLength characters",
+                    fontSize = MEDIUM_PADDING.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.End).padding(end = STANDARD_PADDING.dp)
+                )
+                LinearProgressIndicator(
+                    progress = description.length / maxDescriptionLength.toFloat(),
+                    modifier = Modifier
+                        .height(STANDARD_PADDING.dp).width(130.dp).align(Alignment.End)
+                        .clip(RoundedCornerShape(SMALL_PADDING.dp)).padding(end = STANDARD_PADDING.dp),
+                    color = Color(DARK_BLUE_COLOR),
+                    backgroundColor = Color.LightGray
+                )
               OutlinedTextField(
                   value = description,
-                  onValueChange = { description = it },
+                  onValueChange = {  if (it.length <= maxDescriptionLength) {
+                      description = it  }},
                   label = { Text("Description") },
                   modifier =
                       Modifier.padding(STANDARD_PADDING.dp)
@@ -264,7 +306,7 @@ fun CreateActivityScreen(
                       startTime =
                           time
                               .toInstant()
-                              .atZone(java.time.ZoneId.systemDefault())
+                              .atZone(ZoneId.systemDefault())
                               .toLocalTime()
                               .toString()
                       startTimeIsOpen = false
@@ -297,7 +339,7 @@ fun CreateActivityScreen(
                       duration =
                           time
                               .toInstant()
-                              .atZone(java.time.ZoneId.systemDefault())
+                              .atZone(ZoneId.systemDefault())
                               .toLocalTime()
                               .toString()
                       durationIsOpen = false

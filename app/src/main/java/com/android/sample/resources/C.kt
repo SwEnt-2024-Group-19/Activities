@@ -43,8 +43,8 @@ object C {
     const val SUBTITLE_FONTSIZE = 16
 
     const val WHITE_COLOR = 0xFFFFFFFF
-    const val DARK_BLUE_COLOR = 0xFFD1C4E9
-    const val LIGHT_PURPLE_COLOR = 0xFF4A148C
+    const val LIGHT_PURPLE_COLOR = 0xFFD1C4E9
+    const val DARK_BLUE_COLOR = 0xFF4A148C
 
     const val BLACK_COLOR = 0xFF000000
     const val PURPLE_COLOR = 0xFF6200EE
