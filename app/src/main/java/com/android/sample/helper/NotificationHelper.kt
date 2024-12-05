@@ -51,7 +51,8 @@ class NotificationHelper(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val notificationTime = activityDate - TimeUnit.HOURS.toMillis(24) // 24h before
+      val notificationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1) // 1 mn before activty
+    //val notificationTime = activityDate - TimeUnit.HOURS.toMillis(24) // 24h before
 
     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, notificationTime, pendingIntent)
 

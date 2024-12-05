@@ -83,31 +83,36 @@ constructor(
     repository.addActivity(activity, {
       Log.d("ListActivitiesViewModel", "Activity added successfully")
       getActivities()
-      try {
-        Firebase.auth.currentUser?.uid?.let { currentUserId ->
-          profilesRepository.getUser(
-            userId = currentUserId,
-            onSuccess = { currentUser ->
-              try {
+      Log.d("ListActivitiesViewModel", "Got activities")
+      viewModelScope.launch {
+        Log.d("ListActivitiesViewModel", "Starting notification scheduling")
+        try {
+          Firebase.auth.currentUser?.uid?.let { currentUserId ->
+            Log.d("ListActivitiesViewModel", "Got current user ID: $currentUserId")
+            profilesRepository.getUser(
+              userId = currentUserId,
+              onSuccess = { currentUser ->
+                Log.d("ListActivitiesViewModel", "Got user profile")
                 if (currentUser != null) {
                   App.getInstance().scheduleNotification(
                     activity = activity,
                     isCreator = activity.creator == currentUser.id
                   )
+                  Log.d("ListActivitiesViewModel", "Notification scheduled")
                 }
-              } catch (e: Exception) {
-                Log.e("ListActivitiesViewModel", "Error scheduling notification: ${e.message}", e)
+              },
+              onFailure = { e ->
+                Log.e("ListActivitiesViewModel", "Failed to schedule notification", e)
               }
-            },
-            onFailure = { e ->
-              Log.e("ListActivitiesViewModel", "Failed to get user for notification: ${e.message}", e)
-            }
-          )
+            )
+          }
+        } catch (e: Exception) {
+          Log.e("ListActivitiesViewModel", "Error scheduling notification", e)
         }
-      } catch (e: Exception) {
-        Log.e("ListActivitiesViewModel", "Error in addActivity notification flow: ${e.message}", e)
       }
-    }, {})
+    }, { error ->
+      Log.e("ListActivitiesViewModel", "Failed to add activity", error)
+    })
   }
 
   fun updateActivity(activity: Activity) {
