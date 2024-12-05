@@ -131,16 +131,16 @@ constructor(
 
   @SuppressLint("MissingPermission")
   override fun getCurrentLocation(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
-      // Attempt to get the last known location from the fused location provider
-      fusedLocationClient.lastLocation
+    // Attempt to get the last known location from the fused location provider
+    fusedLocationClient.lastLocation
         .addOnSuccessListener { location ->
-            // If a valid location is found, invoke the success callback
-            location?.let {
+          // If a valid location is found, invoke the success callback
+          location?.let {
             Log.d("NominatimLocationRepository", "Location: $location")
             onSuccess(Location(it.latitude, it.longitude, "Current Location"))
           }
-            // If no location is available, request a fresh location update
-                ?: requestLocationUpdate(onSuccess, onFailure)
+              // If no location is available, request a fresh location update
+              ?: requestLocationUpdate(onSuccess, onFailure)
         }
         .addOnFailureListener { onFailure(it) }
   }
