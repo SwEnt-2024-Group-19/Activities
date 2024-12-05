@@ -505,7 +505,7 @@ fun EditActivityScreen(
             Spacer(Modifier.height(MEDIUM_PADDING.dp))
 
             Button(
-                enabled = title.isNotEmpty() && description.isNotEmpty(),
+                enabled = title.isNotEmpty() && description.isNotEmpty()&& price.isNotEmpty() && maxPlaces.isNotEmpty() && selectedOptionType != "Select a type" && selectedOptionCategory != "Select a category" && startTime?.isNotEmpty() ?: false && duration.isNotEmpty()  ,
                 onClick = {
                   if (!hourDateViewModel.isBeginGreaterThanEnd(
                       startTime ?: "00:00", duration ?: "00:01")) {
