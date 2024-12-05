@@ -50,15 +50,22 @@ constructor(
     }
   }
 
-  fun fetchCurrentLocation() {
+  /**
+   * Starts tracking the user's location if permission is granted. It calls `startLocationUpdates`
+   * from the repository, which continuously fetches location updates.
+   */
+  fun startTrackingLocation() {
     if (permissionChecker.hasLocationPermission()) {
-      repository.getCurrentLocation(
-          onSuccess = { _currentLocation.value = it },
-          onFailure = { Log.e("LocationViewModel", "Failed to get location", it) })
+      (repository as? NominatimLocationRepository)?.startLocationUpdates { location ->
+        _currentLocation.value = location
+      }
     } else {
       Log.e("LocationViewModel", "Location permission not granted")
-      // Handle the permission denial as appropriate
     }
+  }
+
+  fun stopTrackingLocation() {
+    (repository as? NominatimLocationRepository)?.stopLocationUpdates()
   }
 
   /**
