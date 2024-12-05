@@ -530,17 +530,15 @@ fun CreateActivityScreen(
                           dueDate.toDate().after(Timestamp.now().toDate()),
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
-                      // we don't want to allow creators to create activities 1 hour before they start
-                      if (dueDate.toDate().time - System.currentTimeMillis() < TimeUnit.HOURS.toMillis(
-                              1
-                          )
-                      ) {
-                          Toast.makeText(
+                    // we don't want to allow creators to create activities 1 hour before they start
+                    if (dueDate.toDate().time - System.currentTimeMillis() <
+                        TimeUnit.HOURS.toMillis(1)) {
+                      Toast.makeText(
                               context,
                               "Activity must be scheduled at least 1 hour in advance",
-                              Toast.LENGTH_SHORT
-                          ).show()
-                      } else if (creator == "") {
+                              Toast.LENGTH_SHORT)
+                          .show()
+                    } else if (creator == "") {
                       Toast.makeText(
                               context,
                               "You must be logged in to create an activity.",
