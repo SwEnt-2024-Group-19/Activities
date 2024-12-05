@@ -34,4 +34,6 @@ interface ImageRepository {
       onSuccess: (List<Bitmap>) -> Unit,
       onFailure: (Exception) -> Unit
   )
+
+  fun deleteProfilePicture(userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 }
