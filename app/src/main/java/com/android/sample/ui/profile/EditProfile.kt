@@ -89,7 +89,7 @@ fun EditProfileScreen(
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-
+  var isPictureRemoved by remember { mutableStateOf(false) }
   Scaffold(
       modifier = Modifier.testTag("editProfileScreen"),
       topBar = {
@@ -122,17 +122,7 @@ fun EditProfileScreen(
         if (isGalleryOpen) {
           GalleryScreen(
               isGalleryOpen = { isGalleryOpen = false },
-              addImage = { bitmap ->
-                selectedImage = bitmap
-                imageViewModel.uploadProfilePicture(
-                    profile.id,
-                    bitmap,
-                    onSuccess = { url -> photo = url },
-                    onFailure = { error ->
-                      Log.e(
-                          "EditProfileScreen", "Failed to upload profile picture: ${error.message}")
-                    })
-              },
+              addImage = { bitmap -> selectedImage = bitmap },
               context = context)
         }
         if (isCamOpen) {
@@ -146,17 +136,7 @@ fun EditProfileScreen(
                   },
               context = context,
               isCamOpen = { isCamOpen = false },
-              addElem = { bitmap ->
-                selectedImage = bitmap
-                imageViewModel.uploadProfilePicture(
-                    profile.id,
-                    bitmap,
-                    onSuccess = { url -> photo = url },
-                    onFailure = { error ->
-                      Log.e(
-                          "EditProfileScreen", "Failed to upload profile picture: ${error.message}")
-                    })
-              })
+              addElem = { bitmap -> selectedImage = bitmap })
         } else {
           Column(
               modifier =
@@ -170,7 +150,13 @@ fun EditProfileScreen(
                     userId = profile.id,
                     modifier =
                         Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
-                    imageViewModel)
+                    imageViewModel,
+                    editing = true,
+                    bitmap = selectedImage,
+                    onRemoveImage = {
+                      selectedImage = null
+                      isPictureRemoved = true // Mark picture for removal
+                    })
 
                 Button(
                     onClick = {
@@ -210,6 +196,18 @@ fun EditProfileScreen(
 
                 Button(
                     onClick = {
+                      if (isPictureRemoved) {
+                        imageViewModel.deleteProfilePicture(
+                            profile.id,
+                            onSuccess = {
+                              photo = null // Clear photo reference
+                            },
+                            onFailure = { error ->
+                              Log.e(
+                                  "EditProfileScreen",
+                                  "Failed to remove profile picture: ${error.message}")
+                            })
+                      }
                       selectedImage?.let { bitmap ->
                         imageViewModel.uploadProfilePicture(
                             profile.id,
