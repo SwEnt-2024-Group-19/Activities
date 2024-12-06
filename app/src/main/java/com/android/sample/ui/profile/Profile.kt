@@ -29,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.image.ImageViewModel
@@ -48,6 +47,7 @@ import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -316,7 +316,7 @@ fun ActivityRow(
               },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
-            painter = painterResource(id = R.drawable.foot),
+            painter = painterResource(id = getImageResourceIdForCategory(activity.category)),
             contentDescription = "Activity Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))

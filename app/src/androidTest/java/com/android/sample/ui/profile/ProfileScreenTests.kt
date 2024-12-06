@@ -192,11 +192,22 @@ class ProfileScreenTest {
 
   @Test
   fun test_RemainingTime_ForMonths() {
+    // convert 4 december 2024 to date
+    val calendar =
+        Calendar.getInstance().apply {
+          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+          set(Calendar.YEAR, 2024) // Set year to 2024
+          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+          set(Calendar.DAY_OF_MONTH, 4) // Set day to 4
+          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
+          set(Calendar.MINUTE, 0) // Set minute to 00
+          set(Calendar.SECOND, 0) // Set second to 00
+          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+        }
+
     val futureDate =
         com.google.firebase.Timestamp(
-            Date(
-                System.currentTimeMillis() +
-                    305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
+            Date(calendar.timeInMillis + 305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
     val activity = activity1.copy(date = futureDate, startTime = "12:00") // Start time is noon
 
     composeTestRule.setContent { RemainingTime(activity = activity) }
@@ -207,8 +218,19 @@ class ProfileScreenTest {
 
   @Test
   fun test_RemainingTime_ForDays() {
+    val calendar =
+        Calendar.getInstance().apply {
+          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+          set(Calendar.YEAR, 2024) // Set year to 2024
+          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+          set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
+          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
+          set(Calendar.MINUTE, 0) // Set minute to 00
+          set(Calendar.SECOND, 0) // Set second to 00
+          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+        }
     val futureDate =
-        com.google.firebase.Timestamp(Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000))
+        com.google.firebase.Timestamp(Date(calendar.timeInMillis + 7L * 24 * 60 * 60 * 1000))
     val activity = activity1.copy(date = futureDate)
 
     composeTestRule.setContent { RemainingTime(activity = activity) }
