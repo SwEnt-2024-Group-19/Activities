@@ -1,25 +1,16 @@
 package com.android.sample.model.profile
 
-class MockProfilesRepository : ProfilesRepository {
+import com.android.sample.mockDatabase.MockUsersDatabase
 
-  private val userProfiles =
-      mutableMapOf<String, User>(
-          "u1" to
-              User(
-                  id = "u1",
-                  name = "Alice",
-                  surname = "Smith",
-                  interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
-                  activities = listOf("a1", "a2"),
-                  photo = null,
-                  likedActivities = listOf("a1")))
-  private val activitiesList =
-      mutableMapOf<String, MutableList<String>>("u1" to mutableListOf("a1", "a2"))
+class MockProfilesRepository(private val database: MockUsersDatabase = MockUsersDatabase()) :
+    ProfilesRepository {
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     try {
-      // Retrieve the user profile by userId
-      val user = userProfiles["u1"]
+      val user =
+          database.getUser(userId)
+              ?: throw Exception(
+                  "User not found: if you are expecting this to pass, make sure you have the user in the e2e_IdToUser map")
       onSuccess(user)
     } catch (e: Exception) {
       onFailure(e)
@@ -32,17 +23,7 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    try {
-      // Add activity to user's activity list
-      if (userProfiles.containsKey(userId)) {
-        activitiesList.computeIfAbsent(userId) { mutableListOf() }.add(activityId)
-        onSuccess()
-      } else {
-        throw Exception("User not found")
-      }
-    } catch (e: Exception) {
-      onFailure(e)
-    }
+    throw NotImplementedError("Not implemented: addActivity")
   }
 
   override fun addLikedActivity(
@@ -51,17 +32,7 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    try {
-      // Add liked activity to user's liked activities list
-      if (userProfiles.containsKey(userId)) {
-        userProfiles[userId]?.likedActivities?.toMutableList()?.add(activityId)
-        onSuccess()
-      } else {
-        throw Exception("User not found")
-      }
-    } catch (e: Exception) {
-      onFailure(e)
-    }
+    throw NotImplementedError("Not implemented: addLikedActivity")
   }
 
   override fun removeLikedActivity(
@@ -70,17 +41,7 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    try {
-      // Remove liked activity from user's liked activities list
-      if (userProfiles.containsKey(userId)) {
-        userProfiles[userId]?.likedActivities?.toMutableList()?.remove(activityId)
-        onSuccess()
-      } else {
-        throw Exception("User not found")
-      }
-    } catch (e: Exception) {
-      onFailure(e)
-    }
+    throw NotImplementedError("Not implemented: removeLikedActivity")
   }
 
   override fun removeJoinedActivity(
@@ -89,22 +50,11 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    if (userProfiles.containsKey(userId)) {
-      activitiesList[userId]?.remove(activityId)
-      onSuccess()
-    } else {
-      onFailure(Exception("User not found"))
-    }
+    throw NotImplementedError("Not implemented: removeJoinedActivity")
   }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    try {
-      // Update the user profile in the in-memory map
-      userProfiles[user.id] = user
-      onSuccess()
-    } catch (e: Exception) {
-      onFailure(e)
-    }
+    throw NotImplementedError("Not implemented: updateProfile")
   }
 
   override fun addProfileToDatabase(
@@ -112,12 +62,6 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    try {
-      // Simulate adding a user profile to the database
-      userProfiles[userProfile.id] = userProfile
-      onSuccess()
-    } catch (e: Exception) {
-      onFailure(e)
-    }
+    throw NotImplementedError("Not implemented: addProfileToDatabase")
   }
 }
