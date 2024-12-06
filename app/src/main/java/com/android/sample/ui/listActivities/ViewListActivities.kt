@@ -200,7 +200,8 @@ fun ListActivitiesScreen(
                             false
                         else if (viewModel.distance != null &&
                             viewModel.distance!! <
-                                locationViewModel.getDistanceFromCurrentLocation(it.location)!!)
+                            (locationViewModel.getDistanceFromCurrentLocation(it.location) ?: 0f)
+                        )
                             false
                         else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
                         else {

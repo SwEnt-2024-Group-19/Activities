@@ -18,13 +18,14 @@ class FilterDialogTest {
 
   @Test
   fun filterDialog_shouldDisplayAllComponents() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _,_ -> }) }
 
     composeTestRule.onNodeWithTag("FilterDialog").assertIsDisplayed()
     composeTestRule.onNodeWithText("Price Range").assertIsDisplayed()
     composeTestRule.onNodeWithTag("membersAvailableTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("minDateTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("durationTextField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("distanceTextField").assertIsDisplayed()
     composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
     composeTestRule.onNodeWithText("Filter").assertIsDisplayed()
   }
@@ -48,7 +49,7 @@ class FilterDialogTest {
   */
   @Test
   fun filterDialog_shouldUpdateMembersAvailable() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _,_ ,_ -> }) }
 
     val inputText = "10"
     composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput(inputText)
@@ -59,7 +60,7 @@ class FilterDialogTest {
 
   @Test
   fun filterDialog_shouldSetStartDate() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _ -> }) }
 
     val startDate = "15/09/2024"
     composeTestRule.onNodeWithTag("minDateTextField").performTextInput(startDate)
@@ -70,7 +71,7 @@ class FilterDialogTest {
 
   @Test
   fun filterDialog_shouldSetDuration() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _ -> }) }
 
     val duration = "2 hours"
     composeTestRule.onNodeWithTag("durationTextField").performTextInput(duration)
@@ -78,13 +79,23 @@ class FilterDialogTest {
     // Verify the input value
     composeTestRule.onNodeWithTag("durationTextField").assertTextContains(duration)
   }
+  @Test
+  fun filterDialog_shouldSetDistance() {
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _ -> }) }
+
+    val distance = "10"
+    composeTestRule.onNodeWithTag("distanceTextField").performTextInput(distance)
+
+    // Verify the input value
+    composeTestRule.onNodeWithTag("distanceTextField").assertTextContains(distance)
+  }
 
   @Test
   fun filterDialog_shouldDismissOnCancel() {
     var dismissed = false
 
     composeTestRule.setContent {
-      FilterDialog(onDismiss = { dismissed = true }, onFilter = { _, _, _, _, _ -> })
+      FilterDialog(onDismiss = { dismissed = true }, onFilter = { _, _, _, _, _, _ -> })
     }
 
     // Perform click on Cancel
@@ -101,16 +112,18 @@ class FilterDialogTest {
     var membersAvailable: Int? = null
     var schedule: Timestamp? = null
     var duration: String? = null
+    var distance: Double? = null
 
     composeTestRule.setContent {
       FilterDialog(
           onDismiss = {},
-          onFilter = { price, members, date, dur, _ ->
+          onFilter = { price, members, date, dur, dist, _ ->
             filterCalled = true
             maxPrice = price
             membersAvailable = members
             schedule = date
             duration = dur
+            distance = dist
           })
     }
 
@@ -118,6 +131,7 @@ class FilterDialogTest {
     composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput("5")
     composeTestRule.onNodeWithTag("minDateTextField").performTextInput("15/09/2024")
     composeTestRule.onNodeWithTag("durationTextField").performTextInput("2 hours")
+    composeTestRule.onNodeWithTag("distanceTextField").performTextInput("10 km")
     composeTestRule.onNodeWithText("Filter").performClick()
 
     // Verify filter callback
@@ -125,6 +139,7 @@ class FilterDialogTest {
     assertEquals(300.0, maxPrice) // Default max price
     assertEquals(5, membersAvailable)
     assertEquals("2 hours", duration)
+    assertEquals(10.0, distance)
     assert(schedule != null) // Check timestamp is parsed
   }
 
