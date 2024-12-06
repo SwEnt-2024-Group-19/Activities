@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.database.AppDatabase
+import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -24,8 +25,11 @@ import kotlinx.coroutines.runBlocking
 @HiltViewModel
 open class ProfileViewModel
 @Inject
-constructor(private val repository: ProfilesRepository, private val localDatabase: AppDatabase) :
-    ViewModel() {
+constructor(
+    private val repository: ProfilesRepository,
+    private val localDatabase: AppDatabase,
+    signInRepository: SignInRepository
+) : ViewModel() {
   private var userState_ = MutableStateFlow<User?>(null)
   open val userState: StateFlow<User?> = userState_.asStateFlow()
 

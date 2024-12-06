@@ -127,7 +127,7 @@ class LikedActivitiesTest {
   @Test
   fun likeButtonTogglesCorrectly_whenClicked() {
     // Initially set activity as liked
-    profileViewModel = ProfileViewModel(profilesRepository, mock())
+    profileViewModel = ProfileViewModel(profilesRepository, mock(), mock())
     composeTestRule.setContent {
       ActivityCard2(
           activityId = activityBiking.uid,
@@ -156,7 +156,7 @@ class LikedActivitiesTest {
   @Test
   fun navigateToActivityDetails() {
     // Initially set activity as liked
-    profileViewModel = ProfileViewModel(profilesRepository, mock())
+    profileViewModel = ProfileViewModel(profilesRepository, mock(), mock())
     composeTestRule.setContent {
       ActivityCard2(
           activityId = activity.uid,

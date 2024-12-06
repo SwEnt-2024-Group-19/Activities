@@ -378,7 +378,7 @@ class OverviewScreenTest {
 
   @Test
   fun changeIconWhenActivityIsOnclick() {
-    userProfileViewModel = ProfileViewModel(profilesRepository, mock())
+    userProfileViewModel = ProfileViewModel(profilesRepository, mock(), mock())
 
     composeTestRule.setContent {
       ActivityCard(

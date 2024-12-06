@@ -37,7 +37,7 @@ class ProfileViewModelTest {
     firebaseAuth = mock(FirebaseAuth::class.java)
     firebaseFirestore = mock(FirebaseFirestore::class.java)
     profilesRepository = mock(ProfilesRepositoryFirestore::class.java)
-    profileViewModel = ProfileViewModel(repository = profilesRepository, mock())
+    profileViewModel = ProfileViewModel(repository = profilesRepository, mock(), mock())
   }
 
   @Test
@@ -212,7 +212,10 @@ class ProfileViewModelTest {
 
     // Create the ViewModel
     val profileViewModel =
-        ProfileViewModel(repository = profilesRepository, localDatabase = mockDatabase)
+        ProfileViewModel(
+            repository = profilesRepository,
+            localDatabase = mockDatabase,
+            signInRepository = mock())
 
     // Call the method under test
     profileViewModel.fetchUserData(testUser.id)
