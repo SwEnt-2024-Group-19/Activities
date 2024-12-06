@@ -16,7 +16,7 @@ data class User(
 
 data class Interest(val category: String, val interest: String)
 
-val InterestCategories =
+val InterestStringCategories =
     listOf(
         "Sport",
         "Outdoor Activity",
