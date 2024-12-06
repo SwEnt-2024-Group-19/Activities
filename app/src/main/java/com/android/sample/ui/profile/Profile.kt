@@ -55,6 +55,7 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.util.Calendar
 
 @Composable
 fun ProfileScreen(
@@ -142,7 +143,6 @@ fun ProfileContent(
                   onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
                     Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
                   }
-
               DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(
                     text = { Text("Logout") },
@@ -347,7 +347,22 @@ fun ActivityRow(
 @Composable
 fun RemainingTime(activity: Activity) {
   val currentTimeMillis = System.currentTimeMillis()
-  val activityTimeMillis = activity.date.toDate().time
+
+  val startTimeParts = activity.startTime.split(":")
+  val activityHour = startTimeParts[0].toInt()
+  val activityMinute = startTimeParts[1].toInt()
+
+  val activityDate = activity.date.toDate()
+  val calendar =
+      Calendar.getInstance().apply {
+        time = activityDate
+        set(Calendar.HOUR_OF_DAY, activityHour)
+        set(Calendar.MINUTE, activityMinute)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+      }
+  val activityTimeMillis = calendar.timeInMillis
+
   val remainingTimeMillis = activityTimeMillis - currentTimeMillis
 
   val hours = remainingTimeMillis / (1000 * 60 * 60) % 24

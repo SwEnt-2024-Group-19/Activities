@@ -180,4 +180,17 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
           onFailure(exception)
         }
   }
+
+  override fun deleteProfilePicture(
+      userId: String,
+      onSuccess: () -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    val profilePicRef = storageRef.child("users/$userId/profile_picture.jpg")
+
+    profilePicRef
+        .delete()
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { onFailure(it) }
+  }
 }
