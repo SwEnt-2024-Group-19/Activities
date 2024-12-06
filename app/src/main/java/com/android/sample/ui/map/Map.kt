@@ -47,6 +47,7 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
@@ -89,6 +90,7 @@ fun MapScreen(
   var showBottomSheet by remember { mutableStateOf(false) }
   val previousScreen = navigationActions.getPreviousRoute()
   var showFilterDialog by remember { mutableStateOf(false) }
+  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
 
   val firstLocation =
@@ -158,8 +160,21 @@ fun MapScreen(
                         else if (listActivitiesViewModel.minDate != null &&
                             it.date < listActivitiesViewModel.minDate!!)
                             false
-                        else if (listActivitiesViewModel.duration != null &&
-                            it.duration != listActivitiesViewModel.duration)
+                        else if (listActivitiesViewModel.maxDate != null &&
+                            it.date > listActivitiesViewModel.maxDate!!)
+                            false
+                        else if (listActivitiesViewModel.startTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                it.startTime, listActivitiesViewModel.startTime!!))
+                            false
+                        else if (listActivitiesViewModel.endTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                listActivitiesViewModel.endTime!!,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
+                            false
+                        else if (listActivitiesViewModel.distance != null &&
+                            listActivitiesViewModel.distance!! <
+                                locationViewModel.getDistanceFromCurrentLocation(it.location)!!)
                             false
                         else if (listActivitiesViewModel.onlyPRO && it.type != ActivityType.PRO)
                             false
@@ -211,9 +226,24 @@ fun MapScreen(
   if (showFilterDialog) {
     FilterDialog(
         onDismiss = { showFilterDialog = false },
-        onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+        onFilter = {
+            price,
+            placesAvailable,
+            minDateTimestamp,
+            maxDateTimestamp,
+            startTime,
+            endTime,
+            distance,
+            seeOnlyPRO ->
           listActivitiesViewModel.updateFilterState(
-              price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+              price,
+              placesAvailable,
+              minDateTimestamp,
+              maxDateTimestamp,
+              startTime,
+              endTime,
+              distance,
+              seeOnlyPRO)
         })
   }
   if (showBottomSheet) {

@@ -49,7 +49,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
@@ -66,6 +65,7 @@ import com.android.sample.resources.C.Tag.PURPLE_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
+import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.SearchBar
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -115,9 +115,24 @@ fun ListActivitiesScreen(
           if (showFilterDialog) {
             FilterDialog(
                 onDismiss = { showFilterDialog = false },
-                onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+                onFilter = {
+                    price,
+                    placesAvailable,
+                    minDateTimestamp,
+                    maxDateTimestamp,
+                    startTime,
+                    endTime,
+                    distance,
+                    seeOnlyPRO ->
                   viewModel.updateFilterState(
-                      price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+                      price,
+                      placesAvailable,
+                      minDateTimestamp,
+                      maxDateTimestamp,
+                      startTime,
+                      endTime,
+                      distance,
+                      seeOnlyPRO)
                 })
           }
           Box(
@@ -190,7 +205,20 @@ fun ListActivitiesScreen(
                             (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
                             false
                         else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
-                        else if (viewModel.duration != null && it.duration != viewModel.duration)
+                        else if (viewModel.maxDate != null && it.date > viewModel.maxDate!!) false
+                        else if (viewModel.startTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                it.startTime, viewModel.startTime!!))
+                            false
+                        else if (viewModel.endTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                viewModel.endTime!!,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
+                            false
+                        else if (viewModel.distance != null &&
+                            viewModel.distance!! <
+                                (locationViewModel.getDistanceFromCurrentLocation(it.location)
+                                    ?: 0f))
                             false
                         else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
                         else {
@@ -268,7 +296,7 @@ fun ActivityCard(
           Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
             // Display the activity image
             Image(
-                painter = painterResource(R.drawable.foot),
+                painter = painterResource(getImageResourceIdForCategory(activity.category)),
                 contentDescription = activity.title,
                 modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)

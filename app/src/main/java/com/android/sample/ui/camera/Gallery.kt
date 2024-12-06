@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.sample.R
+import com.android.sample.model.activity.Category
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.image.uriToBitmap
 
@@ -155,4 +156,13 @@ fun randomDefaultProfileImage(): Int {
   val defaultImageId = defaultImages.random()
 
   return defaultImageId
+}
+
+fun getImageResourceIdForCategory(category: Category): Int {
+  return when (category) {
+    Category.SPORT -> R.drawable.sports_image
+    Category.CULTURE -> R.drawable.culture_image
+    Category.ENTERTAINMENT -> R.drawable.entertainment_image
+    Category.SKILLS -> R.drawable.skills_image // Fallback image
+  }
 }
