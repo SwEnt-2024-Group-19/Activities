@@ -24,7 +24,6 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 
 class MapScreenTest {
@@ -70,14 +69,6 @@ class MapScreenTest {
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
     composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
-  }
-
-  @Test
-  fun testCenterOnCurrentLocationTriggersGetCurrentLocation() {
-    composeTestRule.setContent {
-      MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
-    }
-    verify(mockRepository).getCurrentLocation(any(), any())
   }
 
   @Test

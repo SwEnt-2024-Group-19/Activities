@@ -114,7 +114,8 @@ fun EditActivityScreen(
   var expandedCategory by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf(activity?.type.toString()) }
   var selectedOptionCategory by remember { mutableStateOf(activity?.category.toString()) }
-
+  val maxDescriptionLength = 500
+  val maxTitleLength = 50
   val locationQuery by locationViewModel.query.collectAsState()
   var showDropdown by remember { mutableStateOf(false) }
   val locationSuggestions by
@@ -199,6 +200,7 @@ fun EditActivityScreen(
                 itemsList = selectedImages,
                 deleteImage = { bitmap -> selectedImages = selectedImages.filter { it != bitmap } })
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            RemainingPlace(title, maxTitleLength)
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -209,6 +211,7 @@ fun EditActivityScreen(
                 singleLine = true,
             )
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+            RemainingPlace(description, maxDescriptionLength)
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -505,7 +508,15 @@ fun EditActivityScreen(
             Spacer(Modifier.height(MEDIUM_PADDING.dp))
 
             Button(
-                enabled = title.isNotEmpty() && description.isNotEmpty(),
+                enabled =
+                    title.isNotEmpty() &&
+                        description.isNotEmpty() &&
+                        price.isNotEmpty() &&
+                        maxPlaces.isNotEmpty() &&
+                        selectedOptionType != "Select a type" &&
+                        selectedOptionCategory != "Select a category" &&
+                        startTime?.isNotEmpty() ?: false &&
+                        duration.isNotEmpty(),
                 onClick = {
                   if (!hourDateViewModel.isBeginGreaterThanEnd(
                       startTime ?: "00:00", duration ?: "00:01")) {
@@ -576,6 +587,13 @@ fun EditActivityScreen(
                     ),
                 onClick = {
                   listActivityViewModel.deleteActivityById(activity?.uid ?: "")
+                  imageViewModel.removeAllActivityImages(
+                      activity?.uid ?: "",
+                      { Log.d("EditActivityScreen", "Images removed") },
+                      { error ->
+                        Log.e("EditActivityScreen", "Failed to remove images: ${error.message}")
+                      })
+
                   navigationActions.navigateTo(Screen.OVERVIEW)
                 },
                 modifier =
