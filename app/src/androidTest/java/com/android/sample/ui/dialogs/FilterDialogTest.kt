@@ -18,7 +18,7 @@ class FilterDialogTest {
 
   @Test
   fun filterDialog_shouldDisplayAllComponents() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _,_ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _ -> }) }
 
     composeTestRule.onNodeWithTag("FilterDialog").assertIsDisplayed()
     composeTestRule.onNodeWithText("Price Range").assertIsDisplayed()
@@ -49,7 +49,7 @@ class FilterDialogTest {
   */
   @Test
   fun filterDialog_shouldUpdateMembersAvailable() {
-    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _,_ ,_ -> }) }
+    composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _ -> }) }
 
     val inputText = "10"
     composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput(inputText)
@@ -79,6 +79,7 @@ class FilterDialogTest {
     // Verify the input value
     composeTestRule.onNodeWithTag("durationTextField").assertTextContains(duration)
   }
+
   @Test
   fun filterDialog_shouldSetDistance() {
     composeTestRule.setContent { FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _ -> }) }
