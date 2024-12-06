@@ -16,7 +16,7 @@ import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
-import com.android.sample.resources.dummydata.email
+import com.android.sample.resources.dummydata.defaultUserCredentials
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
@@ -144,20 +144,26 @@ class ActivityFlowTest {
 
   @Test
   fun aUserSignsInAndLooksAtTheirProfile() {
-    // Tries to log in but fails
+    val email =
+        defaultUserCredentials[
+            "email"]!! // use of !! is allowed because this is a test environment and we know the
+    // key exists. if it doesn't, it is up to the developer to fix the test
+    val password = defaultUserCredentials["password"]!!
+
+    // Tries to log in but fails because of wrong credentials
     composeTestRule.onNodeWithTag("SignInButton").performClick()
     composeTestRule.waitForIdle()
 
     //  Enters credentials then connects
     composeTestRule.onNodeWithTag("EmailTextField").performTextInput(email)
-    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("password")
+    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput(password)
     composeTestRule.onNodeWithTag("SignInButton").performClick()
     composeTestRule.waitForIdle()
 
     // Checks in the profile that the user is connected
     composeTestRule.onNodeWithTag("Profile").performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("Alice Smith").assertIsDisplayed()
+    composeTestRule.onNodeWithText(defaultUserCredentials["full name"]!!).assertIsDisplayed()
   }
 
   /*
