@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -51,6 +53,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -350,37 +353,51 @@ fun CreateActivityScreen(
               )
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-              // Location Input with dropdown using ExposedDropdownMenuBox
-              ExposedDropdownMenuBox(
-                  expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                  onExpandedChange = { showDropdown = it }, // Toggle dropdown visibility ,
-              ) {
+              Box {
                 OutlinedTextField(
                     value = locationQuery,
                     onValueChange = {
                       locationViewModel.setQuery(it)
-                      showDropdown = true // Show dropdown when user starts typing
+                      showDropdown = it != "" // Show dropdown when user starts typing
                     },
                     label = { Text("Location") },
                     placeholder = { Text("Enter an Address or Location") },
                     modifier =
-                        Modifier.menuAnchor() // Anchor the dropdown to this text field
-                            .padding(STANDARD_PADDING.dp)
+                        Modifier.padding(STANDARD_PADDING.dp)
                             .fillMaxWidth()
                             .testTag("inputLocationCreate"),
                     singleLine = true)
 
+                locationSuggestions.filterNotNull().take(3).forEach { location ->
+                  DropdownMenuItem(
+                      text = {
+                        Text(
+                            text =
+                                location.name.take(TOP_TITLE_SIZE) +
+                                    if (location.name.length > TOP_TITLE_SIZE) "..."
+                                    else "", // Limit name length
+                            maxLines = 1 // Ensure name doesn't overflow
+                            )
+                      },
+                      onClick = {
+                        locationViewModel.setQuery(location.name)
+                        selectedLocation = location
+                        showDropdown = false // Close dropdown on selection
+                      },
+                      modifier = Modifier.padding(STANDARD_PADDING.dp))
+                }
                 // Dropdown menu for location suggestions
-                ExposedDropdownMenu(
+                DropdownMenu(
                     expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                    onDismissRequest = { showDropdown = false }) {
+                    onDismissRequest = { showDropdown = false },
+                    properties = PopupProperties(focusable = false)) {
                       locationSuggestions.filterNotNull().take(3).forEach { location ->
                         DropdownMenuItem(
                             text = {
                               Text(
                                   text =
-                                      location.name.take(TOP_TITLE_SIZE) +
-                                          if (location.name.length > TOP_TITLE_SIZE) "..."
+                                      location.name.take(30) +
+                                          if (location.name.length > 30) "..."
                                           else "", // Limit name length
                                   maxLines = 1 // Ensure name doesn't overflow
                                   )
@@ -401,6 +418,14 @@ fun CreateActivityScreen(
                       }
                     }
               }
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              if (locationSuggestions.size > 3) {
+                DropdownMenuItem(
+                    text = { Text("More...") },
+                    onClick = { /* TODO: Define behavior for 'More...' */},
+                    modifier = Modifier.padding(STANDARD_PADDING.dp))
+              }
+
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
               ExposedDropdownMenuBox(
