@@ -34,6 +34,7 @@ fun FilterDialog(
             membersAvailable: Int?,
             schedule: Timestamp?,
             duration: String?,
+            distance: Double?,
             onlyPRO: Boolean?) -> Unit,
 ) {
   var maxPrice by remember { mutableStateOf(DEFAULT_MAX_PRICE) }
@@ -42,6 +43,7 @@ fun FilterDialog(
   var minDateTimestamp by remember { mutableStateOf<Timestamp?>(null) }
   var duration by remember { mutableStateOf<String?>(null) }
   var onlyPRO by remember { mutableStateOf<Boolean?>(false) }
+  var distance by remember { mutableStateOf<String?>(null) }
 
   Dialog(
       onDismissRequest = { onDismiss() },
@@ -89,6 +91,7 @@ fun FilterDialog(
                     value = availablePlaces?.toString() ?: "",
                     onValueChange = { availablePlaces = it.toIntOrNull() },
                     label = { Text("Members Available") },
+                    singleLine = true,
                     modifier = Modifier.testTag("membersAvailableTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
 
@@ -107,7 +110,16 @@ fun FilterDialog(
                     value = duration ?: "",
                     onValueChange = { duration = it },
                     label = { Text("Duration") },
+                    singleLine = true,
                     modifier = Modifier.testTag("durationTextField"),
+                    shape = RoundedCornerShape(TEXT_PADDING.dp))
+                OutlinedTextField(
+                    value = distance ?: "",
+                    onValueChange = { distance = it },
+                    label = { Text("distance") },
+                    modifier = Modifier.testTag("distanceTextField"),
+                    placeholder = { androidx.compose.material3.Text(text = "exp: 10.5 km") },
+                    singleLine = true,
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
                 Row(
@@ -154,6 +166,7 @@ fun FilterDialog(
                             availablePlaces,
                             minDateTimestamp,
                             duration,
+                            distance?.toDouble(),
                             onlyPRO)
                         onDismiss()
                       },

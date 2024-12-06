@@ -161,6 +161,10 @@ fun MapScreen(
                         else if (listActivitiesViewModel.duration != null &&
                             it.duration != listActivitiesViewModel.duration)
                             false
+                        else if (listActivitiesViewModel.distance != null &&
+                            listActivitiesViewModel.distance!! <
+                                locationViewModel.getDistanceFromCurrentLocation(it.location)!!)
+                            false
                         else if (listActivitiesViewModel.onlyPRO && it.type != ActivityType.PRO)
                             false
                         else it.location != null
@@ -211,9 +215,9 @@ fun MapScreen(
   if (showFilterDialog) {
     FilterDialog(
         onDismiss = { showFilterDialog = false },
-        onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+        onFilter = { price, placesAvailable, minDateTimestamp, acDuration, distance, seeOnlyPRO ->
           listActivitiesViewModel.updateFilterState(
-              price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+              price, placesAvailable, minDateTimestamp, acDuration, distance, seeOnlyPRO)
         })
   }
   if (showBottomSheet) {

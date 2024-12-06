@@ -39,6 +39,7 @@ constructor(
   var availablePlaces by mutableStateOf<Int?>(null)
   var minDate by mutableStateOf<Timestamp?>(null)
   var duration by mutableStateOf<String?>(null)
+  var distance by mutableStateOf<Double?>(null)
   var onlyPRO by mutableStateOf(false)
 
   /** Set the UI state to a new value For testing purposes only */
@@ -59,12 +60,14 @@ constructor(
       placesAvailable: Int?,
       mindateTimestamp: Timestamp?,
       acDuration: String?,
+      distance: Double?,
       seeOnlyPRO: Boolean?
   ) {
     maxPrice = price ?: Double.MAX_VALUE
     availablePlaces = placesAvailable
     minDate = mindateTimestamp
     duration = acDuration
+    this.distance = distance
     onlyPRO = seeOnlyPRO ?: false
   }
 

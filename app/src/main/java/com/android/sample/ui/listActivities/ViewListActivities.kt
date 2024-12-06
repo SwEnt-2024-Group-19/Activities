@@ -115,9 +115,15 @@ fun ListActivitiesScreen(
           if (showFilterDialog) {
             FilterDialog(
                 onDismiss = { showFilterDialog = false },
-                onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+                onFilter = {
+                    price,
+                    placesAvailable,
+                    minDateTimestamp,
+                    acDuration,
+                    distance,
+                    seeOnlyPRO ->
                   viewModel.updateFilterState(
-                      price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+                      price, placesAvailable, minDateTimestamp, acDuration, distance, seeOnlyPRO)
                 })
           }
           Box(
@@ -191,6 +197,10 @@ fun ListActivitiesScreen(
                             false
                         else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
                         else if (viewModel.duration != null && it.duration != viewModel.duration)
+                            false
+                        else if (viewModel.distance != null &&
+                            viewModel.distance!! <
+                                locationViewModel.getDistanceFromCurrentLocation(it.location)!!)
                             false
                         else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
                         else {
