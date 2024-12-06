@@ -17,7 +17,7 @@ class LocationViewModelTest {
   @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
   private lateinit var viewModel: LocationViewModel
-  private val mockRepository: LocationRepository = mock()
+  private val mockRepository: NominatimLocationRepository = mock()
   private val mockPermissionChecker: LocationPermissionChecker = mock()
 
   @Before
@@ -50,76 +50,46 @@ class LocationViewModelTest {
   }
 
   @Test
-  fun `fetchCurrentLocation should call getCurrentLocation when permission is granted`() = runTest {
-    // Given
-    whenever(mockPermissionChecker.hasLocationPermission()).thenReturn(true)
-    doAnswer { invocation ->
-          val successCallback = invocation.arguments[0] as (Location) -> Unit
-          successCallback(Location(1.0, 2.0, "Test Location"))
-          null
-        }
-        .whenever(mockRepository)
-        .getCurrentLocation(any(), any())
+  fun `startTrackingLocation should call repository startLocationUpdates when permission is granted`() =
+      runTest {
+        // Given
+        whenever(mockPermissionChecker.hasLocationPermission()).thenReturn(true)
+        doAnswer { invocation ->
+              val onUpdate = invocation.arguments[0] as (Location) -> Unit
+              onUpdate(Location(1.0, 2.0, "Updated Location"))
+              null
+            }
+            .whenever(mockRepository)
+            .startLocationUpdates(any())
 
-    // When
-    viewModel.fetchCurrentLocation()
+        // When
+        viewModel.startTrackingLocation()
 
-    // Then
-    verify(mockRepository).getCurrentLocation(any(), any())
-    assertEquals(Location(1.0, 2.0, "Test Location"), viewModel.currentLocation.first())
-  }
+        // Then
+        verify(mockRepository).startLocationUpdates(any())
+        assertEquals(Location(1.0, 2.0, "Updated Location"), viewModel.currentLocation.first())
+      }
 
   @Test
-  fun `fetchCurrentLocation should not call getCurrentLocation when permission is denied`() =
+  fun `startTrackingLocation should not call repository startLocationUpdates when permission is denied`() =
       runTest {
         // Given
         whenever(mockPermissionChecker.hasLocationPermission()).thenReturn(false)
 
         // When
-        viewModel.fetchCurrentLocation()
+        viewModel.startTrackingLocation()
 
         // Then
-        verify(mockRepository, never()).getCurrentLocation(any(), any())
+        verify(mockRepository, never()).startLocationUpdates(any())
       }
 
   @Test
-  fun `fetchCurrentLocation should update currentLocation when getCurrentLocation succeeds`() =
-      runTest {
-        // Given
-        whenever(mockPermissionChecker.hasLocationPermission()).thenReturn(true)
-        val expectedLocation = Location(1.0, 2.0, "Test Location")
-        doAnswer { invocation ->
-              val successCallback = invocation.arguments[0] as (Location) -> Unit
-              successCallback(expectedLocation)
-              null
-            }
-            .whenever(mockRepository)
-            .getCurrentLocation(any(), any())
-
-        // When
-        viewModel.fetchCurrentLocation()
-
-        // Then
-        assertEquals(expectedLocation, viewModel.currentLocation.first())
-      }
-
-  @Test
-  fun `fetchCurrentLocation should handle error when getCurrentLocation fails`() = runTest {
-    // Given
-    whenever(mockPermissionChecker.hasLocationPermission()).thenReturn(true)
-    doAnswer { invocation ->
-          val errorCallback = invocation.arguments[1] as (Exception) -> Unit
-          errorCallback(Exception("Location error"))
-          null
-        }
-        .whenever(mockRepository)
-        .getCurrentLocation(any(), any())
-
+  fun `stopTrackingLocation should call repository stopLocationUpdates`() = runTest {
     // When
-    viewModel.fetchCurrentLocation()
+    viewModel.stopTrackingLocation()
 
     // Then
-    assertEquals(null, viewModel.currentLocation.first())
+    verify(mockRepository).stopLocationUpdates()
   }
 
   @Test
@@ -143,8 +113,10 @@ class LocationViewModelTest {
         val currentLocation = Location(46.518831258, 6.559331096, "EPFL")
         viewModel.setCurrentLocation(currentLocation)
         val activityLocation = Location(46.5375, 6.573611, "Epenex")
+
         // When
         val distance = viewModel.getDistanceFromCurrentLocation(activityLocation)
+
         // Then
         assertNotNull(distance)
         if (distance != null) {

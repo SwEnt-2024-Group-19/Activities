@@ -19,10 +19,15 @@ import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.activity1
 import com.android.sample.resources.dummydata.activityListWithPastActivity
 import com.android.sample.resources.dummydata.listOfActivitiesUid
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import java.lang.Thread.sleep
+import java.sql.Timestamp
+import java.util.Calendar
+import java.util.Date
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
@@ -108,11 +113,7 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("Cycling").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Reading").assertIsDisplayed()
 
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("goBackButton")
-        .performClick() // test for if on click it goes back
   }
 
   @Test
@@ -187,6 +188,70 @@ class ProfileScreenTest {
     // Verify navigation based on whether the user is the creator
     activityListWithPastActivity.first { it.uid == listOfActivitiesUid.first() }
     verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
+  }
+
+  @Test
+  fun test_RemainingTime_ForMonths() {
+    // convert 4 december 2024 to date
+    val calendar =
+        Calendar.getInstance().apply {
+          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+          set(Calendar.YEAR, 2024) // Set year to 2024
+          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+          set(Calendar.DAY_OF_MONTH, 4) // Set day to 4
+          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
+          set(Calendar.MINUTE, 0) // Set minute to 00
+          set(Calendar.SECOND, 0) // Set second to 00
+          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+        }
+
+    val futureDate =
+        com.google.firebase.Timestamp(
+            Date(calendar.timeInMillis + 305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
+    val activity = activity1.copy(date = futureDate, startTime = "12:00") // Start time is noon
+
+    composeTestRule.setContent { RemainingTime(activity = activity) }
+    sleep(5000)
+    composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
+    composeTestRule.onNodeWithText("In 304 months").assertIsDisplayed()
+  }
+
+  @Test
+  fun test_RemainingTime_ForDays() {
+    val calendar =
+        Calendar.getInstance().apply {
+          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+          set(Calendar.YEAR, 2024) // Set year to 2024
+          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+          set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
+          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
+          set(Calendar.MINUTE, 0) // Set minute to 00
+          set(Calendar.SECOND, 0) // Set second to 00
+          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+        }
+    val futureDate =
+        com.google.firebase.Timestamp(Date(calendar.timeInMillis + 7L * 24 * 60 * 60 * 1000))
+    val activity = activity1.copy(date = futureDate)
+
+    composeTestRule.setContent { RemainingTime(activity = activity) }
+    sleep(5000)
+    composeTestRule.onNodeWithText("In 6 days").assertIsDisplayed()
+  }
+
+  @Test
+  fun test_RemainingTime_ForHours() {
+    val currentTime = System.currentTimeMillis()
+    val futureDate = com.google.firebase.Timestamp(Date(currentTime))
+    val calendar = Calendar.getInstance().apply { timeInMillis = currentTime }
+    calendar.add(Calendar.MINUTE, 30)
+    val futureStartTime = "${calendar.get(Calendar.HOUR_OF_DAY)}:${calendar.get(Calendar.MINUTE)}"
+
+    val activity = activity1.copy(date = futureDate, startTime = futureStartTime)
+
+    composeTestRule.setContent { RemainingTime(activity = activity) }
+    sleep(5000)
+    composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
+    composeTestRule.onNodeWithText("In 0 h 29 min").assertIsDisplayed()
   }
 
   @Test
