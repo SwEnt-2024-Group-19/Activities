@@ -194,26 +194,24 @@ class ProfileScreenTest {
   fun test_RemainingTime_ForMonths() {
     val futureDate =
         com.google.firebase.Timestamp(
-            Date(
-                System.currentTimeMillis() +
-                    305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
-    val activity = activity1.copy(date = futureDate, startTime = "12:00") // Start time is noon
-
+            Date(System.currentTimeMillis() + 12L * 30 * 24 * 60 * 60 * 1000 + 60 * 60 * 1000))
+    val activity = activity1.copy(date = futureDate)
     composeTestRule.setContent { RemainingTime(activity = activity) }
-    sleep(5000)
+
     composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
-    composeTestRule.onNodeWithText("In 304 months").assertIsDisplayed()
+    composeTestRule.onNodeWithText("In 12 months").assertIsDisplayed()
   }
 
   @Test
   fun test_RemainingTime_ForDays() {
     val futureDate =
-        com.google.firebase.Timestamp(Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000))
+        com.google.firebase.Timestamp(
+            Date(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000 + 60 * 60 * 1000))
     val activity = activity1.copy(date = futureDate)
 
     composeTestRule.setContent { RemainingTime(activity = activity) }
     sleep(5000)
-    composeTestRule.onNodeWithText("In 6 days").assertIsDisplayed()
+    composeTestRule.onNodeWithText("In 7 days").assertIsDisplayed()
   }
 
   @Test
