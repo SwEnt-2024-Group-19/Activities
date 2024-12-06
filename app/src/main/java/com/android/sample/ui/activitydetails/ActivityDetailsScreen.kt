@@ -468,6 +468,13 @@ fun ActivityDetailsScreen(
                     }
               }
 
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              // Export to calendar button
+              if (activity != null) {
+                ExportActivityToCalendarButton(activity)
+              }
+
               CommentSection(
                   profileId = profile?.id ?: "anonymous",
                   comments = comments,
