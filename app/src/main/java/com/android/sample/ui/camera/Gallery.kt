@@ -27,7 +27,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.android.sample.R
 import com.android.sample.model.activity.Category
-
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.image.uriToBitmap
 
