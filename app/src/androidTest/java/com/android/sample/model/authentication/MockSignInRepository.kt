@@ -8,6 +8,13 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 
 class MockSignInRepository : SignInRepository {
+  private var signedInUserId: String? = null
+  private val authStateListeners = mutableListOf<(String?) -> Unit>()
+
+  override fun observeAuthState(onSignedIn: (String) -> Unit, onSignedOut: () -> Unit) {
+    authStateListeners.add { userId -> if (userId != null) onSignedIn(userId) else onSignedOut() }
+    notifyAuthStateChanged()
+  }
 
   override suspend fun signInWithEmail(email: String, password: String): AuthResult {
     val authResult = Mockito.mock(AuthResult::class.java)
@@ -30,7 +37,15 @@ class MockSignInRepository : SignInRepository {
   }
 
   override fun signOut() {
-    // Simulate the sign-out logic
-    println("User signed out")
+    setSignedInUserId(null)
+  }
+
+  private fun setSignedInUserId(userId: String?) {
+    signedInUserId = userId
+    notifyAuthStateChanged()
+  }
+
+  private fun notifyAuthStateChanged() {
+    authStateListeners.forEach { it(signedInUserId) }
   }
 }
