@@ -1,7 +1,9 @@
 package com.android.sample.model.authentication
 
 import com.android.sample.model.auth.SignInRepository
-import com.android.sample.resources.dummydata.testUser
+import com.android.sample.resources.dummydata.e2e_Credentials
+import com.android.sample.resources.dummydata.e2e_EmailToUserId
+import com.android.sample.resources.dummydata.e2e_IdTokenToUserId
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import org.mockito.Mockito
@@ -19,20 +21,38 @@ class MockSignInRepository : SignInRepository {
   override suspend fun signInWithEmail(email: String, password: String): AuthResult {
     val authResult = Mockito.mock(AuthResult::class.java)
     val firebaseUser = Mockito.mock(FirebaseUser::class.java)
-    `when`(firebaseUser.uid).thenReturn(testUser.id)
+
+    val isCorrectCredentials = e2e_Credentials[email] == password
+    if (!isCorrectCredentials) {
+      throw Exception(
+          "Invalid credentials: if you are expecting this to pass, make sure you have the user in the e2e_Credentials map")
+    }
+
+    val userId =
+        e2e_EmailToUserId[email]
+            ?: throw Exception(
+                "User not found: make sure you have the user in the e2e_EmailToUserId map")
+    setSignedInUserId(userId)
+
+    `when`(firebaseUser.uid).thenReturn(userId)
     `when`(authResult.user).thenReturn(firebaseUser)
 
-    // Return a mocked AuthResult object with a test user
     return authResult
   }
 
   override suspend fun signInWithGoogle(idToken: String): AuthResult {
     val authResult = Mockito.mock(AuthResult::class.java)
     val firebaseUser = Mockito.mock(FirebaseUser::class.java)
-    `when`(firebaseUser.uid).thenReturn(testUser.id)
+
+    val userId =
+        e2e_IdTokenToUserId[idToken]
+            ?: throw Exception(
+                "Invalid token: if you are expecting this to pass, make sure you have the user in the e2e_IdTokenToUserId map")
+    setSignedInUserId(userId)
+
+    `when`(firebaseUser.uid).thenReturn(userId)
     `when`(authResult.user).thenReturn(firebaseUser)
 
-    // Return a mocked AuthResult object with a test user
     return authResult
   }
 
