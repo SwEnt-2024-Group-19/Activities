@@ -132,7 +132,7 @@ class FilterDialogTest {
     composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput("5")
     composeTestRule.onNodeWithTag("minDateTextField").performTextInput("15/09/2024")
     composeTestRule.onNodeWithTag("durationTextField").performTextInput("2 hours")
-    composeTestRule.onNodeWithTag("distanceTextField").performTextInput("10 km")
+    composeTestRule.onNodeWithTag("distanceTextField").performTextInput("10")
     composeTestRule.onNodeWithText("Filter").performClick()
 
     // Verify filter callback
