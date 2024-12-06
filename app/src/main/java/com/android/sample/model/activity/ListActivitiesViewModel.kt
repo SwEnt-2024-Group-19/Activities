@@ -38,7 +38,10 @@ constructor(
   var maxPrice by mutableStateOf(Double.MAX_VALUE)
   var availablePlaces by mutableStateOf<Int?>(null)
   var minDate by mutableStateOf<Timestamp?>(null)
-  var duration by mutableStateOf<String?>(null)
+  var maxDate by mutableStateOf<Timestamp?>(null)
+
+  var startTime by mutableStateOf<String?>(null)
+  var endTime by mutableStateOf<String?>(null)
   var distance by mutableStateOf<Double?>(null)
   var onlyPRO by mutableStateOf(false)
 
@@ -58,15 +61,19 @@ constructor(
   fun updateFilterState(
       price: Double?,
       placesAvailable: Int?,
-      mindateTimestamp: Timestamp?,
-      acDuration: String?,
+      minDateTimestamp: Timestamp?,
+      maxDateTimestamp: Timestamp?,
+      startTime: String?,
+      endTime: String?,
       distance: Double?,
       seeOnlyPRO: Boolean?
   ) {
     maxPrice = price ?: Double.MAX_VALUE
     availablePlaces = placesAvailable
-    minDate = mindateTimestamp
-    duration = acDuration
+    minDate = minDateTimestamp
+    maxDate = maxDateTimestamp
+    this.startTime = startTime
+    this.endTime = endTime
     this.distance = distance
     onlyPRO = seeOnlyPRO ?: false
   }

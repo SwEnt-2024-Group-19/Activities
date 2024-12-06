@@ -20,6 +20,8 @@ object C {
 
     const val STANDARD_PADDING = 8
 
+    const val HALF_SCREEN_TEXT_FIELD_PADDING = 120
+
     const val DEFAULT_MAX_PRICE = 300f
 
     const val BUTTON_WIDTH = 300

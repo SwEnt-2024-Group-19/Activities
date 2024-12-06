@@ -119,11 +119,20 @@ fun ListActivitiesScreen(
                     price,
                     placesAvailable,
                     minDateTimestamp,
-                    acDuration,
+                    maxDateTimestamp,
+                    startTime,
+                    endTime,
                     distance,
                     seeOnlyPRO ->
                   viewModel.updateFilterState(
-                      price, placesAvailable, minDateTimestamp, acDuration, distance, seeOnlyPRO)
+                      price,
+                      placesAvailable,
+                      minDateTimestamp,
+                      maxDateTimestamp,
+                      startTime,
+                      endTime,
+                      distance,
+                      seeOnlyPRO)
                 })
           }
           Box(
@@ -196,7 +205,15 @@ fun ListActivitiesScreen(
                             (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
                             false
                         else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
-                        else if (viewModel.duration != null && it.duration != viewModel.duration)
+                        else if (viewModel.maxDate != null && it.date > viewModel.maxDate!!) false
+                        else if (viewModel.startTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                it.startTime, viewModel.startTime!!))
+                            false
+                        else if (viewModel.endTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                viewModel.endTime!!,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
                             false
                         else if (viewModel.distance != null &&
                             viewModel.distance!! <
