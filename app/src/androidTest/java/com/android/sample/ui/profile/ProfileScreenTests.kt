@@ -223,7 +223,7 @@ class ProfileScreenTest {
           clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
           set(Calendar.YEAR, 2024) // Set year to 2024
           set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
-          set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
+          set(Calendar.DAY_OF_MONTH, 6) // Set day to 5
           set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
           set(Calendar.MINUTE, 0) // Set minute to 00
           set(Calendar.SECOND, 0) // Set second to 00
