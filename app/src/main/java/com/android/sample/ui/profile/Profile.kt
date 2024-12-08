@@ -195,7 +195,14 @@ fun ProfileContent(
 
               // Display activities sections
               displayActivitySection(
-                  "Activities Created", "created", user, listActivitiesViewModel, false, user)
+                  "Activities Created",
+                  "created",
+                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
+                  navigationActions,
+                  userProfileViewModel,
+                  listActivitiesViewModel,
+                  false,
+                  user)
               displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
