@@ -22,24 +22,38 @@ class PlusButtonToCreateTest {
   @Before
   fun setUp() {
     mockNavigationActions = Mockito.mock(NavigationActions::class.java)
-    composeTestRule.setContent {
-      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
-    }
   }
 
   @Test
   fun plusButtonToCreate_isDisplayed() {
+    composeTestRule.setContent {
+      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+    }
     composeTestRule.onNodeWithTag("plusRowToCreate").assertIsDisplayed()
   }
 
   @Test
-  fun plusButtonToCreate_performsClick() {
+  fun plusButtonToCreate_performsClickToOverview() {
+    composeTestRule.setContent {
+      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+    }
+    composeTestRule.onNodeWithTag("plusRowToCreate").performClick()
+    verify(mockNavigationActions).navigateTo(TopLevelDestinations.OVERVIEW)
+  }
+  @Test
+  fun plusButtonToCreate_performsClickToCreate() {
+    composeTestRule.setContent {
+      PlusButtonToCreate(navigationActions = mockNavigationActions, "created")
+    }
     composeTestRule.onNodeWithTag("plusRowToCreate").performClick()
     verify(mockNavigationActions).navigateTo(TopLevelDestinations.ADD_ACTIVITY)
   }
 
   @Test
   fun plusButtonToCreate_iconIsDisplayed() {
+    composeTestRule.setContent {
+        PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+    }
     composeTestRule
         .onNodeWithContentDescription(TopLevelDestinations.ADD_ACTIVITY.textId)
         .assertIsDisplayed()
