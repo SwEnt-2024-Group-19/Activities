@@ -40,6 +40,7 @@ class PlusButtonToCreateTest {
     composeTestRule.onNodeWithTag("plusRowToCreate").performClick()
     verify(mockNavigationActions).navigateTo(TopLevelDestinations.OVERVIEW)
   }
+
   @Test
   fun plusButtonToCreate_performsClickToCreate() {
     composeTestRule.setContent {
@@ -52,7 +53,7 @@ class PlusButtonToCreateTest {
   @Test
   fun plusButtonToCreate_iconIsDisplayed() {
     composeTestRule.setContent {
-        PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
     }
     composeTestRule
         .onNodeWithContentDescription(TopLevelDestinations.ADD_ACTIVITY.textId)

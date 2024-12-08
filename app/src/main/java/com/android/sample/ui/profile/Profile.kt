@@ -349,7 +349,7 @@ fun ActivityRow(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black)
                 if (category != "past") {
-                  RemainingTime(System.currentTimeMillis(),activity)
+                  RemainingTime(System.currentTimeMillis(), activity)
                 }
               }
           Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
@@ -363,7 +363,7 @@ fun ActivityRow(
 }
 
 @Composable
-fun RemainingTime(currentTimeMillis: Long,activity: Activity) {
+fun RemainingTime(currentTimeMillis: Long, activity: Activity) {
   val startTimeParts = activity.startTime.split(":")
   val activityHour = startTimeParts[0].toInt()
   val activityMinute = startTimeParts[1].toInt()
