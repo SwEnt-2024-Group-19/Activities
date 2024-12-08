@@ -1,14 +1,18 @@
 package com.android.sample.model.activity
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.sample.App
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -83,11 +87,56 @@ constructor(
   }
 
   fun addActivity(activity: Activity) {
-    repository.addActivity(activity, { getActivities() }, {})
+    repository.addActivity(
+        activity,
+        {
+          getActivities()
+          viewModelScope.launch {
+            try {
+              Firebase.auth.currentUser?.uid?.let { currentUserId ->
+                profilesRepository.getUser(
+                    userId = currentUserId,
+                    onSuccess = { currentUser ->
+                      if (currentUser != null) {
+                        App.getInstance()
+                            .scheduleNotification(
+                                activity = activity, isCreator = activity.creator == currentUser.id)
+                      }
+                    },
+                    onFailure = { e ->
+                      Log.e("ListActivitiesViewModel", "Failed to schedule notification", e)
+                    })
+              }
+            } catch (e: Exception) {
+              Log.e("ListActivitiesViewModel", "Error scheduling notification", e)
+            }
+          }
+        },
+        { error -> Log.e("ListActivitiesViewModel", "Failed to add activity", error) })
   }
 
   fun updateActivity(activity: Activity) {
-    repository.updateActivity(activity, { getActivities() }, {})
+    repository.updateActivity(
+        activity,
+        {
+          getActivities()
+          // notification scheduling
+          Firebase.auth.currentUser?.uid?.let { currentUserId ->
+            profilesRepository.getUser(
+                userId = currentUserId,
+                onSuccess = { currentUser ->
+                  if (currentUser != null) {
+                    App.getInstance()
+                        .scheduleNotification(
+                            activity = activity, isCreator = activity.creator == currentUser.id)
+                  }
+                },
+                onFailure = { e ->
+                  Log.e("ListActivitiesViewModel", "Failed to schedule notification for update", e)
+                })
+          }
+        },
+        {})
   }
 
   fun deleteActivityById(id: String) {

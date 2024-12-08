@@ -93,6 +93,7 @@ import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -554,7 +555,15 @@ fun CreateActivityScreen(
                           dueDate.toDate().after(Timestamp.now().toDate()),
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
-                    if (creator == "") {
+                    // we don't want to allow creators to create activities 1 hour before they start
+                    if (dueDate.toDate().time - System.currentTimeMillis() <
+                        TimeUnit.HOURS.toMillis(1)) {
+                      Toast.makeText(
+                              context,
+                              "Activity must be scheduled at least 1 hour in advance",
+                              Toast.LENGTH_SHORT)
+                          .show()
+                    } else if (creator == "") {
                       Toast.makeText(
                               context,
                               "You must be logged in to create an activity.",

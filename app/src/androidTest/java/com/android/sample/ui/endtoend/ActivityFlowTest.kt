@@ -48,7 +48,8 @@ class ActivityFlowTest {
       GrantPermissionRule.grant(
           android.Manifest.permission.ACCESS_FINE_LOCATION,
           android.Manifest.permission.ACCESS_COARSE_LOCATION,
-          android.Manifest.permission.CAMERA)
+          android.Manifest.permission.CAMERA,
+          android.Manifest.permission.POST_NOTIFICATIONS)
 
   @Before
   fun setUp() {
