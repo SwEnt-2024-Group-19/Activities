@@ -48,11 +48,13 @@ import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.camera.getImageResourceIdForCategory
+import com.android.sample.ui.components.PlusButtonToCreate
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.Calendar
@@ -119,6 +121,7 @@ fun ProfileContent(
     userProfileViewModel: ProfileViewModel,
     imageViewModel: ImageViewModel
 ) {
+  val uiState by listActivitiesViewModel.uiState.collectAsState()
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   var showMenu by remember { mutableStateOf(false) }
@@ -183,28 +186,41 @@ fun ProfileContent(
                     }
               }
 
+              val activitiesList =
+                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+              val usersActivity =
+                  activitiesList.filter {
+                    it.creator == user.id || it.participants.map { it.id }.contains(user.id)
+                  }
+
               // Display activities sections
               displayActivitySection(
                   "Activities Created",
                   "created",
-                  user,
-                  listActivitiesViewModel,
+                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
                   navigationActions,
-                  userProfileViewModel)
+                  userProfileViewModel,
+                  listActivitiesViewModel,
+                  false,
+                  user)
               displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
-                  user,
-                  listActivitiesViewModel,
+                  usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
                   navigationActions,
-                  userProfileViewModel)
+                  userProfileViewModel,
+                  listActivitiesViewModel,
+                  false,
+                  user)
               displayActivitySection(
                   "Past Activities",
                   "past",
-                  user,
-                  listActivitiesViewModel,
+                  usersActivity.filter { it.date <= Timestamp.now() },
                   navigationActions,
-                  userProfileViewModel)
+                  userProfileViewModel,
+                  listActivitiesViewModel,
+                  false,
+                  user)
             }
       }
 }
@@ -213,25 +229,34 @@ fun ProfileContent(
 fun LazyListScope.displayActivitySection(
     sectionTitle: String,
     category: String,
-    user: User,
-    listActivitiesViewModel: ListActivitiesViewModel,
+    listActivities: List<Activity>,
     navigationActions: NavigationActions,
-    userProfileViewModel: ProfileViewModel
+    userProfileViewModel: ProfileViewModel,
+    listActivitiesViewModel: ListActivitiesViewModel,
+    isParticipantProfile: Boolean,
+    user: User
 ) {
   item {
     Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
     SectionTitle(title = sectionTitle, testTag = "${category}ActivitiesTitle")
   }
-
-  user.activities?.let { activities ->
-    items(activities.size) { index ->
+  if (listActivities.isNotEmpty()) {
+    items(listActivities.size) { index ->
       ActivityBox(
-          activityId = activities[index],
-          user = user,
+          activity = listActivities[index],
           listActivitiesViewModel = listActivitiesViewModel,
           navigationActions = navigationActions,
           category = category,
-          userProfileViewModel = userProfileViewModel)
+          userProfileViewModel = userProfileViewModel,
+          user = user)
+    }
+  } else {
+    if (!isParticipantProfile) {
+      item { PlusButtonToCreate(navigationActions = navigationActions, category) }
+    } else {
+      item {
+        Text("This participant has no activities", modifier = Modifier.padding(MEDIUM_PADDING.dp))
+      }
     }
   }
 }
@@ -266,30 +291,23 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel) {
 /** Display a single activity in a box, the same box is used for all categories */
 @Composable
 fun ActivityBox(
-    activityId: String,
-    user: User,
+    activity: Activity,
     listActivitiesViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     category: String,
-    userProfileViewModel: ProfileViewModel
+    userProfileViewModel: ProfileViewModel,
+    user: User
 ) {
-  val uiState by listActivitiesViewModel.uiState.collectAsState()
-  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-  val thisActivity = activitiesList.find { it.uid == activityId }
   val context = LocalContext.current
-  thisActivity?.let { activity ->
-    if (userProfileViewModel.shouldShowActivity(activity, user, category)) {
-      ActivityRow(
-          activity = activity,
-          listActivitiesViewModel = listActivitiesViewModel,
-          userProfileViewModel = userProfileViewModel,
-          navigationActions = navigationActions,
-          category = category,
-          userId = user.id,
-          context = context,
-          testTag = "activity${category.capitalize()}")
-    }
-  }
+  ActivityRow(
+      activity = activity,
+      listActivitiesViewModel = listActivitiesViewModel,
+      userProfileViewModel = userProfileViewModel,
+      navigationActions = navigationActions,
+      category = category,
+      userId = user.id,
+      context = context,
+      testTag = "activity${category.capitalize()}")
 }
 
 /** Display a single activity in a row */
@@ -331,7 +349,7 @@ fun ActivityRow(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black)
                 if (category != "past") {
-                  RemainingTime(activity)
+                  RemainingTime(System.currentTimeMillis(), activity)
                 }
               }
           Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
@@ -345,9 +363,7 @@ fun ActivityRow(
 }
 
 @Composable
-fun RemainingTime(activity: Activity) {
-  val currentTimeMillis = System.currentTimeMillis()
-
+fun RemainingTime(currentTimeMillis: Long, activity: Activity) {
   val startTimeParts = activity.startTime.split(":")
   val activityHour = startTimeParts[0].toInt()
   val activityMinute = startTimeParts[1].toInt()
