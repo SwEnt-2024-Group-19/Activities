@@ -210,10 +210,9 @@ class ProfileScreenTest {
             Date(calendar.timeInMillis + 305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
     val activity = activity1.copy(date = futureDate, startTime = "12:00") // Start time is noon
 
-    composeTestRule.setContent { RemainingTime(activity = activity) }
-    sleep(5000)
+    composeTestRule.setContent { RemainingTime(calendar.timeInMillis,activity = activity) }
     composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
-    composeTestRule.onNodeWithText("In 304 months").assertIsDisplayed()
+    composeTestRule.onNodeWithText("In 305 months").assertIsDisplayed()
   }
 
   @Test
@@ -229,13 +228,11 @@ class ProfileScreenTest {
           set(Calendar.SECOND, 0) // Set second to 00
           set(Calendar.MILLISECOND, 0) // Set millisecond to 00
         }
-    val futureDate =
-        com.google.firebase.Timestamp(Date(calendar.timeInMillis + 7L * 24 * 60 * 60 * 1000))
-    val activity = activity1.copy(date = futureDate)
+      val futureDate = com.google.firebase.Timestamp(Date(calendar.timeInMillis + 6L * 24 * 60 * 60 * 1000))
+      val activity = activity1.copy(date = futureDate)
 
-    composeTestRule.setContent { RemainingTime(activity = activity) }
-    sleep(5000)
-    composeTestRule.onNodeWithText("In 6 days").assertIsDisplayed()
+      composeTestRule.setContent { RemainingTime(calendar.timeInMillis, activity = activity) }
+      composeTestRule.onNodeWithText("In 6 days", useUnmergedTree = true).assertIsDisplayed()
   }
 
   @Test
@@ -248,7 +245,7 @@ class ProfileScreenTest {
 
     val activity = activity1.copy(date = futureDate, startTime = futureStartTime)
 
-    composeTestRule.setContent { RemainingTime(activity = activity) }
+    composeTestRule.setContent { RemainingTime(currentTime,activity = activity) }
     sleep(5000)
     composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
     composeTestRule.onNodeWithText("In 0 h 29 min").assertIsDisplayed()
