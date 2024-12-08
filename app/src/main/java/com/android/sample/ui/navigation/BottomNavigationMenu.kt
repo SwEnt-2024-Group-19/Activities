@@ -10,7 +10,6 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +32,6 @@ fun BottomNavigationMenu(
         tabList.forEach { tab ->
           BottomNavigationItem(
               icon = { Icon(tab.icon, contentDescription = null) },
-              label = { Text(tab.textId) },
               selected = tab.route == selectedItem,
               onClick = { onTabSelect(tab) },
               modifier = Modifier.clip(RoundedCornerShape(BOTTOM_CORNER.dp)).testTag(tab.textId))

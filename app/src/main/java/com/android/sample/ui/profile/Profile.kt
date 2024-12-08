@@ -12,8 +12,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
@@ -31,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.image.ImageViewModel
@@ -51,6 +48,7 @@ import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.PlusButtonToCreate
+import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -59,6 +57,7 @@ import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.util.Calendar
 
 @Composable
 fun ProfileScreen(
@@ -137,22 +136,16 @@ fun ProfileContent(
       },
       topBar = {
         TopAppBar(
-            title = { Text("Profile") },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back")
-                  }
+            title = {
+              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Profile")
+              }
             },
             actions = {
               IconButton(
                   onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
                     Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
                   }
-
               DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(
                     text = { Text("Logout") },
@@ -168,13 +161,11 @@ fun ProfileContent(
                           })
                     },
                     enabled = Firebase.auth.currentUser?.isAnonymous == false)
+                DropdownMenuItem(
+                    text = { Text("Edit profile") },
+                    onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
               }
             })
-      },
-      floatingActionButton = {
-        FloatingActionButton(onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) }) {
-          Icon(Icons.Filled.ModeEdit, contentDescription = "Edit Profile")
-        }
       }) { innerPadding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(innerPadding).testTag("profileContentColumn"),
@@ -206,9 +197,7 @@ fun ProfileContent(
               displayActivitySection(
                   "Activities Created",
                   "created",
-                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
-                  navigationActions,
-                  userProfileViewModel,
+                  user,
                   listActivitiesViewModel,
                   false,
                   user)
@@ -343,7 +332,7 @@ fun ActivityRow(
               },
       verticalAlignment = Alignment.CenterVertically) {
         Image(
-            painter = painterResource(id = R.drawable.foot),
+            painter = painterResource(id = getImageResourceIdForCategory(activity.category)),
             contentDescription = "Activity Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
@@ -374,7 +363,22 @@ fun ActivityRow(
 @Composable
 fun RemainingTime(activity: Activity) {
   val currentTimeMillis = System.currentTimeMillis()
-  val activityTimeMillis = activity.date.toDate().time
+
+  val startTimeParts = activity.startTime.split(":")
+  val activityHour = startTimeParts[0].toInt()
+  val activityMinute = startTimeParts[1].toInt()
+
+  val activityDate = activity.date.toDate()
+  val calendar =
+      Calendar.getInstance().apply {
+        time = activityDate
+        set(Calendar.HOUR_OF_DAY, activityHour)
+        set(Calendar.MINUTE, activityMinute)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+      }
+  val activityTimeMillis = calendar.timeInMillis
+
   val remainingTimeMillis = activityTimeMillis - currentTimeMillis
 
   val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
@@ -386,7 +390,7 @@ fun RemainingTime(activity: Activity) {
     val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
     val fraction =
         (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
-    return lerp(Color(DARK_BLUE_COLOR), Color(LIGHT_PURPLE_COLOR), 1 - fraction)
+    return lerp(Color(LIGHT_PURPLE_COLOR), Color(DARK_BLUE_COLOR), 1 - fraction)
   }
 
   val textColor = calculateColor(remainingTimeMillis)
@@ -454,7 +458,7 @@ fun InterestBox(interest: String) {
       modifier =
           Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
               .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-              .testTag(interest),
+              .testTag("$interest"),
       contentAlignment = Alignment.Center) {
         Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
       }

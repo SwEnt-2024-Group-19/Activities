@@ -1,11 +1,6 @@
 package com.android.sample.ui.listActivities
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,7 +32,6 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -49,20 +43,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.hour_date.HourDateViewModel
+import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
@@ -73,6 +65,7 @@ import com.android.sample.resources.C.Tag.PURPLE_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
+import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.SearchBar
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
@@ -93,7 +86,6 @@ fun ListActivitiesScreen(
     locationViewModel: LocationViewModel,
     modifier: Modifier = Modifier
 ) {
-  val context = LocalContext.current
   val uiState by viewModel.uiState.collectAsState()
   val options = categories.map { it.name }
   val profile = profileViewModel.userState.collectAsState().value
@@ -102,31 +94,7 @@ fun ListActivitiesScreen(
   val checkedList = remember { mutableStateListOf<Int>() }
   val hourDateViewModel: HourDateViewModel = HourDateViewModel()
 
-  val locationPermissionLauncher =
-      rememberLauncherForActivityResult(
-          contract = ActivityResultContracts.RequestPermission(),
-          onResult = { isGranted ->
-            if (isGranted) {
-              locationViewModel.fetchCurrentLocation()
-            } else {
-              Log.d("OverviewScreen", "Location permission denied by the user.")
-            }
-          })
-
-  LaunchedEffect(Unit) {
-    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_GRANTED) {
-      locationViewModel.fetchCurrentLocation()
-    } else {
-      locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
-
-    if (profile != null) {
-      viewModel.sortActivitiesByScore(profile) {
-        locationViewModel.getDistanceFromCurrentLocation(it)
-      }
-    }
-  }
+  HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
@@ -147,9 +115,24 @@ fun ListActivitiesScreen(
           if (showFilterDialog) {
             FilterDialog(
                 onDismiss = { showFilterDialog = false },
-                onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+                onFilter = {
+                    price,
+                    placesAvailable,
+                    minDateTimestamp,
+                    maxDateTimestamp,
+                    startTime,
+                    endTime,
+                    distance,
+                    seeOnlyPRO ->
                   viewModel.updateFilterState(
-                      price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+                      price,
+                      placesAvailable,
+                      minDateTimestamp,
+                      maxDateTimestamp,
+                      startTime,
+                      endTime,
+                      distance,
+                      seeOnlyPRO)
                 })
           }
           Box(
@@ -222,7 +205,20 @@ fun ListActivitiesScreen(
                             (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
                             false
                         else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
-                        else if (viewModel.duration != null && it.duration != viewModel.duration)
+                        else if (viewModel.maxDate != null && it.date > viewModel.maxDate!!) false
+                        else if (viewModel.startTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                it.startTime, viewModel.startTime!!))
+                            false
+                        else if (viewModel.endTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                viewModel.endTime!!,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
+                            false
+                        else if (viewModel.distance != null &&
+                            viewModel.distance!! <
+                                (locationViewModel.getDistanceFromCurrentLocation(it.location)
+                                    ?: 0f))
                             false
                         else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
                         else {
@@ -300,7 +296,7 @@ fun ActivityCard(
           Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
             // Display the activity image
             Image(
-                painter = painterResource(R.drawable.foot),
+                painter = painterResource(getImageResourceIdForCategory(activity.category)),
                 contentDescription = activity.title,
                 modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
