@@ -47,8 +47,8 @@ import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.ProfileImage
-import com.android.sample.ui.components.PlusButtonToCreate
 import com.android.sample.ui.camera.getImageResourceIdForCategory
+import com.android.sample.ui.components.PlusButtonToCreate
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -195,12 +195,7 @@ fun ProfileContent(
 
               // Display activities sections
               displayActivitySection(
-                  "Activities Created",
-                  "created",
-                  user,
-                  listActivitiesViewModel,
-                  false,
-                  user)
+                  "Activities Created", "created", user, listActivitiesViewModel, false, user)
               displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
