@@ -642,7 +642,7 @@ fun CreateActivityScreen(
                                 if (creator == "") {
                                     Toast.makeText(
                                         context,
-                                        "You must be logged in to create an activity.",
+                                        context.getString(R.string.login_check_in_create),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     return@Button
@@ -651,7 +651,7 @@ fun CreateActivityScreen(
                                 if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
                                     Toast.makeText(
                                         context,
-                                        "The start time must be before the end time.",
+                                        context.getString(R.string.startTime_before_endTime),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     return@Button
@@ -660,7 +660,7 @@ fun CreateActivityScreen(
                                 if (price.toDoubleOrNull() == null) {
                                     Toast.makeText(
                                         context,
-                                        "Invalid price format.",
+                                        context.getString(R.string.invalid_price_format),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     return@Button
@@ -669,7 +669,7 @@ fun CreateActivityScreen(
                                 if (placesMax.toLongOrNull() == null) {
                                     Toast.makeText(
                                         context,
-                                        "Invalid places format.",
+                                        context.getString(R.string.invalid_places_format),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     return@Button
@@ -678,7 +678,7 @@ fun CreateActivityScreen(
                                 if (selectedLocation == null) {
                                     Toast.makeText(
                                         context,
-                                        "You must select a location.",
+                                        context.getString(R.string.invalid_no_location),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     return@Button

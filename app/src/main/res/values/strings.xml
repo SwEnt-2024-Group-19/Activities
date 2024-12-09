@@ -25,6 +25,11 @@
     <string name="PRO_explanation">A PRO activity is organized by an official institution that is susceptible to make profit from the activity.</string>
     <string name="free_activity">This activity is free. No payment is needed to attend.</string>
     <string name="schedule_activity">Activity must be scheduled at least 1 hour in advance</string>
+    <string name="startTime_before_endTime">The start time must be before the end time</string>
+    <string name="login_check_in_create">You must be logged in to create an activity</string>
+    <string name="invalid_price_format">Invalid price format</string>
+    <string name="invalid_places_format">Invalid places format</string>
+    <string name="invalid_no_location">You must select a location</string>
 
 
 </resources>
