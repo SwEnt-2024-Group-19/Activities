@@ -1,7 +1,6 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -93,10 +92,10 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
-import java.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -683,55 +682,54 @@ fun CreateActivityScreen(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     return@Button
-                                } else {
-                                    if (selectedOptionType == ActivityType.INDIVIDUAL.name)
-                                        profileViewModel.userState.value?.let { user -> attendees += user }
-                                    try {
-                                        imageViewModel.uploadActivityImages(
-                                            activityId,
-                                            selectedImages,
-                                            onSuccess = { imageUrls ->
-                                                items.addAll(imageUrls) // Store URLs in items to retrieve later
-                                            },
-                                            onFailure = { exception ->
-                                                Toast.makeText(
-                                                    context,
-                                                    "Failed to upload images: ${exception.message}",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                    .show()
-                                            })
-                                        val activity =
-                                            Activity(
-                                                uid = activityId,
-                                                title = title,
-                                                description = description,
-                                                date = dueDate,
-                                                startTime = startTime,
-                                                duration = hourDateViewModel.calculateDuration(
-                                                    startTime,
-                                                    duration
-                                                ),
-                                                price = price.toDouble(),
-                                                placesLeft = attendees.size.toLong(),
-                                                maxPlaces = placesMax.toLongOrNull() ?: 0,
-                                                creator = creator,
-                                                status = ActivityStatus.ACTIVE,
-                                                location = selectedLocation,
-                                                images = items,
-                                                participants = attendees,
-                                                type = types.find { it.name == selectedOptionType }
-                                                    ?: types[1],
-                                                comments = listOf(),
-                                                category =
-                                                categories.find { it.name == selectedOptionCategory }
-                                                    ?: categories[0])
-                                        listActivityViewModel.addActivity(activity)
-                                        profileViewModel.addActivity(creator, activity.uid)
-                                        navigationActions.navigateTo(Screen.OVERVIEW)
-                                    } catch (_: NumberFormatException) {
-                                        println("There is an error")
-                                    }
+                                }
+                                if (selectedOptionType == ActivityType.INDIVIDUAL.name)
+                                    profileViewModel.userState.value?.let { user -> attendees += user }
+                                try {
+                                    imageViewModel.uploadActivityImages(
+                                        activityId,
+                                        selectedImages,
+                                        onSuccess = { imageUrls ->
+                                            items.addAll(imageUrls) // Store URLs in items to retrieve later
+                                        },
+                                        onFailure = { exception ->
+                                            Toast.makeText(
+                                                context,
+                                                "Failed to upload images: ${exception.message}",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                                .show()
+                                        })
+                                    val activity =
+                                        Activity(
+                                            uid = activityId,
+                                            title = title,
+                                            description = description,
+                                            date = dueDate,
+                                            startTime = startTime,
+                                            duration = hourDateViewModel.calculateDuration(
+                                                startTime,
+                                                duration
+                                            ),
+                                            price = price.toDouble(),
+                                            placesLeft = attendees.size.toLong(),
+                                            maxPlaces = placesMax.toLongOrNull() ?: 0,
+                                            creator = creator,
+                                            status = ActivityStatus.ACTIVE,
+                                            location = selectedLocation,
+                                            images = items,
+                                            participants = attendees,
+                                            type = types.find { it.name == selectedOptionType }
+                                                ?: types[1],
+                                            comments = listOf(),
+                                            category =
+                                            categories.find { it.name == selectedOptionCategory }
+                                                ?: categories[0])
+                                    listActivityViewModel.addActivity(activity)
+                                    profileViewModel.addActivity(creator, activity.uid)
+                                    navigationActions.navigateTo(Screen.OVERVIEW)
+                                } catch (_: NumberFormatException) {
+                                    println("There is an error")
                                 }
                             },
                             modifier =
