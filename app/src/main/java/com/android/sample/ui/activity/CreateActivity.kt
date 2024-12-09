@@ -636,13 +636,7 @@ fun CreateActivityScreen(
                                 val dueDateTime = dueDate.toDate().time
                                 val timeDifference = dueDateTime - currentTime
                                 val oneHourMillis = TimeUnit.HOURS.toMillis(1)
-
-                                Log.d("TimeDebug", """
-                                        Current time: ${Date(currentTime)}
-                                        Due date time: ${Date(dueDateTime)}
-                                        Time difference: ${timeDifference / 1000 / 60} minutes
-                                        One hour in millis: ${oneHourMillis / 1000 / 60} minutes
-                                    """.trimIndent())
+                                
                                 // we disable creating activities 1 hour before start time
                                 if (dueDate.toDate().time - System.currentTimeMillis() < TimeUnit.HOURS.toMillis(1)) {
                                     Toast.makeText(context, context.getString(R.string.schedule_activity), Toast.LENGTH_SHORT).show()
