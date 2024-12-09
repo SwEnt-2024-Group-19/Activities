@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
@@ -192,12 +193,18 @@ fun ProfileContent(
                   activitiesList.filter {
                     it.creator == user.id || it.participants.map { it.id }.contains(user.id)
                   }
-
+              val hourDateViewModel = HourDateViewModel()
               // Display activities sections
               displayActivitySection(
                   "Activities Created",
                   "created",
-                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
+                  usersActivity.filter {
+                    it.creator == user.id &&
+                        hourDateViewModel.combineDateAndTime(
+                            it.date,
+                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                            Timestamp.now()
+                  },
                   navigationActions,
                   userProfileViewModel,
                   listActivitiesViewModel,
@@ -206,7 +213,13 @@ fun ProfileContent(
               displayActivitySection(
                   "Activities Enrolled in",
                   "enrolled",
-                  usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
+                  usersActivity.filter {
+                    it.creator != user.id &&
+                        hourDateViewModel.combineDateAndTime(
+                            it.date,
+                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                            Timestamp.now()
+                  },
                   navigationActions,
                   userProfileViewModel,
                   listActivitiesViewModel,
@@ -215,7 +228,11 @@ fun ProfileContent(
               displayActivitySection(
                   "Past Activities",
                   "past",
-                  usersActivity.filter { it.date <= Timestamp.now() },
+                  usersActivity.filter {
+                    hourDateViewModel.combineDateAndTime(
+                        it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) <=
+                        Timestamp.now()
+                  },
                   navigationActions,
                   userProfileViewModel,
                   listActivitiesViewModel,
