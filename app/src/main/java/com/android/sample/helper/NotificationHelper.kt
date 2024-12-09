@@ -31,7 +31,7 @@ class NotificationHelper(private val context: Context) {
   }
 
   fun scheduleNotification(
-      activityId: Int,
+      activityId: String,
       activityName: String,
       activityDate: Long,
       notificationTitle: String
@@ -48,7 +48,7 @@ class NotificationHelper(private val context: Context) {
     val pendingIntent =
         PendingIntent.getBroadcast(
             context,
-            activityId,
+            activityId.toIntOrNull() ?: activityId.hashCode(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
@@ -75,11 +75,11 @@ class NotificationHelper(private val context: Context) {
     }
   }
 
-  fun cancelNotification(activityId: Int) {
+  fun cancelNotification(activityId: String) {
     val pendingIntent =
         PendingIntent.getBroadcast(
             context,
-            activityId,
+            activityId.toIntOrNull() ?: activityId.hashCode(),
             Intent(context, NotificationReceiver::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
