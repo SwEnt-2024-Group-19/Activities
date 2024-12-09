@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
@@ -93,6 +94,8 @@ import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import java.time.ZoneId
+import java.util.Calendar
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -305,6 +308,17 @@ fun CreateActivityScreen(
                                     startTime =
                                         time.toInstant().atZone(ZoneId.systemDefault())
                                             .toLocalTime().toString()
+
+
+                                    val calendar = Calendar.getInstance()
+                                    calendar.time = time.toDate()
+                                    // Update dueDate with selected date AND time
+                                    val selectedDateTime = dueDate.toDate().toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .withHour(calendar.get(Calendar.HOUR_OF_DAY))
+                                        .withMinute(calendar.get(Calendar.MINUTE))
+                                    dueDate = Timestamp(Date.from(selectedDateTime.toInstant()))
+
                                     startTimeIsOpen = false
                                     startTimeIsSet = true
                                 },
@@ -617,62 +631,48 @@ fun CreateActivityScreen(
                                     dueDate.toDate().after(Timestamp.now().toDate()),
                             onClick = {
                                 val activityId = listActivityViewModel.getNewUid()
-                                // we don't want to allow creators to create activities 1 hour before they start
-                                when {
-                                    creator == "" -> {
-                                        Toast.makeText(
-                                            context,
-                                            "You must be logged in to create an activity.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
 
-                                    dueDate.toDate().time - System.currentTimeMillis() < TimeUnit.HOURS.toMillis(
-                                        1
-                                    ) -> {
-                                        Toast.makeText(
-                                            context,
-                                            context.getString(R.string.schedule_activity),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                val currentTime = System.currentTimeMillis()
+                                val dueDateTime = dueDate.toDate().time
+                                val timeDifference = dueDateTime - currentTime
+                                val oneHourMillis = TimeUnit.HOURS.toMillis(1)
 
-                                    !hourDateViewModel.isBeginGreaterThanEnd(
-                                        startTime,
-                                        duration
-                                    ) -> {
-                                        Toast.makeText(
-                                            context,
-                                            "The start time must be before the end time.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                Log.d("TimeDebug", """
+                                        Current time: ${Date(currentTime)}
+                                        Due date time: ${Date(dueDateTime)}
+                                        Time difference: ${timeDifference / 1000 / 60} minutes
+                                        One hour in millis: ${oneHourMillis / 1000 / 60} minutes
+                                    """.trimIndent())
+                                // we disable creating activities 1 hour before start time
+                                if (dueDate.toDate().time - System.currentTimeMillis() < TimeUnit.HOURS.toMillis(1)) {
+                                    Toast.makeText(context, context.getString(R.string.schedule_activity), Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
 
-                                    price.toDoubleOrNull() == null -> {
-                                        Toast.makeText(
-                                            context,
-                                            "Invalid price format.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                if (creator == "") {
+                                    Toast.makeText(context, "You must be logged in to create an activity.", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
 
-                                    placesMax.toLongOrNull() == null -> {
-                                        Toast.makeText(
-                                            context,
-                                            "Invalid places format.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
+                                    Toast.makeText(context, "The start time must be before the end time.", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
 
-                                    selectedLocation == null -> {
-                                        Toast.makeText(
-                                            context,
-                                            "You must select a location.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                if (price.toDoubleOrNull() == null) {
+                                    Toast.makeText(context, "Invalid price format.", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
 
-                                    else -> {
+                                if (placesMax.toLongOrNull() == null) {
+                                    Toast.makeText(context, "Invalid places format.", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                if (selectedLocation == null) {
+                                    Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                } else {
                                         if (selectedOptionType == ActivityType.INDIVIDUAL.name)
                                             profileViewModel.userState.value?.let { user -> attendees += user }
                                         try {
@@ -722,7 +722,6 @@ fun CreateActivityScreen(
                                             println("There is an error")
                                         }
                                     }
-                                }
                             },
                             modifier =
                             Modifier
