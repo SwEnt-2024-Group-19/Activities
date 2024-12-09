@@ -93,10 +93,10 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
-import java.util.Calendar
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -308,17 +308,6 @@ fun CreateActivityScreen(
                                     startTime =
                                         time.toInstant().atZone(ZoneId.systemDefault())
                                             .toLocalTime().toString()
-
-
-                                    val calendar = Calendar.getInstance()
-                                    calendar.time = time.toDate()
-                                    // Update dueDate with selected date AND time
-                                    val selectedDateTime = dueDate.toDate().toInstant()
-                                        .atZone(ZoneId.systemDefault())
-                                        .withHour(calendar.get(Calendar.HOUR_OF_DAY))
-                                        .withMinute(calendar.get(Calendar.MINUTE))
-                                    dueDate = Timestamp(Date.from(selectedDateTime.toInstant()))
-
                                     startTimeIsOpen = false
                                     startTimeIsSet = true
                                 },
@@ -632,90 +621,118 @@ fun CreateActivityScreen(
                             onClick = {
                                 val activityId = listActivityViewModel.getNewUid()
 
-                                val currentTime = System.currentTimeMillis()
-                                val dueDateTime = dueDate.toDate().time
-                                val timeDifference = dueDateTime - currentTime
-                                val oneHourMillis = TimeUnit.HOURS.toMillis(1)
-                                
+                                val startLocalTime = LocalTime.parse(startTime)
+                                val activityDateTime = LocalDateTime.now()
+                                    .withHour(startLocalTime.hour)
+                                    .withMinute(startLocalTime.minute)
+                                    .withSecond(0)
+                                    .withNano(0)
+
                                 // we disable creating activities 1 hour before start time
-                                if (dueDate.toDate().time - System.currentTimeMillis() < TimeUnit.HOURS.toMillis(1)) {
-                                    Toast.makeText(context, context.getString(R.string.schedule_activity), Toast.LENGTH_SHORT).show()
+                                if (Duration.between(LocalDateTime.now(), activityDateTime)
+                                        .toMinutes() < 60
+                                ) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.schedule_activity),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 }
 
                                 if (creator == "") {
-                                    Toast.makeText(context, "You must be logged in to create an activity.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "You must be logged in to create an activity.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 }
 
                                 if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
-                                    Toast.makeText(context, "The start time must be before the end time.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "The start time must be before the end time.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 }
 
                                 if (price.toDoubleOrNull() == null) {
-                                    Toast.makeText(context, "Invalid price format.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Invalid price format.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 }
 
                                 if (placesMax.toLongOrNull() == null) {
-                                    Toast.makeText(context, "Invalid places format.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Invalid places format.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 }
 
                                 if (selectedLocation == null) {
-                                    Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "You must select a location.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     return@Button
                                 } else {
-                                        if (selectedOptionType == ActivityType.INDIVIDUAL.name)
-                                            profileViewModel.userState.value?.let { user -> attendees += user }
-                                        try {
-                                            imageViewModel.uploadActivityImages(
-                                                activityId,
-                                                selectedImages,
-                                                onSuccess = { imageUrls ->
-                                                    items.addAll(imageUrls) // Store URLs in items to retrieve later
-                                                },
-                                                onFailure = { exception ->
-                                                    Toast.makeText(
-                                                        context,
-                                                        "Failed to upload images: ${exception.message}",
-                                                        Toast.LENGTH_SHORT
-                                                    )
-                                                        .show()
-                                                })
-                                            val activity =
-                                                Activity(
-                                                    uid = activityId,
-                                                    title = title,
-                                                    description = description,
-                                                    date = dueDate,
-                                                    startTime = startTime,
-                                                    duration = hourDateViewModel.calculateDuration(
-                                                        startTime,
-                                                        duration
-                                                    ),
-                                                    price = price.toDouble(),
-                                                    placesLeft = attendees.size.toLong(),
-                                                    maxPlaces = placesMax.toLongOrNull() ?: 0,
-                                                    creator = creator,
-                                                    status = ActivityStatus.ACTIVE,
-                                                    location = selectedLocation,
-                                                    images = items,
-                                                    participants = attendees,
-                                                    type = types.find { it.name == selectedOptionType }
-                                                        ?: types[1],
-                                                    comments = listOf(),
-                                                    category =
-                                                    categories.find { it.name == selectedOptionCategory }
-                                                        ?: categories[0])
-                                            listActivityViewModel.addActivity(activity)
-                                            profileViewModel.addActivity(creator, activity.uid)
-                                            navigationActions.navigateTo(Screen.OVERVIEW)
-                                        } catch (_: NumberFormatException) {
-                                            println("There is an error")
-                                        }
+                                    if (selectedOptionType == ActivityType.INDIVIDUAL.name)
+                                        profileViewModel.userState.value?.let { user -> attendees += user }
+                                    try {
+                                        imageViewModel.uploadActivityImages(
+                                            activityId,
+                                            selectedImages,
+                                            onSuccess = { imageUrls ->
+                                                items.addAll(imageUrls) // Store URLs in items to retrieve later
+                                            },
+                                            onFailure = { exception ->
+                                                Toast.makeText(
+                                                    context,
+                                                    "Failed to upload images: ${exception.message}",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                    .show()
+                                            })
+                                        val activity =
+                                            Activity(
+                                                uid = activityId,
+                                                title = title,
+                                                description = description,
+                                                date = dueDate,
+                                                startTime = startTime,
+                                                duration = hourDateViewModel.calculateDuration(
+                                                    startTime,
+                                                    duration
+                                                ),
+                                                price = price.toDouble(),
+                                                placesLeft = attendees.size.toLong(),
+                                                maxPlaces = placesMax.toLongOrNull() ?: 0,
+                                                creator = creator,
+                                                status = ActivityStatus.ACTIVE,
+                                                location = selectedLocation,
+                                                images = items,
+                                                participants = attendees,
+                                                type = types.find { it.name == selectedOptionType }
+                                                    ?: types[1],
+                                                comments = listOf(),
+                                                category =
+                                                categories.find { it.name == selectedOptionCategory }
+                                                    ?: categories[0])
+                                        listActivityViewModel.addActivity(activity)
+                                        profileViewModel.addActivity(creator, activity.uid)
+                                        navigationActions.navigateTo(Screen.OVERVIEW)
+                                    } catch (_: NumberFormatException) {
+                                        println("There is an error")
                                     }
+                                }
                             },
                             modifier =
                             Modifier
