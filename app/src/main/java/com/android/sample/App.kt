@@ -39,10 +39,14 @@ class App : Application() {
             TimeUnit.HOURS.toMillis(activityTime.hour.toLong()) +
             TimeUnit.MINUTES.toMillis(activityTime.minute.toLong())
 
-    notificationHelper.scheduleNotification(
-        activityId = activity.uid.toIntOrNull() ?: 0,
-        activityName = activity.title,
-        activityDate = activityDate,
-        notificationTitle = title)
+      //only schedule notification if uid is not null
+      activity.uid.toIntOrNull()?.let { activityId ->
+          notificationHelper.scheduleNotification(
+              activityId = activityId,
+              activityName = activity.title,
+              activityDate = activityDate,
+              notificationTitle = title
+          )
+      }
   }
 }

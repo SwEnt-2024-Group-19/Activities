@@ -8,22 +8,30 @@ import androidx.core.app.NotificationCompat
 import com.android.sample.R
 
 class NotificationReceiver : BroadcastReceiver() {
-  override fun onReceive(context: Context, intent: Intent) {
-    val activityId = intent.getIntExtra("activityId", 0)
-    val activityName = intent.getStringExtra("activityName") ?: "Activity"
-    val title = intent.getStringExtra("notificationTitle") ?: "Activity Reminder"
+    override fun onReceive(context: Context, intent: Intent) {
+        if (!intent.hasExtra("activityId")) {
+            return
+        }
 
-    val notification =
-        NotificationCompat.Builder(context, "activity_reminders")
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(title)
-            .setContentText("Reminder: $activityName")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(true)
-            .build()
+        val activityId = intent.getIntExtra("activityId", -1)
+        if (activityId == -1) {
+            return
+        }
+        // Early return if required notification data is missing, preventing incomplete notification
+        val activityName = intent.getStringExtra("activityName") ?: return
+        val title = intent.getStringExtra("notificationTitle") ?: return
 
-    val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.notify(activityId, notification)
-  }
+        val notification =
+            NotificationCompat.Builder(context, "activity_reminders")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText("Reminder: $activityName")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .build()
+
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(activityId, notification)
+    }
 }

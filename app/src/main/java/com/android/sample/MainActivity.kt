@@ -66,10 +66,7 @@ class MainActivity : ComponentActivity() {
       ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
 
-    // Notification permissions
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       requestNotificationPermission()
-    }
 
     // Alarm permissions
     requestAlarmPermission()
