@@ -368,24 +368,6 @@ fun CreateActivityScreen(
                             .testTag("inputLocationCreate"),
                     singleLine = true)
 
-                locationSuggestions.filterNotNull().take(3).forEach { location ->
-                  DropdownMenuItem(
-                      text = {
-                        Text(
-                            text =
-                                location.name.take(TOP_TITLE_SIZE) +
-                                    if (location.name.length > TOP_TITLE_SIZE) "..."
-                                    else "", // Limit name length
-                            maxLines = 1 // Ensure name doesn't overflow
-                            )
-                      },
-                      onClick = {
-                        locationViewModel.setQuery(location.name)
-                        selectedLocation = location
-                        showDropdown = false // Close dropdown on selection
-                      },
-                      modifier = Modifier.padding(STANDARD_PADDING.dp))
-                }
                 // Dropdown menu for location suggestions
                 DropdownMenu(
                     expanded = showDropdown && locationSuggestions.isNotEmpty(),
@@ -396,8 +378,8 @@ fun CreateActivityScreen(
                             text = {
                               Text(
                                   text =
-                                      location.name.take(30) +
-                                          if (location.name.length > 30) "..."
+                                      location.name.take(TOP_TITLE_SIZE) +
+                                          if (location.name.length > TOP_TITLE_SIZE) "..."
                                           else "", // Limit name length
                                   maxLines = 1 // Ensure name doesn't overflow
                                   )
