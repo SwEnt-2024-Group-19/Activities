@@ -132,427 +132,357 @@ fun CreateActivityScreen(
     var showDialogUser by remember { mutableStateOf(false) }
     var showDialogImage by remember { mutableStateOf(false) }
 
-    val maxTitleLength = 50
-    val maxDescriptionLength = 500
-    val locationQuery by locationViewModel.query.collectAsState()
-    var showDropdown by remember { mutableStateOf(false) }
-    //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
-    val locationSuggestions by
-    locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
+  val maxTitleLength = 50
+  val maxDescriptionLength = 500
+  val locationQuery by locationViewModel.query.collectAsState()
+  var showDropdown by remember { mutableStateOf(false) }
+  //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
+  val locationSuggestions by
+      locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
 
-    var selectedLocation by remember { mutableStateOf<Location?>(null) }
-    // Add scroll
-    val scrollState = rememberScrollState()
+  var selectedLocation by remember { mutableStateOf<Location?>(null) }
+  // Add scroll
+  val scrollState = rememberScrollState()
 
-    // Attendees
-    val attendees_: List<User> = listOf<User>()
-    var attendees: List<User> by remember { mutableStateOf(attendees_) }
-    var selectedImages = remember { mutableStateListOf<Bitmap>() }
-    var items = remember { mutableStateListOf<String>() }
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag("createActivityScreen"),
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
-            )
-        },
-        content = { paddingValues ->
-            if (!networkManager.isNetworkAvailable()) {
-                NoInternetScreen(paddingValues = paddingValues)
-            } else {
-                if (isCamOpen) {
-                    CameraScreen(
-                        paddingValues = paddingValues,
-                        controller =
-                        remember {
-                            LifecycleCameraController(context).apply {
-                                setEnabledUseCases(CameraController.IMAGE_CAPTURE)
-                            }
+  // Attendees
+  val attendees_: List<User> = listOf<User>()
+  var attendees: List<User> by remember { mutableStateOf(attendees_) }
+  var selectedImages = remember { mutableStateListOf<Bitmap>() }
+  var items = remember { mutableStateListOf<String>() }
+  Scaffold(
+      modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
+      topBar = {
+        TopAppBar(
+            title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
+        )
+      },
+      content = { paddingValues ->
+        if (!networkManager.isNetworkAvailable()) {
+          NoInternetScreen(paddingValues = paddingValues)
+        } else {
+          if (isCamOpen) {
+            CameraScreen(
+                paddingValues = paddingValues,
+                controller =
+                    remember {
+                      LifecycleCameraController(context).apply {
+                        setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+                      }
+                    },
+                context = context,
+                isCamOpen = { isCamOpen = false },
+                addElem = { bitmap -> selectedImages.add(bitmap) })
+          } else {
+            Column(
+                modifier =
+                    Modifier.padding(paddingValues)
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .testTag("activityCreateScreen"),
+            ) {
+              if (isGalleryOpen) {
+                GalleryScreen(
+                    isGalleryOpen = { isGalleryOpen = false },
+                    addImage = { bitmap -> selectedImages.add(bitmap) },
+                    context = context)
+              }
+              if (showDialogImage) {
+                AddImageDialog(
+                    onDismiss = { showDialogImage = false },
+                    onGalleryClick = {
+                      showDialogImage = false
+                      isGalleryOpen = true
+                    },
+                    onCameraClick = {
+                      showDialogImage = false
+                      isCamOpen = true
+                    })
+              }
+              Carousel(
+                  openDialog = { showDialogImage = true },
+                  itemsList = selectedImages,
+                  deleteImage = { bitmap -> selectedImages.remove(bitmap) })
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              RemainingPlace(title, maxTitleLength)
+              OutlinedTextField(
+                  value = title,
+                  onValueChange = {
+                    if (it.length <= maxTitleLength) {
+                      title = it
+                    }
+                  },
+                  label = { Text("Title") },
+                  modifier =
+                      Modifier.padding(STANDARD_PADDING.dp)
+                          .fillMaxWidth()
+                          .testTag("inputTitleCreate"),
+                  placeholder = {
+                    Text(text = stringResource(id = R.string.request_activity_title))
+                  },
+                  singleLine = true,
+              )
+
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              RemainingPlace(description, maxDescriptionLength)
+              OutlinedTextField(
+                  value = description,
+                  onValueChange = {
+                    if (it.length <= maxDescriptionLength) {
+                      description = it
+                    }
+                  },
+                  label = { Text("Description") },
+                  modifier =
+                      Modifier.padding(STANDARD_PADDING.dp)
+                          .fillMaxWidth()
+                          .testTag("inputDescriptionCreate"),
+                  placeholder = {
+                    Text(text = stringResource(id = R.string.request_activity_description))
+                  })
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              OutlinedButton(
+                  onClick = { dateIsOpen = true },
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(STANDARD_PADDING.dp)
+                          .testTag("inputDateCreate"),
+              ) {
+                Icon(
+                    Icons.Filled.CalendarMonth,
+                    contentDescription = "select date",
+                    modifier =
+                        Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+                if (dateIsSet)
+                    Text(
+                        "Selected date: ${dueDate.toDate().toString().take(11)}," +
+                            "${dueDate.toDate().year + 1900}  (click to change)")
+                else Text("Select Date for the activity")
+              }
+              if (dateIsOpen) {
+                MyDatePicker(
+                    onDateSelected = { date ->
+                      dueDate = date
+                      dateIsOpen = false
+                      dateIsSet = true
+                    },
+                    isOpen = dateIsOpen,
+                    null)
+              }
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              OutlinedButton(
+                  onClick = { startTimeIsOpen = true },
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(STANDARD_PADDING.dp)
+                          .testTag("inputStartTimeCreate"),
+              ) {
+                Icon(
+                    Icons.Filled.AccessTime,
+                    contentDescription = "select start time",
+                    modifier =
+                        Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconStartTimeCreate"))
+                if (startTimeIsSet) Text("Start time: ${startTime} (click to change)")
+                else Text("Select start time")
+              }
+              if (startTimeIsOpen) {
+                MyTimePicker(
+                    onTimeSelected = { time ->
+                      startTime =
+                          time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
+                      startTimeIsOpen = false
+                      startTimeIsSet = true
+                    },
+                    isOpen = startTimeIsOpen)
+              }
+
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              OutlinedButton(
+                  onClick = { durationIsOpen = true },
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(STANDARD_PADDING.dp)
+                          .testTag("inputEndTimeCreate"),
+              ) {
+                Icon(
+                    Icons.Filled.HourglassTop,
+                    contentDescription = "select duration",
+                    modifier =
+                        Modifier.padding(end = STANDARD_PADDING.dp)
+                            .align(Alignment.CenterVertically)
+                            .testTag("iconEndTimeCreate"))
+                if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
+                else Text("Select End Time")
+              }
+              if (durationIsOpen) {
+                MyTimePicker(
+                    onTimeSelected = { time ->
+                      duration =
+                          time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
+                      durationIsOpen = false
+                      durationIsSet = true
+                    },
+                    isOpen = durationIsOpen)
+              }
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              OutlinedTextField(
+                  value = price,
+                  onValueChange = { price = it },
+                  label = { Text("Price") },
+                  modifier =
+                      Modifier.padding(STANDARD_PADDING.dp)
+                          .fillMaxWidth()
+                          .testTag("inputPriceCreate"),
+                  placeholder = {
+                    Text(text = stringResource(id = R.string.request_price_activity))
+                  },
+                  singleLine = true,
+              )
+
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              OutlinedTextField(
+                  value = placesMax,
+                  onValueChange = { placesMax = it },
+                  label = { Text("Total Places") },
+                  modifier =
+                      Modifier.padding(STANDARD_PADDING.dp)
+                          .fillMaxWidth()
+                          .testTag("inputPlacesCreate"),
+                  placeholder = {
+                    Text(text = stringResource(id = R.string.request_placesMax_activity))
+                  },
+                  singleLine = true,
+              )
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              Box {
+                OutlinedTextField(
+                    value = locationQuery,
+                    onValueChange = {
+                      locationViewModel.setQuery(it)
+                      showDropdown = it != "" // Show dropdown when user starts typing
+                    },
+                    label = { Text("Location") },
+                    placeholder = { Text("Enter an Address or Location") },
+                    modifier =
+                        Modifier.padding(STANDARD_PADDING.dp)
+                            .fillMaxWidth()
+                            .testTag("inputLocationCreate"),
+                    singleLine = true)
+
+                // Dropdown menu for location suggestions
+                DropdownMenu(
+                    expanded = showDropdown && locationSuggestions.isNotEmpty(),
+                    onDismissRequest = { showDropdown = false },
+                    properties = PopupProperties(focusable = false)) {
+                      locationSuggestions.filterNotNull().take(3).forEach { location ->
+                        DropdownMenuItem(
+                            text = {
+                              Text(
+                                  text =
+                                      location.name.take(TOP_TITLE_SIZE) +
+                                          if (location.name.length > TOP_TITLE_SIZE) "..."
+                                          else "", // Limit name length
+                                  maxLines = 1 // Ensure name doesn't overflow
+                                  )
+                            },
+                            onClick = {
+                              locationViewModel.setQuery(location.name)
+                              selectedLocation = location
+                              showDropdown = false // Close dropdown on selection
+                            },
+                            modifier = Modifier.padding(STANDARD_PADDING.dp))
+                      }
+
+                      if (locationSuggestions.size > 3) {
+                        DropdownMenuItem(
+                            text = { Text("More...") },
+                            onClick = {},
+                            modifier = Modifier.padding(STANDARD_PADDING.dp))
+                      }
+                    }
+              }
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+              if (locationSuggestions.size > 3) {
+                DropdownMenuItem(
+                    text = { Text("More...") },
+                    onClick = { /* TODO: Define behavior for 'More...' */},
+                    modifier = Modifier.padding(STANDARD_PADDING.dp))
+              }
+
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              ExposedDropdownMenuBox(
+                  modifier =
+                      Modifier.testTag("chooseTypeMenu")
+                          .align(Alignment.CenterHorizontally)
+                          .fillMaxWidth()
+                          .padding(STANDARD_PADDING.dp),
+                  expanded = expandedType,
+                  onExpandedChange = { expandedType = !expandedType }) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = selectedOptionType,
+                        onValueChange = {},
+                        label = { Text("Activity Type") },
+                        trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
                         },
-                        context = context,
-                        isCamOpen = { isCamOpen = false },
-                        addElem = { bitmap -> selectedImages.add(bitmap) })
-                } else {
-                    Column(
-                        modifier =
-                        Modifier
-                            .padding(paddingValues)
-                            .fillMaxSize()
-                            .verticalScroll(scrollState)
-                            .testTag("activityCreateScreen"),
-                    ) {
-                        if (isGalleryOpen) {
-                            GalleryScreen(
-                                isGalleryOpen = { isGalleryOpen = false },
-                                addImage = { bitmap -> selectedImages.add(bitmap) },
-                                context = context
-                            )
-                        }
-                        if (showDialogImage) {
-                            AddImageDialog(
-                                onDismiss = { showDialogImage = false },
-                                onGalleryClick = {
-                                    showDialogImage = false
-                                    isGalleryOpen = true
-                                },
-                                onCameraClick = {
-                                    showDialogImage = false
-                                    isCamOpen = true
-                                })
-                        }
-                        Carousel(
-                            openDialog = { showDialogImage = true },
-                            itemsList = selectedImages,
-                            deleteImage = { bitmap -> selectedImages.remove(bitmap) })
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-                        RemainingPlace(title, maxTitleLength)
-                        OutlinedTextField(
-                            value = title,
-                            onValueChange = {
-                                if (it.length <= maxTitleLength) {
-                                    title = it
-                                }
-                            },
-                            label = { Text("Title") },
-                            modifier =
-                            Modifier
-                                .padding(STANDARD_PADDING.dp)
-                                .fillMaxWidth()
-                                .testTag("inputTitleCreate"),
-                            placeholder = {
-                                Text(text = stringResource(id = R.string.request_activity_title))
-                            },
-                            singleLine = true,
-                        )
-
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                        RemainingPlace(description, maxDescriptionLength)
-                        OutlinedTextField(
-                            value = description,
-                            onValueChange = {
-                                if (it.length <= maxDescriptionLength) {
-                                    description = it
-                                }
-                            },
-                            label = { Text("Description") },
-                            modifier =
-                            Modifier
-                                .padding(STANDARD_PADDING.dp)
-                                .fillMaxWidth()
-                                .testTag("inputDescriptionCreate"),
-                            placeholder = {
-                                Text(text = stringResource(id = R.string.request_activity_description))
-                            })
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                        OutlinedButton(
-                            onClick = { dateIsOpen = true },
-                            modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(STANDARD_PADDING.dp)
-                                .testTag("inputDateCreate"),
-                        ) {
-                            Icon(
-                                Icons.Filled.CalendarMonth,
-                                contentDescription = "select date",
-                                modifier =
-                                Modifier
-                                    .padding(end = STANDARD_PADDING.dp)
-                                    .testTag("iconDateCreate")
-                            )
-                            if (dateIsSet)
-                                Text(
-                                    "Selected date: ${dueDate.toDate().toString().take(11)}," +
-                                            "${dueDate.toDate().year + 1900}  (click to change)"
-                                )
-                            else Text("Select Date for the activity")
-                        }
-                        if (dateIsOpen) {
-                            MyDatePicker(
-                                onDateSelected = { date ->
-                                    dueDate = date
-                                    dateIsOpen = false
-                                    dateIsSet = true
-                                },
-                                isOpen = dateIsOpen,
-                                null
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                        OutlinedButton(
-                            onClick = { startTimeIsOpen = true },
-                            modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(STANDARD_PADDING.dp)
-                                .testTag("inputStartTimeCreate"),
-                        ) {
-                            Icon(
-                                Icons.Filled.AccessTime,
-                                contentDescription = "select start time",
-                                modifier =
-                                Modifier
-                                    .padding(end = STANDARD_PADDING.dp)
-                                    .testTag("iconStartTimeCreate")
-                            )
-                            if (startTimeIsSet) Text("Start time: ${startTime} (click to change)")
-                            else Text("Select start time")
-                        }
-                        if (startTimeIsOpen) {
-                            MyTimePicker(
-                                onTimeSelected = { time ->
-                                    startTime =
-                                        time.toInstant().atZone(ZoneId.systemDefault())
-                                            .toLocalTime().toString()
-                                    startTimeIsOpen = false
-                                    startTimeIsSet = true
-                                },
-                                isOpen = startTimeIsOpen
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                        OutlinedButton(
-                            onClick = { durationIsOpen = true },
-                            modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(STANDARD_PADDING.dp)
-                                .testTag("inputEndTimeCreate"),
-                        ) {
-                            Icon(
-                                Icons.Filled.HourglassTop,
-                                contentDescription = "select duration",
-                                modifier =
-                                Modifier
-                                    .padding(end = STANDARD_PADDING.dp)
-                                    .align(Alignment.CenterVertically)
-                                    .testTag("iconEndTimeCreate")
-                            )
-                            if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
-                            else Text("Select End Time")
-                        }
-                        if (durationIsOpen) {
-                            MyTimePicker(
-                                onTimeSelected = { time ->
-                                    duration =
-                                        time.toInstant().atZone(ZoneId.systemDefault())
-                                            .toLocalTime().toString()
-                                    durationIsOpen = false
-                                    durationIsSet = true
-                                },
-                                isOpen = durationIsOpen
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-                        OutlinedTextField(
-                            value = price,
-                            onValueChange = { price = it },
-                            label = { Text("Price") },
-                            modifier =
-                            Modifier
-                                .padding(STANDARD_PADDING.dp)
-                                .fillMaxWidth()
-                                .testTag("inputPriceCreate"),
-                            placeholder = {
-                                Text(text = stringResource(id = R.string.request_price_activity))
-                            },
-                            singleLine = true,
-                        )
-
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                        OutlinedTextField(
-                            value = placesMax,
-                            onValueChange = { placesMax = it },
-                            label = { Text("Total Places") },
-                            modifier =
-                            Modifier
-                                .padding(STANDARD_PADDING.dp)
-                                .fillMaxWidth()
-                                .testTag("inputPlacesCreate"),
-                            placeholder = {
-                                Text(text = stringResource(id = R.string.request_placesMax_activity))
-                            },
-                            singleLine = true,
-                        )
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-                        Box {
-                            OutlinedTextField(
-                                value = locationQuery,
-                                onValueChange = {
-                                    locationViewModel.setQuery(it)
-                                    showDropdown = it != "" // Show dropdown when user starts typing
-                                },
-                                label = { Text("Location") },
-                                placeholder = { Text("Enter an Address or Location") },
-                                modifier =
-                                Modifier
-                                    .padding(STANDARD_PADDING.dp)
-                                    .fillMaxWidth()
-                                    .testTag("inputLocationCreate"),
-                                singleLine = true
-                            )
-
-                            locationSuggestions.filterNotNull().take(3).forEach { location ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text =
-                                            location.name.take(TOP_TITLE_SIZE) +
-                                                    if (location.name.length > TOP_TITLE_SIZE) "..."
-                                                    else "", // Limit name length
-                                            maxLines = 1 // Ensure name doesn't overflow
-                                        )
-                                    },
-                                    onClick = {
-                                        locationViewModel.setQuery(location.name)
-                                        selectedLocation = location
-                                        showDropdown = false // Close dropdown on selection
-                                    },
-                                    modifier = Modifier.padding(STANDARD_PADDING.dp)
-                                )
-                            }
-                            // Dropdown menu for location suggestions
-                            DropdownMenu(
-                                expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                                onDismissRequest = { showDropdown = false },
-                                properties = PopupProperties(focusable = false)
-                            ) {
-                                locationSuggestions.filterNotNull().take(3).forEach { location ->
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text =
-                                                location.name.take(30) +
-                                                        if (location.name.length > 30) "..."
-                                                        else "", // Limit name length
-                                                maxLines = 1 // Ensure name doesn't overflow
-                                            )
-                                        },
-                                        onClick = {
-                                            locationViewModel.setQuery(location.name)
-                                            selectedLocation = location
-                                            showDropdown = false // Close dropdown on selection
-                                        },
-                                        modifier = Modifier.padding(STANDARD_PADDING.dp)
-                                    )
-                                }
-
-                                if (locationSuggestions.size > 3) {
-                                    DropdownMenuItem(
-                                        text = { Text("More...") },
-                                        onClick = {},
-                                        modifier = Modifier.padding(STANDARD_PADDING.dp)
-                                    )
-                                }
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                        if (locationSuggestions.size > 3) {
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        modifier = Modifier.menuAnchor().fillMaxWidth().testTag("typeTextField"))
+                    ExposedDropdownMenu(
+                        expanded = expandedType,
+                        onDismissRequest = { expandedType = false },
+                        modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                          types.forEach { selectionOption ->
                             DropdownMenuItem(
-                                text = { Text("More...") },
-                                onClick = { /* TODO: Define behavior for 'More...' */ },
-                                modifier = Modifier.padding(STANDARD_PADDING.dp)
-                            )
+                                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                                text = { Text(selectionOption.name) },
+                                onClick = {
+                                  selectedOptionType = selectionOption.name
+                                  expandedType = false
+                                })
+                          }
                         }
+                  }
 
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-                        ExposedDropdownMenuBox(
-                            modifier =
-                            Modifier
-                                .testTag("chooseTypeMenu")
-                                .align(Alignment.CenterHorizontally)
-                                .fillMaxWidth()
-                                .padding(STANDARD_PADDING.dp),
-                            expanded = expandedType,
-                            onExpandedChange = { expandedType = !expandedType }) {
-                            OutlinedTextField(
-                                readOnly = true,
-                                value = selectedOptionType,
-                                onValueChange = {},
-                                label = { Text("Activity Type") },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
-                                },
-                                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                                modifier = Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth()
-                                    .testTag("typeTextField")
-                            )
-                            ExposedDropdownMenu(
-                                expanded = expandedType,
-                                onDismissRequest = { expandedType = false },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(STANDARD_PADDING.dp)
-                            ) {
-                                types.forEach { selectionOption ->
-                                    DropdownMenuItem(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(STANDARD_PADDING.dp),
-                                        text = { Text(selectionOption.name) },
-                                        onClick = {
-                                            selectedOptionType = selectionOption.name
-                                            expandedType = false
-                                        })
-                                }
-                            }
+              ExposedDropdownMenuBox(
+                  modifier =
+                      Modifier.testTag("chooseCategoryMenu")
+                          .align(Alignment.CenterHorizontally)
+                          .fillMaxWidth()
+                          .padding(STANDARD_PADDING.dp),
+                  expanded = expandedCategory,
+                  onExpandedChange = { expandedCategory = !expandedCategory }) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = selectedOptionCategory,
+                        onValueChange = {},
+                        label = { Text("Activity Category") },
+                        trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        modifier =
+                            Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
+                    ExposedDropdownMenu(
+                        expanded = expandedCategory,
+                        onDismissRequest = { expandedCategory = false },
+                        modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                          categories.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                                text = { Text(selectionOption.name) },
+                                onClick = {
+                                  selectedOptionCategory = selectionOption.name
+                                  expandedCategory = false
+                                })
+                          }
                         }
+                  }
 
-                        ExposedDropdownMenuBox(
-                            modifier =
-                            Modifier
-                                .testTag("chooseCategoryMenu")
-                                .align(Alignment.CenterHorizontally)
-                                .fillMaxWidth()
-                                .padding(STANDARD_PADDING.dp),
-                            expanded = expandedCategory,
-                            onExpandedChange = { expandedCategory = !expandedCategory }) {
-                            OutlinedTextField(
-                                readOnly = true,
-                                value = selectedOptionCategory,
-                                onValueChange = {},
-                                label = { Text("Activity Category") },
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
-                                },
-                                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                                modifier =
-                                Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth()
-                                    .testTag("categoryTextField")
-                            )
-                            ExposedDropdownMenu(
-                                expanded = expandedCategory,
-                                onDismissRequest = { expandedCategory = false },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(STANDARD_PADDING.dp)
-                            ) {
-                                categories.forEach { selectionOption ->
-                                    DropdownMenuItem(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(STANDARD_PADDING.dp),
-                                        text = { Text(selectionOption.name) },
-                                        onClick = {
-                                            selectedOptionCategory = selectionOption.name
-                                            expandedCategory = false
-                                        })
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
+              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
                         Button(
                             onClick = { showDialogUser = true },
@@ -761,35 +691,27 @@ fun CreateActivityScreen(
 
 @Composable
 fun RemainingPlace(field: String, maxLength: Int) {
-    Row(
-        modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = MEDIUM_PADDING.dp)
-            .testTag("remainingPlace"),
-        horizontalArrangement = Arrangement.End
-    ) {
+  Row(
+      modifier =
+          Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp).testTag("remainingPlace"),
+      horizontalArrangement = Arrangement.End) {
         Column(
             horizontalAlignment = Alignment.End,
-            modifier = Modifier.testTag("remainingPlaceColumn")
-        ) {
-            Text(
-                text = "${field.length}/$maxLength characters",
-                fontSize = MEDIUM_PADDING.sp,
-                color = Color.Gray,
-                modifier = Modifier.testTag("remainingPlaceText")
-            )
-            LinearProgressIndicator(
-                progress = field.length / maxLength.toFloat(),
-                modifier =
-                Modifier
-                    .height(STANDARD_PADDING.dp)
-                    .width(130.dp)
-                    .clip(RoundedCornerShape(SMALL_PADDING.dp))
-                    .testTag("remainingPlaceProgress"),
-                color = Color(DARK_BLUE_COLOR),
-                backgroundColor = Color.LightGray
-            )
-        }
-    }
+            modifier = Modifier.testTag("remainingPlaceColumn")) {
+              Text(
+                  text = "${field.length}/$maxLength characters",
+                  fontSize = MEDIUM_PADDING.sp,
+                  color = Color.Gray,
+                  modifier = Modifier.testTag("remainingPlaceText"))
+              LinearProgressIndicator(
+                  progress = field.length / maxLength.toFloat(),
+                  modifier =
+                      Modifier.height(STANDARD_PADDING.dp)
+                          .width(130.dp)
+                          .clip(RoundedCornerShape(SMALL_PADDING.dp))
+                          .testTag("remainingPlaceProgress"),
+                  color = Color(DARK_BLUE_COLOR),
+                  backgroundColor = Color.LightGray)
+            }
+      }
 }
