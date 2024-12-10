@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_TOP
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 
 @Composable
 fun PasswordTextField(
@@ -35,7 +35,7 @@ fun PasswordTextField(
     onPasswordVisibilityChange: () -> Unit,
     passwordError: String?
 ) {
-  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION)) {
+  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_MD)) {
     Card(
         modifier = Modifier.fillMaxWidth().testTag("PasswordCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
@@ -92,7 +92,7 @@ fun EmailTextField(
     onEmailChange: (String) -> Unit,
     emailError: String?,
 ) {
-  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION)) {
+  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_MD)) {
     Card(
         modifier = Modifier.fillMaxWidth().testTag("EmailCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),

@@ -36,6 +36,8 @@ object C {
 
     const val SMALL_PADDING = 4
 
+    const val EXTRA_LARGE_PADDING = 32
+
     const val TITLE_FONTSIZE = 24
 
     const val TEXT_PADDING = 40
@@ -69,7 +71,9 @@ object C {
 
     const val TEXT_FONTSIZE = 12
 
-    const val WIDTH_FRACTION = 0.8f
+    const val WIDTH_FRACTION_MD = 0.8f
+
+    const val WIDTH_FRACTION_SM = 0.6f
 
     const val LINE_STROKE = 1
 

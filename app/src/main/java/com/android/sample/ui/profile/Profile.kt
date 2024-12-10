@@ -45,7 +45,7 @@ import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.PlusButtonToCreate
@@ -339,7 +339,7 @@ fun ActivityRow(
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
-        Column(modifier = Modifier.weight(WIDTH_FRACTION)) {
+        Column(modifier = Modifier.weight(WIDTH_FRACTION_MD)) {
           Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
