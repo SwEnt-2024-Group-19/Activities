@@ -130,54 +130,65 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                 }
 
                 item {
-                    // Sign-In Button
-                    Button(
-                        onClick = {
-                            performOfflineAwareAction(
-                                context = context,
-                                networkManager = networkManager,
-                                onPerform = {
-                                    when {
-                                        !isValidEmail(emailState.value) -> {
-                                            emailErrorState.value =
-                                                "Please enter a valid address: example@mail.xx"
-                                        }
-
-                                        passwordState.value.isEmpty() -> {
-                                            passwordErrorState.value =
-                                                "Password cannot be empty" // Set external error
-                                        }
-
-                                        else -> {
-                                            passwordErrorState.value =
-                                                null // Clear external error if password is valid
-                                            viewModel.signInWithEmailAndPassword(
-                                                emailState.value,
-                                                passwordState.value,
-                                                onProfileExists,
-                                                onProfileMissing,
-                                                onSignInFailure
-                                            )
-                                        }
-                                    }
-                                    Log.d("SignInScreen", "Sign in with email/password")
-                                })
-                        },
-                        modifier =
-                        Modifier
-                            .height(60.dp)
+                    Card(
+                        modifier = Modifier
                             .fillMaxWidth(0.7f)
-                            .shadow(4.dp, shape = RoundedCornerShape(12.dp))
-                            .testTag("SignInButton"),
+                            .testTag("SignInCard"),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("SIGN IN", fontSize = SUBTITLE_FONTSIZE.sp)
+                        Button(
+                            onClick = {
+                                performOfflineAwareAction(
+                                    context = context,
+                                    networkManager = networkManager,
+                                    onPerform = {
+                                        when {
+                                            !isValidEmail(emailState.value) -> {
+                                                emailErrorState.value =
+                                                    "Please enter a valid address: example@mail.xx"
+                                            }
+
+                                            passwordState.value.isEmpty() -> {
+                                                passwordErrorState.value =
+                                                    "Password cannot be empty" // Set external error
+                                            }
+
+                                            else -> {
+                                                passwordErrorState.value =
+                                                    null // Clear external error if password is valid
+                                                viewModel.signInWithEmailAndPassword(
+                                                    emailState.value,
+                                                    passwordState.value,
+                                                    onProfileExists,
+                                                    onProfileMissing,
+                                                    onSignInFailure
+                                                )
+                                            }
+                                        }
+                                        Log.d("SignInScreen", "Sign in with email/password")
+                                    })
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp)
+                                .testTag("SignInButton"),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("SIGN IN", fontSize = SUBTITLE_FONTSIZE.sp)
+                        }
                     }
                     Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
                 }
+
                 // text that separates the buttons "OR"
                 item {
-                    Text("OR", fontSize = SUBTITLE_FONTSIZE.sp)
+                    Text("OR", fontSize = SUBTITLE_FONTSIZE.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
                 }
 
