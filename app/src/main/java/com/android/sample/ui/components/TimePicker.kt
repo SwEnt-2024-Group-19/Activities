@@ -19,7 +19,7 @@ fun MyTimePicker(onTimeSelected: (Timestamp) -> Unit, isOpen: Boolean, onCloseRe
         negativeButton(text = "Cancel")
       }) {
         timepicker(
-            initialTime = LocalTime.NOON,
+            initialTime = LocalTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES),
             title = "Pick a time",
         ) {
           onTimeSelected(
