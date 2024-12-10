@@ -1,9 +1,13 @@
 package com.android.sample
 
 import android.Manifest
+import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,14 +55,21 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   private val CAMERA_PERMISSION_REQUEST_CODE = 0
   private val LOCATION_PERMISSION_REQUEST_CODE = 1
+  private val NOTIFICATION_PERMISSION_REQUEST_CODE = 2
 
   private lateinit var auth: FirebaseAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
     if (!hasCameraPermissions(applicationContext)) {
       ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
+
+    requestNotificationPermission()
+
+    // Alarm permissions
+    requestAlarmPermission()
 
     auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
@@ -75,6 +86,26 @@ class MainActivity : ComponentActivity() {
           color = MaterialTheme.colorScheme.background) {
             NavGraph(startDestination)
           }
+    }
+  }
+
+  private fun requestNotificationPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+          PackageManager.PERMISSION_GRANTED) {
+        requestPermissions(
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST_CODE)
+      }
+    }
+  }
+
+  private fun requestAlarmPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+      if (!alarmManager.canScheduleExactAlarms()) {
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+        startActivity(intent)
+      }
     }
   }
 

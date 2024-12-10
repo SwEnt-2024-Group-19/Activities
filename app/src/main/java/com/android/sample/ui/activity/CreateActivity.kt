@@ -93,6 +93,7 @@ import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -368,24 +369,6 @@ fun CreateActivityScreen(
                             .testTag("inputLocationCreate"),
                     singleLine = true)
 
-                locationSuggestions.filterNotNull().take(3).forEach { location ->
-                  DropdownMenuItem(
-                      text = {
-                        Text(
-                            text =
-                                location.name.take(TOP_TITLE_SIZE) +
-                                    if (location.name.length > TOP_TITLE_SIZE) "..."
-                                    else "", // Limit name length
-                            maxLines = 1 // Ensure name doesn't overflow
-                            )
-                      },
-                      onClick = {
-                        locationViewModel.setQuery(location.name)
-                        selectedLocation = location
-                        showDropdown = false // Close dropdown on selection
-                      },
-                      modifier = Modifier.padding(STANDARD_PADDING.dp))
-                }
                 // Dropdown menu for location suggestions
                 DropdownMenu(
                     expanded = showDropdown && locationSuggestions.isNotEmpty(),
@@ -396,8 +379,8 @@ fun CreateActivityScreen(
                             text = {
                               Text(
                                   text =
-                                      location.name.take(30) +
-                                          if (location.name.length > 30) "..."
+                                      location.name.take(TOP_TITLE_SIZE) +
+                                          if (location.name.length > TOP_TITLE_SIZE) "..."
                                           else "", // Limit name length
                                   maxLines = 1 // Ensure name doesn't overflow
                                   )
@@ -554,25 +537,55 @@ fun CreateActivityScreen(
                           dueDate.toDate().after(Timestamp.now().toDate()),
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
-                    if (creator == "") {
+
+                    val activityTimestamps =
+                        hourDateViewModel.combineDateAndTime(dueDate, startTime)
+                    val activityDateTime = activityTimestamps.toInstant().toEpochMilli()
+
+                    // we disable creating activities 1 hour before start time
+                    if (activityDateTime - System.currentTimeMillis() <
+                        TimeUnit.HOURS.toMillis(1)) {
                       Toast.makeText(
                               context,
-                              "You must be logged in to create an activity.",
+                              context.getString(R.string.schedule_activity),
                               Toast.LENGTH_SHORT)
                           .show()
+                      return@Button
+                    } else if (creator == "") {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.login_check_in_create),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
                     } else if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
                       Toast.makeText(
                               context,
-                              "The start time must be before the end time.",
+                              context.getString(R.string.startTime_before_endTime),
                               Toast.LENGTH_SHORT)
                           .show()
+                      return@Button
                     } else if (price.toDoubleOrNull() == null) {
-                      Toast.makeText(context, "Invalid price format.", Toast.LENGTH_SHORT).show()
-                    } else if (placesMax.toLongOrNull() == null) {
-                      Toast.makeText(context, "Invalid places format.", Toast.LENGTH_SHORT).show()
-                    } else if (selectedLocation == null) {
-                      Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT)
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_price_format),
+                              Toast.LENGTH_SHORT)
                           .show()
+                      return@Button
+                    } else if (placesMax.toLongOrNull() == null) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_places_format),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (selectedLocation == null) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_no_location),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
                     } else {
                       if (selectedOptionType == ActivityType.INDIVIDUAL.name)
                           profileViewModel.userState.value?.let { user -> attendees += user }
