@@ -10,7 +10,11 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun MyTimePicker(onTimeSelected: (Timestamp) -> Unit, isOpen: Boolean, onCloseRequest: (MaterialDialogState) -> Unit) {
+fun MyTimePicker(
+    onTimeSelected: (Timestamp) -> Unit,
+    isOpen: Boolean,
+    onCloseRequest: (MaterialDialogState) -> Unit
+) {
   MaterialDialog(
       onCloseRequest = onCloseRequest,
       dialogState = rememberMaterialDialogState(isOpen),

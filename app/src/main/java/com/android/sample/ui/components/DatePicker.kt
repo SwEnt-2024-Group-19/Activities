@@ -10,7 +10,12 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 @Composable
-fun MyDatePicker(onDateSelected: (Timestamp) -> Unit, isOpen: Boolean, initialDate: LocalDate?, onCloseRequest: (MaterialDialogState) -> Unit) {
+fun MyDatePicker(
+    onDateSelected: (Timestamp) -> Unit,
+    isOpen: Boolean,
+    initialDate: LocalDate?,
+    onCloseRequest: (MaterialDialogState) -> Unit
+) {
   MaterialDialog(
       onCloseRequest = onCloseRequest,
       dialogState = rememberMaterialDialogState(isOpen),
