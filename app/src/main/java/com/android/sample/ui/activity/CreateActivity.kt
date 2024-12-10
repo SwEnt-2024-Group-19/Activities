@@ -554,14 +554,6 @@ fun CreateActivityScreen(
                                 val activityTimestamps = hourDateViewModel.combineDateAndTime(dueDate, startTime)
                                 val activityDateTime = activityTimestamps.toInstant().toEpochMilli()
 
-                               // val startLocalTime = LocalTime.parse(startTime)
-                             /*   val activityDateTime = LocalDateTime.now()
-                                    .withHour(startLocalTime.hour)
-                                    .withMinute(startLocalTime.minute)
-                                    .withSecond(0)
-                                    .withNano(0)
-                              */
-
                                 // we disable creating activities 1 hour before start time
                                 if (activityDateTime - System.currentTimeMillis() <
                                     TimeUnit.HOURS.toMillis(1)) {

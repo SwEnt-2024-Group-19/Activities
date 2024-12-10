@@ -84,6 +84,7 @@ import com.google.firebase.Timestamp
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -580,76 +581,70 @@ fun EditActivityScreen(
                             duration.isNotEmpty(),
                     onClick = {
 
-                        val startLocalTime = LocalTime.parse(startTime)
-                        val activityDateTime = LocalDateTime.now()
-                            .withHour(startLocalTime.hour)
-                            .withMinute(startLocalTime.minute)
-                            .withSecond(0)
-                            .withNano(0)
+                        val activityTimestamps =
+                            startTime?.let { hourDateViewModel.combineDateAndTime(dueDate, it) }
+                        val activityDateTime = activityTimestamps?.toInstant()?.toEpochMilli()
 
                         // we disable creating activities 1 hour before start time
-                        if (Duration.between(LocalDateTime.now(), activityDateTime)
-                                .toMinutes() < 60
-                        ) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.schedule_activity),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            return@Button
-                        }
-                        // disable creating activities with end time being before start time
-                        if (!startTime?.let {
-                                hourDateViewModel.isBeginGreaterThanEnd(
-                                    it,
-                                    duration
-                                )
-                            }!!) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.startTime_before_endTime),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            return@Button
-                        }
-                        try {
-                            imageViewModel.uploadActivityImages(
-                                activity?.uid ?: "",
-                                selectedImages.toList(),
-                                { urls -> items = urls },
-                                { error ->
-                                    Log.e(
-                                        "EditActivityScreen",
-                                        "Failed to upload images: ${error.message}"
-                                    )
-                                })
-                            val updatedActivity =
-                                Activity(
-                                    uid = activity?.uid ?: "",
-                                    title = title,
-                                    description = description,
-                                    date = dueDate,
-                                    startTime = startTime ?: "",
-                                    duration =
-                                    hourDateViewModel.calculateDuration(
-                                        startTime ?: "", duration ?: ""
-                                    ),
-                                    price = price.toDouble(),
-                                    placesLeft = attendees.size.toLong(),
-                                    maxPlaces = maxPlaces.toLongOrNull() ?: 0,
-                                    creator = creator,
-                                    status = ActivityStatus.ACTIVE,
-                                    location = selectedLocation,
-                                    images = activity?.images ?: listOf(),
-                                    type = types.find { it.name == selectedOption } ?: types[0],
-                                    participants = attendees,
-                                    category =
-                                    categories.find { it.name == selectedOptionCategory }
-                                        ?: categories[0],
-                                    comments = activity?.comments ?: listOf())
-                            listActivityViewModel.updateActivity(updatedActivity)
-                            navigationActions.navigateTo(Screen.OVERVIEW)
-                        } catch (_: Exception) {
+
+                        if (activityDateTime != null) {
+                            if (activityDateTime - System.currentTimeMillis() <
+                                TimeUnit.HOURS.toMillis(1)) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.schedule_activity),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@Button
+                            } else if (!hourDateViewModel.isBeginGreaterThanEnd(
+                                    startTime ?: "00:00", duration ?: "00:01")) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.startTime_before_endTime),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@Button
+                            } else {
+                                try {
+                                    imageViewModel.uploadActivityImages(
+                                        activity?.uid ?: "",
+                                        selectedImages.toList(),
+                                        { urls -> items = urls },
+                                        { error ->
+                                            Log.e(
+                                                "EditActivityScreen",
+                                                "Failed to upload images: ${error.message}"
+                                            )
+                                        })
+                                    val updatedActivity =
+                                        Activity(
+                                            uid = activity?.uid ?: "",
+                                            title = title,
+                                            description = description,
+                                            date = dueDate,
+                                            startTime = startTime ?: "",
+                                            duration =
+                                            hourDateViewModel.calculateDuration(
+                                                startTime ?: "", duration ?: ""
+                                            ),
+                                            price = price.toDouble(),
+                                            placesLeft = attendees.size.toLong(),
+                                            maxPlaces = maxPlaces.toLongOrNull() ?: 0,
+                                            creator = creator,
+                                            status = ActivityStatus.ACTIVE,
+                                            location = selectedLocation,
+                                            images = activity?.images ?: listOf(),
+                                            type = types.find { it.name == selectedOption } ?: types[0],
+                                            participants = attendees,
+                                            category =
+                                            categories.find { it.name == selectedOptionCategory }
+                                                ?: categories[0],
+                                            comments = activity?.comments ?: listOf())
+                                    listActivityViewModel.updateActivity(updatedActivity)
+                                    navigationActions.navigateTo(Screen.OVERVIEW)
+                                } catch (_: Exception) {
+                                }
+                            }
                         }
                     },
                     modifier =
