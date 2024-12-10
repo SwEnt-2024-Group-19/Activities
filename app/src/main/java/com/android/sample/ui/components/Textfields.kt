@@ -81,7 +81,10 @@ fun PasswordTextField(
       Text(
           text = it,
           color = Color.Red,
-          modifier = Modifier.align(Alignment.Start).padding(start = 16.dp, top = 8.dp))
+          modifier =
+              Modifier.align(Alignment.Start)
+                  .padding(start = 16.dp, top = 8.dp)
+                  .testTag("PasswordErrorText"))
     }
   }
 }
