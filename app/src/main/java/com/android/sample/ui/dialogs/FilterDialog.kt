@@ -2,8 +2,11 @@ package com.android.sample.ui.dialogs
 
 import android.icu.util.GregorianCalendar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +21,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.android.sample.R
 import com.android.sample.resources.C.Tag.DEFAULT_MAX_PRICE
 import com.android.sample.resources.C.Tag.DIALOG_PADDING
+import com.android.sample.resources.C.Tag.HALF_SCREEN_TEXT_FIELD_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -32,16 +36,23 @@ fun FilterDialog(
         (
             price: Double?,
             membersAvailable: Int?,
-            schedule: Timestamp?,
-            duration: String?,
+            minDate: Timestamp?,
+            maxDate: Timestamp?,
+            startTime: String?,
+            endTime: String?,
+            distance: Double?,
             onlyPRO: Boolean?) -> Unit,
 ) {
   var maxPrice by remember { mutableStateOf(DEFAULT_MAX_PRICE) }
   var availablePlaces by remember { mutableStateOf<Int?>(null) }
   var minDate by remember { mutableStateOf<String?>(null) }
+  var maxDate by remember { mutableStateOf<String?>(null) }
   var minDateTimestamp by remember { mutableStateOf<Timestamp?>(null) }
-  var duration by remember { mutableStateOf<String?>(null) }
+  var maxDateTimestamp by remember { mutableStateOf<Timestamp?>(null) }
+  var startTime by remember { mutableStateOf<String?>(null) }
+  var endTime by remember { mutableStateOf<String?>(null) }
   var onlyPRO by remember { mutableStateOf<Boolean?>(false) }
+  var distance by remember { mutableStateOf<String?>(null) }
 
   Dialog(
       onDismissRequest = { onDismiss() },
@@ -52,6 +63,7 @@ fun FilterDialog(
                     .height(DIALOG_PADDING.dp)
                     .background(
                         color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
+                    .verticalScroll(rememberScrollState())
                     .testTag("FilterDialog"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -89,25 +101,80 @@ fun FilterDialog(
                     value = availablePlaces?.toString() ?: "",
                     onValueChange = { availablePlaces = it.toIntOrNull() },
                     label = { Text("Members Available") },
+                    singleLine = true,
                     modifier = Modifier.testTag("membersAvailableTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
-
+                Row(
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = STANDARD_PADDING.dp),
+                    horizontalArrangement =
+                        Arrangement.SpaceBetween // Adjust spacing between text fields
+                    ) {
+                      OutlinedTextField(
+                          value = minDate ?: "",
+                          onValueChange = { minDate = it },
+                          label = { Text("StartDate") },
+                          modifier =
+                              Modifier.width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                                  .testTag("minDateTextField"),
+                          placeholder = {
+                            androidx.compose.material3.Text(
+                                text =
+                                    stringResource(id = R.string.request_date_activity_withFormat))
+                          },
+                          singleLine = true,
+                          shape = RoundedCornerShape(TEXT_PADDING.dp))
+                      OutlinedTextField(
+                          value = maxDate ?: "",
+                          onValueChange = { maxDate = it },
+                          label = { Text("DeadLine") },
+                          modifier =
+                              Modifier.width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                                  .testTag("maxDateTextField"),
+                          placeholder = {
+                            androidx.compose.material3.Text(
+                                text =
+                                    stringResource(id = R.string.request_date_activity_withFormat))
+                          },
+                          singleLine = true,
+                          shape = RoundedCornerShape(TEXT_PADDING.dp))
+                    }
+                Row(
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = STANDARD_PADDING.dp),
+                    horizontalArrangement =
+                        Arrangement.SpaceBetween // Adjust spacing between text fields
+                    ) {
+                      OutlinedTextField(
+                          value = startTime ?: "",
+                          onValueChange = { startTime = it },
+                          label = { Text("StartTime") },
+                          singleLine = true,
+                          modifier =
+                              Modifier.width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                                  .testTag("startTimeTextField"),
+                          shape = RoundedCornerShape(TEXT_PADDING.dp))
+                      OutlinedTextField(
+                          value = endTime ?: "",
+                          onValueChange = { endTime = it },
+                          label = { Text("EndTime") },
+                          singleLine = true,
+                          modifier =
+                              Modifier.width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                                  .testTag("endTimeTextField"),
+                          shape = RoundedCornerShape(TEXT_PADDING.dp))
+                    }
                 OutlinedTextField(
-                    value = minDate ?: "",
-                    onValueChange = { minDate = it },
-                    label = { Text("startDate") },
-                    modifier = Modifier.testTag("minDateTextField"),
-                    placeholder = {
-                      androidx.compose.material3.Text(
-                          text = stringResource(id = R.string.request_date_activity_withFormat))
-                    },
+                    value = distance ?: "",
+                    onValueChange = { distance = it },
+                    label = { Text("distance") },
+                    modifier = Modifier.testTag("distanceTextField"),
+                    placeholder = { androidx.compose.material3.Text(text = "exp: 10.5 km") },
                     singleLine = true,
-                    shape = RoundedCornerShape(TEXT_PADDING.dp))
-                OutlinedTextField(
-                    value = duration ?: "",
-                    onValueChange = { duration = it },
-                    label = { Text("Duration") },
-                    modifier = Modifier.testTag("durationTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
                 Row(
@@ -149,11 +216,26 @@ fun FilterDialog(
                               0)
                           minDateTimestamp = Timestamp(calendar.time)
                         }
+                        if (maxDate != null) {
+                          val calendar = GregorianCalendar()
+                          val parts = maxDate!!.split("/")
+                          calendar.set(
+                              parts[2].toInt(),
+                              parts[1].toInt() - 1, // Months are 0-based
+                              parts[0].toInt(),
+                              0,
+                              0,
+                              0)
+                          maxDateTimestamp = Timestamp(calendar.time)
+                        }
                         onFilter(
                             maxPrice.toDouble(),
                             availablePlaces,
                             minDateTimestamp,
-                            duration,
+                            maxDateTimestamp,
+                            startTime,
+                            endTime,
+                            distance?.toDouble(),
                             onlyPRO)
                         onDismiss()
                       },
