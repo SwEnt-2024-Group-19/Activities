@@ -202,7 +202,7 @@ fun ProfileContent(
                     it.creator == user.id &&
                         hourDateViewModel.combineDateAndTime(
                             it.date,
-                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                            it.startTime) >
                             Timestamp.now()
                   },
                   navigationActions,
@@ -217,7 +217,7 @@ fun ProfileContent(
                     it.creator != user.id &&
                         hourDateViewModel.combineDateAndTime(
                             it.date,
-                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                            it.startTime) >
                             Timestamp.now()
                   },
                   navigationActions,
@@ -230,7 +230,7 @@ fun ProfileContent(
                   "past",
                   usersActivity.filter {
                     hourDateViewModel.combineDateAndTime(
-                        it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) <=
+                        it.date, it.startTime) <=
                         Timestamp.now()
                   },
                   navigationActions,
