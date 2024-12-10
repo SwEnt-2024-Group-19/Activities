@@ -96,6 +96,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -550,17 +551,20 @@ fun CreateActivityScreen(
                             onClick = {
                                 val activityId = listActivityViewModel.getNewUid()
 
-                                val startLocalTime = LocalTime.parse(startTime)
-                                val activityDateTime = LocalDateTime.now()
+                                val activityTimestamps = hourDateViewModel.combineDateAndTime(dueDate, startTime)
+                                val activityDateTime = activityTimestamps.toInstant().toEpochMilli()
+
+                               // val startLocalTime = LocalTime.parse(startTime)
+                             /*   val activityDateTime = LocalDateTime.now()
                                     .withHour(startLocalTime.hour)
                                     .withMinute(startLocalTime.minute)
                                     .withSecond(0)
                                     .withNano(0)
+                              */
 
                                 // we disable creating activities 1 hour before start time
-                                if (Duration.between(LocalDateTime.now(), activityDateTime)
-                                        .toMinutes() < 60
-                                ) {
+                                if (activityDateTime - System.currentTimeMillis() <
+                                    TimeUnit.HOURS.toMillis(1)) {
                                     Toast.makeText(
                                         context,
                                         context.getString(R.string.schedule_activity),

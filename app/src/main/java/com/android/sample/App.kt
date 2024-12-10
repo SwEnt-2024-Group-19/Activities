@@ -3,6 +3,7 @@ package com.android.sample
 import android.app.Application
 import com.android.sample.helper.NotificationHelper
 import com.android.sample.model.activity.Activity
+import com.android.sample.model.hour_date.HourDateViewModel
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -28,7 +29,10 @@ class App : Application() {
             if (isCreator) "Your Activity is in less than 24h!"
             else "The Activity you joined is in less than 24h!"
 
-        val activityDate = activity.date.toDate().time
+        val hourDateViewModel = HourDateViewModel()
+        val activityTimestamps = hourDateViewModel.combineDateAndTime(activity.date,activity.startTime)
+        val activityDate = activityTimestamps.toInstant().toEpochMilli()
+       // val activityDate = activity.date.toDate().time
 
         notificationHelper.scheduleNotification(
             activityId = activity.uid,

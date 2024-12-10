@@ -67,50 +67,50 @@ fun ProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel,
     imageViewModel: ImageViewModel
 ) {
-  val context = LocalContext.current
-  val networkManager = NetworkManager(context)
+    val context = LocalContext.current
+    val networkManager = NetworkManager(context)
 
-  // Determine if we should use cached data
-  val profileState by userProfileViewModel.userState.collectAsState()
-  val user =
-      if (networkManager.isNetworkAvailable()) {
-        profileState
-      } else {
-        remember { mutableStateOf(userProfileViewModel.loadCachedProfile()) }.value
-      }
-  when (user) {
-    null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
-    else -> {
-      ProfileContent(
-          user, navigationActions, listActivitiesViewModel, userProfileViewModel, imageViewModel)
+    // Determine if we should use cached data
+    val profileState by userProfileViewModel.userState.collectAsState()
+    val user =
+        if (networkManager.isNetworkAvailable()) {
+            profileState
+        } else {
+            remember { mutableStateOf(userProfileViewModel.loadCachedProfile()) }.value
+        }
+    when (user) {
+        null -> LoadingScreen(navigationActions) // Show a loading indicator or a retry button
+        else -> {
+            ProfileContent(
+                user, navigationActions, listActivitiesViewModel, userProfileViewModel, imageViewModel)
+        }
     }
-  }
 }
 
 @Composable
 fun LoadingScreen(navigationActions: NavigationActions) {
-  Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
-      }) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { route -> navigationActions.navigateTo(route) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = navigationActions.currentRoute())
+        }) { innerPadding ->
         Column(
             Modifier.fillMaxSize().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(
-                  "You do not have a profile",
-                  modifier = Modifier.testTag("loadingText"),
-                  color = Color.Black)
-              Button(
-                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                  modifier = Modifier.testTag("signInButton")) {
-                    Text("Go to Sign In Page")
-                  }
+            Text(
+                "You do not have a profile",
+                modifier = Modifier.testTag("loadingText"),
+                color = Color.Black)
+            Button(
+                onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                modifier = Modifier.testTag("signInButton")) {
+                Text("Go to Sign In Page")
             }
-      }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,124 +122,124 @@ fun ProfileContent(
     userProfileViewModel: ProfileViewModel,
     imageViewModel: ImageViewModel
 ) {
-  val uiState by listActivitiesViewModel.uiState.collectAsState()
-  val context = LocalContext.current
-  val networkManager = NetworkManager(context)
-  var showMenu by remember { mutableStateOf(false) }
-  Log.d("ProfileScreen", "User photo: ${user.photo}")
-  Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("profileScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { route -> navigationActions.navigateTo(route) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
-      },
-      topBar = {
-        TopAppBar(
-            title = {
-              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Profile")
-              }
-            },
-            actions = {
-              IconButton(
-                  onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
-                    Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
-                  }
-              DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                DropdownMenuItem(
-                    text = { Text("Logout") },
-                    onClick = {
-                      performOfflineAwareAction(
-                          context = context,
-                          networkManager = networkManager,
-                          onPerform = {
-                            showMenu = false
-                            userProfileViewModel.clearUserData()
-                            Firebase.auth.signOut()
-                            navigationActions.navigateTo(Screen.AUTH)
-                          })
-                    },
-                    enabled = Firebase.auth.currentUser?.isAnonymous == false)
-                DropdownMenuItem(
-                    text = { Text("Edit profile") },
-                    onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
-              }
-            })
-      }) { innerPadding ->
+    val uiState by listActivitiesViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val networkManager = NetworkManager(context)
+    var showMenu by remember { mutableStateOf(false) }
+    Log.d("ProfileScreen", "User photo: ${user.photo}")
+    Scaffold(
+        modifier = Modifier.fillMaxSize().testTag("profileScreen"),
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { route -> navigationActions.navigateTo(route) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = navigationActions.currentRoute())
+        },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Profile")
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
+                        Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
+                    }
+                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Logout") },
+                            onClick = {
+                                performOfflineAwareAction(
+                                    context = context,
+                                    networkManager = networkManager,
+                                    onPerform = {
+                                        showMenu = false
+                                        userProfileViewModel.clearUserData()
+                                        Firebase.auth.signOut()
+                                        navigationActions.navigateTo(Screen.AUTH)
+                                    })
+                            },
+                            enabled = Firebase.auth.currentUser?.isAnonymous == false)
+                        DropdownMenuItem(
+                            text = { Text("Edit profile") },
+                            onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
+                    }
+                })
+        }) { innerPadding ->
         LazyColumn(
             Modifier.fillMaxSize().padding(innerPadding).testTag("profileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              item { ProfileHeader(user, imageViewModel) }
+            item { ProfileHeader(user, imageViewModel) }
 
-              item { SectionTitle(title = "Interests", testTag = "interestsSection") }
+            item { SectionTitle(title = "Interests", testTag = "interestsSection") }
 
-              item {
+            item {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
                     contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-                      user.interests?.let { interests ->
+                    user.interests?.let { interests ->
                         items(interests.size) { index ->
-                          InterestBox(interest = user.interests[index].interest)
+                            InterestBox(interest = user.interests[index].interest)
                         }
-                      }
                     }
-              }
+                }
+            }
 
-              val activitiesList =
-                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              val usersActivity =
-                  activitiesList.filter {
+            val activitiesList =
+                (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+            val usersActivity =
+                activitiesList.filter {
                     it.creator == user.id || it.participants.map { it.id }.contains(user.id)
-                  }
-              val hourDateViewModel = HourDateViewModel()
-              // Display activities sections
-              displayActivitySection(
-                  "Activities Created",
-                  "created",
-                  usersActivity.filter {
+                }
+            val hourDateViewModel = HourDateViewModel()
+            // Display activities sections
+            displayActivitySection(
+                "Activities Created",
+                "created",
+                usersActivity.filter {
                     it.creator == user.id &&
-                        hourDateViewModel.combineDateAndTime(
-                            it.date,
-                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                            hourDateViewModel.combineDateAndTime(
+                                it.date,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
                             Timestamp.now()
-                  },
-                  navigationActions,
-                  userProfileViewModel,
-                  listActivitiesViewModel,
-                  false,
-                  user)
-              displayActivitySection(
-                  "Activities Enrolled in",
-                  "enrolled",
-                  usersActivity.filter {
+                },
+                navigationActions,
+                userProfileViewModel,
+                listActivitiesViewModel,
+                false,
+                user)
+            displayActivitySection(
+                "Activities Enrolled in",
+                "enrolled",
+                usersActivity.filter {
                     it.creator != user.id &&
-                        hourDateViewModel.combineDateAndTime(
-                            it.date,
-                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                            hourDateViewModel.combineDateAndTime(
+                                it.date,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
                             Timestamp.now()
-                  },
-                  navigationActions,
-                  userProfileViewModel,
-                  listActivitiesViewModel,
-                  false,
-                  user)
-              displayActivitySection(
-                  "Past Activities",
-                  "past",
-                  usersActivity.filter {
+                },
+                navigationActions,
+                userProfileViewModel,
+                listActivitiesViewModel,
+                false,
+                user)
+            displayActivitySection(
+                "Past Activities",
+                "past",
+                usersActivity.filter {
                     hourDateViewModel.combineDateAndTime(
                         it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) <=
-                        Timestamp.now()
-                  },
-                  navigationActions,
-                  userProfileViewModel,
-                  listActivitiesViewModel,
-                  false,
-                  user)
-            }
-      }
+                            Timestamp.now()
+                },
+                navigationActions,
+                userProfileViewModel,
+                listActivitiesViewModel,
+                false,
+                user)
+        }
+    }
 }
 
 /** Display the activity section based on the category */
@@ -253,56 +253,56 @@ fun LazyListScope.displayActivitySection(
     isParticipantProfile: Boolean,
     user: User
 ) {
-  item {
-    Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-    SectionTitle(title = sectionTitle, testTag = "${category}ActivitiesTitle")
-  }
-  if (listActivities.isNotEmpty()) {
-    items(listActivities.size) { index ->
-      ActivityBox(
-          activity = listActivities[index],
-          listActivitiesViewModel = listActivitiesViewModel,
-          navigationActions = navigationActions,
-          category = category,
-          userProfileViewModel = userProfileViewModel,
-          user = user)
+    item {
+        Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+        SectionTitle(title = sectionTitle, testTag = "${category}ActivitiesTitle")
     }
-  } else {
-    if (!isParticipantProfile) {
-      item { PlusButtonToCreate(navigationActions = navigationActions, category) }
+    if (listActivities.isNotEmpty()) {
+        items(listActivities.size) { index ->
+            ActivityBox(
+                activity = listActivities[index],
+                listActivitiesViewModel = listActivitiesViewModel,
+                navigationActions = navigationActions,
+                category = category,
+                userProfileViewModel = userProfileViewModel,
+                user = user)
+        }
     } else {
-      item {
-        Text("This participant has no activities", modifier = Modifier.padding(MEDIUM_PADDING.dp))
-      }
+        if (!isParticipantProfile) {
+            item { PlusButtonToCreate(navigationActions = navigationActions, category) }
+        } else {
+            item {
+                Text("This participant has no activities", modifier = Modifier.padding(MEDIUM_PADDING.dp))
+            }
+        }
     }
-  }
 }
 
 @Composable
 fun SectionTitle(title: String, testTag: String) {
-  Text(
-      text = title,
-      fontSize = TITLE_FONTSIZE.sp,
-      modifier =
-          Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp).testTag(testTag))
+    Text(
+        text = title,
+        fontSize = TITLE_FONTSIZE.sp,
+        modifier =
+        Modifier.padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp).testTag(testTag))
 }
 
 /** Display the user's profile picture and name */
 @Composable
 fun ProfileHeader(user: User, imageViewModel: ImageViewModel) {
-  Spacer(Modifier.height(MEDIUM_PADDING.dp))
-  Text(
-      text = "Profile",
-      fontSize = TOP_TITLE_SIZE.sp,
-      modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
-  ProfileImage(
-      userId = user.id,
-      modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
-      imageViewModel)
-  Text(
-      text = "${user.name} ${user.surname}",
-      fontSize = TITLE_FONTSIZE.sp,
-      modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
+    Spacer(Modifier.height(MEDIUM_PADDING.dp))
+    Text(
+        text = "Profile",
+        fontSize = TOP_TITLE_SIZE.sp,
+        modifier = Modifier.padding(top = MEDIUM_PADDING.dp))
+    ProfileImage(
+        userId = user.id,
+        modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+        imageViewModel)
+    Text(
+        text = "${user.name} ${user.surname}",
+        fontSize = TITLE_FONTSIZE.sp,
+        modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("userName"))
 }
 
 /** Display a single activity in a box, the same box is used for all categories */
@@ -315,16 +315,16 @@ fun ActivityBox(
     userProfileViewModel: ProfileViewModel,
     user: User
 ) {
-  val context = LocalContext.current
-  ActivityRow(
-      activity = activity,
-      listActivitiesViewModel = listActivitiesViewModel,
-      userProfileViewModel = userProfileViewModel,
-      navigationActions = navigationActions,
-      category = category,
-      userId = user.id,
-      context = context,
-      testTag = "activity${category.capitalize()}")
+    val context = LocalContext.current
+    ActivityRow(
+        activity = activity,
+        listActivitiesViewModel = listActivitiesViewModel,
+        userProfileViewModel = userProfileViewModel,
+        navigationActions = navigationActions,
+        category = category,
+        userId = user.id,
+        context = context,
+        testTag = "activity${category.capitalize()}")
 }
 
 /** Display a single activity in a row */
@@ -339,17 +339,17 @@ fun ActivityRow(
     context: Context,
     testTag: String
 ) {
-  Row(
-      modifier =
-          Modifier.fillMaxWidth()
-              .testTag(testTag)
-              .padding(STANDARD_PADDING.dp)
-              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable {
+    Row(
+        modifier =
+        Modifier.fillMaxWidth()
+            .testTag(testTag)
+            .padding(STANDARD_PADDING.dp)
+            .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+            .clickable {
                 listActivitiesViewModel.selectActivity(activity)
                 userProfileViewModel.navigateToActivity(navigationActions, context)
-              },
-      verticalAlignment = Alignment.CenterVertically) {
+            },
+        verticalAlignment = Alignment.CenterVertically) {
         Image(
             painter = painterResource(id = getImageResourceIdForCategory(activity.category)),
             contentDescription = "Activity Image",
@@ -357,126 +357,126 @@ fun ActivityRow(
             modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
         Column(modifier = Modifier.weight(WIDTH_FRACTION)) {
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
                     text = activity.title,
                     fontSize = SUBTITLE_FONTSIZE.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black)
                 if (category != "past") {
-                  RemainingTime(System.currentTimeMillis(), activity)
+                    RemainingTime(System.currentTimeMillis(), activity)
                 }
-              }
-          Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
+            }
+            Text(text = activity.description, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Gray)
         }
         if (category == "past") {
-          ReviewActivityButtons(activity.likes[userId]) { review ->
-            listActivitiesViewModel.reviewActivity(activity, userId, review)
-          }
+            ReviewActivityButtons(activity.likes[userId]) { review ->
+                listActivitiesViewModel.reviewActivity(activity, userId, review)
+            }
         }
-      }
+    }
 }
 
 @Composable
 fun RemainingTime(currentTimeMillis: Long, activity: Activity) {
-  val startTimeParts = activity.startTime.split(":")
-  val activityHour = startTimeParts[0].toInt()
-  val activityMinute = startTimeParts[1].toInt()
+    val startTimeParts = activity.startTime.split(":")
+    val activityHour = startTimeParts[0].toInt()
+    val activityMinute = startTimeParts[1].toInt()
 
-  val activityDate = activity.date.toDate()
-  val calendar =
-      Calendar.getInstance().apply {
-        time = activityDate
-        set(Calendar.HOUR_OF_DAY, activityHour)
-        set(Calendar.MINUTE, activityMinute)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-      }
-  val activityTimeMillis = calendar.timeInMillis
+    val activityDate = activity.date.toDate()
+    val calendar =
+        Calendar.getInstance().apply {
+            time = activityDate
+            set(Calendar.HOUR_OF_DAY, activityHour)
+            set(Calendar.MINUTE, activityMinute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+    val activityTimeMillis = calendar.timeInMillis
 
-  val remainingTimeMillis = activityTimeMillis - currentTimeMillis
+    val remainingTimeMillis = activityTimeMillis - currentTimeMillis
 
-  val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
-  val minutes = remainingTimeMillis / (1000 * 60) % 60
-  val days = remainingTimeMillis / (1000 * 60 * 60 * 24)
-  val months = days / 30
+    val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
+    val minutes = remainingTimeMillis / (1000 * 60) % 60
+    val days = remainingTimeMillis / (1000 * 60 * 60 * 24)
+    val months = days / 30
 
-  fun calculateColor(remainingTimeMillis: Long): Color {
-    val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
-    val fraction =
-        (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
-    return lerp(Color(LIGHT_PURPLE_COLOR), Color(DARK_BLUE_COLOR), 1 - fraction)
-  }
+    fun calculateColor(remainingTimeMillis: Long): Color {
+        val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
+        val fraction =
+            (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
+        return lerp(Color(LIGHT_PURPLE_COLOR), Color(DARK_BLUE_COLOR), 1 - fraction)
+    }
 
-  val textColor = calculateColor(remainingTimeMillis)
+    val textColor = calculateColor(remainingTimeMillis)
 
-  Text(
-      text =
-          when {
+    Text(
+        text =
+        when {
             months > 1 -> "In $months months"
             days in 6..30 -> "In $days days"
             days in 1..5 -> "In $days days and $hours hours"
             days < 1 -> "In $hours h $minutes min"
             else -> ""
-          },
-      fontSize = SUBTITLE_FONTSIZE.sp,
-      color = textColor,
-      modifier = Modifier.testTag("remainingTime"))
+        },
+        fontSize = SUBTITLE_FONTSIZE.sp,
+        color = textColor,
+        modifier = Modifier.testTag("remainingTime"))
 }
 
 @Composable
 fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
-  var isLiked: Boolean? by remember { mutableStateOf(currentReview) }
-  Row {
-    IconButton(
-        onClick = {
-          isLiked = if (isLiked == true) null else true
-          review(isLiked)
-        },
-        colors =
+    var isLiked: Boolean? by remember { mutableStateOf(currentReview) }
+    Row {
+        IconButton(
+            onClick = {
+                isLiked = if (isLiked == true) null else true
+                review(isLiked)
+            },
+            colors =
             IconButtonDefaults.iconButtonColors(
                 containerColor = if (isLiked == true) Color(SUCCESS_COLOR) else Color.Transparent,
                 contentColor =
-                    if (isLiked == true) MaterialTheme.colorScheme.onError
-                    else MaterialTheme.colorScheme.onSurface),
-        modifier = Modifier.testTag("likeIconButton_${isLiked == true}")) {
-          Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "Like")
+                if (isLiked == true) MaterialTheme.colorScheme.onError
+                else MaterialTheme.colorScheme.onSurface),
+            modifier = Modifier.testTag("likeIconButton_${isLiked == true}")) {
+            Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "Like")
         }
-    Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
-    IconButton(
-        onClick = {
-          isLiked = if (isLiked == false) null else false
-          review(isLiked)
-        },
-        colors =
+        Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
+        IconButton(
+            onClick = {
+                isLiked = if (isLiked == false) null else false
+                review(isLiked)
+            },
+            colors =
             IconButtonDefaults.iconButtonColors(
                 containerColor =
-                    if (isLiked == false) MaterialTheme.colorScheme.error else Color.Transparent,
+                if (isLiked == false) MaterialTheme.colorScheme.error else Color.Transparent,
                 contentColor =
-                    if (isLiked == false) MaterialTheme.colorScheme.onError
-                    else MaterialTheme.colorScheme.onSurface),
-        modifier = Modifier.testTag("dislikeIconButton_${isLiked == false}")) {
-          Icon(
-              imageVector = Icons.Default.ThumbDown,
-              contentDescription = "Dislike",
-              tint =
-                  if (isLiked == false) MaterialTheme.colorScheme.onError
-                  else MaterialTheme.colorScheme.onSurface)
+                if (isLiked == false) MaterialTheme.colorScheme.onError
+                else MaterialTheme.colorScheme.onSurface),
+            modifier = Modifier.testTag("dislikeIconButton_${isLiked == false}")) {
+            Icon(
+                imageVector = Icons.Default.ThumbDown,
+                contentDescription = "Dislike",
+                tint =
+                if (isLiked == false) MaterialTheme.colorScheme.onError
+                else MaterialTheme.colorScheme.onSurface)
         }
-  }
+    }
 }
 
 /** Display a single interest in a box */
 @Composable
 fun InterestBox(interest: String) {
-  Box(
-      modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
-              .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-              .testTag("$interest"),
-      contentAlignment = Alignment.Center) {
+    Box(
+        modifier =
+        Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+            .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
+            .testTag("$interest"),
+        contentAlignment = Alignment.Center) {
         Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
-      }
+    }
 }

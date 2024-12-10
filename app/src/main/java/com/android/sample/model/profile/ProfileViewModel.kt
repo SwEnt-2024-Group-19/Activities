@@ -26,120 +26,120 @@ open class ProfileViewModel
 @Inject
 constructor(private val repository: ProfilesRepository, private val localDatabase: AppDatabase) :
     ViewModel() {
-  private var userState_ = MutableStateFlow<User?>(null)
-  open val userState: StateFlow<User?> = userState_.asStateFlow()
+    private var userState_ = MutableStateFlow<User?>(null)
+    open val userState: StateFlow<User?> = userState_.asStateFlow()
 
-  init {
-    observeAuthState()
-  }
-
-  private fun observeAuthState() {
-    Firebase.auth.addAuthStateListener { auth ->
-      val currentUser = auth.currentUser
-      if (currentUser != null) {
-        fetchUserData(currentUser.uid)
-      } else {
-        clearUserData()
-      }
+    init {
+        observeAuthState()
     }
-  }
 
-  fun fetchUserData(userId: String) {
-    viewModelScope.launch {
-      try {
-        // Attempt to fetch from Firestore
-        repository.getUser(
-            userId = userId,
-            onSuccess = { user ->
-              user?.let {
-                userState_.value = it
-                viewModelScope.launch {
-                  localDatabase.userDao().insert(it) // Cache locally
-                }
-              }
-            },
-            onFailure = {
-              // If Firestore fails, load from Room
-              viewModelScope.launch {
+    private fun observeAuthState() {
+        Firebase.auth.addAuthStateListener { auth ->
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                fetchUserData(currentUser.uid)
+            } else {
+                clearUserData()
+            }
+        }
+    }
+
+    fun fetchUserData(userId: String) {
+        viewModelScope.launch {
+            try {
+                // Attempt to fetch from Firestore
+                repository.getUser(
+                    userId = userId,
+                    onSuccess = { user ->
+                        user?.let {
+                            userState_.value = it
+                            viewModelScope.launch {
+                                localDatabase.userDao().insert(it) // Cache locally
+                            }
+                        }
+                    },
+                    onFailure = {
+                        // If Firestore fails, load from Room
+                        viewModelScope.launch {
+                            val cachedUser = localDatabase.userDao().getUser(userId)
+                            userState_.value = cachedUser
+                        }
+                    })
+            } catch (e: Exception) {
+                // If unexpected exception occurs, fallback to Room
                 val cachedUser = localDatabase.userDao().getUser(userId)
                 userState_.value = cachedUser
-              }
-            })
-      } catch (e: Exception) {
-        // If unexpected exception occurs, fallback to Room
-        val cachedUser = localDatabase.userDao().getUser(userId)
-        userState_.value = cachedUser
-      }
+            }
+        }
     }
-  }
 
-  fun clearUserData() {
-    userState_.value = null
-  }
-
-  fun createUserProfile(userProfile: User, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
-    repository.addProfileToDatabase(
-        userProfile = userProfile,
-        onSuccess = { onSuccess() },
-        onFailure = { error -> onError(error) })
-  }
-
-  fun addActivity(userId: String, activityId: String) {
-    repository.addActivity(
-        userId = userId,
-        activityId = activityId,
-        onSuccess = { fetchUserData(userId) },
-        onFailure = {})
-  }
-
-  fun addLikedActivity(userId: String, activityId: String) {
-    repository.addLikedActivity(
-        userId = userId,
-        activityId = activityId,
-        onSuccess = { fetchUserData(userId) },
-        onFailure = {})
-  }
-
-  fun removeLikedActivity(userId: String, activityId: String) {
-    repository.removeLikedActivity(
-        userId = userId,
-        activityId = activityId,
-        onSuccess = { fetchUserData(userId) },
-        onFailure = {})
-  }
-
-  fun removeJoinedActivity(userId: String, activityId: String) {
-    repository.removeJoinedActivity(
-        userId = userId,
-        activityId = activityId,
-        onSuccess = { fetchUserData(userId) },
-        onFailure = {})
-  }
-
-  fun updateProfile(user: User) {
-    repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
-  }
-
-  fun loadCachedProfile(): User? {
-    return runBlocking { localDatabase.userDao().getUser(Firebase.auth.currentUser?.uid ?: "") }
-  }
-  /** Check if the activity should be displayed based on the category and the user's role in the */
-  fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
-    val hourDateViewModel = HourDateViewModel()
-    val activityTimestamp = hourDateViewModel.combineDateAndTime(activity.date, activity.startTime)
-    return when (category) {
-      "created" -> activity.creator == user.id && activityTimestamp > Timestamp.now()
-      "enrolled" -> activity.creator != user.id && activityTimestamp > Timestamp.now()
-      "past" -> activityTimestamp < Timestamp.now()
-      else -> false
+    fun clearUserData() {
+        userState_.value = null
     }
-  }
-  /** Navigate to the appropriate screen based on the category */
-  fun navigateToActivity(navigationActions: NavigationActions, context: Context) {
-    val networkManager = NetworkManager(context)
-    performOfflineAwareAction(
-        context,
-        networkManager,
-        onPerform = { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) })
-  }
+
+    fun createUserProfile(userProfile: User, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
+        repository.addProfileToDatabase(
+            userProfile = userProfile,
+            onSuccess = { onSuccess() },
+            onFailure = { error -> onError(error) })
+    }
+
+    fun addActivity(userId: String, activityId: String) {
+        repository.addActivity(
+            userId = userId,
+            activityId = activityId,
+            onSuccess = { fetchUserData(userId) },
+            onFailure = {})
+    }
+
+    fun addLikedActivity(userId: String, activityId: String) {
+        repository.addLikedActivity(
+            userId = userId,
+            activityId = activityId,
+            onSuccess = { fetchUserData(userId) },
+            onFailure = {})
+    }
+
+    fun removeLikedActivity(userId: String, activityId: String) {
+        repository.removeLikedActivity(
+            userId = userId,
+            activityId = activityId,
+            onSuccess = { fetchUserData(userId) },
+            onFailure = {})
+    }
+
+    fun removeJoinedActivity(userId: String, activityId: String) {
+        repository.removeJoinedActivity(
+            userId = userId,
+            activityId = activityId,
+            onSuccess = { fetchUserData(userId) },
+            onFailure = {})
+    }
+
+    fun updateProfile(user: User) {
+        repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
+    }
+
+    fun loadCachedProfile(): User? {
+        return runBlocking { localDatabase.userDao().getUser(Firebase.auth.currentUser?.uid ?: "") }
+    }
+    /** Check if the activity should be displayed based on the category and the user's role in the */
+    fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
+        val hourDateViewModel = HourDateViewModel()
+        val activityTimestamp = hourDateViewModel.combineDateAndTime(activity.date, activity.startTime)
+        return when (category) {
+            "created" -> activity.creator == user.id && activityTimestamp > Timestamp.now()
+            "enrolled" -> activity.creator != user.id && activityTimestamp > Timestamp.now()
+            "past" -> activityTimestamp < Timestamp.now()
+            else -> false
+        }
+    }
+    /** Navigate to the appropriate screen based on the category */
+    fun navigateToActivity(navigationActions: NavigationActions, context: Context) {
+        val networkManager = NetworkManager(context)
+        performOfflineAwareAction(
+            context,
+            networkManager,
+            onPerform = { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) })
+    }
 }
