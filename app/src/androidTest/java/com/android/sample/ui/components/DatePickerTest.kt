@@ -13,7 +13,7 @@ class DatePickerTest {
   @Test
   fun datePicker_disallowsPastDates() {
     composeTestRule.setContent {
-      MyDatePicker(onDateSelected = {}, isOpen = true, initialDate = null)
+      MyDatePicker(onDateSelected = {}, isOpen = true, initialDate = null, onCloseRequest = {})
     }
 
     val pastDate = LocalDate.now().minusDays(2)
@@ -23,7 +23,7 @@ class DatePickerTest {
   @Test
   fun datePicker_isDisplayed() {
     composeTestRule.setContent {
-      MyDatePicker(onDateSelected = {}, isOpen = true, initialDate = null)
+      MyDatePicker(onDateSelected = {}, isOpen = true, initialDate = null, onCloseRequest = {})
     }
     composeTestRule.onNodeWithText("Select a date").assertExists()
   }
@@ -31,7 +31,7 @@ class DatePickerTest {
   @Test
   fun datePicker_isNotDisplayed() {
     composeTestRule.setContent {
-      MyDatePicker(onDateSelected = {}, isOpen = false, initialDate = null)
+      MyDatePicker(onDateSelected = {}, isOpen = false, initialDate = null, onCloseRequest = {})
     }
     composeTestRule.onNodeWithText("Select a date").assertDoesNotExist()
   }

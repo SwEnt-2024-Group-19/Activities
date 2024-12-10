@@ -243,6 +243,7 @@ fun EditActivityScreen(
             }
             if (dateIsOpen) {
               MyDatePicker(
+                  onCloseRequest = { dateIsOpen = false },
                   onDateSelected = { date ->
                     dueDate = date
                     dateIsOpen = false
@@ -284,6 +285,7 @@ fun EditActivityScreen(
                     timeIsOpen = false
                   },
                   isOpen = timeIsOpen,
+                  onCloseRequest = { timeIsOpen = false },
               )
             }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -312,6 +314,7 @@ fun EditActivityScreen(
                     durationIsOpen = false
                   },
                   isOpen = durationIsOpen,
+                  onCloseRequest = { durationIsOpen = false },
               )
             }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
