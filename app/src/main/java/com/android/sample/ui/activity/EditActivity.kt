@@ -81,6 +81,7 @@ import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -521,47 +522,67 @@ fun EditActivityScreen(
                         startTime?.isNotEmpty() ?: false &&
                         duration.isNotEmpty(),
                 onClick = {
-                  if (!hourDateViewModel.isBeginGreaterThanEnd(
-                      startTime ?: "00:00", duration ?: "00:01")) {
-                    Toast.makeText(
-                            context, "Start time must be before end time", Toast.LENGTH_SHORT)
-                        .show()
-                    return@Button
+                  val activityTimestamps =
+                      startTime?.let { hourDateViewModel.combineDateAndTime(dueDate, it) }
+                  val activityDateTime = activityTimestamps?.toInstant()?.toEpochMilli()
+
+                  // we disable creating activities 1 hour before start time
+                  if (activityDateTime != null) {
+                    if (activityDateTime - System.currentTimeMillis() <
+                        TimeUnit.HOURS.toMillis(1)) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.schedule_activity),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                      // we force the start time to be before the end time
+                    } else if (!hourDateViewModel.isBeginGreaterThanEnd(
+                        startTime ?: "00:00", duration ?: "00:01")) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.startTime_before_endTime),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else {
+                      try {
+                        imageViewModel.uploadActivityImages(
+                            activity?.uid ?: "",
+                            selectedImages.toList(),
+                            { urls -> items = urls },
+                            { error ->
+                              Log.e(
+                                  "EditActivityScreen", "Failed to upload images: ${error.message}")
+                            })
+                        val updatedActivity =
+                            Activity(
+                                uid = activity?.uid ?: "",
+                                title = title,
+                                description = description,
+                                date = dueDate,
+                                startTime = startTime ?: "",
+                                duration =
+                                    hourDateViewModel.calculateDuration(
+                                        startTime ?: "", duration ?: ""),
+                                price = price.toDouble(),
+                                placesLeft = attendees.size.toLong(),
+                                maxPlaces = maxPlaces.toLongOrNull() ?: 0,
+                                creator = creator,
+                                status = ActivityStatus.ACTIVE,
+                                location = selectedLocation,
+                                images = activity?.images ?: listOf(),
+                                type = types.find { it.name == selectedOption } ?: types[0],
+                                participants = attendees,
+                                category =
+                                    categories.find { it.name == selectedOptionCategory }
+                                        ?: categories[0],
+                                comments = activity?.comments ?: listOf())
+                        listActivityViewModel.updateActivity(updatedActivity)
+                        navigationActions.navigateTo(Screen.OVERVIEW)
+                      } catch (_: Exception) {}
+                    }
                   }
-                  try {
-                    imageViewModel.uploadActivityImages(
-                        activity?.uid ?: "",
-                        selectedImages.toList(),
-                        { urls -> items = urls },
-                        { error ->
-                          Log.e("EditActivityScreen", "Failed to upload images: ${error.message}")
-                        })
-                    val updatedActivity =
-                        Activity(
-                            uid = activity?.uid ?: "",
-                            title = title,
-                            description = description,
-                            date = dueDate,
-                            startTime = startTime ?: "",
-                            duration =
-                                hourDateViewModel.calculateDuration(
-                                    startTime ?: "", duration ?: ""),
-                            price = price.toDouble(),
-                            placesLeft = attendees.size.toLong(),
-                            maxPlaces = maxPlaces.toLongOrNull() ?: 0,
-                            creator = creator,
-                            status = ActivityStatus.ACTIVE,
-                            location = selectedLocation,
-                            images = activity?.images ?: listOf(),
-                            type = types.find { it.name == selectedOption } ?: types[0],
-                            participants = attendees,
-                            category =
-                                categories.find { it.name == selectedOptionCategory }
-                                    ?: categories[0],
-                            comments = activity?.comments ?: listOf())
-                    listActivityViewModel.updateActivity(updatedActivity)
-                    navigationActions.navigateTo(Screen.OVERVIEW)
-                  } catch (_: Exception) {}
                 },
                 modifier =
                     Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("editButton"),
