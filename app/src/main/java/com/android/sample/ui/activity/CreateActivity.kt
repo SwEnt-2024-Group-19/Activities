@@ -92,9 +92,6 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
@@ -107,31 +104,31 @@ fun CreateActivityScreen(
     locationViewModel: LocationViewModel,
     imageViewModel: ImageViewModel
 ) {
-    val hourDateViewModel: HourDateViewModel = HourDateViewModel()
-    val context = LocalContext.current
-    val networkManager = NetworkManager(context)
-    var expandedType by remember { mutableStateOf(false) }
-    var expandedCategory by remember { mutableStateOf(false) }
-    var selectedOptionType by remember { mutableStateOf("Select a type") }
-    var selectedOptionCategory by remember { mutableStateOf("Select a category") }
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    var dateIsOpen by remember { mutableStateOf(false) }
-    var dateIsSet by remember { mutableStateOf(false) }
-    var startTimeIsOpen by remember { mutableStateOf(false) }
-    var startTimeIsSet by remember { mutableStateOf(false) }
-    var durationIsOpen by remember { mutableStateOf(false) }
-    var durationIsSet by remember { mutableStateOf(false) }
-    var price by remember { mutableStateOf("") }
-    var placesMax by remember { mutableStateOf("") }
-    var dueDate by remember { mutableStateOf(Timestamp.now()) }
-    var isCamOpen by remember { mutableStateOf(false) }
-    var isGalleryOpen by remember { mutableStateOf(false) }
-    var startTime by remember { mutableStateOf("") }
-    var duration by remember { mutableStateOf("") }
-    var showDialogUser by remember { mutableStateOf(false) }
-    var showDialogImage by remember { mutableStateOf(false) }
+  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
+  var expandedType by remember { mutableStateOf(false) }
+  var expandedCategory by remember { mutableStateOf(false) }
+  var selectedOptionType by remember { mutableStateOf("Select a type") }
+  var selectedOptionCategory by remember { mutableStateOf("Select a category") }
+  var title by remember { mutableStateOf("") }
+  var description by remember { mutableStateOf("") }
+  val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+  var dateIsOpen by remember { mutableStateOf(false) }
+  var dateIsSet by remember { mutableStateOf(false) }
+  var startTimeIsOpen by remember { mutableStateOf(false) }
+  var startTimeIsSet by remember { mutableStateOf(false) }
+  var durationIsOpen by remember { mutableStateOf(false) }
+  var durationIsSet by remember { mutableStateOf(false) }
+  var price by remember { mutableStateOf("") }
+  var placesMax by remember { mutableStateOf("") }
+  var dueDate by remember { mutableStateOf(Timestamp.now()) }
+  var isCamOpen by remember { mutableStateOf(false) }
+  var isGalleryOpen by remember { mutableStateOf(false) }
+  var startTime by remember { mutableStateOf("") }
+  var duration by remember { mutableStateOf("") }
+  var showDialogUser by remember { mutableStateOf(false) }
+  var showDialogImage by remember { mutableStateOf(false) }
 
   val maxTitleLength = 50
   val maxDescriptionLength = 500
@@ -485,204 +482,185 @@ fun CreateActivityScreen(
 
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
-                        Button(
-                            onClick = { showDialogUser = true },
-                            modifier =
-                            Modifier
-                                .width(BUTTON_WIDTH.dp)
-                                .height(BUTTON_HEIGHT.dp)
-                                .testTag("addAttendeeButton")
-                                .align(Alignment.CenterHorizontally),
-                        ) {
-                            Row(
-                                horizontalArrangement =
-                                Arrangement.spacedBy(
-                                    STANDARD_PADDING.dp,
-                                    Alignment.CenterHorizontally
-                                ),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Icon(
-                                    Icons.Filled.Add,
-                                    contentDescription = "add a new attendee",
-                                )
-                                Text("Add Attendee")
-                            }
-                        }
-                        if (attendees.isNotEmpty()) {
-                            LazyRow(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .height(85.dp)
-                                    .padding(STANDARD_PADDING.dp),
-                            ) {
-                                items(attendees.size) { index ->
-                                    AttendantPreview(
-                                        onProfileClick = {},
-                                        imageViewModel = imageViewModel,
-                                        deleteAttendant = { user ->
-                                            attendees = attendees.filter { it != user }
-                                        },
-                                        user = attendees[index],
-                                        index = index
-                                    )
-                                }
-                            }
-                        }
-                        if (showDialogUser) {
-                            AddUserDialog(
-                                onDismiss = { showDialogUser = false },
-                                onAddUser = { user -> attendees = attendees + user },
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
-                        Button(
-                            enabled =
-                            title.isNotEmpty() &&
-                                    description.isNotEmpty() &&
-                                    price.isNotEmpty() &&
-                                    placesMax.isNotEmpty() &&
-                                    selectedLocation != null &&
-                                    selectedOptionType != "Select a type" &&
-                                    selectedOptionCategory != "Select a category" &&
-                                    startTime.isNotEmpty() &&
-                                    duration.isNotEmpty() &&
-                                    dueDate.toDate().after(Timestamp.now().toDate()),
-                            onClick = {
-                                val activityId = listActivityViewModel.getNewUid()
-
-                                val activityTimestamps = hourDateViewModel.combineDateAndTime(dueDate, startTime)
-                                val activityDateTime = activityTimestamps.toInstant().toEpochMilli()
-
-                                // we disable creating activities 1 hour before start time
-                                if (activityDateTime - System.currentTimeMillis() <
-                                    TimeUnit.HOURS.toMillis(1)) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.schedule_activity),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@Button
-                                } else if (creator == "") {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.login_check_in_create),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@Button
-                                } else if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.startTime_before_endTime),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@Button
-                                } else if (price.toDoubleOrNull() == null) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.invalid_price_format),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@Button
-                                } else if (placesMax.toLongOrNull() == null) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.invalid_places_format),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@Button
-                                } else if (selectedLocation == null) {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.invalid_no_location),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    return@Button
-                                } else {
-                                    if (selectedOptionType == ActivityType.INDIVIDUAL.name)
-                                        profileViewModel.userState.value?.let { user -> attendees += user }
-                                    try {
-                                        imageViewModel.uploadActivityImages(
-                                            activityId,
-                                            selectedImages,
-                                            onSuccess = { imageUrls ->
-                                                items.addAll(imageUrls) // Store URLs in items to retrieve later
-                                            },
-                                            onFailure = { exception ->
-                                                Toast.makeText(
-                                                    context,
-                                                    "Failed to upload images: ${exception.message}",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                    .show()
-                                            })
-                                        val activity =
-                                            Activity(
-                                                uid = activityId,
-                                                title = title,
-                                                description = description,
-                                                date = dueDate,
-                                                startTime = startTime,
-                                                duration = hourDateViewModel.calculateDuration(
-                                                    startTime,
-                                                    duration
-                                                ),
-                                                price = price.toDouble(),
-                                                placesLeft = attendees.size.toLong(),
-                                                maxPlaces = placesMax.toLongOrNull() ?: 0,
-                                                creator = creator,
-                                                status = ActivityStatus.ACTIVE,
-                                                location = selectedLocation,
-                                                images = items,
-                                                participants = attendees,
-                                                type = types.find { it.name == selectedOptionType }
-                                                    ?: types[1],
-                                                comments = listOf(),
-                                                category =
-                                                categories.find { it.name == selectedOptionCategory }
-                                                    ?: categories[0])
-                                        listActivityViewModel.addActivity(activity)
-                                        profileViewModel.addActivity(creator, activity.uid)
-                                        navigationActions.navigateTo(Screen.OVERVIEW)
-                                    } catch (_: NumberFormatException) {
-                                        println("There is an error")
-                                    }
-                                }
-                            },
-                            modifier =
-                            Modifier
-                                .width(BUTTON_WIDTH.dp)
-                                .height(BUTTON_HEIGHT.dp)
-                                .testTag("createButton")
-                                .align(Alignment.CenterHorizontally),
-                        ) {
-                            Row(
-                                horizontalArrangement =
-                                Arrangement.spacedBy(
-                                    STANDARD_PADDING.dp,
-                                    Alignment.CenterHorizontally
-                                ),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Icon(
-                                    Icons.Filled.Add,
-                                    contentDescription = "add a new activity",
-                                )
-                                Text(text = stringResource(id = R.string.button_create_activity))
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-                    }
+              Button(
+                  onClick = { showDialogUser = true },
+                  modifier =
+                      Modifier.width(BUTTON_WIDTH.dp)
+                          .height(BUTTON_HEIGHT.dp)
+                          .testTag("addAttendeeButton")
+                          .align(Alignment.CenterHorizontally),
+              ) {
+                Row(
+                    horizontalArrangement =
+                        Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                  Icon(
+                      Icons.Filled.Add,
+                      contentDescription = "add a new attendee",
+                  )
+                  Text("Add Attendee")
                 }
+              }
+              if (attendees.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier.fillMaxHeight().height(85.dp).padding(STANDARD_PADDING.dp),
+                ) {
+                  items(attendees.size) { index ->
+                    AttendantPreview(
+                        onProfileClick = {},
+                        imageViewModel = imageViewModel,
+                        deleteAttendant = { user -> attendees = attendees.filter { it != user } },
+                        user = attendees[index],
+                        index = index)
+                  }
+                }
+              }
+              if (showDialogUser) {
+                AddUserDialog(
+                    onDismiss = { showDialogUser = false },
+                    onAddUser = { user -> attendees = attendees + user },
+                )
+              }
+              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
+              Button(
+                  enabled =
+                      title.isNotEmpty() &&
+                          description.isNotEmpty() &&
+                          price.isNotEmpty() &&
+                          placesMax.isNotEmpty() &&
+                          selectedLocation != null &&
+                          selectedOptionType != "Select a type" &&
+                          selectedOptionCategory != "Select a category" &&
+                          startTime.isNotEmpty() &&
+                          duration.isNotEmpty() &&
+                          dueDate.toDate().after(Timestamp.now().toDate()),
+                  onClick = {
+                    val activityId = listActivityViewModel.getNewUid()
+
+                    val activityTimestamps =
+                        hourDateViewModel.combineDateAndTime(dueDate, startTime)
+                    val activityDateTime = activityTimestamps.toInstant().toEpochMilli()
+
+                    // we disable creating activities 1 hour before start time
+                    if (activityDateTime - System.currentTimeMillis() <
+                        TimeUnit.HOURS.toMillis(1)) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.schedule_activity),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (creator == "") {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.login_check_in_create),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.startTime_before_endTime),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (price.toDoubleOrNull() == null) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_price_format),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (placesMax.toLongOrNull() == null) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_places_format),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (selectedLocation == null) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_no_location),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else {
+                      if (selectedOptionType == ActivityType.INDIVIDUAL.name)
+                          profileViewModel.userState.value?.let { user -> attendees += user }
+                      try {
+                        imageViewModel.uploadActivityImages(
+                            activityId,
+                            selectedImages,
+                            onSuccess = { imageUrls ->
+                              items.addAll(imageUrls) // Store URLs in items to retrieve later
+                            },
+                            onFailure = { exception ->
+                              Toast.makeText(
+                                      context,
+                                      "Failed to upload images: ${exception.message}",
+                                      Toast.LENGTH_SHORT)
+                                  .show()
+                            })
+                        val activity =
+                            Activity(
+                                uid = activityId,
+                                title = title,
+                                description = description,
+                                date = dueDate,
+                                startTime = startTime,
+                                duration = hourDateViewModel.calculateDuration(startTime, duration),
+                                price = price.toDouble(),
+                                placesLeft = attendees.size.toLong(),
+                                maxPlaces = placesMax.toLongOrNull() ?: 0,
+                                creator = creator,
+                                status = ActivityStatus.ACTIVE,
+                                location = selectedLocation,
+                                images = items,
+                                participants = attendees,
+                                type = types.find { it.name == selectedOptionType } ?: types[1],
+                                comments = listOf(),
+                                category =
+                                    categories.find { it.name == selectedOptionCategory }
+                                        ?: categories[0])
+                        listActivityViewModel.addActivity(activity)
+                        profileViewModel.addActivity(creator, activity.uid)
+                        navigationActions.navigateTo(Screen.OVERVIEW)
+                      } catch (_: NumberFormatException) {
+                        println("There is an error")
+                      }
+                    }
+                  },
+                  modifier =
+                      Modifier.width(BUTTON_WIDTH.dp)
+                          .height(BUTTON_HEIGHT.dp)
+                          .testTag("createButton")
+                          .align(Alignment.CenterHorizontally),
+              ) {
+                Row(
+                    horizontalArrangement =
+                        Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                  Icon(
+                      Icons.Filled.Add,
+                      contentDescription = "add a new activity",
+                  )
+                  Text(text = stringResource(id = R.string.button_create_activity))
+                }
+              }
+              Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
             }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { route -> navigationActions.navigateTo(route) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.ADD_ACTIVITY
-            )
-        })
+          }
+        }
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.ADD_ACTIVITY)
+      })
 }
 
 @Composable

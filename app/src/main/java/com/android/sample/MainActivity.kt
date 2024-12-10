@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
       ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
 
-      requestNotificationPermission()
+    requestNotificationPermission()
 
     // Alarm permissions
     requestAlarmPermission()
