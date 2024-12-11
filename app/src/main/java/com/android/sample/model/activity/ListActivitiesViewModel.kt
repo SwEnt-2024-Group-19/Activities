@@ -140,6 +140,14 @@ constructor(
   }
 
   fun deleteActivityById(id: String) {
+    // Get activity before deletion to access its data
+    val activityToDelete =
+        (_uiState.value as? ActivitiesUiState.Success)?.activities?.find { it.uid == id }
+
+    activityToDelete?.let { activity ->
+      // Send deletion notification (which also cancels any scheduled notifications)
+      App.getInstance().sendDeletionNotification(activity)
+    }
     repository.deleteActivityById(id, { getActivities() }, {})
   }
 
