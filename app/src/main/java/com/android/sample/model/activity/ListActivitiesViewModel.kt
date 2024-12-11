@@ -14,12 +14,12 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @HiltViewModel
 open class ListActivitiesViewModel
@@ -29,252 +29,275 @@ constructor(
     private val repository: ActivitiesRepository,
 ) : ViewModel() {
 
-  private val selectedActivity_ = MutableStateFlow<Activity?>(null)
-  open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
+    private val selectedActivity_ = MutableStateFlow<Activity?>(null)
+    open val selectedActivity: StateFlow<Activity?> = selectedActivity_.asStateFlow()
 
-  private val selectedUser_ = MutableStateFlow<User?>(null)
-  open val selectedUser: StateFlow<User?> = selectedUser_.asStateFlow()
+    private val selectedUser_ = MutableStateFlow<User?>(null)
+    open val selectedUser: StateFlow<User?> = selectedUser_.asStateFlow()
 
-  private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
-  open val uiState: StateFlow<ActivitiesUiState> = _uiState
+    private val _uiState =
+        MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
+    open val uiState: StateFlow<ActivitiesUiState> = _uiState
 
-  // Filter state variables
-  var maxPrice by mutableStateOf(Double.MAX_VALUE)
-  var availablePlaces by mutableStateOf<Int?>(null)
-  var minDate by mutableStateOf<Timestamp?>(null)
-  var maxDate by mutableStateOf<Timestamp?>(null)
+    // Filter state variables
+    var maxPrice by mutableStateOf(Double.MAX_VALUE)
+    var availablePlaces by mutableStateOf<Int?>(null)
+    var minDate by mutableStateOf<Timestamp?>(null)
+    var maxDate by mutableStateOf<Timestamp?>(null)
 
-  var startTime by mutableStateOf<String?>(null)
-  var endTime by mutableStateOf<String?>(null)
-  var distance by mutableStateOf<Double?>(null)
-  var onlyPRO by mutableStateOf(false)
+    var startTime by mutableStateOf<String?>(null)
+    var endTime by mutableStateOf<String?>(null)
+    var distance by mutableStateOf<Double?>(null)
+    var onlyPRO by mutableStateOf(false)
 
-  /** Set the UI state to a new value For testing purposes only */
-  open fun setUiState(state: ActivitiesUiState) {
-    _uiState.value = state
-  }
-
-  private val cachedScores_ = mutableMapOf<String, Double>()
-  open val cachedScores = cachedScores_
-
-  init {
-    repository.init { viewModelScope.launch { getActivities() } }
-  }
-
-  // Function to update filter state
-  fun updateFilterState(
-      price: Double?,
-      placesAvailable: Int?,
-      minDateTimestamp: Timestamp?,
-      maxDateTimestamp: Timestamp?,
-      startTime: String?,
-      endTime: String?,
-      distance: Double?,
-      seeOnlyPRO: Boolean?
-  ) {
-    maxPrice = price ?: Double.MAX_VALUE
-    availablePlaces = placesAvailable
-    minDate = minDateTimestamp
-    maxDate = maxDateTimestamp
-    this.startTime = startTime
-    this.endTime = endTime
-    this.distance = distance
-    onlyPRO = seeOnlyPRO ?: false
-  }
-
-  fun getNewUid(): String {
-    return repository.getNewUid()
-  }
-
-  fun addActivity(activity: Activity) {
-    repository.addActivity(
-        activity,
-        {
-          getActivities()
-          viewModelScope.launch {
-            try {
-              Firebase.auth.currentUser?.uid?.let { currentUserId ->
-                profilesRepository.getUser(
-                    userId = currentUserId,
-                    onSuccess = { currentUser ->
-                      if (currentUser != null) {
-                        App.getInstance()
-                            .scheduleNotification(
-                                activity = activity, isCreator = activity.creator == currentUser.id)
-                      }
-                    },
-                    onFailure = { e ->
-                      Log.e("ListActivitiesViewModel", "Failed to schedule notification", e)
-                    })
-              }
-            } catch (e: Exception) {
-              Log.e("ListActivitiesViewModel", "Error scheduling notification", e)
-            }
-          }
-        },
-        { error -> Log.e("ListActivitiesViewModel", "Failed to add activity", error) })
-  }
-
-  fun updateActivity(activity: Activity) {
-    repository.updateActivity(
-        activity,
-        {
-          getActivities()
-          // notification scheduling
-          Firebase.auth.currentUser?.uid?.let { currentUserId ->
-            profilesRepository.getUser(
-                userId = currentUserId,
-                onSuccess = { currentUser ->
-                  if (currentUser != null) {
-                    App.getInstance()
-                        .scheduleNotification(
-                            activity = activity, isCreator = activity.creator == currentUser.id)
-                  }
-                },
-                onFailure = { e ->
-                  Log.e("ListActivitiesViewModel", "Failed to schedule notification for update", e)
-                })
-          }
-        },
-        {})
-  }
-
-  fun deleteActivityById(id: String) {
-    repository.deleteActivityById(id, { getActivities() }, {})
-  }
-
-  fun selectActivity(activity: Activity) {
-    selectedActivity_.value = activity
-  }
-
-  fun selectUser(user: User) {
-    selectedUser_.value = user
-  }
-
-  fun getActivities(onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit = {}) {
-
-    val onS = { activities: List<Activity> ->
-      _uiState.value = ActivitiesUiState.Success(activities)
-      onSuccess()
+    /** Set the UI state to a new value For testing purposes only */
+    open fun setUiState(state: ActivitiesUiState) {
+        _uiState.value = state
     }
-    val onF = { exception: Exception ->
-      _uiState.value = ActivitiesUiState.Error(exception)
-      onFailure(exception)
+
+    private val cachedScores_ = mutableMapOf<String, Double>()
+    open val cachedScores = cachedScores_
+
+    init {
+        repository.init { viewModelScope.launch { getActivities() } }
     }
-    repository.getActivities(onS, onF)
-  }
 
-  fun reviewActivity(activity: Activity, userId: String, review: Boolean?) {
-    val newLikes = activity.likes.plus(userId to review)
-    val newActivity = activity.copy(likes = newLikes)
-    updateActivity(newActivity)
-  }
+    // Function to update filter state
+    fun updateFilterState(
+        price: Double?,
+        placesAvailable: Int?,
+        minDateTimestamp: Timestamp?,
+        maxDateTimestamp: Timestamp?,
+        startTime: String?,
+        endTime: String?,
+        distance: Double?,
+        seeOnlyPRO: Boolean?
+    ) {
+        maxPrice = price ?: Double.MAX_VALUE
+        availablePlaces = placesAvailable
+        minDate = minDateTimestamp
+        maxDate = maxDateTimestamp
+        this.startTime = startTime
+        this.endTime = endTime
+        this.distance = distance
+        onlyPRO = seeOnlyPRO ?: false
+    }
 
-  fun sortActivitiesByScore(user: User, distanceTo: (Location?) -> Float?) {
-    val activities =
-        (_uiState.value as? ActivitiesUiState.Success)?.activities?.sortedByDescending {
-          calculateActivityScore(it, user, distanceTo)
+    fun getNewUid(): String {
+        return repository.getNewUid()
+    }
+
+    fun addActivity(activity: Activity) {
+        repository.addActivity(
+            activity,
+            {
+                getActivities()
+                viewModelScope.launch {
+                    try {
+                        Firebase.auth.currentUser?.uid?.let { currentUserId ->
+                            profilesRepository.getUser(
+                                userId = currentUserId,
+                                onSuccess = { currentUser ->
+                                    if (currentUser != null) {
+                                        App.getInstance()
+                                            .scheduleNotification(
+                                                activity = activity,
+                                                isCreator = activity.creator == currentUser.id
+                                            )
+                                    }
+                                },
+                                onFailure = { e ->
+                                    Log.e(
+                                        "ListActivitiesViewModel",
+                                        "Failed to schedule notification",
+                                        e
+                                    )
+                                })
+                        }
+                    } catch (e: Exception) {
+                        Log.e("ListActivitiesViewModel", "Error scheduling notification", e)
+                    }
+                }
+            },
+            { error -> Log.e("ListActivitiesViewModel", "Failed to add activity", error) })
+    }
+
+    fun updateActivity(activity: Activity) {
+        repository.updateActivity(
+            activity,
+            {
+                getActivities()
+                // notification scheduling
+                Firebase.auth.currentUser?.uid?.let { currentUserId ->
+                    profilesRepository.getUser(
+                        userId = currentUserId,
+                        onSuccess = { currentUser ->
+                            if (currentUser != null) {
+                                App.getInstance()
+                                    .scheduleNotification(
+                                        activity = activity,
+                                        isCreator = activity.creator == currentUser.id
+                                    )
+                            }
+                        },
+                        onFailure = { e ->
+                            Log.e(
+                                "ListActivitiesViewModel",
+                                "Failed to schedule notification for update",
+                                e
+                            )
+                        })
+                }
+            },
+            {})
+    }
+
+    fun deleteActivityById(id: String) {
+        // Get activity before deletion to access its data
+        val activityToDelete = (_uiState.value as? ActivitiesUiState.Success)?.activities
+            ?.find { it.uid == id }
+
+        activityToDelete?.let { activity ->
+            // Send deletion notification (which also cancels any scheduled notifications)
+            App.getInstance().sendDeletionNotification(activity)
         }
+        repository.deleteActivityById(id, { getActivities() }, {})
+    }
 
-    if (activities != null) _uiState.value = ActivitiesUiState.Success(activities)
-  }
+    fun selectActivity(activity: Activity) {
+        selectedActivity_.value = activity
+    }
 
-  open fun getWeights(): Map<String, Double> {
-    return mapOf(
-        "distance" to 0.2,
-        "date" to 0.15,
-        "interest" to 0.25,
-        "participation" to 0.15,
-        "completion" to 0.1,
-        "price" to 0.15)
-  }
+    fun selectUser(user: User) {
+        selectedUser_.value = user
+    }
 
-  open fun calculateDistanceScore(distance: Float?): Double {
-    val MAX_DISTANCE = 100.0 // 100 km
-    if (distance == null) return 0.0
-    return 1 - (distance / MAX_DISTANCE).coerceAtMost(1.0)
-  }
+    fun getActivities(onSuccess: () -> Unit = {}, onFailure: (Exception) -> Unit = {}) {
 
-  open fun calculateDateScore(date: Timestamp): Double {
-    val MAX_HOURS = 96.0 // 4 days
-    val hoursBetween = calculateHoursBetween(Timestamp.now(), date)?.toDouble() ?: return 0.0
+        val onS = { activities: List<Activity> ->
+            _uiState.value = ActivitiesUiState.Success(activities)
+            onSuccess()
+        }
+        val onF = { exception: Exception ->
+            _uiState.value = ActivitiesUiState.Error(exception)
+            onFailure(exception)
+        }
+        repository.getActivities(onS, onF)
+    }
 
-    return 1 - (hoursBetween / MAX_HOURS).coerceAtMost(1.0)
-  }
+    fun reviewActivity(activity: Activity, userId: String, review: Boolean?) {
+        val newLikes = activity.likes.plus(userId to review)
+        val newActivity = activity.copy(likes = newLikes)
+        updateActivity(newActivity)
+    }
 
-  open fun calculateHoursBetween(start: Timestamp, end: Timestamp): Long? {
-    val startMillis = start.toDate().time
-    val endMillis = end.toDate().time
+    fun sortActivitiesByScore(user: User, distanceTo: (Location?) -> Float?) {
+        val activities =
+            (_uiState.value as? ActivitiesUiState.Success)?.activities?.sortedByDescending {
+                calculateActivityScore(it, user, distanceTo)
+            }
 
-    if (startMillis > endMillis) return null
+        if (activities != null) _uiState.value = ActivitiesUiState.Success(activities)
+    }
 
-    val differenceMillis = endMillis - startMillis
-    return TimeUnit.MILLISECONDS.toHours(differenceMillis)
-  }
+    open fun getWeights(): Map<String, Double> {
+        return mapOf(
+            "distance" to 0.2,
+            "date" to 0.15,
+            "interest" to 0.25,
+            "participation" to 0.15,
+            "completion" to 0.1,
+            "price" to 0.15
+        )
+    }
 
-  open fun calculateInterestScore(): Double {
-    // return user.interests.count { it == activity.category }.toDouble() /
-    // user.interests.size.coerceAtLeast(1) TODO in Sprint 7
-    return 0.0
-  }
+    open fun calculateDistanceScore(distance: Float?): Double {
+        val MAX_DISTANCE = 100.0 // 100 km
+        if (distance == null) return 0.0
+        return 1 - (distance / MAX_DISTANCE).coerceAtMost(1.0)
+    }
 
-  open fun calculateParticipationScore(userActivities: List<String>?, creator: String): Double {
-    var participationScore = 0.0
-    if (userActivities.isNullOrEmpty() || creator.isEmpty()) return participationScore
-    profilesRepository.getUser(
-        creator,
-        { creatorLambda ->
-          val matchingActivities =
-              creatorLambda?.activities?.count { userActivities.contains(it) } ?: 0
-          participationScore = (matchingActivities.toDouble() / 10).coerceAtMost(1.0)
-        },
-        { participationScore = 0.0 })
-    return participationScore
-  }
+    open fun calculateDateScore(date: Timestamp): Double {
+        val MAX_HOURS = 96.0 // 4 days
+        val hoursBetween = calculateHoursBetween(Timestamp.now(), date)?.toDouble() ?: return 0.0
 
-  open fun calculateCompletionScore(numberParticipants: Int, maxPlaces: Long): Double {
-    if (maxPlaces == 0L || numberParticipants == 0 || numberParticipants > maxPlaces.toInt())
+        return 1 - (hoursBetween / MAX_HOURS).coerceAtMost(1.0)
+    }
+
+    open fun calculateHoursBetween(start: Timestamp, end: Timestamp): Long? {
+        val startMillis = start.toDate().time
+        val endMillis = end.toDate().time
+
+        if (startMillis > endMillis) return null
+
+        val differenceMillis = endMillis - startMillis
+        return TimeUnit.MILLISECONDS.toHours(differenceMillis)
+    }
+
+    open fun calculateInterestScore(): Double {
+        // return user.interests.count { it == activity.category }.toDouble() /
+        // user.interests.size.coerceAtLeast(1) TODO in Sprint 7
         return 0.0
-    return (numberParticipants.toDouble() / maxPlaces).coerceAtMost(1.0)
-  }
+    }
 
-  open fun calculatePriceScore(price: Double): Double {
-    val MAX_PRICE = 100.0 // Maximum reasonable price
-    return 1 - (price / MAX_PRICE).coerceAtMost(1.0)
-  }
+    open fun calculateParticipationScore(userActivities: List<String>?, creator: String): Double {
+        var participationScore = 0.0
+        if (userActivities.isNullOrEmpty() || creator.isEmpty()) return participationScore
+        profilesRepository.getUser(
+            creator,
+            { creatorLambda ->
+                val matchingActivities =
+                    creatorLambda?.activities?.count { userActivities.contains(it) } ?: 0
+                participationScore = (matchingActivities.toDouble() / 10).coerceAtMost(1.0)
+            },
+            { participationScore = 0.0 })
+        return participationScore
+    }
 
-  open fun calculateActivityScore(
-      activity: Activity,
-      user: User,
-      distanceTo: (Location?) -> Float?
-  ): Double {
-    val weights = getWeights()
-    val totalWeights = weights.values.sum()
+    open fun calculateCompletionScore(numberParticipants: Int, maxPlaces: Long): Double {
+        if (maxPlaces == 0L || numberParticipants == 0 || numberParticipants > maxPlaces.toInt())
+            return 0.0
+        return (numberParticipants.toDouble() / maxPlaces).coerceAtMost(1.0)
+    }
 
-    if (cachedScores_.containsKey(activity.uid)) return cachedScores_[activity.uid]!!
+    open fun calculatePriceScore(price: Double): Double {
+        val MAX_PRICE = 100.0 // Maximum reasonable price
+        return 1 - (price / MAX_PRICE).coerceAtMost(1.0)
+    }
 
-    val distanceScore = calculateDistanceScore(distanceTo(activity.location))
-    val dateScore = calculateDateScore(activity.date)
-    val interestScore = calculateInterestScore()
-    val participationScore = calculateParticipationScore(user.activities, activity.creator)
-    val completionScore = calculateCompletionScore(activity.participants.size, activity.maxPlaces)
-    val priceScore = calculatePriceScore(activity.price)
+    open fun calculateActivityScore(
+        activity: Activity,
+        user: User,
+        distanceTo: (Location?) -> Float?
+    ): Double {
+        val weights = getWeights()
+        val totalWeights = weights.values.sum()
 
-    val score =
-        (distanceScore * weights["distance"]!! +
-            dateScore * weights["date"]!! +
-            interestScore * weights["interest"]!! +
-            participationScore * weights["participation"]!! +
-            completionScore * weights["completion"]!! +
-            priceScore * weights["price"]!!) / totalWeights
+        if (cachedScores_.containsKey(activity.uid)) return cachedScores_[activity.uid]!!
 
-    cachedScores_[activity.uid] = score
-    return score
-  }
+        val distanceScore = calculateDistanceScore(distanceTo(activity.location))
+        val dateScore = calculateDateScore(activity.date)
+        val interestScore = calculateInterestScore()
+        val participationScore = calculateParticipationScore(user.activities, activity.creator)
+        val completionScore =
+            calculateCompletionScore(activity.participants.size, activity.maxPlaces)
+        val priceScore = calculatePriceScore(activity.price)
 
-  sealed class ActivitiesUiState {
-    data class Success(val activities: List<Activity>) : ActivitiesUiState()
+        val score =
+            (distanceScore * weights["distance"]!! +
+                    dateScore * weights["date"]!! +
+                    interestScore * weights["interest"]!! +
+                    participationScore * weights["participation"]!! +
+                    completionScore * weights["completion"]!! +
+                    priceScore * weights["price"]!!) / totalWeights
 
-    data class Error(val exception: Exception) : ActivitiesUiState()
-  }
+        cachedScores_[activity.uid] = score
+        return score
+    }
+
+    sealed class ActivitiesUiState {
+        data class Success(val activities: List<Activity>) : ActivitiesUiState()
+
+        data class Error(val exception: Exception) : ActivitiesUiState()
+    }
 }
