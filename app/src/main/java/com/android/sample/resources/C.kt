@@ -42,6 +42,7 @@ object C {
 
     const val TITLE_FONTSIZE = 24
 
+    const val IMAGE_IN_BUTTON_DEFAULT = 24
     const val TEXT_PADDING = 40
 
     const val DIALOG_PADDING = 600

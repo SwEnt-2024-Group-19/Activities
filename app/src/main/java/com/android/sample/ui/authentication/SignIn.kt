@@ -32,11 +32,14 @@ import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
+import com.android.sample.resources.C.Tag.IMAGE_IN_BUTTON_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.LINE_STROKE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
 import com.android.sample.ui.components.EmailTextField
@@ -265,9 +268,9 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   Card(
-      modifier = Modifier.fillMaxWidth(0.7f).testTag("GoogleCard"),
+      modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("GoogleCard"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-      elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
       shape = RoundedCornerShape(12.dp),
   ) {
     Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
@@ -276,15 +279,15 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
             performOfflineAwareAction(
                 context = context, networkManager = networkManager, onPerform = onSignInClick)
           },
-          shape = RoundedCornerShape(12.dp),
+          shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
           modifier = Modifier.height(BUTTON_HEIGHT.dp).fillMaxWidth().testTag("GoogleSignInButton"),
-          border = BorderStroke(1.dp, Color.Transparent) // Transparent indicator
+          border = BorderStroke(LINE_STROKE.dp, Color.Transparent) // Transparent indicator
           ) {
             Image(
                 painter = painterResource(id = R.drawable.google_logo),
                 contentDescription = "Google Sign-In",
-                modifier = Modifier.size(24.dp))
-            Spacer(Modifier.width(8.dp))
+                modifier = Modifier.size(IMAGE_IN_BUTTON_DEFAULT.dp))
+            Spacer(Modifier.width(STANDARD_PADDING.dp))
             Text("Login with Google", fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
           }
     }
