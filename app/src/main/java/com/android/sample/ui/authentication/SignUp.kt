@@ -120,7 +120,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                       !isValidEmail(emailState.value) -> {
                         emailErrorState.value =
                             "Please enter a valid email address" // Set the error message if email
-                                                                 // is
+                        // is
                         // invalid
                       }
                       passwordState.value.isEmpty() -> {
@@ -130,7 +130,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                       passwordState.value.length < 6 -> {
                         passwordErrorState.value =
                             "Password must be at least 6 characters long" // Set the error message
-                                                                          // for
+                        // for
                         // short passwords
                       }
                       else -> {
