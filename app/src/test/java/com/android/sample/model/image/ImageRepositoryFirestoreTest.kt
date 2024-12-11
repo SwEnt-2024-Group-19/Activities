@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
@@ -16,6 +17,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
 import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
@@ -203,5 +205,144 @@ class ImageRepositoryFirestoreTest {
           assertEquals(expectedBitmaps, resultBitmaps)
         },
         {})
+  }
+
+  @Test
+  fun fetchProfileImageUrl_failure() {
+    val userId = "testUserId"
+    `when`(mockStorageRef.child("users/$userId/profile_picture.jpg")).thenReturn(mockStorageRef)
+    `when`(mockStorageRef.downloadUrl)
+        .thenReturn(Tasks.forException(Exception("Failed to fetch URL")))
+
+    var errorOccurred = false
+    imageRepository.fetchProfileImageUrl(
+        userId,
+        {},
+        {
+          errorOccurred = true
+          assertTrue("Error should have been triggered", errorOccurred)
+        })
+  }
+
+  @Test
+  fun uploadProfilePicture_failure() {
+    val userId = "userId"
+    val bitmap = mock(Bitmap::class.java)
+    val baos = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+    val imageData = baos.toByteArray()
+
+    `when`(mockStorageRef.child("users/$userId/profile_picture.jpg")).thenReturn(mockStorageRef)
+    `when`(mockStorageRef.putBytes(imageData)).thenReturn(mockUploadTask)
+
+    // Ensure onSuccess returns the mockUploadTask to allow chaining
+    `when`(mockUploadTask.addOnSuccessListener(any())).thenReturn(mockUploadTask)
+    // Correct chaining for onFailureListener
+    `when`(mockUploadTask.addOnFailureListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnFailureListener>(0)
+      listener.onFailure(Exception("Failed to upload image"))
+      mockUploadTask // Continue the chain by returning the mockUploadTask
+    }
+
+    var errorOccurred = false
+    imageRepository.uploadProfilePicture(
+        userId,
+        bitmap,
+        {},
+        {
+          errorOccurred = true
+          assertTrue("Error should have been triggered", errorOccurred)
+        })
+  }
+
+  @Test
+  fun uploadActivityImages_failure() {
+    val activityId = "activityId"
+    val bitmap = mock(Bitmap::class.java)
+    val baos = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+    val imageData = baos.toByteArray()
+
+    // Setup Firestore collection and document references
+    `when`(mockFirestore.collection("activities")).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(activityId)).thenReturn(mockDocumentReference)
+
+    // Setup Storage references and upload task
+    `when`(mockStorageRef.child("activities/$activityId")).thenReturn(mockStorageRef)
+    `when`(mockStorageRef.putBytes(imageData)).thenReturn(mockUploadTask)
+
+    // Mock the listAll() method to return a successful task with empty results to simulate an empty
+    // directory
+    val mockListResult = mock(ListResult::class.java)
+    `when`(mockListResult.items).thenReturn(emptyList())
+    `when`(mockStorageRef.listAll()).thenReturn(Tasks.forResult(mockListResult))
+
+    // Setup failure for the upload task
+    `when`(mockUploadTask.addOnFailureListener(any())).thenAnswer { invocation ->
+      val listener = invocation.getArgument<OnFailureListener>(0)
+      listener.onFailure(Exception("Failed to upload activity images"))
+      mockUploadTask // Ensuring we return the mock upload task for chaining
+    }
+
+    var errorOccurred = false
+    imageRepository.uploadActivityImages(
+        activityId,
+        listOf(bitmap),
+        {},
+        {
+          errorOccurred = true
+          assertTrue("Error should have been triggered", errorOccurred)
+        })
+  }
+
+  @Test
+  fun fetchActivityImageUrls_failure() {
+    val activityId = "activityId"
+
+    // Ensure the Firestore collection reference is properly mocked
+    `when`(mockFirestore.collection("activities")).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(activityId)).thenReturn(mockDocumentReference)
+
+    // Setup the failure response for the document fetch
+    `when`(mockDocumentReference.get())
+        .thenReturn(Tasks.forException(Exception("Failed to fetch document")))
+
+    var errorOccurred = false
+    imageRepository.fetchActivityImageUrls(
+        activityId,
+        {},
+        {
+          errorOccurred = true
+          assertTrue("Error should have been triggered", errorOccurred)
+        })
+  }
+
+  @Test
+  fun fetchActivityImagesAsBitmaps_failure() {
+    val activityId = "activityId"
+    val urls = listOf("https://example.com/image1.jpg", "https://example.com/image2.jpg")
+
+    // Ensure the Firestore collection reference is properly mocked
+    `when`(mockFirestore.collection("activities")).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document(activityId)).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
+    `when`(mockDocumentSnapshot.exists()).thenReturn(true)
+    `when`(mockDocumentSnapshot.get("images")).thenReturn(urls)
+
+    // Mock the StorageReference and failure scenario for fetching each image
+    urls.forEach { url ->
+      `when`(mockStorage.getReferenceFromUrl(url)).thenReturn(mockStorageRef)
+      `when`(mockStorageRef.getBytes(Long.MAX_VALUE))
+          .thenReturn(Tasks.forException(Exception("Failed to fetch image data")))
+    }
+
+    var errorOccurred = false
+    imageRepository.fetchActivityImagesAsBitmaps(
+        activityId,
+        {},
+        {
+          errorOccurred = true
+          assertTrue("Error should have been triggered", errorOccurred)
+        })
   }
 }
