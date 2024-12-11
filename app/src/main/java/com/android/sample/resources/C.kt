@@ -1,5 +1,6 @@
 package com.android.sample.resources
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -89,5 +90,16 @@ object C {
     const val BORDER_STROKE_SM = 1
     // errors
     const val OFFLINE_TOAST_MESSAGE = "You are offline. Action not allowed."
+
+    // colors categories
+    val SPORT_COLOR = Color(0xFFC0EDAD)
+    val CULTURE_COLOR = Color(0xFFD0B0E0)
+    val SKILLS_COLOR = Color(0xFFC8E7F2)
+    val OUTDOOR_COLOR = Color(0xFFC8E7F2)
+    val INDOOR_COLOR = Color(0xFFE8D8C9)
+    val ENTERTAINMENT_COLOR = Color(0xFFFFCE7A)
+    val CULTURAL_ACTIVITY_COLOR = Color(0xFFFFCE7A)
+    val MUSICAL_ACTIVITY_COLOR = Color(0xFFFBF2C4)
+    val ART_ACTIVITY_COLOR = Color(0xFFE4BABE)
   }
 }
