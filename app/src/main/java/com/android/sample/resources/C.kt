@@ -28,6 +28,8 @@ object C {
 
     const val BUTTON_HEIGHT = 40
 
+    const val AUTH_BUTTON_HEIGHT = 60
+
     const val LARGE_BUTTON_HEIGHT = 50
 
     const val MEDIUM_PADDING = 16
@@ -36,8 +38,11 @@ object C {
 
     const val SMALL_PADDING = 4
 
+    const val EXTRA_LARGE_PADDING = 32
+
     const val TITLE_FONTSIZE = 24
 
+    const val IMAGE_IN_BUTTON_DEFAULT = 24
     const val TEXT_PADDING = 40
 
     const val DIALOG_PADDING = 600
@@ -69,10 +74,19 @@ object C {
 
     const val TEXT_FONTSIZE = 12
 
-    const val WIDTH_FRACTION = 0.8f
+    const val WIDTH_FRACTION_MD = 0.8f
+
+    const val WIDTH_FRACTION_SM = 0.7f
+
+    const val CARD_ELEVATION_DEFAULT = 4
+
+    const val ROUNDED_CORNER_SHAPE_DEFAULT = 12
 
     const val LINE_STROKE = 1
 
+    const val MIN_PASSWORD_LENGTH = 6
+
+    const val BORDER_STROKE_SM = 1
     // errors
     const val OFFLINE_TOAST_MESSAGE = "You are offline. Action not allowed."
   }
