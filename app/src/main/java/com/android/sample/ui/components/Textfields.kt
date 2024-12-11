@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
@@ -46,7 +47,7 @@ fun PasswordTextField(
         shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
         border =
             if (passwordError != null) {
-              BorderStroke(1.dp, Color.Red) // Apply red border in case of error
+              BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
             } else null) {
           // Box to remove padding discrepancies
           Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
@@ -106,7 +107,7 @@ fun EmailTextField(
         shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
         border =
             if (emailError != null) {
-              BorderStroke(1.dp, Color.Red) // Apply red border in case of error
+              BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
             } else null) {
           // Box to ensure alignment and padding consistency
           Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {

@@ -271,7 +271,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("GoogleCard"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
       elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
-      shape = RoundedCornerShape(12.dp),
+      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
   ) {
     Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
       OutlinedButton(
