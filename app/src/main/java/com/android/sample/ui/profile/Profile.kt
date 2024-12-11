@@ -595,7 +595,7 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
             actions = {
                 IconButton(
                   onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
-                    Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More options")
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = "More options")
                   }
               DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(
@@ -619,187 +619,59 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
             })
       })
      { innerPadding ->
-
          Column(
              modifier= Modifier.padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
+             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
+             horizontalAlignment = Alignment.CenterHorizontally
+         ){
 
+            ProfileHeader(user, imageViewModel, innerPadding, userActivities)
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    ProfileImage(
-                        userId = user.id,
-                        modifier = Modifier
-                            .size(IMAGE_SIZE.dp)
-                            .clip(CircleShape)
-                            .testTag("profilePicture"),
-                        imageViewModel
-                    )
+            ShowInterests(user)
 
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(
-                            15.dp,
-                            Alignment.CenterVertically
-                        ),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = userActivities.filter { it.creator == user.id }.size.toString(),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-
-                                fontWeight = FontWeight(600),
-                                color = Color(0xFF212121),
-                                textAlign = TextAlign.Center,
-                            )
-                        )
-                        Text(
-                            text = "Avtivities\nCreated",
-                            style = TextStyle(
-                                fontSize = 13.sp,
-
-                                fontWeight = FontWeight(500),
-                                color = Color(0xFF212121),
-
-                                textAlign = TextAlign.Center,
-                            )
-                        )
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(
-                            15.dp,
-                            Alignment.CenterVertically
-                        ),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = userActivities.filter({
-                                it.creator != user.id || it.participants.map { it.id }
-                                    .contains(user.id)
-                            }).size.toString(),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-
-                                fontWeight = FontWeight(600),
-                                color = Color(0xFF212121),
-
-                                textAlign = TextAlign.Center,
-                            )
-                        )
-                        Text(
-                            text = "Activities\njoined",
-                            style = TextStyle(
-                                fontSize = 13.sp,
-
-                                fontWeight = FontWeight(500),
-                                color = Color(0xFF212121),
-
-                                textAlign = TextAlign.Center,
-                            )
-                        )
-
-                    }
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(
-                            10.dp,
-                            Alignment.CenterVertically
-                        ),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(
-                                10.dp,
-                                Alignment.CenterHorizontally
-                            ),
-                            verticalAlignment = Alignment.Top,
-                        ) {
-                            Text(
-                                text = "Blank",
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-
-                                    fontWeight = FontWeight(600),
-                                    color = Color(0xFF212121),
-
-                                    textAlign = TextAlign.Center,
-                                )
-                            )
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = "ratingStar"
-                            )
-                        }
-                        Text(
-                            text = "Rating",
-                            style = TextStyle(
-                                fontSize = 13.sp,
-
-                                fontWeight = FontWeight(500),
-                                color = Color(0xFF212121),
-
-                                textAlign = TextAlign.Center,
-                            )
-                        )
-                    }
-                }
-
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier= Modifier.padding(horizontal = 12.dp)
-            ) {
-
-                    Text(
-                        text = "Interests",
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            lineHeight = 24.sp,
-                             
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF212121),
-                        )
-                    )
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
-                        contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-                        user.interests?.let { interests ->
-                            items(interests.size) { index ->
-                                InterestBox(interest = user.interests[index].interest)
-                            }
-                        }
-                    }
-
-
-            }
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(110.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Top,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = { activityType=0 }) {
+
+                IconButton(onClick = { activityType = 0 },
+                    modifier = if (activityType == 0) Modifier.background(Color.LightGray, shape = CircleShape) else Modifier) {
                     Icon(Icons.Outlined.Edit, contentDescription = "Created")
+
                 }
-                IconButton(onClick = { activityType=1 }) {
+
+                IconButton(onClick = { activityType = 1 },
+                    modifier = if (activityType == 1) Modifier.background(Color.LightGray, shape = CircleShape) else Modifier) {
+
                     Icon(Icons.Outlined.Groups, contentDescription = "Enrolled")
                 }
-                IconButton(onClick = { activityType=2 }) {
+                IconButton(onClick = { activityType = 2 },
+                    modifier = if (activityType == 2) Modifier.background(Color.LightGray, shape = CircleShape) else Modifier) {
+
                     Icon(Icons.Outlined.HourglassFull, contentDescription = "Passed")
 
                 }
 
             }
-             Column(
-                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-                 horizontalAlignment = Alignment.Start,
-             ) {
-             DisplayActivitiesList(userActivities, activityType,user, hourDateViewModel,navigationActions,profileViewModel,listActivitiesViewModel,imageViewModel)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                DisplayActivitiesList(
+                    userActivities,
+                    activityType,
+                    user,
+                    hourDateViewModel,
+                    navigationActions,
+                    profileViewModel,
+                    listActivitiesViewModel,
+                    imageViewModel
+                )
             }
         }
+
     }
 
 }
@@ -835,5 +707,119 @@ fun DisplayActivitiesList(userActivities: List<Activity>, activityType: Int,user
             )
             Spacer(modifier = Modifier.height(10.dp))
         }
+    }
+}
+@Composable
+fun ProfileHeader(user: User, imageViewModel: ImageViewModel,innerPadding: PaddingValues,userActivities: List<Activity>) {
+
+
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ProfileImage(
+                userId = user.id,
+                modifier = Modifier
+                    .size(IMAGE_SIZE.dp)
+                    .clip(CircleShape)
+                    .testTag("profilePicture"),
+                imageViewModel
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.Top,
+            ){
+            HeaderItem("Created\nActivities",userActivities.filter { it.creator == user.id }.size.toString(),false)
+            HeaderItem("Activities\nJoined",userActivities.filter({
+                it.creator != user.id || it.participants.map { it.id }
+                    .contains(user.id)
+            }).size.toString(),false)
+            HeaderItem("Rating","4.7", true)}
+
+
+
+
+        }
+}
+
+@Composable
+fun HeaderItem( field: String, number: String,isStar:Boolean){
+    Column(
+        verticalArrangement = Arrangement.spacedBy(
+            10.dp,
+            Alignment.CenterVertically
+        ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(
+                5.dp,
+                Alignment.CenterHorizontally
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = number,
+                style = TextStyle(
+                    fontSize = 16.sp,
+
+                    fontWeight = FontWeight(600),
+                    color = Color(0xFF212121),
+
+                    textAlign = TextAlign.Center,
+                )
+            )
+            if(isStar){
+                Icon(
+                    Icons.Default.Star,
+                    contentDescription = "ratingStar",
+                            modifier = Modifier.size(16.dp)
+                )
+            }
+
+        }
+        Text(
+            text = field,
+            style = TextStyle(
+                fontSize = 13.sp,
+
+                fontWeight = FontWeight(500),
+                color = Color(0xFF212121),
+
+                textAlign = TextAlign.Center,
+            )
+        )
+    }
+}
+@Composable
+fun ShowInterests(user: User){
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier= Modifier.padding(horizontal = 12.dp)
+    ) {
+
+        Text(
+            text = "Interests",
+            style = TextStyle(
+                fontSize = 20.sp,
+                lineHeight = 24.sp,
+
+                fontWeight = FontWeight(400),
+                color = Color(0xFF212121),
+            )
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+            contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
+            user.interests?.let { interests ->
+                items(interests.size) { index ->
+                    InterestBox(interest = user.interests[index].interest)
+                }
+            }
+        }
+
+
     }
 }
