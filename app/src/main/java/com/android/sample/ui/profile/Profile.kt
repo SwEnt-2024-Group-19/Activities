@@ -712,9 +712,9 @@ fun DisplayActivitiesList(userActivities: List<Activity>, activityType: Int,user
 @Composable
 fun ProfileHeader(user: User, imageViewModel: ImageViewModel,userActivities: List<Activity>) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.testTag("profileHeader")
+            modifier = Modifier.testTag("profileHeader").fillMaxWidth()
         ) {
             ProfileImage(
                 userId = user.id,
