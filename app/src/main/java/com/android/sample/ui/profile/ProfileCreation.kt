@@ -7,13 +7,16 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,9 +39,11 @@ import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
@@ -125,7 +130,7 @@ fun ProfileCreationScreen(
   } else {
     Column(
         modifier =
-            Modifier.fillMaxSize()
+            Modifier.fillMaxWidth()
                 .padding(MEDIUM_PADDING.dp)
                 .verticalScroll(scrollState)
                 .testTag("profileCreationScrollColumn"),
@@ -151,24 +156,31 @@ fun ProfileCreationScreen(
               }
           Spacer(modifier = Modifier.padding((2 * LARGE_PADDING).dp))
 
-          TextFieldWithErrorState(
-              value = name,
-              onValueChange = { name = it },
-              label = "Name",
-              validation = { input -> if (input.isBlank()) "Name cannot be empty" else null },
-              externalError = nameErrorState.value,
-              modifier = Modifier.testTag("nameTextField"),
-              errorTestTag = "nameError")
+          Row(
+              Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
+                TextFieldWithErrorState(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = "Name",
+                    validation = { input -> if (input.isBlank()) "Name cannot be empty" else null },
+                    externalError = nameErrorState.value,
+                    modifier = Modifier.weight(1f),
+                    errorTestTag = "nameError",
+                    testTag = "nameTextField")
+                TextFieldWithErrorState(
+                    value = surname,
+                    onValueChange = { surname = it },
+                    label = "Surname",
+                    validation = { input ->
+                      if (input.isBlank()) "Surname cannot be empty" else null
+                    },
+                    externalError = surnameErrorState.value,
+                    modifier = Modifier.weight(1f),
+                    errorTestTag = "surnameError",
+                    testTag = "surnameTextField")
+              }
 
-          Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
-          TextFieldWithErrorState(
-              value = surname,
-              onValueChange = { surname = it },
-              label = "Surname",
-              validation = { input -> if (input.isBlank()) "Surname cannot be empty" else null },
-              externalError = surnameErrorState.value,
-              modifier = Modifier.testTag("surnameTextField"),
-              errorTestTag = "surnameError")
           Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
 
           var newListInterests by remember { mutableStateOf(interests) }
@@ -214,7 +226,11 @@ fun ProfileCreationScreen(
                       onError = { error -> errorMessage = error.message })
                 }
               },
-              modifier = Modifier.testTag("createProfileButton")) {
+              modifier =
+                  Modifier.testTag("createProfileButton")
+                      .fillMaxWidth()
+                      .height(AUTH_BUTTON_HEIGHT.dp),
+              shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
                 Text("Create Profile")
               }
 
