@@ -53,17 +53,27 @@ import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.BIG_PADDING
 import com.android.sample.resources.C.Tag.BLACK_COLOR
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
+import com.android.sample.resources.C.Tag.DARK_GRAY
+import com.android.sample.resources.C.Tag.HALF_SCREEN_TEXT_FIELD_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
+import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.LIGHT_PURPLE_COLOR
+import com.android.sample.resources.C.Tag.MAXIMUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.NORMAL_PADDING
+import com.android.sample.resources.C.Tag.ROW_WIDTH
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
+import com.android.sample.resources.C.Tag.VERY_LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.camera.getImageResourceIdForCategory
@@ -380,7 +390,7 @@ fun ActivityRow(
     Row(
         modifier = Modifier
             .testTag(testTag)
-            .width(408.dp)
+            .width(ROW_WIDTH.dp)
             .clickable {
                 listActivitiesViewModel.selectActivity(activity)
                 userProfileViewModel.navigateToActivity(navigationActions, context)
@@ -402,8 +412,8 @@ fun ActivityRow(
                 contentDescription = "Activity Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .width(120.dp)
-                    .height(120.dp)
+                    .width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                    .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
                     .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
             )
         } else {
@@ -412,13 +422,13 @@ fun ActivityRow(
                 contentDescription = "Activity Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .width(120.dp)
-                    .height(120.dp)
+                    .width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                    .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
                     .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
             )
         }
 
-        Column(modifier = Modifier.weight(WIDTH_FRACTION).padding(horizontal = 16.dp)) {
+        Column(modifier = Modifier.weight(WIDTH_FRACTION).padding(horizontal = MEDIUM_PADDING.dp)) {
 
                 Text(
                     text = activity.title,
@@ -583,10 +593,10 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
                   Text(
                       text = user.name,
                       style = TextStyle(
-                          fontSize = 16.sp,
+                          fontSize = MEDIUM_PADDING.sp,
 
-                          fontWeight = FontWeight(700),
-                          color = Color(0xFF212121),
+                          fontWeight = FontWeight(MAXIMUM_FONT_WEIGHT),
+                          color = Color(DARK_GRAY),
 
                           )
                   )
@@ -621,7 +631,7 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
      { innerPadding ->
          Column(
              modifier= Modifier.padding(innerPadding),
-             verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.Top),
+             verticalArrangement = Arrangement.spacedBy(NORMAL_PADDING.dp, Alignment.Top),
              horizontalAlignment = Alignment.CenterHorizontally
          ){
 
@@ -656,7 +666,7 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
 
             }
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.Top),
                 horizontalAlignment = Alignment.Start,
             ) {
                 DisplayActivitiesList(
@@ -705,7 +715,7 @@ fun DisplayActivitiesList(userActivities: List<Activity>, activityType: Int,user
                 remainingTime = remainingTime,
                 imageViewModel =imageViewModel
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(NORMAL_PADDING.dp))
         }
     }
 }
@@ -715,7 +725,7 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel,innerPadding: Paddi
 
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ProfileImage(
@@ -727,7 +737,7 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel,innerPadding: Paddi
                 imageViewModel
             )
             Row(
-                horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.Top,
             ){
             HeaderItem("Created\nActivities",userActivities.filter { it.creator == user.id }.size.toString(),false)
@@ -747,14 +757,14 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel,innerPadding: Paddi
 fun HeaderItem( field: String, number: String,isStar:Boolean){
     Column(
         verticalArrangement = Arrangement.spacedBy(
-            10.dp,
+            NORMAL_PADDING.dp,
             Alignment.CenterVertically
         ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(
-                5.dp,
+                SMALL_PADDING.dp,
                 Alignment.CenterHorizontally
             ),
             verticalAlignment = Alignment.CenterVertically,
@@ -762,10 +772,10 @@ fun HeaderItem( field: String, number: String,isStar:Boolean){
             Text(
                 text = number,
                 style = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = MEDIUM_PADDING.sp,
 
-                    fontWeight = FontWeight(600),
-                    color = Color(0xFF212121),
+                    fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                    color = Color(DARK_GRAY),
 
                     textAlign = TextAlign.Center,
                 )
@@ -774,7 +784,7 @@ fun HeaderItem( field: String, number: String,isStar:Boolean){
                 Icon(
                     Icons.Default.Star,
                     contentDescription = "ratingStar",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(MEDIUM_PADDING.dp)
                 )
             }
 
@@ -782,10 +792,9 @@ fun HeaderItem( field: String, number: String,isStar:Boolean){
         Text(
             text = field,
             style = TextStyle(
-                fontSize = 13.sp,
-
-                fontWeight = FontWeight(500),
-                color = Color(0xFF212121),
+                fontSize = TEXT_FONTSIZE.sp,
+                fontWeight = FontWeight(VERY_LARGE_FONT_WEIGHT),
+                color = Color(DARK_GRAY),
 
                 textAlign = TextAlign.Center,
             )
@@ -795,19 +804,18 @@ fun HeaderItem( field: String, number: String,isStar:Boolean){
 @Composable
 fun ShowInterests(user: User){
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
+        verticalArrangement = Arrangement.spacedBy(TEXT_FONTSIZE.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier= Modifier.padding(horizontal = 12.dp)
+        modifier= Modifier.padding(horizontal = TEXT_FONTSIZE.dp)
     ) {
 
         Text(
             text = "Interests",
             style = TextStyle(
-                fontSize = 20.sp,
-                lineHeight = 24.sp,
-
-                fontWeight = FontWeight(400),
-                color = Color(0xFF212121),
+                fontSize = BIG_PADDING.sp,
+                lineHeight = LARGE_PADDING.sp,
+                fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                color = Color(DARK_GRAY),
             )
         )
         LazyRow(
