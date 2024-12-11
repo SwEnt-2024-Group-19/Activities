@@ -682,10 +682,14 @@ fun DisplayActivitiesList(userActivities: List<Activity>, activityType: Int,user
                     Timestamp.now() }
         }
         0 -> {
-            listToShow = userActivities.filter { it.creator == user.id }
+            listToShow = userActivities.filter { it.creator == user.id && hourDateViewModel.combineDateAndTime(
+                it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                    Timestamp.now()}
         }
         1 -> {
-            listToShow = userActivities.filter { it.creator != user.id || it.participants.map { it.id }.contains(user.id) }
+            listToShow = userActivities.filter { (it.creator != user.id || it.participants.map { it.id }.contains(user.id) )&&   hourDateViewModel.combineDateAndTime(
+                it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                    Timestamp.now()}
         }
     }
     val remainingTime = activityType != 2
