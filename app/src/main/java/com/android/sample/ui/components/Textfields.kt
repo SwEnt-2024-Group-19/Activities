@@ -22,9 +22,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_TOP
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 
 @Composable
@@ -39,8 +42,8 @@ fun PasswordTextField(
     Card(
         modifier = Modifier.fillMaxWidth().testTag("PasswordCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
         border =
             if (passwordError != null) {
               BorderStroke(1.dp, Color.Red) // Apply red border in case of error
@@ -52,7 +55,7 @@ fun PasswordTextField(
                 onValueChange = onPasswordChange,
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth().testTag("PasswordTextField"),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
                 visualTransformation =
                     if (isPasswordVisible) VisualTransformation.None
                     else PasswordVisualTransformation(),
@@ -83,7 +86,7 @@ fun PasswordTextField(
           color = Color.Red,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = 16.dp, top = 8.dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING/2).dp)
                   .testTag("PasswordErrorText"))
     }
   }
@@ -99,8 +102,8 @@ fun EmailTextField(
     Card(
         modifier = Modifier.fillMaxWidth().testTag("EmailCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
         border =
             if (emailError != null) {
               BorderStroke(1.dp, Color.Red) // Apply red border in case of error
@@ -112,7 +115,7 @@ fun EmailTextField(
                 onValueChange = onEmailChange,
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth().testTag("EmailTextField"),
-                shape = RoundedCornerShape(12.dp), // Matches the Card shape
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp), // Matches the Card shape
                 isError = emailError != null,
                 colors =
                     TextFieldDefaults.colors(
@@ -130,7 +133,7 @@ fun EmailTextField(
           color = Color.Red,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = 16.dp, top = 8.dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING/2).dp)
                   .testTag("EmailErrorText"))
     }
   }

@@ -36,12 +36,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.MIN_PASSWORD_LENGTH
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.navigation.NavigationActions
@@ -81,7 +88,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
                 contentDescription = "App Logo",
                 modifier = Modifier.size(IMAGE_SIZE.dp))
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height((2* LARGE_PADDING).dp))
           }
           item {
             // Email field
@@ -108,11 +115,11 @@ fun SignUpScreen(navigationActions: NavigationActions) {
           item {
             // Sign up button
             Card(
-                modifier = Modifier.fillMaxWidth(0.7f).testTag("SignUpCard"),
+                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignUpCard"),
                 colors =
                     CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
             ) {
               OutlinedButton(
                   onClick = {
@@ -127,7 +134,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                         passwordErrorState.value =
                             "Password cannot be empty" // Set the error message if password is empty
                       }
-                      passwordState.value.length < 6 -> {
+                      passwordState.value.length < MIN_PASSWORD_LENGTH -> {
                         passwordErrorState.value =
                             "Password must be at least 6 characters long" // Set the error message
                         // for
@@ -142,9 +149,9 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                       }
                     }
                   },
-                  shape = RoundedCornerShape(12.dp),
-                  border = BorderStroke(1.dp, Color.Transparent), // Transparent indicator
-                  modifier = Modifier.fillMaxWidth().height(60.dp).testTag("SignUpButton"),
+                  shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                  border = BorderStroke(BORDER_STROKE_SM.dp, Color.Transparent), // Transparent indicator
+                  modifier = Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignUpButton"),
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor = MaterialTheme.colorScheme.primary,
@@ -162,7 +169,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     Modifier.width(BUTTON_WIDTH.dp)
                         .height(BUTTON_HEIGHT.dp)
                         .testTag("GoToSignInButton")) {
-                  Text("Already an account?", fontSize = 16.sp)
+                  Text("Already an account?", fontSize = SUBTITLE_FONTSIZE.sp)
                 }
           }
         }

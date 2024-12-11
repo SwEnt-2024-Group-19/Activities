@@ -28,12 +28,17 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.network.NetworkManager
+import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -112,11 +117,11 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
 
           item {
             Card(
-                modifier = Modifier.fillMaxWidth(0.7f).testTag("SignInCard"),
+                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignInCard"),
                 colors =
                     CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(12.dp)) {
+                elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
                   Button(
                       onClick = {
                         performOfflineAwareAction(
@@ -146,8 +151,8 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                               Log.d("SignInScreen", "Sign in with email/password")
                             })
                       },
-                      modifier = Modifier.fillMaxWidth().height(60.dp).testTag("SignInButton"),
-                      shape = RoundedCornerShape(12.dp),
+                      modifier = Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignInButton"),
+                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
                       colors =
                           ButtonDefaults.buttonColors(
                               containerColor = MaterialTheme.colorScheme.primary,
@@ -198,7 +203,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                 verticalAlignment = Alignment.CenterVertically,
             ) {
               Text("Don't have an account? ", fontSize = SUBTITLE_FONTSIZE.sp)
-              Spacer(modifier = Modifier.width(4.dp))
+              Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
               TextButton(
                   onClick = {
                     performOfflineAwareAction(
