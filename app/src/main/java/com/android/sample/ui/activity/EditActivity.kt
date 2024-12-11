@@ -615,7 +615,7 @@ fun EditActivityScreen(
                         Log.e("EditActivityScreen", "Failed to remove images: ${error.message}")
                       })
 
-                  navigationActions.navigateTo(Screen.OVERVIEW)
+                  navigationActions.navigateTo(Screen.PROFILE)
                 },
                 modifier =
                     Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("deleteButton"),
