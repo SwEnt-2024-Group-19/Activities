@@ -88,7 +88,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
                 contentDescription = "App Logo",
                 modifier = Modifier.size(IMAGE_SIZE.dp))
-            Spacer(modifier = Modifier.height((2* LARGE_PADDING).dp))
+            Spacer(modifier = Modifier.height((2 * LARGE_PADDING).dp))
           }
           item {
             // Email field
@@ -118,7 +118,8 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignUpCard"),
                 colors =
                     CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-                elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+                elevation =
+                    CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
                 shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
             ) {
               OutlinedButton(
@@ -150,8 +151,10 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                     }
                   },
                   shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
-                  border = BorderStroke(BORDER_STROKE_SM.dp, Color.Transparent), // Transparent indicator
-                  modifier = Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignUpButton"),
+                  border =
+                      BorderStroke(BORDER_STROKE_SM.dp, Color.Transparent), // Transparent indicator
+                  modifier =
+                      Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignUpButton"),
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor = MaterialTheme.colorScheme.primary,

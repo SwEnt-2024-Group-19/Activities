@@ -120,7 +120,8 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                 modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignInCard"),
                 colors =
                     CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-                elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+                elevation =
+                    CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
                 shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
                   Button(
                       onClick = {
@@ -151,7 +152,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                               Log.d("SignInScreen", "Sign in with email/password")
                             })
                       },
-                      modifier = Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignInButton"),
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .height(AUTH_BUTTON_HEIGHT.dp)
+                              .testTag("SignInButton"),
                       shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
                       colors =
                           ButtonDefaults.buttonColors(

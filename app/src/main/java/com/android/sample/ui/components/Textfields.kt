@@ -86,7 +86,7 @@ fun PasswordTextField(
           color = Color.Red,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING/2).dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
                   .testTag("PasswordErrorText"))
     }
   }
@@ -115,7 +115,8 @@ fun EmailTextField(
                 onValueChange = onEmailChange,
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth().testTag("EmailTextField"),
-                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp), // Matches the Card shape
+                shape =
+                    RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp), // Matches the Card shape
                 isError = emailError != null,
                 colors =
                     TextFieldDefaults.colors(
@@ -133,7 +134,7 @@ fun EmailTextField(
           color = Color.Red,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING/2).dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
                   .testTag("EmailErrorText"))
     }
   }
