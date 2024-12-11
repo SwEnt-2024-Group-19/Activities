@@ -75,7 +75,7 @@ import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.resources.C.Tag.VERY_LARGE_FONT_WEIGHT
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.PlusButtonToCreate
@@ -407,8 +407,7 @@ fun ActivityRow(
             )
         }
 
-        Column(modifier = Modifier.weight(WIDTH_FRACTION).padding(horizontal = MEDIUM_PADDING.dp)) {
-
+        Column(modifier = Modifier.weight(WIDTH_FRACTION_MD).padding(horizontal = MEDIUM_PADDING.dp)) {
                 Text(
                     text = activity.title,
                     fontSize = SUBTITLE_FONTSIZE.sp,

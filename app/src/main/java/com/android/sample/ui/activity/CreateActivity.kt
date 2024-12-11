@@ -93,6 +93,7 @@ import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -258,13 +259,14 @@ fun CreateActivityScreen(
               }
               if (dateIsOpen) {
                 MyDatePicker(
+                    onCloseRequest = { dateIsOpen = false },
                     onDateSelected = { date ->
                       dueDate = date
                       dateIsOpen = false
                       dateIsSet = true
                     },
                     isOpen = dateIsOpen,
-                    null)
+                    initialDate = null)
               }
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
               OutlinedButton(
@@ -290,7 +292,8 @@ fun CreateActivityScreen(
                       startTimeIsOpen = false
                       startTimeIsSet = true
                     },
-                    isOpen = startTimeIsOpen)
+                    isOpen = startTimeIsOpen,
+                    onCloseRequest = { startTimeIsOpen = false })
               }
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -319,7 +322,8 @@ fun CreateActivityScreen(
                       durationIsOpen = false
                       durationIsSet = true
                     },
-                    isOpen = durationIsOpen)
+                    isOpen = durationIsOpen,
+                    onCloseRequest = { durationIsOpen = false })
               }
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
@@ -536,25 +540,55 @@ fun CreateActivityScreen(
                           dueDate.toDate().after(Timestamp.now().toDate()),
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
-                    if (creator == "") {
+
+                    val activityTimestamps =
+                        hourDateViewModel.combineDateAndTime(dueDate, startTime)
+                    val activityDateTime = activityTimestamps.toInstant().toEpochMilli()
+
+                    // we disable creating activities 1 hour before start time
+                    if (activityDateTime - System.currentTimeMillis() <
+                        TimeUnit.HOURS.toMillis(1)) {
                       Toast.makeText(
                               context,
-                              "You must be logged in to create an activity.",
+                              context.getString(R.string.schedule_activity),
                               Toast.LENGTH_SHORT)
                           .show()
+                      return@Button
+                    } else if (creator == "") {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.login_check_in_create),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
                     } else if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
                       Toast.makeText(
                               context,
-                              "The start time must be before the end time.",
+                              context.getString(R.string.startTime_before_endTime),
                               Toast.LENGTH_SHORT)
                           .show()
+                      return@Button
                     } else if (price.toDoubleOrNull() == null) {
-                      Toast.makeText(context, "Invalid price format.", Toast.LENGTH_SHORT).show()
-                    } else if (placesMax.toLongOrNull() == null) {
-                      Toast.makeText(context, "Invalid places format.", Toast.LENGTH_SHORT).show()
-                    } else if (selectedLocation == null) {
-                      Toast.makeText(context, "You must select a location.", Toast.LENGTH_SHORT)
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_price_format),
+                              Toast.LENGTH_SHORT)
                           .show()
+                      return@Button
+                    } else if (placesMax.toLongOrNull() == null) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_places_format),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (selectedLocation == null) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_no_location),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
                     } else {
                       if (selectedOptionType == ActivityType.INDIVIDUAL.name)
                           profileViewModel.userState.value?.let { user -> attendees += user }

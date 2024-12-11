@@ -119,8 +119,7 @@ fun ParticipantProfileContent(
             horizontalAlignment = Alignment.CenterHorizontally) {
               item { ProfileHeader(user, imageViewModel) }
               item {
-                // Interests Section
-                SectionTitle(title = "Interests", testTag = "interestsSection")
+                SectionTitle(title = "Interests")
               }
               item {
                 LazyRow(
