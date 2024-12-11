@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -231,7 +232,7 @@ fun LoadingScreen(navigationActions: NavigationActions) {
 //                  activitiesList.filter {
 //                    it.creator == user.id || it.participants.map { it.id }.contains(user.id)
 //                  }
-//              val hourDateViewModel = HourDateViewModel()
+//              val 2 = HourDateViewModel()
 //              // Display activities sections
 //              displayActivitySection(
 //                  "Activities Created",
@@ -316,17 +317,17 @@ fun LoadingScreen(navigationActions: NavigationActions) {
 //  }
 //}
 //
-@Composable
-fun SectionTitle(title: String, testTag: String) {
-  Text(
-      text = title,
-      fontSize = TITLE_FONTSIZE.sp,
-      modifier =
-      Modifier
-          .padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
-          .testTag(testTag))
-}
 
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontSize = TITLE_FONTSIZE.sp,
+        modifier =
+        Modifier
+            .padding(start = MEDIUM_PADDING.dp, top = MEDIUM_PADDING.dp)
+            .testTag("interestsSectionTitle"))
+}
 ///** Display the user's profile picture and name */
 @Composable
 fun ProfileHeader(user: User, imageViewModel: ImageViewModel) {
@@ -350,29 +351,7 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel) {
           .testTag("userName"))
 }
 
-/** Display a single activity in a box, the same box is used for all categories */
-@Composable
-fun ActivityBox(
-    activity: Activity,
-    listActivitiesViewModel: ListActivitiesViewModel,
-    navigationActions: NavigationActions,
-    remainingTime:  Boolean,
-    userProfileViewModel: ProfileViewModel,
-    user: User,
-    imageViewModel: ImageViewModel
-) {
-  val context = LocalContext.current
-  ActivityRow(
-      activity = activity,
-      listActivitiesViewModel = listActivitiesViewModel,
-      userProfileViewModel = userProfileViewModel,
-      navigationActions = navigationActions,
-      remainingTime = remainingTime,
-      userId = user.id,
-      context = context,
-      testTag = "",
-      imageViewModel = imageViewModel)
-}
+
 
 /** Display a single activity in a row */
 @Composable
@@ -383,13 +362,13 @@ fun ActivityRow(
     navigationActions: NavigationActions,
     remainingTime: Boolean,
     userId: String,
-    context: Context,
-    testTag: String,
+    context: Context=LocalContext.current,
     imageViewModel: ImageViewModel
 ) {
+
     Row(
         modifier = Modifier
-            .testTag(testTag)
+            .testTag("activityRow")
             .width(ROW_WIDTH.dp)
             .clickable {
                 listActivitiesViewModel.selectActivity(activity)
@@ -414,7 +393,7 @@ fun ActivityRow(
                 modifier = Modifier
                     .width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
                     .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
-                    .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+                    .clip(RoundedCornerShape(MEDIUM_PADDING.dp)).testTag("activityImage")
             )
         } else {
             Image(
@@ -424,7 +403,7 @@ fun ActivityRow(
                 modifier = Modifier
                     .width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
                     .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
-                    .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+                    .clip(RoundedCornerShape(MEDIUM_PADDING.dp)).testTag("activityImage")
             )
         }
 
@@ -434,7 +413,8 @@ fun ActivityRow(
                     text = activity.title,
                     fontSize = SUBTITLE_FONTSIZE.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color.Black,
+                    modifier = Modifier.testTag("activityTitle")
                 )
 
             if (remainingTime) {
@@ -447,7 +427,8 @@ fun ActivityRow(
                 fontSize = SUBTITLE_FONTSIZE.sp,
                 color = Color.Gray,
                 maxLines = 3,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.testTag("activityDescription")
             )
         }
         if (!remainingTime) {
@@ -588,15 +569,18 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
       },
         topBar = {
         TopAppBar(
+            modifier = Modifier.testTag("profileTopBar"),
             title = {
               Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                   Text(
+                      modifier = Modifier.testTag("userName"),
                       text = user.name,
                       style = TextStyle(
                           fontSize = MEDIUM_PADDING.sp,
 
                           fontWeight = FontWeight(MAXIMUM_FONT_WEIGHT),
                           color = Color(DARK_GRAY),
+
 
                           )
                   )
@@ -605,10 +589,11 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
             actions = {
                 IconButton(
                   onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
-                    Icon(imageVector = Icons.Default.Settings, contentDescription = "More options")
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = "More options", modifier = Modifier.testTag("settingsIcon"))
                   }
               DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(
+                    modifier = Modifier.testTag("logoutMenuItem"),
                     text = { Text("Logout") },
                     onClick = {
                       performOfflineAwareAction(
@@ -623,6 +608,7 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
                     },
                     enabled = Firebase.auth.currentUser?.isAnonymous == false)
                 DropdownMenuItem(
+                    modifier = Modifier.testTag("editProfileMenuItem"),
                     text = { Text("Edit profile") },
                     onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
               }
@@ -630,12 +616,12 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
       })
      { innerPadding ->
          Column(
-             modifier= Modifier.padding(innerPadding),
+             modifier= Modifier.padding(innerPadding).testTag("profileContentColumn"),
              verticalArrangement = Arrangement.spacedBy(NORMAL_PADDING.dp, Alignment.Top),
              horizontalAlignment = Alignment.CenterHorizontally
          ){
 
-            ProfileHeader(user, imageViewModel, innerPadding, userActivities)
+            ProfileHeader(user, imageViewModel, userActivities)
 
             ShowInterests(user)
 
@@ -643,22 +629,22 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Top,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().testTag("activityTypeRow")
             ) {
 
                 IconButton(onClick = { activityType = 0 },
-                    modifier = if (activityType == 0) Modifier.background(Color.LightGray, shape = CircleShape) else Modifier) {
+                    modifier = if (activityType == 0) Modifier.background(Color.LightGray, shape = CircleShape).testTag("createdActivities") else Modifier.testTag("createdActivities")) {
                     Icon(Icons.Outlined.Edit, contentDescription = "Created")
 
                 }
 
                 IconButton(onClick = { activityType = 1 },
-                    modifier = if (activityType == 1) Modifier.background(Color.LightGray, shape = CircleShape) else Modifier) {
+                    modifier = if (activityType == 1) Modifier.background(Color.LightGray, shape = CircleShape).testTag("enrolledActivities") else Modifier.testTag("enrolledActivities")) {
 
                     Icon(Icons.Outlined.Groups, contentDescription = "Enrolled")
                 }
                 IconButton(onClick = { activityType = 2 },
-                    modifier = if (activityType == 2) Modifier.background(Color.LightGray, shape = CircleShape) else Modifier) {
+                    modifier = if (activityType == 2) Modifier.background(Color.LightGray, shape = CircleShape).testTag("passedActivities") else Modifier.testTag("passedActivities")) {
 
                     Icon(Icons.Outlined.HourglassFull, contentDescription = "Passed")
 
@@ -668,6 +654,7 @@ fun UserProfile(user:User, navigationActions: NavigationActions, imageViewModel:
             Column(
                 verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.Top),
                 horizontalAlignment = Alignment.Start,
+                modifier = Modifier.testTag("activitiesColumn")
             ) {
                 DisplayActivitiesList(
                     userActivities,
@@ -704,14 +691,14 @@ fun DisplayActivitiesList(userActivities: List<Activity>, activityType: Int,user
     }
     val remainingTime = activityType != 2
 
-    LazyColumn {
+    LazyColumn(modifier= Modifier.testTag("activitiesList")) {
         items(listToShow.size) { index ->
-            ActivityBox(
+            ActivityRow(
                 activity = listToShow[index],
                 listActivitiesViewModel = listActivitiesViewModel,
                 navigationActions = navigationActions,
                 userProfileViewModel = userProfileViewModel,
-                user = user,
+                userId = user.id,
                 remainingTime = remainingTime,
                 imageViewModel =imageViewModel
             )
@@ -720,13 +707,11 @@ fun DisplayActivitiesList(userActivities: List<Activity>, activityType: Int,user
     }
 }
 @Composable
-fun ProfileHeader(user: User, imageViewModel: ImageViewModel,innerPadding: PaddingValues,userActivities: List<Activity>) {
-
-
-
+fun ProfileHeader(user: User, imageViewModel: ImageViewModel,userActivities: List<Activity>) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.testTag("profileHeader")
         ) {
             ProfileImage(
                 userId = user.id,
@@ -740,7 +725,7 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel,innerPadding: Paddi
                 horizontalArrangement = Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.Top,
             ){
-            HeaderItem("Created\nActivities",userActivities.filter { it.creator == user.id }.size.toString(),false)
+            HeaderItem("Activities\nCreated",userActivities.filter { it.creator == user.id }.size.toString(),false)
             HeaderItem("Activities\nJoined",userActivities.filter({
                 it.creator != user.id || it.participants.map { it.id }
                     .contains(user.id)
@@ -761,6 +746,7 @@ fun HeaderItem( field: String, number: String,isStar:Boolean){
             Alignment.CenterVertically
         ),
         horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.testTag("headerItem")
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(
@@ -770,13 +756,12 @@ fun HeaderItem( field: String, number: String,isStar:Boolean){
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
+                modifier = Modifier.testTag("headerItemTitle"),
                 text = number,
                 style = TextStyle(
                     fontSize = MEDIUM_PADDING.sp,
-
                     fontWeight = FontWeight(LARGE_FONT_WEIGHT),
                     color = Color(DARK_GRAY),
-
                     textAlign = TextAlign.Center,
                 )
             )
@@ -784,18 +769,17 @@ fun HeaderItem( field: String, number: String,isStar:Boolean){
                 Icon(
                     Icons.Default.Star,
                     contentDescription = "ratingStar",
-                            modifier = Modifier.size(MEDIUM_PADDING.dp)
+                            modifier = Modifier.size(MEDIUM_PADDING.dp).testTag("ratingStar")
                 )
             }
 
         }
-        Text(
+        Text(modifier = Modifier.testTag("headerItemField"),
             text = field,
             style = TextStyle(
                 fontSize = TEXT_FONTSIZE.sp,
                 fontWeight = FontWeight(VERY_LARGE_FONT_WEIGHT),
                 color = Color(DARK_GRAY),
-
                 textAlign = TextAlign.Center,
             )
         )
@@ -806,19 +790,22 @@ fun ShowInterests(user: User){
     Column(
         verticalArrangement = Arrangement.spacedBy(TEXT_FONTSIZE.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier= Modifier.padding(horizontal = TEXT_FONTSIZE.dp)
+        modifier= Modifier.padding(horizontal = TEXT_FONTSIZE.dp).testTag("interestsSection")
     ) {
 
         Text(
+            modifier = Modifier.testTag("interestsTitle"),
             text = "Interests",
             style = TextStyle(
                 fontSize = BIG_PADDING.sp,
                 lineHeight = LARGE_PADDING.sp,
                 fontWeight = FontWeight(LARGE_FONT_WEIGHT),
                 color = Color(DARK_GRAY),
+
             )
         )
         LazyRow(
+            modifier = Modifier.testTag("interestsRow"),
             horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
             contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
             user.interests?.let { interests ->
