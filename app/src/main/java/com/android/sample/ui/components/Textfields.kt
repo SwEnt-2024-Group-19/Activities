@@ -147,6 +147,7 @@ fun TextFieldWithErrorState(
     modifier: Modifier = Modifier,
     validation: (String) -> String?,
     externalError: String? = null,
+    testTag : String? = null,
     errorTestTag: String
 ) {
   var internalError by remember { mutableStateOf<String?>(null) }
@@ -154,7 +155,7 @@ fun TextFieldWithErrorState(
   // Show external error if present, otherwise use internal error
   val error = externalError ?: internalError
 
-  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_MD)) {
+  Column(modifier = modifier) {
     Card(
         modifier = Modifier.fillMaxWidth().testTag("TextFieldWithErrorStateCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
@@ -170,7 +171,7 @@ fun TextFieldWithErrorState(
                 },
                 label = { Text(label) },
                 isError = error != null,
-                modifier = modifier,
+                modifier = Modifier.fillMaxWidth().testTag(testTag  ?: "TextFieldWithErrorState"),
                 shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
                 colors =
                     TextFieldDefaults.colors(
@@ -179,7 +180,8 @@ fun TextFieldWithErrorState(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         errorIndicatorColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent))
+                        errorContainerColor = Color.Transparent),
+                singleLine = true)
           }
         }
     error?.let {
