@@ -140,33 +140,33 @@ fun ParticipantProfileContent(
                   activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
 
               // Display activities sections
-              displayActivitySection(
-                  "Activities Created",
-                  "created",
-                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
-                  navigationActions,
-                  profileViewModel,
-                  listActivitiesViewModel,
-                  true,
-                  user)
-              displayActivitySection(
-                  "Activities Enrolled in",
-                  "enrolled",
-                  usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
-                  navigationActions,
-                  profileViewModel,
-                  listActivitiesViewModel,
-                  true,
-                  user)
-              displayActivitySection(
-                  "Past Activities",
-                  "past",
-                  usersActivity.filter { it.date < Timestamp.now() },
-                  navigationActions,
-                  profileViewModel,
-                  listActivitiesViewModel,
-                  true,
-                  user)
+//              displayActivitySection(
+//                  "Activities Created",
+//                  "created",
+//                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
+//                  navigationActions,
+//                  profileViewModel,
+//                  listActivitiesViewModel,
+//                  true,
+//                  user)
+//              displayActivitySection(
+//                  "Activities Enrolled in",
+//                  "enrolled",
+//                  usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
+//                  navigationActions,
+//                  profileViewModel,
+//                  listActivitiesViewModel,
+//                  true,
+//                  user)
+//              displayActivitySection(
+//                  "Past Activities",
+//                  "past",
+//                  usersActivity.filter { it.date < Timestamp.now() },
+//                  navigationActions,
+//                  profileViewModel,
+//                  listActivitiesViewModel,
+//                  true,
+//                  user)
             }
       }
 }
