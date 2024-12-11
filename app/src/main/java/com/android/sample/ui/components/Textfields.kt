@@ -147,7 +147,7 @@ fun TextFieldWithErrorState(
     modifier: Modifier = Modifier,
     validation: (String) -> String?,
     externalError: String? = null,
-    testTag : String? = null,
+    testTag: String? = null,
     errorTestTag: String
 ) {
   var internalError by remember { mutableStateOf<String?>(null) }
@@ -171,7 +171,7 @@ fun TextFieldWithErrorState(
                 },
                 label = { Text(label) },
                 isError = error != null,
-                modifier = Modifier.fillMaxWidth().testTag(testTag  ?: "TextFieldWithErrorState"),
+                modifier = Modifier.fillMaxWidth().testTag(testTag ?: "TextFieldWithErrorState"),
                 shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
                 colors =
                     TextFieldDefaults.colors(
