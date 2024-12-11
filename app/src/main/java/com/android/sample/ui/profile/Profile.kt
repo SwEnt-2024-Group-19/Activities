@@ -474,11 +474,11 @@ fun RemainingTime(currentTimeMillis: Long, activity: Activity) {
   Text(
       text =
           when {
-            months > 1 -> "In $months months"
+            months >= 1 -> "In $months months"
             days in 6..30 -> "In $days days"
             days in 1..5 -> "In $days days and $hours hours"
             days < 1 -> "In $hours h $minutes min"
-            else -> ""
+            else -> "In $days days, $hours hours and $minutes minutes, $months months"
           },
       fontSize = SUBTITLE_FONTSIZE.sp,
       color = textColor,

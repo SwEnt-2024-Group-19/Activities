@@ -1,5 +1,6 @@
 package com.android.sample.resources
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -55,7 +56,7 @@ object C {
     const val SUBTITLE_FONTSIZE = 16
 
     const val WHITE_COLOR = 0xFFFFFFFF
-    const val LIGHT_PURPLE_COLOR = 0xFFD1C4E9
+    const val LIGHT_PURPLE_COLOR = 0xFF8B6EA2
     const val DARK_BLUE_COLOR = 0xFF4A148C
 
     const val BLACK_COLOR = 0xFF000000
