@@ -30,6 +30,10 @@
     <string name="invalid_price_format">Invalid price format</string>
     <string name="invalid_places_format">Invalid places format</string>
     <string name="invalid_no_location">You must select a location</string>
-
+    <string name="activity_type">Activity Type</string>
+    <string name="activity_category">Activity Category</string>
+    <string name="select_activity_type">Select an interest</string>
+    <string name="select_activity_category">Select a category</string>
+    <string name="invalid_interest_category">You must select an interest and a category</string>
 
 </resources>

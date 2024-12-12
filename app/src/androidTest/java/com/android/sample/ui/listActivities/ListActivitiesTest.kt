@@ -73,7 +73,7 @@ class OverviewScreenTest {
                       id = "1",
                       name = "Amine",
                       surname = "A",
-                      interests = listOf(Interest("Sport", "Cycling")),
+                      interests = listOf(Interest("Football", Category.SPORT)),
                       activities = listOf(),
                       photo = "",
                       likedActivities = listOf("1")),
@@ -81,7 +81,7 @@ class OverviewScreenTest {
                       id = "2",
                       name = "John",
                       surname = "Doe",
-                      interests = listOf(Interest("Indoor Activity", "Reading")),
+                      interests = listOf(Interest("Movies", Category.ENTERTAINMENT)),
                       activities = listOf(),
                       photo = "",
                       likedActivities = listOf("1"))),
@@ -111,7 +111,9 @@ class OverviewScreenTest {
             surname = "A",
             photo = "",
             interests =
-                listOf(Interest("Sport", "Cycling"), Interest("Indoor Activity", "Reading")),
+                listOf(
+                    Interest("Football", Category.SPORT),
+                    Interest("Movies", Category.ENTERTAINMENT)),
             activities = listOf(activity.uid),
         )
 

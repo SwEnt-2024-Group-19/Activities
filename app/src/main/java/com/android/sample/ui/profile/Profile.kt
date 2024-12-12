@@ -34,6 +34,7 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
@@ -47,6 +48,7 @@ import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
+import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.PlusButtonToCreate
@@ -179,11 +181,7 @@ fun ProfileContent(
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
                     contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-                      user.interests?.let { interests ->
-                        items(interests.size) { index ->
-                          InterestBox(interest = user.interests[index].interest)
-                        }
-                      }
+                      user.interests?.map { item { InterestBox(interest = it) } }
                     }
               }
 
@@ -464,13 +462,14 @@ fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
 
 /** Display a single interest in a box */
 @Composable
-fun InterestBox(interest: String) {
+fun InterestBox(interest: Interest) {
   Box(
       modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+          Modifier.background(
+                  colorOfCategory(interest.category), RoundedCornerShape(STANDARD_PADDING.dp))
               .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-              .testTag("$interest"),
+              .testTag(interest.name),
       contentAlignment = Alignment.Center) {
-        Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
+        Text(text = interest.name, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
       }
 }
