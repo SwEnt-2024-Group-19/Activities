@@ -101,7 +101,9 @@ fun EditActivityScreen(
   var title by remember { mutableStateOf(activity?.title ?: "") }
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
-  var selectedLocation by remember { mutableStateOf(Location(0.0, 0.0, "No location", "No location")) }
+  var selectedLocation by remember {
+    mutableStateOf(Location(0.0, 0.0, "No location", "No location"))
+  }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants!!) }

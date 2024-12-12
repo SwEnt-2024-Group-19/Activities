@@ -133,18 +133,17 @@ constructor(
   @SuppressLint("MissingPermission")
   override fun getCurrentLocation(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
 
-      fusedLocationClient.lastLocation
-          .addOnSuccessListener { location ->
-              location?.let {
-                  Log.d("NominatimLocationRepository", "Location: $location")
-                  val fullName = "Current Location" // Replace with actual logic if needed
-                  val name = "Current"             // Summarized name
-                  onSuccess(Location(it.latitude, it.longitude,  name, fullName))
-              } ?: requestLocationUpdate(onSuccess, onFailure)
-          }
-          .addOnFailureListener { onFailure(it) }
+    fusedLocationClient.lastLocation
+        .addOnSuccessListener { location ->
+          location?.let {
+            Log.d("NominatimLocationRepository", "Location: $location")
+            val fullName = "Current Location" // Replace with actual logic if needed
+            val name = "Current" // Summarized name
+            onSuccess(Location(it.latitude, it.longitude, name, fullName))
+          } ?: requestLocationUpdate(onSuccess, onFailure)
+        }
+        .addOnFailureListener { onFailure(it) }
   }
-
 
   @SuppressLint("MissingPermission")
   private fun requestLocationUpdate(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
@@ -153,8 +152,9 @@ constructor(
         .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
         .addOnSuccessListener { location ->
           Log.d("NominatimLocationRepository", "Location: $location")
-          location?.let { onSuccess(Location(it.latitude, it.longitude, "Updated","Updated Location")) }
-              ?: onFailure(Exception("Location not available"))
+          location?.let {
+            onSuccess(Location(it.latitude, it.longitude, "Updated", "Updated Location"))
+          } ?: onFailure(Exception("Location not available"))
         }
         .addOnFailureListener { onFailure(it) }
   }

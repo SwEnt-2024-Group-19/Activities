@@ -58,7 +58,8 @@ class OverviewScreenTest {
           title = "Mountain Biking",
           description = "Exciting mountain biking experience.",
           date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
-          location = Location(46.519962, 6.633597, "EPFL","Ecole Polytechnique Fédérale de Lausanne"),
+          location =
+              Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
           creator = "Chris",
           images = listOf(),
           price = 10.0,

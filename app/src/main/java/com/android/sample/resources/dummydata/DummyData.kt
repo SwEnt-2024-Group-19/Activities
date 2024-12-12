@@ -74,7 +74,8 @@ val activityWithParticipants =
         maxPlaces = 10,
         creator = "Creator",
         status = ActivityStatus.ACTIVE,
-        location = Location(46.519962, 6.633597, "EPFL","Ecole Polytechnique Fédérale de Lausanne"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         images = listOf("1"),
         participants =
             listOf(
@@ -125,7 +126,8 @@ val activityBiking =
         title = "Mountain Biking",
         description = "Exciting mountain biking experience.",
         date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
-        location = Location(46.519962, 6.633597, "EPFL","Ecole Polytechnique Fédérale de Lausanne"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         creator = "Chris",
         images = listOf(),
         price = 10.0,
@@ -181,7 +183,8 @@ val activity2 =
         title = "Cooking",
         description = "Great cooking class",
         date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
-        location = Location(46.519962, 6.633597, "EPFL","Ecole Polytechnique Fédérale de Lausanne"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         creator = "123",
         price = 1.0,
         images = listOf(),
@@ -199,7 +202,8 @@ val pastActivity =
         title = "Watch World Cup 2022",
         description = "Exciting mountain biking experience.",
         date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time),
-        location = Location(46.519962, 6.633597, "EPFL","Ecole Polytechnique Fédérale de Lausanne"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         creator = "Chris",
         images = listOf(),
         price = 10.0,

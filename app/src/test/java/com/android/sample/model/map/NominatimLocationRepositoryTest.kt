@@ -174,5 +174,4 @@ class NominatimLocationRepositoryTest {
         .body(body?.toResponseBody("application/json".toMediaTypeOrNull()))
         .build()
   }
-
 }
