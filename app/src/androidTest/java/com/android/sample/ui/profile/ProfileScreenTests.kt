@@ -95,9 +95,9 @@ class ProfileScreenTest {
     composeTestRule.setContent {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
-          navigationActions,
-          listActivitiesViewModel,
-          mockImageViewModel)
+          navigationActions=navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          imageViewModel=mockImageViewModel)
     }
     composeTestRule.onNodeWithTag("loadingText").assertTextEquals("You do not have a profile")
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
@@ -109,8 +109,8 @@ class ProfileScreenTest {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
-          listActivitiesViewModel,
-          mockImageViewModel)
+          listActivitiesViewModel = listActivitiesViewModel,
+          imageViewModel=mockImageViewModel)
     }
       composeTestRule.onNodeWithTag("profileTopBar").assertIsDisplayed()
       composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
@@ -134,8 +134,8 @@ class ProfileScreenTest {
             ProfileScreen(
                 userProfileViewModel = userProfileViewModel,
                 navigationActions = navigationActions,
-                listActivitiesViewModel,
-                mockImageViewModel)
+                listActivitiesViewModel=listActivitiesViewModel,
+                imageViewModel=mockImageViewModel)
         }
         composeTestRule.onNodeWithTag("settingsIcon",   useUnmergedTree = true).performClick()
         composeTestRule.onNodeWithTag("editProfileMenuItem").performClick()
@@ -149,7 +149,7 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          mockImageViewModel)
+          imageViewModel=mockImageViewModel)
     }
 
     // Wait until the UI is idle and ready
@@ -178,7 +178,7 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          mockImageViewModel)
+          imageViewModel=mockImageViewModel)
     }
       composeTestRule
           .onNodeWithTag("passedActivities").performClick()
@@ -201,7 +201,7 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          mockImageViewModel)
+          imageViewModel=mockImageViewModel)
     }
 
 
@@ -220,67 +220,78 @@ class ProfileScreenTest {
     verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
 
-//  @Test
-//  fun test_RemainingTime_ForMonths() {
-//    // convert 4 december 2024 to date
-//    val calendar =
-//        Calendar.getInstance().apply {
-//          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
-//          set(Calendar.YEAR, 2024) // Set year to 2024
-//          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
-//          set(Calendar.DAY_OF_MONTH, 4) // Set day to 4
-//          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
-//          set(Calendar.MINUTE, 0) // Set minute to 00
-//          set(Calendar.SECOND, 0) // Set second to 00
-//          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
-//        }
-//
-//    val futureDate =
-//        com.google.firebase.Timestamp(
-//            Date(calendar.timeInMillis + 305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
-//    val activity = activity1.copy(date = futureDate, startTime = "12:00") // Start time is noon
-//
-//    composeTestRule.setContent { RemainingTime(calendar.timeInMillis, activity = activity) }
-//    composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
-//    composeTestRule.onNodeWithText("In 305 months").assertIsDisplayed()
-//  }
-//
-//  @Test
-//  fun test_RemainingTime_ForDays() {
-//    val calendar =
-//        Calendar.getInstance().apply {
-//          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
-//          set(Calendar.YEAR, 2024) // Set year to 2024
-//          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
-//          set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
-//          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
-//          set(Calendar.MINUTE, 0) // Set minute to 00
-//          set(Calendar.SECOND, 0) // Set second to 00
-//          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
-//        }
-//    val futureDate =
-//        com.google.firebase.Timestamp(Date(calendar.timeInMillis + 6L * 24 * 60 * 60 * 1000))
-//    val activity = activity1.copy(date = futureDate)
-//
-//    composeTestRule.setContent { RemainingTime(calendar.timeInMillis, activity = activity) }
-//    composeTestRule.onNodeWithText("In 6 days", useUnmergedTree = true).assertIsDisplayed()
-//  }
-//
-//  @Test
-//  fun test_RemainingTime_ForHours() {
-//    val currentTime = System.currentTimeMillis()
-//    val futureDate = com.google.firebase.Timestamp(Date(currentTime))
-//    val calendar = Calendar.getInstance().apply { timeInMillis = currentTime }
-//    calendar.add(Calendar.MINUTE, 30)
-//    val futureStartTime = "${calendar.get(Calendar.HOUR_OF_DAY)}:${calendar.get(Calendar.MINUTE)}"
-//
-//    val activity = activity1.copy(date = futureDate, startTime = futureStartTime)
-//
-//    composeTestRule.setContent { RemainingTime(currentTime, activity = activity) }
-//    sleep(5000)
-//    composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
-//    composeTestRule.onNodeWithText("In 0 h 29 min").assertIsDisplayed()
-//  }
+  @Test
+  fun test_RemainingTime_ForMonths() {
+    // convert 4 december 2024 to date
+    val calendar =
+        Calendar.getInstance().apply {
+          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+          set(Calendar.YEAR, 2024) // Set year to 2024
+          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+          set(Calendar.DAY_OF_MONTH, 4) // Set day to 4
+          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
+          set(Calendar.MINUTE, 0) // Set minute to 00
+          set(Calendar.SECOND, 0) // Set second to 00
+          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+        }
+
+    val futureDate =
+        com.google.firebase.Timestamp(
+            Date(calendar.timeInMillis + 305L * 30 * 24 * 60 * 60 * 1000)) // 305 months from now
+    val activity = activity1.copy(date = futureDate, startTime = "12:00") // Start time is noon
+
+    composeTestRule.setContent { RemainingTime(calendar.timeInMillis, activity = activity) }
+    composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
+    composeTestRule.onNodeWithText("In 305 months").assertIsDisplayed()
+  }
+
+  @Test
+  fun test_RemainingTime_ForDays() {
+    val calendar =
+        Calendar.getInstance().apply {
+          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+          set(Calendar.YEAR, 2024) // Set year to 2024
+          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+          set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
+          set(Calendar.HOUR_OF_DAY, 0) // Set hour to 00
+          set(Calendar.MINUTE, 0) // Set minute to 00
+          set(Calendar.SECOND, 0) // Set second to 00
+          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+        }
+    val futureDate =
+        com.google.firebase.Timestamp(Date(calendar.timeInMillis + 6L * 24 * 60 * 60 * 1000))
+    val activity = activity1.copy(date = futureDate)
+
+    composeTestRule.setContent { RemainingTime(calendar.timeInMillis, activity = activity) }
+    composeTestRule.onNodeWithText("In 6 days", useUnmergedTree = true).assertIsDisplayed()
+  }
+
+  @Test
+  fun test_RemainingTime_ForHours() {
+      val calendar =
+          Calendar.getInstance().apply {
+              clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+              set(Calendar.YEAR, 2024) // Set year to 2024
+              set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+              set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
+              set(Calendar.HOUR_OF_DAY, 1) // Set hour to 00
+              set(Calendar.MINUTE, 0) // Set minute to 00
+              set(Calendar.SECOND, 0) // Set second to 00
+              set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+          }
+
+    val futureDate = com.google.firebase.Timestamp(Date(calendar.timeInMillis + 2L  * 60 * 60 * 1000))
+
+
+
+
+    val activity = activity1.copy(date = futureDate, startTime = "3:00")
+
+    composeTestRule.setContent { RemainingTime(calendar.timeInMillis, activity = activity) }
+    sleep(5000)
+    composeTestRule.onNodeWithTag("remainingTime").assertIsDisplayed()
+    composeTestRule.onNodeWithText("In 2 h 0 min").assertIsDisplayed()
+  }
 
   @Test
   fun reviewPastActivity_updatesReviewStatus() {
