@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,21 +42,17 @@ fun ParticipantProfileScreen(
     profileViewModel: ProfileViewModel
 ) {
 
-  val selectedParticipant = listActivitiesViewModel.selectedUser.collectAsState().value
-  val profile = selectedParticipant
-  when (profile) {
-    null ->
-        ParticipantLoadingScreen(navigationActions) // Show a loading indicator or a retry button
-    else -> {
-      ParticipantProfileContent(
-          user = profile,
-          navigationActions,
-          listActivitiesViewModel,
-          imageViewModel,
-          profileViewModel)
+    val selectedParticipant = listActivitiesViewModel.selectedUser.collectAsState().value
+    if (selectedParticipant != null) {
+        Log.d("ParticipantProfileScreen", "ParticipantProfileScreen: $selectedParticipant.id")
+        ProfileScreen(
+            selectedParticipant.id,
+            profileViewModel,
+            navigationActions,
+            listActivitiesViewModel,
+            imageViewModel
+        )
     }
-  // Proceed with showing profile content
-  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,54 +84,3 @@ fun ParticipantLoadingScreen(navigationActions: NavigationActions) {
       }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ParticipantProfileContent(
-    user: User,
-    navigationActions: NavigationActions,
-    listActivitiesViewModel: ListActivitiesViewModel,
-    imageViewModel: ImageViewModel,
-    profileViewModel: ProfileViewModel
-) {
-  val uiState by listActivitiesViewModel.uiState.collectAsState()
-  Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("profileScreen"),
-      topBar = {
-        TopAppBar(
-            title = { Text("Participant's Profile") },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                        contentDescription = "Back")
-                  }
-            },
-            modifier = Modifier.testTag("topAppBar"))
-      }) { innerPadding ->
-        LazyColumn(
-            Modifier.fillMaxSize().padding(innerPadding).testTag("ParticipantProfileContentColumn"),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              item { ProfileHeader(user, imageViewModel) }
-              item { SectionTitle(title = "Interests") }
-              item {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
-                    contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-                      user.interests?.let { interests ->
-                        items(interests.size) { index ->
-                          InterestBox(interest = user.interests[index].interest)
-                        }
-                      }
-                    }
-              }
-
-              val activitiesList =
-                  (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-              val usersActivity =
-                  activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
-
-            }
-      }
-}

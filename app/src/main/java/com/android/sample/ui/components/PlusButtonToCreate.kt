@@ -20,7 +20,7 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.TopLevelDestinations
 
 @Composable
-fun PlusButtonToCreate(navigationActions: NavigationActions, category: String) {
+fun PlusButtonToCreate(navigationActions: NavigationActions, activityType: Int) {
   Row(
       modifier =
           Modifier.fillMaxWidth()
@@ -35,9 +35,9 @@ fun PlusButtonToCreate(navigationActions: NavigationActions, category: String) {
   ) {
     IconButton(
         onClick = {
-          if (category == "created") {
+          if (activityType == 0) {
             navigationActions.navigateTo(TopLevelDestinations.ADD_ACTIVITY)
-          } else if (category == "enrolled")
+          } else if (activityType == 1)
               navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
         }) {
           Icon(
