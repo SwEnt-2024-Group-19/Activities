@@ -7,9 +7,6 @@ import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.activityBiking
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.auth.User
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -208,6 +205,7 @@ class ListActivitiesViewModelTest {
 
     assertEquals(expectedActivity, capturedActivity)
   }
+
   @Test
   fun `verify initial fetch of activities`() = runBlocking {
     val dummyActivities = listOf(activityBiking)
@@ -223,6 +221,7 @@ class ListActivitiesViewModelTest {
     val successState = uiState as ListActivitiesViewModel.ActivitiesUiState.Success
     assertEquals(dummyActivities, successState.activities)
   }
+
   @Test
   fun `verify addActivity updates state`() = runBlocking {
     val dummyActivity = activityBiking
@@ -238,27 +237,20 @@ class ListActivitiesViewModelTest {
     assertThat(uiState is ListActivitiesViewModel.ActivitiesUiState.Success, `is`(true))
   }
 
-
   @Test
   fun `verify filters update ViewModel state`() {
     listActivitiesViewModel.updateFilterState(
-      price = 50.0,
-      placesAvailable = 5,
-      minDateTimestamp = Timestamp(1635678900L, 0),
-      maxDateTimestamp = Timestamp(1638270900L, 0),
-      startTime = "08:00",
-      endTime = "20:00",
-      distance = 15.0,
-      seeOnlyPRO = true
-    )
+        price = 50.0,
+        placesAvailable = 5,
+        minDateTimestamp = Timestamp(1635678900L, 0),
+        maxDateTimestamp = Timestamp(1638270900L, 0),
+        startTime = "08:00",
+        endTime = "20:00",
+        distance = 15.0,
+        seeOnlyPRO = true)
 
     assertThat(listActivitiesViewModel.maxPrice, `is`(50.0))
     assertThat(listActivitiesViewModel.availablePlaces, `is`(5))
     assertThat(listActivitiesViewModel.onlyPRO, `is`(true))
   }
-
-
-
-
-
 }
