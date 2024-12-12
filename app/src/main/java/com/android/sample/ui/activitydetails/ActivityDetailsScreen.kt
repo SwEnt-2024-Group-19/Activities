@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -30,9 +31,12 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -60,7 +64,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -72,6 +78,7 @@ import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -83,6 +90,7 @@ import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import java.lang.Double.parseDouble
 import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.UUID
@@ -152,6 +160,19 @@ fun ActivityDetailsScreen(
     // Update the activity with the modified comments list
     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
   }
+
+  val creatorID = activity?.creator ?: ""
+  var creator by remember {
+    mutableStateOf(User(creatorID, "anonymous", "anonymous", listOf(), listOf(), "", listOf()))
+  }
+  activity?.participants?.forEach() {
+    if (it.id == creatorID) {
+      creator = it
+    }
+  }
+  val uiState by listActivityViewModel.uiState.collectAsState()
+  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+  val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
 
   Scaffold(
       topBar = {
@@ -314,6 +335,7 @@ fun ActivityDetailsScreen(
                   }
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
+              CreatorRow(creator, nbActivitiesCreated)
               // Participants section
               Text(
                   text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
@@ -771,4 +793,60 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
           tint = if (isLiked) Color.Black else Color.LightGray)
     }
   }
+}
+
+@OptIn(ExperimentalLayoutApi::class) // Required for FlowRow
+@Composable
+fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
+  Card(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(horizontal = 24.dp, vertical = 16.dp)
+              .testTag("creatorRow"),
+      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp), // Padding inside the card
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+              Text(
+                  text = creator.name + " " + creator.surname,
+                  style = MaterialTheme.typography.titleLarge, // More impactful typography
+                  color = MaterialTheme.colorScheme.onSurface,
+                  fontSize = 25.sp)
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+                  modifier = Modifier.padding(all = SMALL_PADDING.dp)) {
+                    // Displaying stars for rating
+
+                    Text(
+                        text =
+                            parseDouble(creator.id)
+                                .format(1), // Display the numeric rating next to the stars
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        color = Color.Black,
+                        fontSize = 18.sp)
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "Full Star",
+                        tint = Color.Black,
+                        modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
+                    // Displaying the number of activities created
+                    Text(
+                        text = "$nbActivitiesCreated Activities Created",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 18.sp)
+                  }
+            }
+      }
+}
+// Extension function to format Double values to one decimal place
+fun Double.format(digits: Int) = "%.${digits}f".format(this)
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewCreatorRow() {
+  CreatorRow(User("1.203930", "John", "Doe", listOf(), listOf("122"), "2024", listOf()), 101)
 }
