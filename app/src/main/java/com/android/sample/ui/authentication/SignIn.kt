@@ -85,10 +85,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           item {
             // App Logo
             Image(
-                painter = painterResource(id = R.drawable.aptivity_logo),
+                painter = painterResource(id = R.drawable.aptivity_logo_with_text),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(IMAGE_SIZE.dp).testTag("AppLogo"))
-            Spacer(modifier = Modifier.height((2 * LARGE_PADDING).dp))
+                modifier = Modifier.size((3*IMAGE_SIZE).dp).testTag("AppLogo"))
+            Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
           }
 
           item {
