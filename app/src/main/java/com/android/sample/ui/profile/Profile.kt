@@ -159,7 +159,7 @@ fun LoadingScreen(navigationActions: NavigationActions) {
             Modifier.fillMaxSize().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
-                  text =LocalContext.current.getString(R.string.no_profile),
+                  text = LocalContext.current.getString(R.string.no_profile),
                   modifier = Modifier.testTag("loadingText"),
                   color = Color.Black)
               Button(
@@ -546,7 +546,9 @@ fun DisplayActivitiesList(
   if (listToShow.isEmpty()) {
     if (uid == "") {
       if (activityType == PAST_ACTIVITIES) {
-        Text(LocalContext.current.getString(R.string.no_past_activities), modifier = Modifier.testTag("noActivitiesText"))
+        Text(
+            LocalContext.current.getString(R.string.no_past_activities),
+            modifier = Modifier.testTag("noActivitiesText"))
       } else {
         PlusButtonToCreate(navigationActions = navigationActions, activityType)
       }
@@ -667,9 +669,7 @@ fun ShowInterests(user: User) {
             horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
             contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
               user.interests?.let { interests ->
-                items(interests.size) { index ->
-                  InterestBox(interest = user.interests[index])
-                }
+                items(interests.size) { index -> InterestBox(interest = user.interests[index]) }
               }
             }
       }
