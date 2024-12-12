@@ -58,6 +58,7 @@ import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.activity.types
@@ -68,6 +69,9 @@ import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.model.profile.categoryOf
+import com.android.sample.model.profile.interestStringValues
+import com.android.sample.model.profile.interestsCategories
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
@@ -109,8 +113,10 @@ fun CreateActivityScreen(
   val networkManager = NetworkManager(context)
   var expandedType by remember { mutableStateOf(false) }
   var expandedCategory by remember { mutableStateOf(false) }
+  var expandedInterest by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf("Select a type") }
-  var selectedOptionCategory by remember { mutableStateOf("Select a category") }
+  var selectedOptionCategory: Category? by remember { mutableStateOf(null) }
+  var selectedOptionInterest: String? by remember { mutableStateOf(null) }
   var title by remember { mutableStateOf("") }
   var description by remember { mutableStateOf("") }
   val creator = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -423,7 +429,7 @@ fun CreateActivityScreen(
                         readOnly = true,
                         value = selectedOptionType,
                         onValueChange = {},
-                        label = { Text("Activity Type") },
+                        label = { Text(context.getString(R.string.activity_type)) },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
                         },
@@ -455,9 +461,11 @@ fun CreateActivityScreen(
                   onExpandedChange = { expandedCategory = !expandedCategory }) {
                     OutlinedTextField(
                         readOnly = true,
-                        value = selectedOptionCategory,
+                        value =
+                            selectedOptionCategory?.name
+                                ?: context.getString(R.string.select_activity_category),
                         onValueChange = {},
-                        label = { Text("Activity Category") },
+                        label = { Text(context.getString(R.string.activity_category)) },
                         trailingIcon = {
                           ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
                         },
@@ -468,17 +476,61 @@ fun CreateActivityScreen(
                         expanded = expandedCategory,
                         onDismissRequest = { expandedCategory = false },
                         modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                          categories.forEach { selectionOption ->
+                          interestsCategories.forEach {
                             DropdownMenuItem(
                                 modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                                text = { Text(selectionOption.name) },
+                                text = { Text(it.name) },
                                 onClick = {
-                                  selectedOptionCategory = selectionOption.name
+                                  selectedOptionCategory = it
                                   expandedCategory = false
+                                  selectedOptionInterest =
+                                      context.getString(R.string.select_activity_type)
                                 })
                           }
                         }
                   }
+
+              if (selectedOptionCategory != null) {
+                Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+
+                ExposedDropdownMenuBox(
+                    modifier =
+                        Modifier.testTag("chooseInterestMenu")
+                            .align(Alignment.CenterHorizontally)
+                            .fillMaxWidth()
+                            .padding(STANDARD_PADDING.dp),
+                    expanded = expandedInterest,
+                    onExpandedChange = { expandedInterest = !expandedInterest }) {
+                      OutlinedTextField(
+                          readOnly = true,
+                          value =
+                              selectedOptionInterest
+                                  ?: context.getString(R.string.select_activity_type),
+                          onValueChange = {},
+                          label = { Text("Activity Interest") },
+                          trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInterest)
+                          },
+                          colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                          modifier =
+                              Modifier.menuAnchor().fillMaxWidth().testTag("interestTextField"))
+                      ExposedDropdownMenu(
+                          expanded = expandedInterest,
+                          onDismissRequest = { expandedInterest = false },
+                          modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                            interestStringValues[selectedOptionCategory]?.forEach { selectionOption
+                              ->
+                              DropdownMenuItem(
+                                  modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                                  text = { Text(selectionOption) },
+                                  onClick = {
+                                    selectedOptionInterest = selectionOption
+                                    expandedInterest = false
+                                  })
+                            }
+                          }
+                    }
+              }
 
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
@@ -531,7 +583,7 @@ fun CreateActivityScreen(
                           placesMax.isNotEmpty() &&
                           selectedLocation != null &&
                           selectedOptionType != "Select a type" &&
-                          selectedOptionCategory != "Select a category" &&
+                          selectedOptionCategory != null &&
                           startTime.isNotEmpty() &&
                           duration.isNotEmpty() &&
                           dueDate.toDate().after(Timestamp.now().toDate()),
@@ -586,6 +638,14 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
+                    } else if (selectedOptionCategory != null &&
+                        categoryOf[selectedOptionInterest] != selectedOptionCategory) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_interest_category),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
                     } else {
                       if (selectedOptionType == ActivityType.INDIVIDUAL.name)
                           profileViewModel.userState.value?.let { user -> attendees += user }
@@ -621,9 +681,8 @@ fun CreateActivityScreen(
                                 participants = attendees,
                                 type = types.find { it.name == selectedOptionType } ?: types[1],
                                 comments = listOf(),
-                                category =
-                                    categories.find { it.name == selectedOptionCategory }
-                                        ?: categories[0])
+                                category = selectedOptionCategory ?: categories[0],
+                                subcategory = selectedOptionInterest ?: "")
                         listActivityViewModel.addActivity(activity)
                         profileViewModel.addActivity(creator, activity.uid)
                         navigationActions.navigateTo(Screen.OVERVIEW)
