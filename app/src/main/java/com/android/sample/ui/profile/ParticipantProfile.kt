@@ -32,7 +32,6 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.navigation.NavigationActions
-import com.google.firebase.Timestamp
 
 @Composable
 fun ParticipantProfileScreen(
@@ -118,9 +117,7 @@ fun ParticipantProfileContent(
             Modifier.fillMaxSize().padding(innerPadding).testTag("ParticipantProfileContentColumn"),
             horizontalAlignment = Alignment.CenterHorizontally) {
               item { ProfileHeader(user, imageViewModel) }
-              item {
-                SectionTitle(title = "Interests")
-              }
+              item { SectionTitle(title = "Interests") }
               item {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
@@ -139,33 +136,35 @@ fun ParticipantProfileContent(
                   activitiesList.filter { it.creator == user.id || it.participants.contains(user) }
 
               // Display activities sections
-//              displayActivitySection(
-//                  "Activities Created",
-//                  "created",
-//                  usersActivity.filter { it.creator == user.id && it.date > Timestamp.now() },
-//                  navigationActions,
-//                  profileViewModel,
-//                  listActivitiesViewModel,
-//                  true,
-//                  user)
-//              displayActivitySection(
-//                  "Activities Enrolled in",
-//                  "enrolled",
-//                  usersActivity.filter { it.creator != user.id && it.date > Timestamp.now() },
-//                  navigationActions,
-//                  profileViewModel,
-//                  listActivitiesViewModel,
-//                  true,
-//                  user)
-//              displayActivitySection(
-//                  "Past Activities",
-//                  "past",
-//                  usersActivity.filter { it.date < Timestamp.now() },
-//                  navigationActions,
-//                  profileViewModel,
-//                  listActivitiesViewModel,
-//                  true,
-//                  user)
+              //              displayActivitySection(
+              //                  "Activities Created",
+              //                  "created",
+              //                  usersActivity.filter { it.creator == user.id && it.date >
+              // Timestamp.now() },
+              //                  navigationActions,
+              //                  profileViewModel,
+              //                  listActivitiesViewModel,
+              //                  true,
+              //                  user)
+              //              displayActivitySection(
+              //                  "Activities Enrolled in",
+              //                  "enrolled",
+              //                  usersActivity.filter { it.creator != user.id && it.date >
+              // Timestamp.now() },
+              //                  navigationActions,
+              //                  profileViewModel,
+              //                  listActivitiesViewModel,
+              //                  true,
+              //                  user)
+              //              displayActivitySection(
+              //                  "Past Activities",
+              //                  "past",
+              //                  usersActivity.filter { it.date < Timestamp.now() },
+              //                  navigationActions,
+              //                  profileViewModel,
+              //                  listActivitiesViewModel,
+              //                  true,
+              //                  user)
             }
       }
 }

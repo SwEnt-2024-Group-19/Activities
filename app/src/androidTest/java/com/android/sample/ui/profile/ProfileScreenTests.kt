@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -12,7 +11,6 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
@@ -29,7 +27,6 @@ import com.android.sample.resources.dummydata.activity2
 import com.android.sample.resources.dummydata.activityListWithPastActivity
 import com.android.sample.resources.dummydata.listOfActivitiesUid
 import com.android.sample.ui.navigation.NavigationActions
-import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import java.lang.Thread.sleep
 import java.util.Calendar
@@ -84,7 +81,7 @@ class ProfileScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
     mockImageViewModel = ImageViewModel(mockImageRepository)
-      mockHourDateViewModel = mock(HourDateViewModel::class.java)
+    mockHourDateViewModel = mock(HourDateViewModel::class.java)
   }
 
   @Test
@@ -95,9 +92,9 @@ class ProfileScreenTest {
     composeTestRule.setContent {
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
-          navigationActions=navigationActions,
+          navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel=mockImageViewModel)
+          imageViewModel = mockImageViewModel)
     }
     composeTestRule.onNodeWithTag("loadingText").assertTextEquals("You do not have a profile")
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
@@ -110,11 +107,11 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel=mockImageViewModel)
+          imageViewModel = mockImageViewModel)
     }
-      composeTestRule.onNodeWithTag("profileTopBar").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("settingsIcon", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profileTopBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("settingsIcon", useUnmergedTree = true).assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileContentColumn").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profileHeader").assertIsDisplayed()
     composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
@@ -122,25 +119,24 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithTag("createdActivities").assertIsDisplayed()
     composeTestRule.onNodeWithTag("enrolledActivities").assertIsDisplayed()
     composeTestRule.onNodeWithTag("passedActivities").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("activitiesColumn").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activitiesColumn").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
   }
 
-
-    @Test
-    fun editProfileNavigatesToAuth(){
-        composeTestRule.setContent {
-            ProfileScreen(
-                userProfileViewModel = userProfileViewModel,
-                navigationActions = navigationActions,
-                listActivitiesViewModel=listActivitiesViewModel,
-                imageViewModel=mockImageViewModel)
-        }
-        composeTestRule.onNodeWithTag("settingsIcon",   useUnmergedTree = true).performClick()
-        composeTestRule.onNodeWithTag("editProfileMenuItem").performClick()
-        verify(navigationActions).navigateTo(Screen.EDIT_PROFILE)
+  @Test
+  fun editProfileNavigatesToAuth() {
+    composeTestRule.setContent {
+      ProfileScreen(
+          userProfileViewModel = userProfileViewModel,
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          imageViewModel = mockImageViewModel)
     }
+    composeTestRule.onNodeWithTag("settingsIcon", useUnmergedTree = true).performClick()
+    composeTestRule.onNodeWithTag("editProfileMenuItem").performClick()
+    verify(navigationActions).navigateTo(Screen.EDIT_PROFILE)
+  }
 
   @Test
   fun goesToDetailsOnClick() {
@@ -149,12 +145,12 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel=mockImageViewModel)
+          imageViewModel = mockImageViewModel)
     }
 
     // Wait until the UI is idle and ready
     composeTestRule.waitForIdle()
-      composeTestRule.onNodeWithText("Fun Farm", useUnmergedTree = true).assertExists().performClick()
+    composeTestRule.onNodeWithText("Fun Farm", useUnmergedTree = true).assertExists().performClick()
 
     // Wait for any UI operations to complete
     composeTestRule.waitForIdle()
@@ -165,33 +161,27 @@ class ProfileScreenTest {
 
   @Test
   fun displayPastActivities() {
-     val activity2= activity2.copy(participants=listOf(testUser))
-      `when`(activitiesRepository.getActivities(any(), any())).then {
-          it.getArgument<(List<Activity>) -> Unit>(0)(activityListWithPastActivity+activity2)
-      }
+    val activity2 = activity2.copy(participants = listOf(testUser))
+    `when`(activitiesRepository.getActivities(any(), any())).then {
+      it.getArgument<(List<Activity>) -> Unit>(0)(activityListWithPastActivity + activity2)
+    }
 
-      listActivitiesViewModel.getActivities()
+    listActivitiesViewModel.getActivities()
 
     composeTestRule.setContent {
-
       ProfileScreen(
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel=mockImageViewModel)
+          imageViewModel = mockImageViewModel)
     }
-      composeTestRule
-          .onNodeWithTag("passedActivities").performClick()
+    composeTestRule.onNodeWithTag("passedActivities").performClick()
     composeTestRule.onNodeWithText("Watch World Cup 2022", useUnmergedTree = true).assertExists()
-      composeTestRule
-          .onNodeWithTag("createdActivities").performClick()
-        composeTestRule.onNodeWithText("Fun Farm", useUnmergedTree = true).assertExists()
+    composeTestRule.onNodeWithTag("createdActivities").performClick()
+    composeTestRule.onNodeWithText("Fun Farm", useUnmergedTree = true).assertExists()
 
-      composeTestRule.onNodeWithTag("enrolledActivities").performClick()
-        composeTestRule.onNodeWithText("Cooking", useUnmergedTree = true).assertExists()
-
-
-
+    composeTestRule.onNodeWithTag("enrolledActivities").performClick()
+    composeTestRule.onNodeWithText("Cooking", useUnmergedTree = true).assertExists()
   }
 
   @Test
@@ -201,21 +191,16 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel=mockImageViewModel)
+          imageViewModel = mockImageViewModel)
     }
-
 
     composeTestRule.waitForIdle()
 
-
-    composeTestRule
-        .onNodeWithTag("passedActivities").performClick()
-
+    composeTestRule.onNodeWithTag("passedActivities").performClick()
 
     composeTestRule.onAllNodes(hasText("Watch World Cup 2022")).onFirst().performClick()
 
     composeTestRule.waitForIdle()
-
 
     verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
   }
@@ -268,22 +253,20 @@ class ProfileScreenTest {
 
   @Test
   fun test_RemainingTime_ForHours() {
-      val calendar =
-          Calendar.getInstance().apply {
-              clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
-              set(Calendar.YEAR, 2024) // Set year to 2024
-              set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
-              set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
-              set(Calendar.HOUR_OF_DAY, 1) // Set hour to 00
-              set(Calendar.MINUTE, 0) // Set minute to 00
-              set(Calendar.SECOND, 0) // Set second to 00
-              set(Calendar.MILLISECOND, 0) // Set millisecond to 00
-          }
+    val calendar =
+        Calendar.getInstance().apply {
+          clear() // Clears all fields to start fresh and avoid unwanted hour/minute/second
+          set(Calendar.YEAR, 2024) // Set year to 2024
+          set(Calendar.MONTH, Calendar.DECEMBER) // Set month to December
+          set(Calendar.DAY_OF_MONTH, 5) // Set day to 5
+          set(Calendar.HOUR_OF_DAY, 1) // Set hour to 00
+          set(Calendar.MINUTE, 0) // Set minute to 00
+          set(Calendar.SECOND, 0) // Set second to 00
+          set(Calendar.MILLISECOND, 0) // Set millisecond to 00
+        }
 
-    val futureDate = com.google.firebase.Timestamp(Date(calendar.timeInMillis + 2L  * 60 * 60 * 1000))
-
-
-
+    val futureDate =
+        com.google.firebase.Timestamp(Date(calendar.timeInMillis + 2L * 60 * 60 * 1000))
 
     val activity = activity1.copy(date = futureDate, startTime = "3:00")
 
@@ -308,8 +291,7 @@ class ProfileScreenTest {
     composeTestRule.waitForIdle()
 
     // Scroll to the past activity
-    composeTestRule
-        .onNodeWithTag("passedActivities").performClick()
+    composeTestRule.onNodeWithTag("passedActivities").performClick()
 
     val pastActivityNode = composeTestRule.onAllNodes(hasText("Watch World Cup 2022")).onFirst()
     pastActivityNode.assertIsDisplayed()
@@ -325,58 +307,61 @@ class ProfileScreenTest {
     // composeTestRule.onNodeWithTag("dislikeIconButton_true").assertExists()
   }
 
-    @Test
-    fun interestsAreDisplayed(){
-        composeTestRule.setContent {
-            ShowInterests(testUser)
-        }
-        composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("interestsTitle").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("interestsRow").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("Cycling").assertIsDisplayed()
+  @Test
+  fun interestsAreDisplayed() {
+    composeTestRule.setContent { ShowInterests(testUser) }
+    composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("interestsTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("interestsRow").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Cycling").assertIsDisplayed()
+  }
+
+  @Test
+  fun headerProfileIsDisplayed() {
+    val activity1 = activity1.copy(creator = testUser.id)
+    val activity2 = activity.copy(participants = listOf(testUser))
+    val activity3 = activity.copy(creator = testUser.id)
+    composeTestRule.setContent {
+      ProfileHeader(testUser, mockImageViewModel, listOf(activity1, activity2, activity3))
     }
+    composeTestRule.onNodeWithTag("profileHeader").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("profilePicture").assertExists()
+    composeTestRule.onAllNodesWithTag("headerItem").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("headerItemField").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("headerItemTitle").assertCountEquals(3)
+    composeTestRule.onNodeWithTag("ratingStar").assertIsDisplayed()
+  }
 
-    @Test
-    fun headerProfileIsDisplayed(){
-        val activity1=activity1.copy(creator = testUser.id)
-        val activity2=activity.copy(participants = listOf(testUser))
-        val activity3=activity.copy(creator= testUser.id)
-        composeTestRule.setContent {
-            ProfileHeader(testUser, mockImageViewModel, listOf(activity1,activity2,activity3))
-        }
-        composeTestRule.onNodeWithTag("profileHeader").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("profilePicture").assertExists()
-        composeTestRule.onAllNodesWithTag("headerItem").assertCountEquals(3)
-        composeTestRule.onAllNodesWithTag("headerItemField").assertCountEquals(3)
-        composeTestRule.onAllNodesWithTag("headerItemTitle").assertCountEquals(3)
-        composeTestRule.onNodeWithTag("ratingStar").assertIsDisplayed()
-
-
+  @Test
+  fun displayActivityListTest() {
+    val activity1 = activity1.copy(creator = testUser.id)
+    val activity2 = activity.copy(creator = testUser.id)
+    composeTestRule.setContent {
+      DisplayActivitiesList(
+          listOf(activity1, activity2),
+          0,
+          testUser,
+          mockHourDateViewModel,
+          navigationActions,
+          userProfileViewModel,
+          listActivitiesViewModel,
+          mockImageViewModel)
     }
+    composeTestRule.onNodeWithTag("activitiesList").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("activityRow").assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("activityImage", useUnmergedTree = true).assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("activityTitle", useUnmergedTree = true).assertCountEquals(2)
+    composeTestRule.onAllNodesWithTag("remainingTime", useUnmergedTree = true).assertCountEquals(2)
+    composeTestRule
+        .onAllNodesWithTag("activityDescription", useUnmergedTree = true)
+        .assertCountEquals(2)
+  }
 
-    @Test
-    fun displayActivityListTest(){
-        val activity1=activity1.copy(creator = testUser.id)
-        val activity2=activity.copy(creator= testUser.id)
-        composeTestRule.setContent { DisplayActivitiesList(listOf(activity1,activity2),0,testUser, mockHourDateViewModel ,navigationActions,userProfileViewModel,listActivitiesViewModel, mockImageViewModel ) }
-        composeTestRule.onNodeWithTag("activitiesList").assertIsDisplayed()
-        composeTestRule.onAllNodesWithTag("activityRow").assertCountEquals(2)
-        composeTestRule.onAllNodesWithTag("activityImage", useUnmergedTree = true).assertCountEquals(2)
-        composeTestRule.onAllNodesWithTag("activityTitle", useUnmergedTree = true).assertCountEquals(2)
-        composeTestRule.onAllNodesWithTag("remainingTime", useUnmergedTree = true).assertCountEquals(2)
-        composeTestRule.onAllNodesWithTag("activityDescription", useUnmergedTree = true).assertCountEquals(2)
-
-    }
-    @Test
-    fun loadingScreen(){
-        composeTestRule.setContent {
-            LoadingScreen(navigationActions)
-        }
-        composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("signInButton").assertIsDisplayed()
-
-    }
-
-
+  @Test
+  fun loadingScreen() {
+    composeTestRule.setContent { LoadingScreen(navigationActions) }
+    composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("signInButton").assertIsDisplayed()
+  }
 }
