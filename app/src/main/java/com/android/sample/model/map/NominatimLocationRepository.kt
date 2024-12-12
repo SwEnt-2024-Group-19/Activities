@@ -69,8 +69,8 @@ constructor(
         val lat = jsonObject.getDouble("lat")
         val lon = jsonObject.getDouble("lon")
         val fullName = jsonObject.getString("display_name")
-        val name = fullName.split(",").first().trim()      // Extract summarized name
-        Location(lat, lon, fullName, name)
+        val name = fullName.substringBefore(",").trim()
+        Location(lat, lon, name, fullName)
       }
     } catch (e: JSONException) {
       // Log the error and return an empty list if the JSON format is incorrect
@@ -139,7 +139,7 @@ constructor(
                   Log.d("NominatimLocationRepository", "Location: $location")
                   val fullName = "Current Location" // Replace with actual logic if needed
                   val name = "Current"             // Summarized name
-                  onSuccess(Location(it.latitude, it.longitude, fullName, name))
+                  onSuccess(Location(it.latitude, it.longitude,  name, fullName))
               } ?: requestLocationUpdate(onSuccess, onFailure)
           }
           .addOnFailureListener { onFailure(it) }
