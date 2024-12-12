@@ -18,7 +18,7 @@ class MockActivitiesRepository : ActivitiesRepository {
               "09:00",
               category = Category.SPORT,
               10.0,
-              Location(0.0, 0.0, "origin"),
+              Location(0.0, 0.0, "origin", "origin"),
               "creator",
               images = listOf(),
               placesLeft = 5,
