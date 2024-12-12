@@ -4,6 +4,7 @@ import android.util.Log
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.User
+import com.android.sample.model.profile.categoryOf
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -52,23 +53,21 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
     val images = data["images"] as? List<String> ?: listOf()
     val participants =
         (data["participants"] as? List<Map<String, Any>>)?.map { participantData ->
+          val interestsData = participantData["interests"] as? List<*>
+          val interests: List<Interest> =
+              interestsData?.mapNotNull { interestData ->
+                val interest = interestData as? Map<*, *> ?: return@mapNotNull null
+                val name = interest["name"] as? String ?: return@mapNotNull null
+                val categoryData = interest["category"] as? String ?: return@mapNotNull null
+                val category = categories.find { it.name == categoryData } ?: return@mapNotNull null
+                if (category != categoryOf[name]) return@mapNotNull null
+                Interest(name = name, category = category)
+              } ?: return null
           User(
               name = participantData["name"] as? String ?: "No Name",
               surname = participantData["surname"] as? String ?: "No Surname",
               id = participantData["id"] as? String ?: "No ID",
-              interests =
-                  (participantData["interests"] as? List<*>)?.mapNotNull { interestData ->
-                    // Ensure interestData is a map and extract category and interest
-                    (interestData as? Map<*, *>)?.let {
-                      val category = it["category"] as? String
-                      val interest = it["interest"] as? String
-                      if (category != null && interest != null) {
-                        Interest(category, interest)
-                      } else {
-                        null
-                      }
-                    }
-                  } ?: listOf(),
+              interests = interests,
               activities = (participantData["activities"] as? List<String>) ?: listOf(),
               photo = participantData["photo"] as? String,
               likedActivities = (participantData["likedActivities"] as? List<String>) ?: listOf())
@@ -128,7 +127,8 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
         participants = participants,
         comments = comments,
         likes = data["likes"] as? Map<String, Boolean?> ?: emptyMap(),
-        category = Category.valueOf(data["category"] as? String ?: "SPORT"))
+        category = Category.valueOf(data["category"] as? String ?: "SPORT"),
+        subcategory = data["subcategory"] as? String ?: "None")
   }
 
   override fun addActivity(
