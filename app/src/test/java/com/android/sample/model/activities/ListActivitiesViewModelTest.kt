@@ -11,7 +11,6 @@ import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +20,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.robolectric.RobolectricTestRunner
-import java.sql.Timestamp
 
 @RunWith(RobolectricTestRunner::class)
 class ListActivitiesViewModelTest {
@@ -205,5 +203,4 @@ class ListActivitiesViewModelTest {
 
     assertEquals(expectedActivity, capturedActivity)
   }
-
 }

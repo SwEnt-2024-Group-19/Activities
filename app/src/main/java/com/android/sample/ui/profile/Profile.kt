@@ -63,8 +63,6 @@ import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
-import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
-import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.resources.C.Tag.VERY_LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.ProfileImage
@@ -80,7 +78,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.Calendar
 
-
 @Composable
 fun ProfileScreen(
     uid: String = "",
@@ -89,99 +86,84 @@ fun ProfileScreen(
     listActivitiesViewModel: ListActivitiesViewModel,
     imageViewModel: ImageViewModel
 ) {
-    val context = LocalContext.current
-    val networkManager = NetworkManager(context)
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
 
-    // Observe the cached profile or network state
-    val profileState by userProfileViewModel.userState.collectAsState()
+  // Observe the cached profile or network state
+  val profileState by userProfileViewModel.userState.collectAsState()
 
-    // State for the participant
-    var participant by remember { mutableStateOf<User?>(null) }
+  // State for the participant
+  var participant by remember { mutableStateOf<User?>(null) }
 
-    if (uid.isEmpty()) {
-        // Handle the default profile case
-        val user =
-            if (networkManager.isNetworkAvailable()) {
-                profileState
-            } else {
-                userProfileViewModel.loadCachedProfile()
-            }
-
-        when (user) {
-            null -> LoadingScreen(navigationActions)
-            else -> {
-                UserProfile(
-                    user,
-                    navigationActions,
-                    imageViewModel,
-                    userProfileViewModel,
-                    listActivitiesViewModel,
-                    uid
-                )
-            }
-        }
-    } else {
-        // Fetch user data for the given UID
-        LaunchedEffect(uid) {
-            userProfileViewModel.getUserData(uid) { fetchedParticipant ->
-                participant = fetchedParticipant
-            }
+  if (uid.isEmpty()) {
+    // Handle the default profile case
+    val user =
+        if (networkManager.isNetworkAvailable()) {
+          profileState
+        } else {
+          userProfileViewModel.loadCachedProfile()
         }
 
-        when (participant) {
-            null -> ParticipantLoadingScreen(navigationActions) // Show a loading indicator
-            else -> {
-                UserProfile(
-                    participant!!,
-                    navigationActions,
-                    imageViewModel,
-                    userProfileViewModel,
-                    listActivitiesViewModel,
-                    uid
-                )
-            }
-        }
+    when (user) {
+      null -> LoadingScreen(navigationActions)
+      else -> {
+        UserProfile(
+            user,
+            navigationActions,
+            imageViewModel,
+            userProfileViewModel,
+            listActivitiesViewModel,
+            uid)
+      }
     }
-}
+  } else {
+    // Fetch user data for the given UID
+    LaunchedEffect(uid) {
+      userProfileViewModel.getUserData(uid) { fetchedParticipant ->
+        participant = fetchedParticipant
+      }
+    }
 
+    when (participant) {
+      null -> ParticipantLoadingScreen(navigationActions) // Show a loading indicator
+      else -> {
+        UserProfile(
+            participant!!,
+            navigationActions,
+            imageViewModel,
+            userProfileViewModel,
+            listActivitiesViewModel,
+            uid)
+      }
+    }
+  }
+}
 
 @Composable
 fun LoadingScreen(navigationActions: NavigationActions) {
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag("loadingScreen"),
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { route -> navigationActions.navigateTo(route) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = navigationActions.currentRoute()
-            )
-        }) { innerPadding ->
+  Scaffold(
+      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { route -> navigationActions.navigateTo(route) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = navigationActions.currentRoute())
+      }) { innerPadding ->
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "You do not have a profile",
-                modifier = Modifier.testTag("loadingText"),
-                color = Color.Black
-            )
-            Button(
-                onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                modifier = Modifier.testTag("signInButton")
-            ) {
-                Text("Go to Sign In Page")
+            Modifier.fillMaxSize().padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Text(
+                  text = "You do not have a profile",
+                  modifier = Modifier.testTag("loadingText"),
+                  color = Color.Black)
+              Button(
+                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                  modifier = Modifier.testTag("signInButton")) {
+                    Text("Go to Sign In Page")
+                  }
             }
-        }
-    }
+      }
 }
-
-
-
-
 
 /** Display a single activity in a row */
 @Composable
@@ -192,189 +174,177 @@ fun ActivityRow(
     navigationActions: NavigationActions,
     remainingTime: Boolean,
     userId: String,
-    context: Context=LocalContext.current,
+    context: Context = LocalContext.current,
     imageViewModel: ImageViewModel
 ) {
 
-    Row(
-        modifier = Modifier
-            .testTag("activityRow")
-            .width(ROW_WIDTH.dp)
-            .clickable {
-                listActivitiesViewModel.selectActivity(activity)
-                userProfileViewModel.navigateToActivity(navigationActions, context)
-            },
-        verticalAlignment = Alignment.Top
-    ) {
+  Row(
+      modifier =
+          Modifier.testTag("activityRow").width(ROW_WIDTH.dp).clickable {
+            listActivitiesViewModel.selectActivity(activity)
+            userProfileViewModel.navigateToActivity(navigationActions, context)
+          },
+      verticalAlignment = Alignment.Top) {
         var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
 
         imageViewModel.fetchActivityImagesAsBitmaps(
             activity.uid,
             onSuccess = { urls -> bitmaps = urls },
-            onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) }
-        )
+            onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
 
         // Display image
         if (activity.images.isNotEmpty() && bitmaps.isNotEmpty()) {
-            Image(
-                bitmap = bitmaps[0].asImageBitmap(),
-                contentDescription = "Activity Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
-                    .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
-                    .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-                    .testTag("activityImage")
-            )
+          Image(
+              bitmap = bitmaps[0].asImageBitmap(),
+              contentDescription = "Activity Image",
+              contentScale = ContentScale.Crop,
+              modifier =
+                  Modifier.width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                      .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                      .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+                      .testTag("activityImage"))
         } else {
-            Image(
-                painter = painterResource(id = getImageResourceIdForCategory(activity.category)),
-                contentDescription = "Activity Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
-                    .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
-                    .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-                    .testTag("activityImage")
-            )
+          Image(
+              painter = painterResource(id = getImageResourceIdForCategory(activity.category)),
+              contentDescription = "Activity Image",
+              contentScale = ContentScale.Crop,
+              modifier =
+                  Modifier.width(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                      .height(HALF_SCREEN_TEXT_FIELD_PADDING.dp)
+                      .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+                      .testTag("activityImage"))
         }
 
-        Column(modifier = Modifier
-            .weight(WIDTH_FRACTION_MD)
-            .padding(horizontal = MEDIUM_PADDING.dp)) {
-            Text(
-                text = activity.title,
-                fontSize = SUBTITLE_FONTSIZE.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.testTag("activityTitle")
-            )
+        Column(
+            modifier = Modifier.weight(WIDTH_FRACTION_MD).padding(horizontal = MEDIUM_PADDING.dp)) {
+              Text(
+                  text = activity.title,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = Color.Black,
+                  modifier = Modifier.testTag("activityTitle"))
 
-            if (remainingTime) {
+              if (remainingTime) {
                 RemainingTime(System.currentTimeMillis(), activity)
+              }
+
+              Text(
+                  text = activity.description,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  color = Color.Gray,
+                  maxLines = 3,
+                  overflow = TextOverflow.Ellipsis,
+                  modifier = Modifier.testTag("activityDescription"))
             }
-
-
-            Text(
-                text = activity.description,
-                fontSize = SUBTITLE_FONTSIZE.sp,
-                color = Color.Gray,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.testTag("activityDescription")
-            )
-        }
         if (!remainingTime) {
-            ReviewActivityButtons(activity.likes[userId]) { review ->
-                listActivitiesViewModel.reviewActivity(activity, userId, review)
-            }
+          ReviewActivityButtons(activity.likes[userId]) { review ->
+            listActivitiesViewModel.reviewActivity(activity, userId, review)
+          }
         }
-    }
+      }
 }
 
 @Composable
 fun RemainingTime(currentTimeMillis: Long, activity: Activity) {
-    val startTimeParts = activity.startTime.split(":")
-    val activityHour = startTimeParts[0].toInt()
-    val activityMinute = startTimeParts[1].toInt()
+  val startTimeParts = activity.startTime.split(":")
+  val activityHour = startTimeParts[0].toInt()
+  val activityMinute = startTimeParts[1].toInt()
 
-    val activityDate = activity.date.toDate()
-    val calendar =
-        Calendar.getInstance().apply {
-            time = activityDate
-            set(Calendar.HOUR_OF_DAY, activityHour)
-            set(Calendar.MINUTE, activityMinute)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-    val activityTimeMillis = calendar.timeInMillis
+  val activityDate = activity.date.toDate()
+  val calendar =
+      Calendar.getInstance().apply {
+        time = activityDate
+        set(Calendar.HOUR_OF_DAY, activityHour)
+        set(Calendar.MINUTE, activityMinute)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+      }
+  val activityTimeMillis = calendar.timeInMillis
 
-    val remainingTimeMillis = activityTimeMillis - currentTimeMillis
+  val remainingTimeMillis = activityTimeMillis - currentTimeMillis
 
-    val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
-    val minutes = remainingTimeMillis / (1000 * 60) % 60
-    val days = remainingTimeMillis / (1000 * 60 * 60 * 24)
-    val months = days / 30
+  val hours = remainingTimeMillis / (1000 * 60 * 60) % 24
+  val minutes = remainingTimeMillis / (1000 * 60) % 60
+  val days = remainingTimeMillis / (1000 * 60 * 60 * 24)
+  val months = days / 30
 
-    fun calculateColor(remainingTimeMillis: Long): Color {
-        val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
-        val fraction =
-            (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
-        return lerp(Color(LIGHT_PURPLE_COLOR), Color(DARK_BLUE_COLOR), 1 - fraction)
-    }
+  fun calculateColor(remainingTimeMillis: Long): Color {
+    val totalTimeMillis = 30 * 24 * 60 * 60 * 1000L
+    val fraction =
+        (remainingTimeMillis.coerceAtLeast(0).toFloat() / totalTimeMillis).coerceIn(0f, 1f)
+    return lerp(Color(LIGHT_PURPLE_COLOR), Color(DARK_BLUE_COLOR), 1 - fraction)
+  }
 
-    val textColor = calculateColor(remainingTimeMillis)
+  val textColor = calculateColor(remainingTimeMillis)
 
-    Text(
-        text =
-        when {
+  Text(
+      text =
+          when {
             months >= 1 -> "In $months months"
             days in 6..30 -> "In $days days"
             days in 1..5 -> "In $days days and $hours hours"
             days < 1 -> "In $hours h $minutes min"
             else -> "In $days days, $hours hours and $minutes minutes, $months months"
-        },
-        fontSize = SUBTITLE_FONTSIZE.sp,
-        color = textColor,
-        modifier = Modifier.testTag("remainingTime"))
+          },
+      fontSize = SUBTITLE_FONTSIZE.sp,
+      color = textColor,
+      modifier = Modifier.testTag("remainingTime"))
 }
 
 @Composable
 fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
-    var isLiked: Boolean? by remember { mutableStateOf(currentReview) }
-    Row {
-        IconButton(
-            onClick = {
-                isLiked = if (isLiked == true) null else true
-                review(isLiked)
-            },
-            colors =
+  var isLiked: Boolean? by remember { mutableStateOf(currentReview) }
+  Row {
+    IconButton(
+        onClick = {
+          isLiked = if (isLiked == true) null else true
+          review(isLiked)
+        },
+        colors =
             IconButtonDefaults.iconButtonColors(
                 containerColor = if (isLiked == true) Color(SUCCESS_COLOR) else Color.Transparent,
                 contentColor =
-                if (isLiked == true) MaterialTheme.colorScheme.onError
-                else MaterialTheme.colorScheme.onSurface),
-            modifier = Modifier.testTag("likeIconButton_${isLiked == true}")) {
-            Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "Like")
+                    if (isLiked == true) MaterialTheme.colorScheme.onError
+                    else MaterialTheme.colorScheme.onSurface),
+        modifier = Modifier.testTag("likeIconButton_${isLiked == true}")) {
+          Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "Like")
         }
-        Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
-        IconButton(
-            onClick = {
-                isLiked = if (isLiked == false) null else false
-                review(isLiked)
-            },
-            colors =
+    Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
+    IconButton(
+        onClick = {
+          isLiked = if (isLiked == false) null else false
+          review(isLiked)
+        },
+        colors =
             IconButtonDefaults.iconButtonColors(
                 containerColor =
-                if (isLiked == false) MaterialTheme.colorScheme.error else Color.Transparent,
+                    if (isLiked == false) MaterialTheme.colorScheme.error else Color.Transparent,
                 contentColor =
-                if (isLiked == false) MaterialTheme.colorScheme.onError
-                else MaterialTheme.colorScheme.onSurface),
-            modifier = Modifier.testTag("dislikeIconButton_${isLiked == false}")) {
-            Icon(
-                imageVector = Icons.Default.ThumbDown,
-                contentDescription = "Dislike",
-                tint =
-                if (isLiked == false) MaterialTheme.colorScheme.onError
-                else MaterialTheme.colorScheme.onSurface)
+                    if (isLiked == false) MaterialTheme.colorScheme.onError
+                    else MaterialTheme.colorScheme.onSurface),
+        modifier = Modifier.testTag("dislikeIconButton_${isLiked == false}")) {
+          Icon(
+              imageVector = Icons.Default.ThumbDown,
+              contentDescription = "Dislike",
+              tint =
+                  if (isLiked == false) MaterialTheme.colorScheme.onError
+                  else MaterialTheme.colorScheme.onSurface)
         }
-    }
+  }
 }
 
 /** Display a single interest in a box */
 @Composable
 fun InterestBox(interest: String) {
-    Box(
-        modifier =
-        Modifier
-            .background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
-            .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
-            .testTag("$interest"),
-        contentAlignment = Alignment.Center) {
+  Box(
+      modifier =
+          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+              .padding(horizontal = TEXT_FONTSIZE.dp, vertical = STANDARD_PADDING.dp)
+              .testTag("$interest"),
+      contentAlignment = Alignment.Center) {
         Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
-    }
+      }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -387,326 +357,321 @@ fun UserProfile(
     listActivitiesViewModel: ListActivitiesViewModel,
     uid: String
 ) {
-    var activityType by remember { mutableIntStateOf(0) }
-    val uiState by listActivitiesViewModel.uiState.collectAsState()
-    val activitiesList =
-        (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-    val userActivities =
-        activitiesList.filter {
-            it.creator == user.id || it.participants.map { it.id }.contains(user.id)
+  var activityType by remember { mutableIntStateOf(0) }
+  val uiState by listActivitiesViewModel.uiState.collectAsState()
+  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+  val userActivities =
+      activitiesList.filter {
+        it.creator == user.id || it.participants.map { it.id }.contains(user.id)
+      }
+  val hourDateViewModel = HourDateViewModel()
+  var showMenu by remember { mutableStateOf(false) }
+  val context = LocalContext.current
+  val networkManager = NetworkManager(context)
+
+  Scaffold(
+      bottomBar = {
+        if (uid == "") {
+          BottomNavigationMenu(
+              onTabSelect = { route -> navigationActions.navigateTo(route) },
+              tabList = LIST_TOP_LEVEL_DESTINATION,
+              selectedItem = navigationActions.currentRoute())
         }
-    val hourDateViewModel = HourDateViewModel()
-    var showMenu by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val networkManager = NetworkManager(context)
-
-    Scaffold(
-        bottomBar = {
-            if(uid==""){
-            BottomNavigationMenu(
-                onTabSelect = { route -> navigationActions.navigateTo(route) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = navigationActions.currentRoute())}
-        },
-        topBar = {
-
-            TopAppBar(
-                modifier = Modifier.testTag("profileTopBar"),
-                title = {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            modifier = Modifier.testTag("userName"),
-                            text = user.name,
-                            style = TextStyle(
-                                fontSize = MEDIUM_PADDING.sp,
-
-                                fontWeight = FontWeight(MAXIMUM_FONT_WEIGHT),
-                                color = Color(DARK_GRAY),
-
-
-                                )
-                        )
+      },
+      topBar = {
+        TopAppBar(
+            modifier = Modifier.testTag("profileTopBar"),
+            title = {
+              Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    modifier = Modifier.testTag("userName"),
+                    text = user.name,
+                    style =
+                        TextStyle(
+                            fontSize = MEDIUM_PADDING.sp,
+                            fontWeight = FontWeight(MAXIMUM_FONT_WEIGHT),
+                            color = Color(DARK_GRAY),
+                        ))
+              }
+            },
+            navigationIcon = {
+              if (uid != "") {
+                GoBackButton(navigationActions)
+              }
+            },
+            actions = {
+              if (uid == "") {
+                IconButton(
+                    onClick = { showMenu = true },
+                    modifier = Modifier.testTag("moreOptionsButton")) {
+                      Icon(
+                          imageVector = Icons.Default.Settings,
+                          contentDescription = "More options",
+                          modifier = Modifier.testTag("settingsIcon"))
                     }
-                },
-                navigationIcon = {if(uid!=""){ GoBackButton(navigationActions)
-
-                                }
-    },
-                actions = {
-                    if(uid==""){
-                    IconButton(
-                        onClick = { showMenu = true }, modifier = Modifier.testTag("moreOptionsButton")) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "More options", modifier = Modifier.testTag("settingsIcon"))
-                    }
-                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                        DropdownMenuItem(
-                            modifier = Modifier.testTag("logoutMenuItem"),
-                            text = { Text("Logout") },
-                            onClick = {
-                                performOfflineAwareAction(
-                                    context = context,
-                                    networkManager = networkManager,
-                                    onPerform = {
-                                        showMenu = false
-                                        profileViewModel.clearUserData()
-                                        Firebase.auth.signOut()
-                                        navigationActions.navigateTo(Screen.AUTH)
-                                    })
-                            },
-                            enabled = Firebase.auth.currentUser?.isAnonymous == false)
-                        DropdownMenuItem(
-                            modifier = Modifier.testTag("editProfileMenuItem"),
-                            text = { Text("Edit profile") },
-                            onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
-                    }}
-                })
-        })
-    { innerPadding ->
+                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                  DropdownMenuItem(
+                      modifier = Modifier.testTag("logoutMenuItem"),
+                      text = { Text("Logout") },
+                      onClick = {
+                        performOfflineAwareAction(
+                            context = context,
+                            networkManager = networkManager,
+                            onPerform = {
+                              showMenu = false
+                              profileViewModel.clearUserData()
+                              Firebase.auth.signOut()
+                              navigationActions.navigateTo(Screen.AUTH)
+                            })
+                      },
+                      enabled = Firebase.auth.currentUser?.isAnonymous == false)
+                  DropdownMenuItem(
+                      modifier = Modifier.testTag("editProfileMenuItem"),
+                      text = { Text("Edit profile") },
+                      onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
+                }
+              }
+            })
+      }) { innerPadding ->
         Column(
-            modifier= Modifier
-                .padding(innerPadding)
-                .testTag("profileContentColumn"),
+            modifier = Modifier.padding(innerPadding).testTag("profileContentColumn"),
             verticalArrangement = Arrangement.spacedBy(NORMAL_PADDING.dp, Alignment.Top),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              ProfileHeader(user, imageViewModel, userActivities)
 
-            ProfileHeader(user, imageViewModel, userActivities)
+              ShowInterests(user)
 
-            ShowInterests(user)
+              Row(
+                  horizontalArrangement = Arrangement.SpaceEvenly,
+                  verticalAlignment = Alignment.Top,
+                  modifier = Modifier.fillMaxWidth().testTag("activityTypeRow")) {
+                    IconButton(
+                        onClick = { activityType = 0 },
+                        modifier =
+                            if (activityType == 0)
+                                Modifier.background(Color.LightGray, shape = CircleShape)
+                                    .testTag("createdActivities")
+                            else Modifier.testTag("createdActivities")) {
+                          Icon(Icons.Outlined.Edit, contentDescription = "Created")
+                        }
 
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.Top,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("activityTypeRow")
-            ) {
-
-                IconButton(onClick = { activityType = 0 },
-                    modifier = if (activityType == 0) Modifier
-                        .background(Color.LightGray, shape = CircleShape)
-                        .testTag("createdActivities") else Modifier.testTag("createdActivities")) {
-                    Icon(Icons.Outlined.Edit, contentDescription = "Created")
-
-                }
-
-                IconButton(onClick = { activityType = 1 },
-                    modifier = if (activityType == 1) Modifier
-                        .background(Color.LightGray, shape = CircleShape)
-                        .testTag("enrolledActivities") else Modifier.testTag("enrolledActivities")) {
-
-                    Icon(Icons.Outlined.Groups, contentDescription = "Enrolled")
-                }
-                IconButton(onClick = { activityType = 2 },
-                    modifier = if (activityType == 2) Modifier
-                        .background(Color.LightGray, shape = CircleShape)
-                        .testTag("passedActivities") else Modifier.testTag("passedActivities")) {
-
-                    Icon(Icons.Outlined.HourglassFull, contentDescription = "Passed")
-
-                }
-
+                    IconButton(
+                        onClick = { activityType = 1 },
+                        modifier =
+                            if (activityType == 1)
+                                Modifier.background(Color.LightGray, shape = CircleShape)
+                                    .testTag("enrolledActivities")
+                            else Modifier.testTag("enrolledActivities")) {
+                          Icon(Icons.Outlined.Groups, contentDescription = "Enrolled")
+                        }
+                    IconButton(
+                        onClick = { activityType = 2 },
+                        modifier =
+                            if (activityType == 2)
+                                Modifier.background(Color.LightGray, shape = CircleShape)
+                                    .testTag("passedActivities")
+                            else Modifier.testTag("passedActivities")) {
+                          Icon(Icons.Outlined.HourglassFull, contentDescription = "Passed")
+                        }
+                  }
+              Column(
+                  verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.Top),
+                  horizontalAlignment = Alignment.Start,
+                  modifier = Modifier.testTag("activitiesColumn")) {
+                    DisplayActivitiesList(
+                        userActivities,
+                        activityType,
+                        user,
+                        hourDateViewModel,
+                        navigationActions,
+                        profileViewModel,
+                        listActivitiesViewModel,
+                        imageViewModel,
+                        uid)
+                  }
             }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.Top),
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier.testTag("activitiesColumn")
-            ) {
-                DisplayActivitiesList(
-                    userActivities,
-                    activityType,
-                    user,
-                    hourDateViewModel,
-                    navigationActions,
-                    profileViewModel,
-                    listActivitiesViewModel,
-                    imageViewModel,
-                    uid
-                )
-            }
-        }
-
-    }
-
+      }
 }
 
 @Composable
-fun DisplayActivitiesList(userActivities: List<Activity>, activityType: Int,user: User,hourDateViewModel: HourDateViewModel,navigationActions: NavigationActions,userProfileViewModel: ProfileViewModel,listActivitiesViewModel: ListActivitiesViewModel, imageViewModel: ImageViewModel,uid: String) {
-    var listToShow= emptyList<Activity>()
-    when (activityType) {
-        2 -> {
-            listToShow = userActivities.filter {  hourDateViewModel.combineDateAndTime(
+fun DisplayActivitiesList(
+    userActivities: List<Activity>,
+    activityType: Int,
+    user: User,
+    hourDateViewModel: HourDateViewModel,
+    navigationActions: NavigationActions,
+    userProfileViewModel: ProfileViewModel,
+    listActivitiesViewModel: ListActivitiesViewModel,
+    imageViewModel: ImageViewModel,
+    uid: String
+) {
+  var listToShow = emptyList<Activity>()
+  when (activityType) {
+    2 -> {
+      listToShow =
+          userActivities.filter {
+            hourDateViewModel.combineDateAndTime(
                 it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) <=
-                    Timestamp.now() }
-        }
-        0 -> {
-            listToShow = userActivities.filter { it.creator == user.id && hourDateViewModel.combineDateAndTime(
-                it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
-                    Timestamp.now()}
-        }
-        1 -> {
-            listToShow = userActivities.filter { (it.creator != user.id || it.participants.map { it.id }.contains(user.id) )&&   hourDateViewModel.combineDateAndTime(
-                it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
-                    Timestamp.now()}
-        }
+                Timestamp.now()
+          }
     }
-    val remainingTime = activityType != 2
-
-    if(listToShow.isEmpty() ){
-        if(uid=="") {
-            if (activityType == 2) {
-                Text("You have no past activities yet!", modifier = Modifier.testTag("noActivitiesText"))
-
-            } else {
-                PlusButtonToCreate(navigationActions = navigationActions, activityType)
-            }
-        }else {
-            Text("This participant has no activity in this section yet !", modifier = Modifier.testTag("noActivitiesText"))
-    }}
-    else{
-        LazyColumn(modifier= Modifier.testTag("activitiesList")) {
-            items(listToShow.size) { index ->
-                ActivityRow(
-                    activity = listToShow[index],
-                    listActivitiesViewModel = listActivitiesViewModel,
-                    navigationActions = navigationActions,
-                    userProfileViewModel = userProfileViewModel,
-                    userId = user.id,
-                    remainingTime = remainingTime,
-                    imageViewModel =imageViewModel
-                )
-                Spacer(modifier = Modifier.height(NORMAL_PADDING.dp))
-            }
-        }
+    0 -> {
+      listToShow =
+          userActivities.filter {
+            it.creator == user.id &&
+                hourDateViewModel.combineDateAndTime(
+                    it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                    Timestamp.now()
+          }
     }
+    1 -> {
+      listToShow =
+          userActivities.filter {
+            (it.creator != user.id || it.participants.map { it.id }.contains(user.id)) &&
+                hourDateViewModel.combineDateAndTime(
+                    it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                    Timestamp.now()
+          }
+    }
+  }
+  val remainingTime = activityType != 2
 
-
+  if (listToShow.isEmpty()) {
+    if (uid == "") {
+      if (activityType == 2) {
+        Text("You have no past activities yet!", modifier = Modifier.testTag("noActivitiesText"))
+      } else {
+        PlusButtonToCreate(navigationActions = navigationActions, activityType)
+      }
+    } else {
+      Text(
+          "This participant has no activity in this section yet !",
+          modifier = Modifier.testTag("noActivitiesText"))
+    }
+  } else {
+    LazyColumn(modifier = Modifier.testTag("activitiesList")) {
+      items(listToShow.size) { index ->
+        ActivityRow(
+            activity = listToShow[index],
+            listActivitiesViewModel = listActivitiesViewModel,
+            navigationActions = navigationActions,
+            userProfileViewModel = userProfileViewModel,
+            userId = user.id,
+            remainingTime = remainingTime,
+            imageViewModel = imageViewModel)
+        Spacer(modifier = Modifier.height(NORMAL_PADDING.dp))
+      }
+    }
+  }
 }
+
 @Composable
-fun ProfileHeader(user: User, imageViewModel: ImageViewModel,userActivities: List<Activity>) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .testTag("profileHeader")
-            .fillMaxWidth()
-    ) {
+fun ProfileHeader(user: User, imageViewModel: ImageViewModel, userActivities: List<Activity>) {
+  Row(
+      horizontalArrangement = Arrangement.SpaceEvenly,
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.testTag("profileHeader").fillMaxWidth()) {
         ProfileImage(
             userId = user.id,
-            modifier = Modifier
-                .size(IMAGE_SIZE.dp)
-                .clip(CircleShape)
-                .testTag("profilePicture"),
-            imageViewModel
-        )
+            modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+            imageViewModel)
         Row(
-            horizontalArrangement = Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
+            horizontalArrangement =
+                Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.Top,
-        ){
-            HeaderItem("Activities\nCreated",userActivities.filter { it.creator == user.id }.size.toString(),false)
-            HeaderItem("Activities\nJoined",userActivities.filter({
-                it.creator != user.id || it.participants.map { it.id }
-                    .contains(user.id)
-            }).size.toString(),false)
-            HeaderItem("Rating","4.7", true)}
-
-
-
-
-    }
+        ) {
+          HeaderItem(
+              "Activities\nCreated",
+              userActivities.filter { it.creator == user.id }.size.toString(),
+              false)
+          HeaderItem(
+              "Activities\nJoined",
+              userActivities
+                  .filter({
+                    it.creator != user.id || it.participants.map { it.id }.contains(user.id)
+                  })
+                  .size
+                  .toString(),
+              false)
+          HeaderItem("Rating", "4.7", true)
+        }
+      }
 }
 
 @Composable
-fun HeaderItem( field: String, number: String,isStar:Boolean){
-    Column(
-        verticalArrangement = Arrangement.spacedBy(
-            NORMAL_PADDING.dp,
-            Alignment.CenterVertically
-        ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.testTag("headerItem")
-    ) {
+fun HeaderItem(field: String, number: String, isStar: Boolean) {
+  Column(
+      verticalArrangement = Arrangement.spacedBy(NORMAL_PADDING.dp, Alignment.CenterVertically),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.testTag("headerItem")) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(
-                SMALL_PADDING.dp,
-                Alignment.CenterHorizontally
-            ),
+            horizontalArrangement =
+                Arrangement.spacedBy(SMALL_PADDING.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                modifier = Modifier.testTag("headerItemTitle"),
-                text = number,
-                style = TextStyle(
-                    fontSize = MEDIUM_PADDING.sp,
-                    fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+          Text(
+              modifier = Modifier.testTag("headerItemTitle"),
+              text = number,
+              style =
+                  TextStyle(
+                      fontSize = MEDIUM_PADDING.sp,
+                      fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                      color = Color(DARK_GRAY),
+                      textAlign = TextAlign.Center,
+                  ))
+          if (isStar) {
+            Icon(
+                Icons.Default.Star,
+                contentDescription = "ratingStar",
+                modifier = Modifier.size(MEDIUM_PADDING.dp).testTag("ratingStar"))
+          }
+        }
+        Text(
+            modifier = Modifier.testTag("headerItemField"),
+            text = field,
+            style =
+                TextStyle(
+                    fontSize = TEXT_FONTSIZE.sp,
+                    fontWeight = FontWeight(VERY_LARGE_FONT_WEIGHT),
                     color = Color(DARK_GRAY),
                     textAlign = TextAlign.Center,
-                )
-            )
-            if(isStar){
-                Icon(
-                    Icons.Default.Star,
-                    contentDescription = "ratingStar",
-                    modifier = Modifier
-                        .size(MEDIUM_PADDING.dp)
-                        .testTag("ratingStar")
-                )
-            }
-
-        }
-        Text(modifier = Modifier.testTag("headerItemField"),
-            text = field,
-            style = TextStyle(
-                fontSize = TEXT_FONTSIZE.sp,
-                fontWeight = FontWeight(VERY_LARGE_FONT_WEIGHT),
-                color = Color(DARK_GRAY),
-                textAlign = TextAlign.Center,
-            )
-        )
-    }
+                ))
+      }
 }
-@Composable
-fun ShowInterests(user: User){
-    Column(
-        verticalArrangement = Arrangement.spacedBy(TEXT_FONTSIZE.dp, Alignment.Top),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier= Modifier
-            .padding(horizontal = TEXT_FONTSIZE.dp)
-            .testTag("interestsSection")
-    ) {
 
+@Composable
+fun ShowInterests(user: User) {
+  Column(
+      verticalArrangement = Arrangement.spacedBy(TEXT_FONTSIZE.dp, Alignment.Top),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.padding(horizontal = TEXT_FONTSIZE.dp).testTag("interestsSection")) {
         Text(
             modifier = Modifier.testTag("interestsTitle"),
             text = "Interests",
-            style = TextStyle(
-                fontSize = BIG_PADDING.sp,
-                lineHeight = LARGE_PADDING.sp,
-                fontWeight = FontWeight(LARGE_FONT_WEIGHT),
-                color = Color(DARK_GRAY),
-
-                )
-        )
+            style =
+                TextStyle(
+                    fontSize = BIG_PADDING.sp,
+                    lineHeight = LARGE_PADDING.sp,
+                    fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                    color = Color(DARK_GRAY),
+                ))
         LazyRow(
             modifier = Modifier.testTag("interestsRow"),
             horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
             contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-            user.interests?.let { interests ->
+              user.interests?.let { interests ->
                 items(interests.size) { index ->
-                    InterestBox(interest = user.interests[index].interest)
+                  InterestBox(interest = user.interests[index].interest)
                 }
+              }
             }
-        }
-
-
-    }
+      }
 }
+
 @Composable
-fun GoBackButton(navigationActions: NavigationActions){
-    IconButton(
-        modifier = Modifier.testTag("goBackButton"),
-        onClick = { navigationActions.goBack() }) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back") }
+fun GoBackButton(navigationActions: NavigationActions) {
+  IconButton(
+      modifier = Modifier.testTag("goBackButton"), onClick = { navigationActions.goBack() }) {
+        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+      }
 }

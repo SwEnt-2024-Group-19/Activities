@@ -39,7 +39,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 
 class ProfileScreenTest {
 
@@ -75,14 +74,12 @@ class ProfileScreenTest {
       it.getArgument<(List<Activity>) -> Unit>(0)(activityListWithPastActivity)
     }
 
-
     listActivitiesViewModel.getActivities()
     val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
 
-
-      `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
+    `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
     mockImageViewModel = ImageViewModel(mockImageRepository)
     mockHourDateViewModel = mock(HourDateViewModel::class.java)

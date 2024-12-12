@@ -1,6 +1,5 @@
 package com.android.sample.model.profile
 
-import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.database.AppDatabase
 import com.android.sample.model.profile.database.UserDao
@@ -15,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.mockStatic
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
@@ -225,13 +223,13 @@ class ProfileViewModelTest {
     // Verify that the DAO's insert method was called
     verify(mockUserDao).insert(testUser)
   }
+
   @Test
   fun getUserDataInvokesOnResultWithNullOnFailure() {
 
     val userId = "testUserId"
     val exception = Exception("Repository failure")
     val onResult = mock<(User?) -> Unit>()
-
 
     `when`(profilesRepository.getUser(eq(userId), any(), any())).thenAnswer {
       val onFailure = it.getArgument<(Exception) -> Unit>(2)
@@ -240,7 +238,6 @@ class ProfileViewModelTest {
 
     // Act
     profileViewModel.getUserData(userId, onResult)
-
 
     verify(onResult).invoke(null)
 
@@ -254,21 +251,15 @@ class ProfileViewModelTest {
     val expectedUser = testUser
     val onResult = mock<(User?) -> Unit>()
 
-
     `when`(profilesRepository.getUser(eq(userId), any(), any())).thenAnswer {
       val onSuccess = it.getArgument<(User?) -> Unit>(1)
       onSuccess(expectedUser)
     }
 
-
     profileViewModel.getUserData(userId, onResult)
-
 
     verify(onResult).invoke(expectedUser)
 
-
     verify(profilesRepository).getUser(eq(userId), any(), any())
   }
-
-
 }
