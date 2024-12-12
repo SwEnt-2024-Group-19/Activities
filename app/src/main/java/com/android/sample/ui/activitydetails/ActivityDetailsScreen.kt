@@ -10,7 +10,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -64,7 +63,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -90,7 +88,6 @@ import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import java.lang.Double.parseDouble
 import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.UUID
@@ -795,7 +792,6 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
   }
 }
 
-@OptIn(ExperimentalLayoutApi::class) // Required for FlowRow
 @Composable
 fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
   Card(
@@ -806,47 +802,37 @@ fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
       elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp), // Padding inside the card
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
               Text(
-                  text = creator.name + " " + creator.surname,
-                  style = MaterialTheme.typography.titleLarge, // More impactful typography
+                  text = "${creator.name} ${creator.surname}",
+                  style = MaterialTheme.typography.titleLarge,
                   color = MaterialTheme.colorScheme.onSurface,
-                  fontSize = 25.sp)
+                  fontSize = 25.sp,
+                  modifier = Modifier.testTag("creatorName"))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
                   modifier = Modifier.padding(all = SMALL_PADDING.dp)) {
-                    // Displaying stars for rating
-
                     Text(
-                        text =
-                            parseDouble(creator.id)
-                                .format(1), // Display the numeric rating next to the stars
-                        modifier = Modifier.align(Alignment.CenterVertically),
+                        text = "Blank",
+                        modifier =
+                            Modifier.align(Alignment.CenterVertically).testTag("creatorRating"),
                         color = Color.Black,
                         fontSize = 18.sp)
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = "Full Star",
                         tint = Color.Black,
-                        modifier = Modifier.size(18.dp))
+                        modifier = Modifier.size(18.dp).testTag("ratingStar"))
                     Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
-                    // Displaying the number of activities created
                     Text(
                         text = "$nbActivitiesCreated Activities Created",
                         style = MaterialTheme.typography.bodyLarge,
-                        fontSize = 18.sp)
+                        fontSize = 18.sp,
+                        modifier = Modifier.testTag("activityCount"))
                   }
             }
       }
-}
-// Extension function to format Double values to one decimal place
-fun Double.format(digits: Int) = "%.${digits}f".format(this)
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewCreatorRow() {
-  CreatorRow(User("1.203930", "John", "Doe", listOf(), listOf("122"), "2024", listOf()), 101)
 }
