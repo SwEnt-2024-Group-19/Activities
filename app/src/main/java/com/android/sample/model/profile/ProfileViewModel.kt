@@ -79,7 +79,6 @@ constructor(private val repository: ProfilesRepository, private val localDatabas
             userId = userId,
             onSuccess = onResult,
             onFailure = {
-                Log.e("ProfileViewModel", "Failed to fetch user data for $userId")
                 onResult(null)
             }
         )
