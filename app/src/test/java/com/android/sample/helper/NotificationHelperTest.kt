@@ -84,25 +84,20 @@ class NotificationHelperUnitTest {
     val activityId = "a1"
     val activityName = "Test Activity"
     val notificationTitle = "Activity Deleted"
-    val participants = listOf(
-      User(
-        id = "u1",
-        name = "Alice",
-        surname = "Smith",
-        interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
-        activities = listOf("a1", "a2"),
-        photo = null,
-        likedActivities = listOf("a1")
-      )
-    )
+    val participants =
+        listOf(
+            User(
+                id = "u1",
+                name = "Alice",
+                surname = "Smith",
+                interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
+                activities = listOf("a1", "a2"),
+                photo = null,
+                likedActivities = listOf("a1")))
 
     // When
     notificationHelper.sendDeletionNotification(
-      activityId,
-      activityName,
-      notificationTitle,
-      participants
-    )
+        activityId, activityName, notificationTitle, participants)
 
     // Then
     // Verify that PendingIntent.send() was called for each participant
@@ -119,29 +114,23 @@ class NotificationHelperUnitTest {
     val activityId = "a1"
     val activityName = "Test Activity"
     val notificationTitle = "Activity Deleted"
-    val participants = listOf(
-      User(
-        id = "u1",
-        name = "Alice",
-        surname = "Smith",
-        interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
-        activities = listOf("a1", "a2"),
-        photo = null,
-        likedActivities = listOf("a1")
-      )
-    )
+    val participants =
+        listOf(
+            User(
+                id = "u1",
+                name = "Alice",
+                surname = "Smith",
+                interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
+                activities = listOf("a1", "a2"),
+                photo = null,
+                likedActivities = listOf("a1")))
 
     // Setup pendingIntent to throw exception
-    Mockito.doThrow(PendingIntent.CanceledException::class.java)
-      .`when`(pendingIntent).send()
+    Mockito.doThrow(PendingIntent.CanceledException::class.java).`when`(pendingIntent).send()
 
     // When
     notificationHelper.sendDeletionNotification(
-      activityId,
-      activityName,
-      notificationTitle,
-      participants
-    )
+        activityId, activityName, notificationTitle, participants)
 
     // Then
     // Verify that the code handles the exception
