@@ -50,8 +50,8 @@ class CreateActivityScreenTest {
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var profileViewModel: ProfileViewModel
 
-  private val location = Location(46.519962, 6.633597, "EPFL")
-  private val location2 = Location(46.5, 6.6, "Lausanne")
+  private val location = Location(46.519962, 6.633597, "EPFL","Ecole Polytechnique Fédérale de Lausanne")
+  private val location2 = Location(46.5, 6.6, "Lausanne","Lausanne, Vaud")
   private val locationList = listOf(location, location2)
   private val locationListFlow = MutableStateFlow(listOf(location, location2))
 
