@@ -56,7 +56,7 @@ class LocationViewModelTest {
         whenever(mockPermissionChecker.hasLocationPermission()).thenReturn(true)
         doAnswer { invocation ->
               val onUpdate = invocation.arguments[0] as (Location) -> Unit
-              onUpdate(Location(1.0, 2.0, "Updated Location"))
+              onUpdate(Location(1.0, 2.0, "Updated Location", "Updated Location"))
               null
             }
             .whenever(mockRepository)
@@ -67,7 +67,9 @@ class LocationViewModelTest {
 
         // Then
         verify(mockRepository).startLocationUpdates(any())
-        assertEquals(Location(1.0, 2.0, "Updated Location"), viewModel.currentLocation.first())
+        assertEquals(
+            Location(1.0, 2.0, "Updated Location", "Updated Location"),
+            viewModel.currentLocation.first())
       }
 
   @Test
@@ -97,7 +99,7 @@ class LocationViewModelTest {
       runTest {
         // Given
         viewModel.setCurrentLocation(null)
-        val activityLocation = Location(1.0, 2.0, "Test Location")
+        val activityLocation = Location(1.0, 2.0, "Test Location", "Test Location")
 
         // When
         val distance = viewModel.getDistanceFromCurrentLocation(activityLocation)
@@ -110,9 +112,10 @@ class LocationViewModelTest {
   fun `getDistanceFromCurrentLocation should return distance between current location and activity location`() =
       runTest {
         // Given
-        val currentLocation = Location(46.518831258, 6.559331096, "EPFL")
+        val currentLocation =
+            Location(46.518831258, 6.559331096, "EPFL", "Ecole Polytechnique Fédérale de Lausanne")
         viewModel.setCurrentLocation(currentLocation)
-        val activityLocation = Location(46.5375, 6.573611, "Epenex")
+        val activityLocation = Location(46.5375, 6.573611, "Epenex", "Epenex")
 
         // When
         val distance = viewModel.getDistanceFromCurrentLocation(activityLocation)
@@ -123,4 +126,28 @@ class LocationViewModelTest {
           assertEquals(2.34f, distance, 0.05f)
         }
       }
+
+  @Test
+  fun `parseBody should correctly parse locations with shortName and name`() = runTest {
+    // Given
+    val mockLocations =
+        listOf(
+            Location(1.0, 2.0, "Short Name 1", "Name 1"),
+            Location(3.0, 4.0, "Short Name 2", "Name 2"))
+    whenever(mockRepository.search(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(List<Location>) -> Unit>(1)
+      onSuccess(mockLocations)
+    }
+
+    // When
+    viewModel.setQuery("Test Query")
+    val suggestions = viewModel.locationSuggestions.first()
+
+    // Then
+    assertEquals(2, suggestions.size)
+    assertEquals("Short Name 1", suggestions[0].shortName)
+    assertEquals("Name 1", suggestions[0].name)
+    assertEquals("Short Name 2", suggestions[1].shortName)
+    assertEquals("Name 2", suggestions[1].name)
+  }
 }

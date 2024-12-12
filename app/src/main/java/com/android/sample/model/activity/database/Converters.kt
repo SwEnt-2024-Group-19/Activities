@@ -1,6 +1,7 @@
 package com.android.sample.model.activity.database
 
 import androidx.room.TypeConverter
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.Interest
@@ -63,6 +64,17 @@ class Converters {
   @TypeConverter
   fun toCommentList(value: String): List<Comment>? {
     val listType = object : TypeToken<List<Comment>>() {}.type
+    return Gson().fromJson(value, listType)
+  }
+
+  @TypeConverter
+  fun fromCategoriesList(categories: List<Category>?): String {
+    return Gson().toJson(categories)
+  }
+
+  @TypeConverter
+  fun toCategoriesList(value: String): List<Category>? {
+    val listType = object : TypeToken<List<Category>>() {}.type
     return Gson().fromJson(value, listType)
   }
 

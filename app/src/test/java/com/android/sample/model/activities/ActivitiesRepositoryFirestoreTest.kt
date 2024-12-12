@@ -205,7 +205,7 @@ class ActivitiesRepositoryFirestoreTest {
     assertEquals(15.0, result.price, 0.0001)
     assertEquals(12.34, result.location!!.latitude, 0.0001)
     assertEquals(56.78, result.location!!.longitude, 0.0001)
-    assertEquals("Sample Location", result.location!!.name)
+    assertEquals("Sample Location", result.location!!.shortName)
     assertEquals("creatorUserId", result.creator)
     assertEquals(listOf("image1.jpg", "image2.jpg"), result.images)
     assertEquals(5L, result.placesLeft)
@@ -235,7 +235,7 @@ class ActivitiesRepositoryFirestoreTest {
     assertTrue(result.images.isEmpty())
     assertTrue(result.participants.isEmpty())
     assertTrue(result.comments.isEmpty())
-    assertEquals("No Location", result.location!!.name)
+    assertEquals("No Location", result.location!!.shortName)
     assertEquals(ActivityStatus.ACTIVE, result.status)
     assertEquals(ActivityType.INDIVIDUAL, result.type)
   }

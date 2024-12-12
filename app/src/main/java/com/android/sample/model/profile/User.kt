@@ -1,14 +1,9 @@
 package com.android.sample.model.profile
 
-import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.android.sample.resources.C.Tag.ART_ACTIVITY_COLOR
-import com.android.sample.resources.C.Tag.CULTURAL_ACTIVITY_COLOR
-import com.android.sample.resources.C.Tag.INDOOR_COLOR
-import com.android.sample.resources.C.Tag.MUSICAL_ACTIVITY_COLOR
-import com.android.sample.resources.C.Tag.OUTDOOR_COLOR
-import com.android.sample.resources.C.Tag.SPORT_COLOR
+import com.android.sample.model.activity.Category
+import com.android.sample.model.activity.categories
 
 @Entity(tableName = "User")
 data class User(
@@ -21,22 +16,39 @@ data class User(
     val likedActivities: List<String>? = emptyList()
 )
 
-data class Interest(val category: String, val interest: String)
+data class Interest(val name: String, val category: Category)
 
-val InterestCategories =
-    listOf(
-        "Sport",
-        "Outdoor Activity",
-        "Indoor Activity",
-        "Cultural Activity",
-        "Art Activity",
-        "Musical Activity") + "None"
-val InterestCategoriesColors =
+val interestStringValues =
     mapOf(
-        "Sport" to SPORT_COLOR,
-        "Outdoor Activity" to OUTDOOR_COLOR,
-        "Indoor Activity" to INDOOR_COLOR,
-        "Cultural Activity" to CULTURAL_ACTIVITY_COLOR,
-        "Art Activity" to ART_ACTIVITY_COLOR,
-        "Musical Activity" to MUSICAL_ACTIVITY_COLOR,
-        "None" to Color.Gray)
+        categories[0] to
+            listOf( // Sport
+                "Basketball",
+                "Cycling",
+                "Football",
+                "Running",
+                "Swimming",
+                "Tennis",
+                "Volleyball",
+                "Yoga",
+                "Other sports"),
+        categories[1] to
+            listOf( // Culture
+                "Art", "History", "Science", "Travel", "Other culture"),
+        categories[2] to
+            listOf( // Skills
+                "Cooking",
+                "Dancing",
+                "Programming",
+                "Writing",
+                "Drawing",
+                "Photography",
+                "Other skills"),
+        categories[3] to
+            listOf( // Entertainment
+                "Movies", "Music", "Reading", "TV Shows", "Video Games", "Other entertainment"))
+
+val interestsCategories = interestStringValues.keys.toList()
+val categoryOf =
+    interestStringValues
+        .flatMap { (category, interests) -> interests.map { it to category } }
+        .toMap()

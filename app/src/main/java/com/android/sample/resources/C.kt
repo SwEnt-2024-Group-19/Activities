@@ -3,6 +3,7 @@ package com.android.sample.resources
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.model.activity.Category
 
 // Like R, but C
 object C {
@@ -84,6 +85,17 @@ object C {
     const val ROUNDED_CORNER_SHAPE_DEFAULT = 12
 
     const val LINE_STROKE = 1
+
+    fun colorOfCategory(category: Category): Color {
+      val colorCode =
+          when (category) {
+            Category.SPORT -> 0xFF4CAF50
+            Category.SKILLS -> 0xFF2196F3
+            Category.CULTURE -> 0xFF9C27B0
+            Category.ENTERTAINMENT -> 0xFFFF9800
+          }
+      return Color(colorCode)
+    }
 
     const val MIN_PASSWORD_LENGTH = 6
 
