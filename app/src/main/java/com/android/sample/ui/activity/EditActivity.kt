@@ -72,6 +72,7 @@ import com.android.sample.model.profile.interestsCategories
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
@@ -105,7 +106,7 @@ fun EditActivityScreen(
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
   var selectedLocation by remember {
-    mutableStateOf(activity?.location ?: Location(0.0, 0.0, "Origin"))
+    mutableStateOf(activity?.location ?: Location(0.0, 0.0, "Origin", "Origin"))
   }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
@@ -490,8 +491,8 @@ fun EditActivityScreen(
                           text = {
                             Text(
                                 text =
-                                    location.name.take(30) +
-                                        if (location.name.length > 30) "..."
+                                    location.name.take(TOP_TITLE_SIZE) +
+                                        if (location.name.length > TOP_TITLE_SIZE) "..."
                                         else "", // Limit name length
                                 maxLines = 1 // Ensure name doesn't overflow
                                 )

@@ -28,7 +28,8 @@ class ListActivitiesViewModelTest {
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var profilesRepository: ProfilesRepository
 
-  private val location = Location(46.519962, 6.633597, "EPFL")
+  private val location =
+      Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne")
   private val activity = activityBiking
 
   @Before

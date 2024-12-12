@@ -19,7 +19,7 @@ class MockActivitiesRepository : ActivitiesRepository {
               category = Category.SPORT,
               subcategory = "Football",
               price = 10.0,
-              location = Location(0.0, 0.0, "origin"),
+              location = Location(0.0, 0.0, "origin", "origin"),
               creator = "creator",
               images = listOf(),
               placesLeft = 5,
