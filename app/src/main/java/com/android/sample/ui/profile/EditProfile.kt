@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -62,6 +61,7 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
@@ -292,27 +292,6 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
             onInterestChange = { newInterest = it })
         Spacer(Modifier.height(STANDARD_PADDING.dp))
         // Add Button
-
-        // Interests List
-        LazyRow(
-            modifier = Modifier.testTag("interestsList"),
-            horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
-              items(newListInterests.size) { interest ->
-                InterestEditBox(
-                    category = newListInterests[interest].category,
-                    interest = newListInterests[interest].interest,
-                    onRemove = {
-                      performOfflineAwareAction(
-                          context = context,
-                          networkManager = networkManager,
-                          onPerform = {
-                            val updatedList = newListInterests - newListInterests[interest]
-                            newListInterests = updatedList
-                            onUpdateInterests(updatedList)
-                          })
-                    })
-              }
-            }
         Button(
             onClick = {
               performOfflineAwareAction(
@@ -337,6 +316,26 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
             modifier = Modifier.testTag("addInterestButton"),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
               Text("Add Interest")
+            }
+        // Interests List
+        LazyRow(
+            modifier = Modifier.testTag("interestsList"),
+            horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
+              items(newListInterests.size) { interest ->
+                InterestEditBox(
+                    category = newListInterests[interest].category,
+                    interest = newListInterests[interest].interest,
+                    onRemove = {
+                      performOfflineAwareAction(
+                          context = context,
+                          networkManager = networkManager,
+                          onPerform = {
+                            val updatedList = newListInterests - newListInterests[interest]
+                            newListInterests = updatedList
+                            onUpdateInterests(updatedList)
+                          })
+                    })
+              }
             }
       }
 }
@@ -422,21 +421,38 @@ fun InterestInputRow(
 @Composable
 fun InterestEditBox(category: String, interest: String, onRemove: () -> Unit) {
   val backgroundColor = InterestCategoriesColors[category] ?: Color.LightGray
-  Log.d("InterestEditBox", "Interest: $interest")
-  Log.d("InterestEditBox", "Category: $category")
-  Log.d("InterestEditBox", "Color: $backgroundColor")
 
   Box(
       modifier =
-          Modifier.background(color = backgroundColor, RoundedCornerShape(STANDARD_PADDING.dp))
-              .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
-              .testTag("$interest")) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
-          Spacer(Modifier.width(STANDARD_PADDING.dp))
-          IconButton(onClick = onRemove, modifier = Modifier.testTag("removeInterest-$interest")) {
-            Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
-          }
-        }
+          Modifier.background(
+                  color = backgroundColor,
+                  shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
+              .padding(horizontal = MEDIUM_PADDING.dp)
+              .testTag("$interest"),
+      contentAlignment = Alignment.Center // Ensures content is centered within the Box
+      ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement =
+                Arrangement.SpaceBetween, // Ensures spacing between Text and Icon
+            modifier = Modifier.fillMaxWidth() // Allows Row to take full width of the Box
+            ) {
+              Text(
+                  text = interest,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  color = Color.Black,
+                  modifier =
+                      Modifier.padding(vertical = MEDIUM_PADDING.dp, horizontal = SMALL_PADDING.dp))
+              IconButton(
+                  onClick = onRemove,
+                  modifier =
+                      Modifier.size(18.dp) // Optional: Adjust size of the IconButton
+                          .testTag("removeInterest-$interest")) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Remove",
+                        modifier = Modifier.fillMaxSize())
+                  }
+            }
       }
 }
