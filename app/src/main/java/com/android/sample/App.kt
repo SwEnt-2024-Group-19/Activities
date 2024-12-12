@@ -43,7 +43,7 @@ class App : Application() {
   fun sendDeletionNotification(activity: Activity) {
     // No need for isCreator parameter since here we don't make distinction between participant or
     // creator
-    val title = "Activity '${activity.title}' has been cancelled :("
+    val title = "Activity '${activity.title}' has been cancelled "
 
     notificationHelper.sendDeletionNotification(
         activityId = activity.uid,
