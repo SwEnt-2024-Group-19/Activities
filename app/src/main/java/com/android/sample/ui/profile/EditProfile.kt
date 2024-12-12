@@ -48,17 +48,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
+import com.android.sample.model.activity.Category
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.Interest
-import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.model.profile.categoryOf
+import com.android.sample.model.profile.interestStringValues
+import com.android.sample.model.profile.interestsCategories
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
@@ -265,79 +270,102 @@ fun EditProfileScreen(
 fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<Interest>) -> Unit) {
 
   var newListInterests by remember { mutableStateOf(initialInterests) }
-  val categories = InterestCategories
-  var selectedCategory by remember { mutableStateOf("") }
-  var expanded by remember { mutableStateOf(false) }
-  var newInterest by remember { mutableStateOf("") }
+  var selectedCategory: Category? by remember { mutableStateOf(null) }
+  var expandedCategory by remember { mutableStateOf(false) }
+  var expandedInterest by remember { mutableStateOf(false) }
+  var newInterest: String? by remember { mutableStateOf(null) }
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
 
   Row(verticalAlignment = Alignment.CenterVertically) {
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-      OutlinedTextField(
-          value = selectedCategory,
-          onValueChange = { selectedCategory = it },
-          label = { Text("Category") },
-          readOnly = true,
-          modifier = Modifier.menuAnchor().width(LARGE_IMAGE_SIZE.dp).testTag("categoryDropdown"))
+    ExposedDropdownMenuBox(
+        expanded = expandedCategory, onExpandedChange = { expandedCategory = !expandedCategory }) {
+          OutlinedTextField(
+              value =
+                  selectedCategory?.name ?: context.getString(R.string.select_activity_category),
+              onValueChange = {},
+              label = { Text("Category") },
+              readOnly = true,
+              modifier =
+                  Modifier.menuAnchor().width(LARGE_IMAGE_SIZE.dp).testTag("categoryDropdown"))
 
-      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-        categories.forEach { category ->
-          DropdownMenuItem(
-              text = { Text(category) },
-              onClick = {
-                selectedCategory = category
-                expanded = false
-              })
-        }
-      }
-    }
-
-    OutlinedTextField(
-        value = newInterest,
-        onValueChange = { newInterest = it },
-        label = { Text("New Interest") },
-        enabled = selectedCategory.isNotEmpty() && selectedCategory != "None",
-        modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
-  }
-
-  Row(verticalAlignment = Alignment.CenterVertically) {
-    Button(
-        onClick = {
-          performOfflineAwareAction(
-              context = context,
-              networkManager = networkManager,
-              onPerform = {
-                if (newInterest.isNotBlank() &&
-                    selectedCategory.isNotBlank() &&
-                    selectedCategory != "None") {
-                  val updatedList = newListInterests + Interest(selectedCategory, newInterest)
-                  newListInterests = updatedList
-                  newInterest = ""
-                  selectedCategory = ""
-                  onUpdateInterests(updatedList)
+          ExposedDropdownMenu(
+              expanded = expandedCategory, onDismissRequest = { expandedCategory = false }) {
+                interestsCategories.forEach { category ->
+                  DropdownMenuItem(
+                      text = { Text(category.name) },
+                      onClick = {
+                        selectedCategory = category
+                        expandedCategory = false
+                        newInterest = null
+                      })
                 }
-              })
-        },
-        enabled =
-            newInterest.isNotBlank() && selectedCategory.isNotBlank() && selectedCategory != "None",
-        modifier = Modifier.testTag("addInterestButton")) {
-          Text("Add")
+              }
+        }
+
+    ExposedDropdownMenuBox(
+        expanded = expandedInterest,
+        onExpandedChange = { expandedInterest = !expandedInterest },
+        modifier = Modifier.testTag("interestDropdown")) {
+          OutlinedTextField(
+              value = newInterest ?: context.getString(R.string.select_activity_type),
+              onValueChange = { newInterest = it },
+              label = { Text("Interest") },
+              modifier = Modifier.menuAnchor().width(LARGE_IMAGE_SIZE.dp),
+              readOnly = true)
+
+          ExposedDropdownMenu(
+              expanded = expandedInterest, onDismissRequest = { expandedInterest = false }) {
+                selectedCategory?.let { category ->
+                  interestStringValues[category]?.forEach { interest ->
+                    DropdownMenuItem(
+                        text = { Text(interest) },
+                        onClick = {
+                          newInterest = interest
+                          expandedInterest = false
+                        })
+                  }
+                }
+              }
         }
   }
+  Button(
+      onClick = {
+        performOfflineAwareAction(
+            context = context,
+            networkManager = networkManager,
+            onPerform = {
+              if (selectedCategory != null && newInterest != null) {
+                if (categoryOf[newInterest!!] == selectedCategory) {
+                  val updatedList = newListInterests + Interest(newInterest!!, selectedCategory!!)
+                  newListInterests = updatedList
+                  onUpdateInterests(updatedList)
+                  newInterest = null
+                  selectedCategory = null
+                }
+              }
+            })
+      },
+      enabled =
+          selectedCategory != null &&
+              newInterest != null &&
+              categoryOf[newInterest!!] == selectedCategory,
+      modifier = Modifier.testTag("addInterestButton")) {
+        Text("Add")
+      }
 
   LazyRow(
       modifier = Modifier.testTag("interestsList"),
       horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
-        items(newListInterests.size) { interest ->
+        items(newListInterests.size) { index ->
           InterestEditBox(
-              interest = newListInterests[interest].interest,
+              interest = newListInterests[index],
               onRemove = {
                 performOfflineAwareAction(
                     context = context,
                     networkManager = networkManager,
                     onPerform = {
-                      val updatedList = newListInterests - newListInterests[interest]
+                      val updatedList = newListInterests - newListInterests[index]
                       newListInterests = updatedList
                       onUpdateInterests(updatedList)
                     })
@@ -347,14 +375,15 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
 }
 
 @Composable
-fun InterestEditBox(interest: String, onRemove: () -> Unit) {
+fun InterestEditBox(interest: Interest, onRemove: () -> Unit) {
   Box(
       modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
+          Modifier.background(
+                  colorOfCategory(interest.category), RoundedCornerShape(STANDARD_PADDING.dp))
               .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
-              .testTag("$interest")) {
+              .testTag(interest.name)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
+          Text(text = interest.name, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
           Spacer(Modifier.width(STANDARD_PADDING.dp))
           IconButton(onClick = onRemove, modifier = Modifier.testTag("removeInterest-$interest")) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
