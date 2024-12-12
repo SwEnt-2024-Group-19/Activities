@@ -15,6 +15,7 @@ data class Activity(
     var startTime: String,
     var duration: String,
     var category: Category = Category.SPORT,
+    var subcategory: String = "None",
     var price: Double,
     var location: Location?,
     var creator: String,
