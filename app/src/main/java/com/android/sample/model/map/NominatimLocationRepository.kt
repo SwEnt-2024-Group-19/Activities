@@ -42,7 +42,7 @@ constructor(
                 "Updated location: ${location.latitude}, ${location.longitude}")
             // You could notify the ViewModel here, for example:
             onLocationUpdate?.invoke(
-                Location(location.latitude, location.longitude, "Current Location"))
+                Location(location.latitude, location.longitude, "Current", "Current Location"))
           }
         }
       }
@@ -68,8 +68,9 @@ constructor(
         val jsonObject = jsonArray.getJSONObject(i)
         val lat = jsonObject.getDouble("lat")
         val lon = jsonObject.getDouble("lon")
-        val name = jsonObject.getString("display_name")
-        Location(lat, lon, name)
+        val fullName = jsonObject.getString("display_name")
+        val name = fullName.split(",").first().trim()      // Extract summarized name
+        Location(lat, lon, fullName, name)
       }
     } catch (e: JSONException) {
       // Log the error and return an empty list if the JSON format is incorrect
@@ -131,19 +132,19 @@ constructor(
 
   @SuppressLint("MissingPermission")
   override fun getCurrentLocation(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
-    // Attempt to get the last known location from the fused location provider
-    fusedLocationClient.lastLocation
-        .addOnSuccessListener { location ->
-          // If a valid location is found, invoke the success callback
-          location?.let {
-            Log.d("NominatimLocationRepository", "Location: $location")
-            onSuccess(Location(it.latitude, it.longitude, "Current Location"))
+
+      fusedLocationClient.lastLocation
+          .addOnSuccessListener { location ->
+              location?.let {
+                  Log.d("NominatimLocationRepository", "Location: $location")
+                  val fullName = "Current Location" // Replace with actual logic if needed
+                  val name = "Current"             // Summarized name
+                  onSuccess(Location(it.latitude, it.longitude, fullName, name))
+              } ?: requestLocationUpdate(onSuccess, onFailure)
           }
-              // If no location is available, request a fresh location update
-              ?: requestLocationUpdate(onSuccess, onFailure)
-        }
-        .addOnFailureListener { onFailure(it) }
+          .addOnFailureListener { onFailure(it) }
   }
+
 
   @SuppressLint("MissingPermission")
   private fun requestLocationUpdate(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
@@ -152,7 +153,7 @@ constructor(
         .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
         .addOnSuccessListener { location ->
           Log.d("NominatimLocationRepository", "Location: $location")
-          location?.let { onSuccess(Location(it.latitude, it.longitude, "Updated Location")) }
+          location?.let { onSuccess(Location(it.latitude, it.longitude, "Updated","Updated Location")) }
               ?: onFailure(Exception("Location not available"))
         }
         .addOnFailureListener { onFailure(it) }

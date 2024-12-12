@@ -175,7 +175,4 @@ class NominatimLocationRepositoryTest {
         .build()
   }
 
-  private fun AndroidLocation.toCustomLocation(): com.android.sample.model.map.Location {
-    return com.android.sample.model.map.Location(latitude, longitude, "Mocked Location")
-  }
 }
