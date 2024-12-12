@@ -27,7 +27,7 @@ class PlusButtonToCreateTest {
   @Test
   fun plusButtonToCreate_isDisplayed() {
     composeTestRule.setContent {
-      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+      PlusButtonToCreate(navigationActions = mockNavigationActions, 1)
     }
     composeTestRule.onNodeWithTag("plusRowToCreate").assertIsDisplayed()
   }
@@ -35,7 +35,7 @@ class PlusButtonToCreateTest {
   @Test
   fun plusButtonToCreate_performsClickToOverview() {
     composeTestRule.setContent {
-      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+      PlusButtonToCreate(navigationActions = mockNavigationActions, 1)
     }
     composeTestRule.onNodeWithTag("plusRowToCreate").performClick()
     verify(mockNavigationActions).navigateTo(TopLevelDestinations.OVERVIEW)
@@ -44,7 +44,7 @@ class PlusButtonToCreateTest {
   @Test
   fun plusButtonToCreate_performsClickToCreate() {
     composeTestRule.setContent {
-      PlusButtonToCreate(navigationActions = mockNavigationActions, "created")
+      PlusButtonToCreate(navigationActions = mockNavigationActions, 0)
     }
     composeTestRule.onNodeWithTag("plusRowToCreate").performClick()
     verify(mockNavigationActions).navigateTo(TopLevelDestinations.ADD_ACTIVITY)
@@ -53,7 +53,7 @@ class PlusButtonToCreateTest {
   @Test
   fun plusButtonToCreate_iconIsDisplayed() {
     composeTestRule.setContent {
-      PlusButtonToCreate(navigationActions = mockNavigationActions, "enrolled")
+      PlusButtonToCreate(navigationActions = mockNavigationActions, 1)
     }
     composeTestRule
         .onNodeWithContentDescription(TopLevelDestinations.ADD_ACTIVITY.textId)

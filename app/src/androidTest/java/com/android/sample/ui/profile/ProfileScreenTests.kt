@@ -345,7 +345,8 @@ class ProfileScreenTest {
           navigationActions,
           userProfileViewModel,
           listActivitiesViewModel,
-          mockImageViewModel)
+          mockImageViewModel,
+          "")
     }
     composeTestRule.onNodeWithTag("activitiesList").assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("activityRow").assertCountEquals(2)
