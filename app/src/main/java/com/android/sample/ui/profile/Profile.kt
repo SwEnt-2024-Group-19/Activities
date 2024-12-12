@@ -428,14 +428,9 @@ fun UserProfile(
                         )
                     }
                 },
-                navigationIcon = {if(uid!=""){
+                navigationIcon = {if(uid!=""){ GoBackButton(navigationActions)
 
-                                IconButton(
-                                         modifier = Modifier.testTag("goBackButton"),
-                                 onClick = { navigationActions.goBack() }) {
-                            Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back") }}
+                                }
     },
                 actions = {
                     if(uid==""){
@@ -705,4 +700,13 @@ fun ShowInterests(user: User){
 
 
     }
+}
+@Composable
+fun GoBackButton(navigationActions: NavigationActions){
+    IconButton(
+        modifier = Modifier.testTag("goBackButton"),
+        onClick = { navigationActions.goBack() }) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Back") }
 }

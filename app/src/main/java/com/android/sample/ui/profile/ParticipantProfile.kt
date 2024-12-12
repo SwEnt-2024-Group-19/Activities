@@ -62,12 +62,12 @@ fun ParticipantLoadingScreen(navigationActions: NavigationActions) {
       modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
       topBar = {
         TopAppBar(
-            title = { Text("Profile") },
+            title = { Text(text="Profile", modifier = Modifier.testTag("profileText")) },
             navigationIcon = {
               IconButton(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
+                    Icon(modifier = Modifier.testTag("goBackIcon"),
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "Back")
                   }

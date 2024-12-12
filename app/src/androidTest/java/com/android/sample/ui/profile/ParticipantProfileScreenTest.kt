@@ -8,9 +8,11 @@
  import androidx.compose.ui.test.onNodeWithText
  import androidx.compose.ui.test.performClick
  import androidx.compose.ui.test.performScrollToNode
+ import com.android.sample.model.activity.ActivitiesRepository
  import com.android.sample.model.activity.ActivitiesRepositoryFirestore
  import com.android.sample.model.activity.Activity
  import com.android.sample.model.activity.ListActivitiesViewModel
+ import com.android.sample.model.hour_date.HourDateViewModel
  import com.android.sample.model.image.ImageRepositoryFirestore
  import com.android.sample.model.image.ImageViewModel
  import com.android.sample.model.profile.Interest
@@ -21,6 +23,7 @@
  import com.android.sample.resources.dummydata.testUser
  import com.android.sample.ui.navigation.NavigationActions
  import com.android.sample.ui.navigation.Screen
+ import kotlinx.coroutines.flow.MutableStateFlow
  import org.junit.Before
  import org.junit.Rule
  import org.junit.Test
@@ -28,6 +31,8 @@
  import org.mockito.Mockito.verify
  import org.mockito.Mockito.`when`
  import org.mockito.kotlin.any
+ import org.mockito.kotlin.eq
+ import java.lang.Thread.sleep
 
  class ParticipantProfileScreenTest {
 
@@ -38,6 +43,9 @@
   private lateinit var navigationActions: NavigationActions
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
+
+  private lateinit var mockHourDateViewModel: HourDateViewModel
+
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -54,6 +62,7 @@
                 listOf(Interest("Sport", "Cycling"), Interest("Indoor Activity", "Reading")),
             activities = listOfActivitiesUid,
         )
+
     userProfileViewModel = mock(ProfileViewModel::class.java)
     navigationActions = mock(NavigationActions::class.java)
     activitiesRepository = mock(ActivitiesRepositoryFirestore::class.java)
@@ -63,101 +72,46 @@
       it.getArgument<(List<Activity>) -> Unit>(0)(
           com.android.sample.resources.dummydata.activityListWithPastActivity)
     }
+      val userStateFlow = MutableStateFlow(testUser)
+      `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PARTICIPANT_PROFILE)
+
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
     mockImageViewModel = ImageViewModel(mockImageRepository)
+      mockHourDateViewModel = mock(HourDateViewModel::class.java)
+
   }
+     @Test
+     fun displayLoadingScreenComponents(){
+         composeTestRule.setContent { ParticipantLoadingScreen(navigationActions) }
+         composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
+            composeTestRule.onNodeWithTag("profileText").assertIsDisplayed()
+            composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+            composeTestRule.onNodeWithTag("goBackIcon", useUnmergedTree = true).assertIsDisplayed()
+            composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
+
+     }
+     @Test
+     fun displayLoadingScreenComponentsGoBackButton(){
+         composeTestRule.setContent { ParticipantLoadingScreen(navigationActions) }
+         composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+         composeTestRule.onNodeWithTag("goBackButton").performClick()
+
+         verify(navigationActions).goBack()
+
+     }
+
 
   @Test
-  fun displayLoadingScreenWhenNoParticipantSelected() {
-
+  fun navigateBackOnClickDisplayedParticipantProfile() {
+    listActivitiesViewModel.selectUser(testUser)
     composeTestRule.setContent {
-      ParticipantProfileScreen(
-          listActivitiesViewModel, navigationActions, mockImageViewModel, userProfileViewModel)
+      GoBackButton(
+          navigationActions)
     }
+    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
 
-    composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithTag("loadingText")
-        .assertTextEquals("No information available for this participant")
+    verify(navigationActions).goBack()
   }
-//
-//  @Test
-//  fun displayParticipantProfileComponents() {
-//    // Set up a null selected user to simulate loading
-//    listActivitiesViewModel.selectUser(testUser)
-//    composeTestRule.setContent {
-//      ParticipantProfileScreen(
-//          listActivitiesViewModel, navigationActions, mockImageViewModel, userProfileViewModel)
-//    }
-//
-//    composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
-//    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
-//    composeTestRule.onNodeWithTag("userName").assertTextEquals("Amine A")
-//    composeTestRule.onNodeWithTag("interestsSection").assertIsDisplayed()
-//    composeTestRule.onNodeWithText("Cycling").assertIsDisplayed()
-//    composeTestRule.onNodeWithText("Reading").assertIsDisplayed()
-//  }
-//
-//  @Test
-//  fun displayPastActivities() {
-//    listActivitiesViewModel.selectUser(testUser)
-//    composeTestRule.setContent {
-//      ParticipantProfileScreen(
-//          listActivitiesViewModel, navigationActions, mockImageViewModel, userProfileViewModel)
-//    }
-//    composeTestRule
-//        .onNodeWithTag("ParticipantProfileContentColumn")
-//        .assertIsDisplayed()
-//        .performScrollToNode(hasTestTag("pastActivitiesTitle"))
-//    composeTestRule.onNodeWithTag("pastActivitiesTitle").assertIsDisplayed()
-//    composeTestRule.onNodeWithTag("pastActivitiesTitle").assertTextEquals("Past Activities")
-//  }
-//
-//  @Test
-//  fun displayParticipantActivitiesCreated() {
-//    listActivitiesViewModel.selectUser(testUser)
-//    composeTestRule.setContent {
-//      ParticipantProfileScreen(
-//          listActivitiesViewModel, navigationActions, mockImageViewModel, userProfileViewModel)
-//    }
-//
-//    composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
-//    composeTestRule
-//        .onNodeWithTag("createdActivitiesTitle")
-//        .assertTextEquals("Activities Created")
-//        .assertIsDisplayed()
-//  }
-//
-//  @Test
-//  fun displayParticipantActivitiesEnrolled() {
-//    listActivitiesViewModel.selectUser(testUser)
-//
-//    composeTestRule.setContent {
-//      ParticipantProfileScreen(
-//          listActivitiesViewModel, navigationActions, mockImageViewModel, userProfileViewModel)
-//    }
-//
-//    composeTestRule.onNodeWithTag("ParticipantProfileContentColumn").assertIsDisplayed()
-//
-//    composeTestRule
-//        .onNodeWithTag("enrolledActivitiesTitle")
-//        .assertIsDisplayed()
-//        .assertTextEquals("Activities Enrolled in")
-//  }
-//
-//  @Test
-//  fun navigateBackOnClick() {
-//    listActivitiesViewModel.selectUser(testUser)
-//
-//    composeTestRule.setContent {
-//      ParticipantProfileScreen(
-//          listActivitiesViewModel, navigationActions, mockImageViewModel, userProfileViewModel)
-//    }
-//
-//    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-//    composeTestRule.onNodeWithTag("goBackButton").performClick()
-//
-//    verify(navigationActions).goBack()
-//  }
  }
