@@ -68,6 +68,7 @@ import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
@@ -100,7 +101,7 @@ fun EditActivityScreen(
   var title by remember { mutableStateOf(activity?.title ?: "") }
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
-  var selectedLocation by remember { mutableStateOf(Location(0.0, 0.0, "No location")) }
+  var selectedLocation by remember { mutableStateOf(Location(0.0, 0.0, "No location", "No location")) }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants!!) }
@@ -435,14 +436,14 @@ fun EditActivityScreen(
                           text = {
                             Text(
                                 text =
-                                    location.name.take(30) +
-                                        if (location.name.length > 30) "..."
+                                    location.fullName.take(TOP_TITLE_SIZE) +
+                                        if (location.fullName.length > TOP_TITLE_SIZE) "..."
                                         else "", // Limit name length
                                 maxLines = 1 // Ensure name doesn't overflow
                                 )
                           },
                           onClick = {
-                            locationViewModel.setQuery(location.name)
+                            locationViewModel.setQuery(location.fullName)
                             selectedLocation = location
                             showDropdown = false // Close dropdown on selection
                           },

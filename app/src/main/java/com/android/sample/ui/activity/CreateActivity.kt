@@ -382,14 +382,14 @@ fun CreateActivityScreen(
                             text = {
                               Text(
                                   text =
-                                      location.name.take(TOP_TITLE_SIZE) +
-                                          if (location.name.length > TOP_TITLE_SIZE) "..."
+                                      location.fullName.take(TOP_TITLE_SIZE) +
+                                          if (location.fullName.length > TOP_TITLE_SIZE) "..."
                                           else "", // Limit name length
                                   maxLines = 1 // Ensure name doesn't overflow
                                   )
                             },
                             onClick = {
-                              locationViewModel.setQuery(location.name)
+                              locationViewModel.setQuery(location.fullName)
                               selectedLocation = location
                               showDropdown = false // Close dropdown on selection
                             },
