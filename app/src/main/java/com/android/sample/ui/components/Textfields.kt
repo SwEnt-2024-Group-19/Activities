@@ -25,8 +25,6 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
-import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
-import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_TOP
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
@@ -149,6 +147,7 @@ fun TextFieldWithErrorState(
     modifier: Modifier = Modifier,
     validation: (String) -> String?,
     externalError: String? = null,
+    testTag: String? = null,
     errorTestTag: String
 ) {
   var internalError by remember { mutableStateOf<String?>(null) }
@@ -156,24 +155,42 @@ fun TextFieldWithErrorState(
   // Show external error if present, otherwise use internal error
   val error = externalError ?: internalError
 
-  Column() {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { newValue ->
-          onValueChange(newValue)
-          internalError = validation(newValue)
-        },
-        label = { Text(label) },
-        isError = error != null,
-        modifier = modifier)
+  Column(modifier = modifier) {
+    Card(
+        modifier = Modifier.fillMaxWidth().testTag("TextFieldWithErrorStateCard"),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+        border = if (error != null) BorderStroke(BORDER_STROKE_SM.dp, Color.Red) else null) {
+          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = { newValue ->
+                  onValueChange(newValue)
+                  internalError = validation(newValue)
+                },
+                label = { Text(label) },
+                isError = error != null,
+                modifier = Modifier.fillMaxWidth().testTag(testTag ?: "TextFieldWithErrorState"),
+                shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
+                colors =
+                    TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent),
+                singleLine = true)
+          }
+        }
     error?.let {
       Text(
           text = it,
           color = Color.Red,
           fontSize = ERROR_TEXTFIELD_FONT_SIZE,
           modifier =
-              Modifier.align(Alignment.Start)
-                  .padding(start = ERROR_TEXTFIELD_PADDING_START, top = ERROR_TEXTFIELD_PADDING_TOP)
+              Modifier.padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
                   .testTag(errorTestTag))
     }
   }

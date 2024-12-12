@@ -1,7 +1,9 @@
 package com.android.sample.resources
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.model.activity.Category
 
 // Like R, but C
 object C {
@@ -90,10 +92,32 @@ object C {
 
     const val LINE_STROKE = 1
 
+    fun colorOfCategory(category: Category): Color {
+      val colorCode =
+          when (category) {
+            Category.SPORT -> 0xFF4CAF50
+            Category.SKILLS -> 0xFF2196F3
+            Category.CULTURE -> 0xFF9C27B0
+            Category.ENTERTAINMENT -> 0xFFFF9800
+          }
+      return Color(colorCode)
+    }
+
     const val MIN_PASSWORD_LENGTH = 6
 
     const val BORDER_STROKE_SM = 1
     // errors
     const val OFFLINE_TOAST_MESSAGE = "You are offline. Action not allowed."
+
+    // colors categories
+    val SPORT_COLOR = Color(0xFFC0EDAD)
+    val CULTURE_COLOR = Color(0xFFD0B0E0)
+    val SKILLS_COLOR = Color(0xFFC8E7F2)
+    val OUTDOOR_COLOR = Color(0xFFC8E7F2)
+    val INDOOR_COLOR = Color(0xFFE8D8C9)
+    val ENTERTAINMENT_COLOR = Color(0xFFFFCE7A)
+    val CULTURAL_ACTIVITY_COLOR = Color(0xFFFFCE7A)
+    val MUSICAL_ACTIVITY_COLOR = Color(0xFFFBF2C4)
+    val ART_ACTIVITY_COLOR = Color(0xFFE4BABE)
   }
 }
