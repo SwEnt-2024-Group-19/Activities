@@ -4,7 +4,10 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,8 +21,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.image.ImageViewModel
@@ -46,7 +50,9 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
@@ -56,7 +62,6 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileCreationScreen(
     viewModel: ProfileViewModel,
@@ -139,21 +144,29 @@ fun ProfileCreationScreen(
           Text(
               text = "Complete your profile creation",
               fontSize = TITLE_FONTSIZE.sp,
-              fontWeight = FontWeight.Bold, // Set the text to be bold
               modifier =
                   Modifier.padding(MEDIUM_PADDING.dp)
                       .wrapContentWidth(Alignment.CenterHorizontally)
                       .testTag("profileCreationTitle"))
-
+          Spacer(modifier = Modifier.padding(MEDIUM_PADDING.dp))
           ProfileImage(
               userId = uid,
-              modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+              modifier =
+                  Modifier.size((1.5 * IMAGE_SIZE).dp).clip(CircleShape).testTag("profilePicture"),
               imageViewModel)
 
-          Button(
-              onClick = { showDialogImage = true }, modifier = Modifier.testTag("uploadPicture")) {
-                Text("Modify Profile Picture")
+          Box(
+              modifier =
+                  Modifier.testTag("uploadPicture")
+                      .clickable { showDialogImage = true } // Handle click action
+                      .padding(MEDIUM_PADDING.dp)
+                      .background(Color.Transparent)) {
+                Icon(
+                    imageVector = Icons.Default.AddAPhoto,
+                    contentDescription = "Add a photo",
+                    tint = Color.Black)
               }
+
           Spacer(modifier = Modifier.padding((2 * LARGE_PADDING).dp))
 
           Row(
@@ -228,10 +241,10 @@ fun ProfileCreationScreen(
               },
               modifier =
                   Modifier.testTag("createProfileButton")
-                      .fillMaxWidth()
+                      .fillMaxWidth(WIDTH_FRACTION_MD)
                       .height(AUTH_BUTTON_HEIGHT.dp),
               shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
-                Text("Create Profile")
+                Text("Create Profile", fontSize = SUBTITLE_FONTSIZE.sp)
               }
 
           errorMessage?.let {
