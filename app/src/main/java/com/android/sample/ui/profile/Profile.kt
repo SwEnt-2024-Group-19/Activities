@@ -47,8 +47,8 @@ import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
 import com.android.sample.resources.C.Tag.colorOfCategory
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.PlusButtonToCreate
@@ -198,9 +198,7 @@ fun ProfileContent(
                   "created",
                   usersActivity.filter {
                     it.creator == user.id &&
-                        hourDateViewModel.combineDateAndTime(
-                            it.date,
-                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                        hourDateViewModel.combineDateAndTime(it.date, it.startTime) >
                             Timestamp.now()
                   },
                   navigationActions,
@@ -213,9 +211,7 @@ fun ProfileContent(
                   "enrolled",
                   usersActivity.filter {
                     it.creator != user.id &&
-                        hourDateViewModel.combineDateAndTime(
-                            it.date,
-                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
+                        hourDateViewModel.combineDateAndTime(it.date, it.startTime) >
                             Timestamp.now()
                   },
                   navigationActions,
@@ -227,9 +223,7 @@ fun ProfileContent(
                   "Past Activities",
                   "past",
                   usersActivity.filter {
-                    hourDateViewModel.combineDateAndTime(
-                        it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) <=
-                        Timestamp.now()
+                    hourDateViewModel.combineDateAndTime(it.date, it.startTime) <= Timestamp.now()
                   },
                   navigationActions,
                   userProfileViewModel,
@@ -354,7 +348,7 @@ fun ActivityRow(
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(MEDIUM_PADDING.dp).padding(end = MEDIUM_PADDING.dp))
 
-        Column(modifier = Modifier.weight(WIDTH_FRACTION)) {
+        Column(modifier = Modifier.weight(WIDTH_FRACTION_MD)) {
           Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {

@@ -252,6 +252,7 @@ fun EditActivityScreen(
             }
             if (dateIsOpen) {
               MyDatePicker(
+                  onCloseRequest = { dateIsOpen = false },
                   onDateSelected = { date ->
                     dueDate = date
                     dateIsOpen = false
@@ -293,6 +294,7 @@ fun EditActivityScreen(
                     timeIsOpen = false
                   },
                   isOpen = timeIsOpen,
+                  onCloseRequest = { timeIsOpen = false },
               )
             }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -321,6 +323,7 @@ fun EditActivityScreen(
                     durationIsOpen = false
                   },
                   isOpen = durationIsOpen,
+                  onCloseRequest = { durationIsOpen = false },
               )
             }
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -676,7 +679,7 @@ fun EditActivityScreen(
                         Log.e("EditActivityScreen", "Failed to remove images: ${error.message}")
                       })
 
-                  navigationActions.navigateTo(Screen.OVERVIEW)
+                  navigationActions.navigateTo(Screen.PROFILE)
                 },
                 modifier =
                     Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("deleteButton"),

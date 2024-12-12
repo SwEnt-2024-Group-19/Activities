@@ -265,13 +265,14 @@ fun CreateActivityScreen(
               }
               if (dateIsOpen) {
                 MyDatePicker(
+                    onCloseRequest = { dateIsOpen = false },
                     onDateSelected = { date ->
                       dueDate = date
                       dateIsOpen = false
                       dateIsSet = true
                     },
                     isOpen = dateIsOpen,
-                    null)
+                    initialDate = null)
               }
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
               OutlinedButton(
@@ -297,7 +298,8 @@ fun CreateActivityScreen(
                       startTimeIsOpen = false
                       startTimeIsSet = true
                     },
-                    isOpen = startTimeIsOpen)
+                    isOpen = startTimeIsOpen,
+                    onCloseRequest = { startTimeIsOpen = false })
               }
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -326,7 +328,8 @@ fun CreateActivityScreen(
                       durationIsOpen = false
                       durationIsSet = true
                     },
-                    isOpen = durationIsOpen)
+                    isOpen = durationIsOpen,
+                    onCloseRequest = { durationIsOpen = false })
               }
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
