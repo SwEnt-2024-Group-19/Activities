@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.android.sample.model.activity.Category
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.User
 import org.junit.After
@@ -90,7 +91,9 @@ class NotificationHelperUnitTest {
                 id = "u1",
                 name = "Alice",
                 surname = "Smith",
-                interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
+                interests =
+                    listOf(
+                        Interest("Cycling", Category.SPORT), Interest("Running", Category.SPORT)),
                 activities = listOf("a1", "a2"),
                 photo = null,
                 likedActivities = listOf("a1")))
@@ -120,7 +123,9 @@ class NotificationHelperUnitTest {
                 id = "u1",
                 name = "Alice",
                 surname = "Smith",
-                interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
+                interests =
+                    listOf(
+                        Interest("Cycling", Category.SPORT), Interest("Running", Category.SPORT)),
                 activities = listOf("a1", "a2"),
                 photo = null,
                 likedActivities = listOf("a1")))

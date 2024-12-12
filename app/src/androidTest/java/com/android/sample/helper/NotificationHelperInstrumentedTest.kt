@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
+import com.android.sample.model.activity.Category
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.User
 import com.android.sample.receivers.NotificationReceiver
@@ -77,7 +78,9 @@ class NotificationHelperInstrumentedTest {
                 id = "u1",
                 name = "Alice",
                 surname = "Smith",
-                interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
+                interests =
+                    listOf(
+                        Interest("Cycling", Category.SPORT), Interest("Running", Category.SPORT)),
                 activities = listOf("a1", "a2"),
                 photo = null,
                 likedActivities = listOf("a1")))
@@ -155,7 +158,7 @@ class NotificationHelperInstrumentedTest {
     assertTrue(
         "Should be able to create new PendingIntent after cancellation", newPendingIntent != null)
 
-    // Additional verification: try to trigger the alarm
+    // Additional verification, try to trigger the alarm
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val newTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1)
 
