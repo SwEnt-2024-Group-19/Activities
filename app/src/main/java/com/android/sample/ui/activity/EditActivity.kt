@@ -66,7 +66,11 @@ import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.profile.categoryOf
+import com.android.sample.model.profile.interestStringValues
+import com.android.sample.model.profile.interestsCategories
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.Carousel
@@ -100,7 +104,9 @@ fun EditActivityScreen(
   var title by remember { mutableStateOf(activity?.title ?: "") }
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
-  var selectedLocation by remember { mutableStateOf(Location(0.0, 0.0, "No location")) }
+  var selectedLocation by remember {
+    mutableStateOf(activity?.location ?: Location(0.0, 0.0, "Origin"))
+  }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
   var attendees by remember { mutableStateOf(activity?.participants!!) }
@@ -113,8 +119,10 @@ fun EditActivityScreen(
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
   var expandedType by remember { mutableStateOf(false) }
   var expandedCategory by remember { mutableStateOf(false) }
+  var expandedInterest by remember { mutableStateOf(false) }
   var selectedOptionType by remember { mutableStateOf(activity?.type.toString()) }
-  var selectedOptionCategory by remember { mutableStateOf(activity?.category.toString()) }
+  var selectedOptionCategory by remember { mutableStateOf(activity?.category) }
+  var selectedOptionInterest by remember { mutableStateOf(activity?.subcategory) }
   val maxDescriptionLength = 500
   val maxTitleLength = 50
   val locationQuery by locationViewModel.query.collectAsState()
@@ -376,15 +384,18 @@ fun EditActivityScreen(
             ExposedDropdownMenuBox(
                 modifier =
                     Modifier.testTag("chooseCategoryMenu")
+                        .align(Alignment.CenterHorizontally)
                         .fillMaxWidth()
                         .padding(STANDARD_PADDING.dp),
                 expanded = expandedCategory,
                 onExpandedChange = { expandedCategory = !expandedCategory }) {
                   OutlinedTextField(
                       readOnly = true,
-                      value = selectedOptionCategory,
+                      value =
+                          selectedOptionCategory?.name
+                              ?: context.getString(R.string.select_activity_category),
                       onValueChange = {},
-                      label = { Text("Activity Category") },
+                      label = { Text(context.getString(R.string.activity_category)) },
                       trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
                       },
@@ -394,17 +405,61 @@ fun EditActivityScreen(
                       expanded = expandedCategory,
                       onDismissRequest = { expandedCategory = false },
                       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                        categories.forEach { selectionOption ->
+                        interestsCategories.forEach {
                           DropdownMenuItem(
                               modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                              text = { Text(selectionOption.name) },
+                              text = { Text(it.name) },
                               onClick = {
-                                selectedOptionCategory = selectionOption.name
+                                selectedOptionCategory = it
                                 expandedCategory = false
+                                selectedOptionInterest =
+                                    context.getString(R.string.select_activity_type)
                               })
                         }
                       }
                 }
+
+            if (selectedOptionCategory != null) {
+              Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
+
+              ExposedDropdownMenuBox(
+                  modifier =
+                      Modifier.testTag("chooseInterestMenu")
+                          .align(Alignment.CenterHorizontally)
+                          .fillMaxWidth()
+                          .padding(STANDARD_PADDING.dp),
+                  expanded = expandedInterest,
+                  onExpandedChange = { expandedInterest = !expandedInterest }) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value =
+                            selectedOptionInterest
+                                ?: context.getString(R.string.select_activity_type),
+                        onValueChange = {},
+                        label = { Text("Activity Interest") },
+                        trailingIcon = {
+                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInterest)
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        modifier =
+                            Modifier.menuAnchor().fillMaxWidth().testTag("interestTextField"))
+                    ExposedDropdownMenu(
+                        expanded = expandedInterest,
+                        onDismissRequest = { expandedInterest = false },
+                        modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+                          interestStringValues[selectedOptionCategory]?.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                                text = { Text(selectionOption) },
+                                onClick = {
+                                  selectedOptionInterest = selectionOption
+                                  expandedInterest = false
+                                })
+                          }
+                        }
+                  }
+            }
+
             Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
             Box {
@@ -515,7 +570,7 @@ fun EditActivityScreen(
                         price.isNotEmpty() &&
                         maxPlaces.isNotEmpty() &&
                         selectedOptionType != "Select a type" &&
-                        selectedOptionCategory != "Select a category" &&
+                        selectedOptionCategory != null &&
                         startTime?.isNotEmpty() ?: false &&
                         duration.isNotEmpty(),
                 onClick = {
@@ -542,6 +597,14 @@ fun EditActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
+                    } else if (selectedOptionCategory != null &&
+                        selectedOptionCategory != categoryOf[selectedOptionInterest]) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.invalid_interest_category),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
                     } else {
                       try {
                         imageViewModel.uploadActivityImages(
@@ -560,8 +623,7 @@ fun EditActivityScreen(
                                 date = dueDate,
                                 startTime = startTime ?: "",
                                 duration =
-                                    hourDateViewModel.calculateDuration(
-                                        startTime ?: "", duration ?: ""),
+                                    hourDateViewModel.calculateDuration(startTime ?: "", duration),
                                 price = price.toDouble(),
                                 placesLeft = attendees.size.toLong(),
                                 maxPlaces = maxPlaces.toLongOrNull() ?: 0,
@@ -571,9 +633,8 @@ fun EditActivityScreen(
                                 images = activity?.images ?: listOf(),
                                 type = types.find { it.name == selectedOption } ?: types[0],
                                 participants = attendees,
-                                category =
-                                    categories.find { it.name == selectedOptionCategory }
-                                        ?: categories[0],
+                                category = selectedOptionCategory ?: categories[0],
+                                subcategory = selectedOptionInterest ?: "",
                                 comments = activity?.comments ?: listOf())
                         listActivityViewModel.updateActivity(updatedActivity)
                         navigationActions.navigateTo(Screen.OVERVIEW)
