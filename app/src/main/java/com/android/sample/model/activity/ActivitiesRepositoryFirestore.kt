@@ -102,13 +102,17 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
         } ?: emptyList()
 
     val locationData = data["location"] as? Map<String, Any>
-    val location =
-        locationData?.let {
-          Location(
-              latitude = it["latitude"] as? Double ?: 0.0,
-              longitude = it["longitude"] as? Double ?: 0.0,
-              name = it["name"] as? String ?: "No Location")
-        } ?: Location(0.0, 0.0, "No Location")
+      val location =
+          locationData?.let {
+              val fullName = it["name"] as? String ?: "No Location"
+              val name = fullName.split(",").first().trim() // Extract summarized name
+              Location(
+                  latitude = it["latitude"] as? Double ?: 0.0,
+                  longitude = it["longitude"] as? Double ?: 0.0,
+                  fullName = fullName,
+                  name = name
+              )
+          } ?: Location(0.0, 0.0, "No Location", "No Location")
 
     return Activity(
         uid = documentId,

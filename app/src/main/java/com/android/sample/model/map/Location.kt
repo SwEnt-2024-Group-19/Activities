@@ -4,4 +4,5 @@ data class Location(
     val latitude: Double,
     val longitude: Double,
     val name: String,
+    val fullName : String
 )
