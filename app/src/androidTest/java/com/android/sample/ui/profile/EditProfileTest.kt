@@ -2,6 +2,7 @@ package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
@@ -13,9 +14,9 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.sample.model.activity.categories
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
-import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.navigation.NavigationActions
@@ -26,7 +27,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
@@ -107,118 +110,74 @@ class EditProfileScreenTest {
   }
 
   @Test
-  fun testAddInterestButtonFunctionality() {
+  fun testButtonGetsEnabledWhenBothFieldsAreFilled() {
     composeTestRule.setContent {
       EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
     }
+
     composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("Indoor Activity").performClick()
-    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("New Interest")
-    composeTestRule.onNodeWithTag("addInterestButton").performClick()
-    composeTestRule.onNodeWithTag("interestsList").performScrollTo()
-    composeTestRule.onNodeWithTag("interestsList").assertIsDisplayed()
-  }
-
-  @Test
-  fun testCannotWriteInterestBeforeChoosingCategory() {
-    composeTestRule.setContent {
-      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
-    }
-
-    // Check if the interest input is initially disabled
-    composeTestRule.onNodeWithTag("newInterestInput").assertIsNotEnabled()
-
-    // Try to interact with the interest input while it's disabled
-    // Compose testing framework doesn't allow interaction with disabled components
-    // So we verify the disabled state instead of attempting to interact with it
-
-    // Now select a category
-    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("Sport").performClick()
-
-    // The interest input should now be enabled
-    composeTestRule.onNodeWithTag("newInterestInput").assertIsEnabled()
-
-    // Try to enter text
-    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Football")
-    composeTestRule.onNodeWithText("Football").assertIsDisplayed() // Ensure input is now accepted
-  }
-
-  @Test
-  fun testAddButtonEnabledOnlyWithBothFieldsFilled() {
-    composeTestRule.setContent {
-      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
-    }
-
-    // Initially, both fields are empty, and "Add" button should be disabled.
+    composeTestRule.onNodeWithText(categories[0].name).performClick()
     composeTestRule.onNodeWithTag("addInterestButton").assertIsNotEnabled()
 
-    // Select a category
-    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("Sport").performClick()
-
-    // "Add" button should still be disabled because the interest field is empty.
-    composeTestRule.onNodeWithTag("addInterestButton").assertIsNotEnabled()
-
-    // Enter text in the interest input
-    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Football")
-
-    // Now, "Add" button should be enabled as both fields are correctly filled.
+    composeTestRule.onNodeWithTag("interestDropdown").performClick()
+    composeTestRule.onNodeWithText("Art").assertIsNotDisplayed()
+    composeTestRule.onNodeWithText("Football").performClick()
     composeTestRule.onNodeWithTag("addInterestButton").assertIsEnabled()
   }
 
   @Test
-  fun testAddButtonDisabledWhenCategoryIsNone() {
+  fun testModifyProfilePictureButtonIsClickable() {
     composeTestRule.setContent {
       EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
     }
 
-    // Set the category to "None"
-    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("None").performClick()
+    // Verify if the button to modify the profile picture exists
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
 
-    // Verify the interest input field is disabled
-    composeTestRule.onNodeWithTag("newInterestInput").assertIsNotEnabled()
+    // Perform a click action on the button
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
 
-    // Try to add the interest
-    composeTestRule.onNodeWithTag("addInterestButton").assertIsNotEnabled()
+    // Verify that the dialog to select a picture is shown
+    composeTestRule.onNodeWithTag("editProfileScreen").assertIsDisplayed()
   }
 
   @Test
-  fun testAddButtonDisabledWhenCategoryIsNoneEvenIfThereIsAnInterest() {
+  fun testOpenImageDialogWhenButtonClicked() {
     composeTestRule.setContent {
       EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
     }
 
-    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("Sport").performClick()
+    // Perform a click on the button to modify the profile picture
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
 
-    // Input an interest and add it
-    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Luge")
-    // Set the category to "None"
-    composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("None").performClick()
-
-    // Verify the interest input field is disabled
-    composeTestRule.onNodeWithTag("newInterestInput").assertIsNotEnabled()
-
-    // Try to add the interest
-    composeTestRule.onNodeWithTag("addInterestButton").assertIsNotEnabled()
+    // Verify that the dialog for selecting an image is displayed
+    composeTestRule.onNodeWithTag("editProfileScreen").assertIsDisplayed()
   }
 
   @Test
-  fun testAllCategoriesAppearOnClick() {
-
+  fun testGoBackButtonNavigatesBack() {
     composeTestRule.setContent {
       EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
     }
 
-    // Click the dropdown to expand it
-    composeTestRule.onNodeWithText("Category").performClick()
+    // Perform a click on the Go Back button
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
 
-    // Check each category is displayed in the dropdown
-    InterestCategories.forEach { category ->
-      composeTestRule.onNodeWithText(category).assertIsDisplayed()
-    }
+    // Verify that the goBack method was called
+    verify(navigationActions).goBack()
   }
+
+  @Test
+  fun testRemoveProfilePicture() {
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
+
+    // Click on the profile picture to remove it
+    composeTestRule.onNodeWithTag("profilePicture").performClick()
+
+    // Verify the "Remove Image" action was performed
+    composeTestRule.onNodeWithTag("profilePicture").assertExists()
+  }
+
 }

@@ -51,7 +51,9 @@ class ParticipantProfileScreenTest {
             surname = "A",
             photo = "",
             interests =
-                listOf(Interest("Sport", "Cycling"), Interest("Indoor Activity", "Reading")),
+                listOf(
+                    Interest("Cycling", com.android.sample.model.activity.Category.SPORT),
+                    Interest("Reading", com.android.sample.model.activity.Category.ENTERTAINMENT)),
             activities = listOfActivitiesUid,
         )
     userProfileViewModel = mock(ProfileViewModel::class.java)
