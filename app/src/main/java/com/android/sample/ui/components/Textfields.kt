@@ -159,7 +159,7 @@ fun TextFieldWithErrorState(
     Card(
         modifier = Modifier.fillMaxWidth().testTag("TextFieldWithErrorStateCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
         shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
         border = if (error != null) BorderStroke(BORDER_STROKE_SM.dp, Color.Red) else null) {
           Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {

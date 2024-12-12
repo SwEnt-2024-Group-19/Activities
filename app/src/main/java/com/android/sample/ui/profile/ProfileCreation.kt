@@ -24,7 +24,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,6 +47,7 @@ import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
@@ -202,49 +206,58 @@ fun ProfileCreationScreen(
               initialInterests = interests, onUpdateInterests = { newListInterests = it })
 
           Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
-          Button(
-              onClick = {
-                // Set errors if fields are empty
-                nameErrorState.value = if (name.isBlank()) "Name cannot be empty" else null
-                surnameErrorState.value = if (surname.isBlank()) "Surname cannot be empty" else null
-
-                // Proceed only if there are no errors
-                if (nameErrorState.value == null && surnameErrorState.value == null) {
-                  selectedBitmap?.let { bitmap ->
-                    imageViewModel.uploadProfilePicture(
-                        uid,
-                        bitmap,
-                        onSuccess = { url ->
-                          photo = url // Update photo URL in profile
-                        },
-                        onFailure = { error -> errorMessage = error.message })
-                  }
-                  val userProfile =
-                      User(
-                          id = uid,
-                          name = name,
-                          surname = surname,
-                          interests = newListInterests,
-                          activities = emptyList(),
-                          photo = photo,
-                          likedActivities = emptyList())
-
-                  viewModel.createUserProfile(
-                      userProfile = userProfile,
-                      onSuccess = {
-                        Log.d("ProfileCreation", "Profile created successfully")
-                        viewModel.fetchUserData(uid)
-                        navigationActions.navigateTo(Screen.OVERVIEW)
-                      },
-                      onError = { error -> errorMessage = error.message })
-                }
-              },
+          Card(
               modifier =
-                  Modifier.testTag("createProfileButton")
-                      .fillMaxWidth(WIDTH_FRACTION_MD)
-                      .height(AUTH_BUTTON_HEIGHT.dp),
+                  Modifier.fillMaxWidth(WIDTH_FRACTION_MD).testTag("ProfileCreationButtonCard"),
+              colors =
+                  CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+              elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
               shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
-                Text("Create Profile", fontSize = SUBTITLE_FONTSIZE.sp)
+                Button(
+                    onClick = {
+                      // Set errors if fields are empty
+                      nameErrorState.value = if (name.isBlank()) "Name cannot be empty" else null
+                      surnameErrorState.value =
+                          if (surname.isBlank()) "Surname cannot be empty" else null
+
+                      // Proceed only if there are no errors
+                      if (nameErrorState.value == null && surnameErrorState.value == null) {
+                        selectedBitmap?.let { bitmap ->
+                          imageViewModel.uploadProfilePicture(
+                              uid,
+                              bitmap,
+                              onSuccess = { url ->
+                                photo = url // Update photo URL in profile
+                              },
+                              onFailure = { error -> errorMessage = error.message })
+                        }
+                        val userProfile =
+                            User(
+                                id = uid,
+                                name = name,
+                                surname = surname,
+                                interests = newListInterests,
+                                activities = emptyList(),
+                                photo = photo,
+                                likedActivities = emptyList())
+
+                        viewModel.createUserProfile(
+                            userProfile = userProfile,
+                            onSuccess = {
+                              Log.d("ProfileCreation", "Profile created successfully")
+                              viewModel.fetchUserData(uid)
+                              navigationActions.navigateTo(Screen.OVERVIEW)
+                            },
+                            onError = { error -> errorMessage = error.message })
+                      }
+                    },
+                    modifier =
+                        Modifier.testTag("createProfileButton")
+                            .fillMaxWidth()
+                            .height(AUTH_BUTTON_HEIGHT.dp),
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                      Text("Create Profile", fontSize = SUBTITLE_FONTSIZE.sp)
+                    }
               }
 
           errorMessage?.let {

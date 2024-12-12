@@ -58,12 +58,14 @@ import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.InterestCategoriesColors
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
@@ -358,7 +360,7 @@ fun InterestInputRow(
         Card(
             modifier = Modifier.weight(1f).testTag("TextFieldWithErrorStateCard"),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
               ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = onExpandChange) {
                 OutlinedTextField(
@@ -394,7 +396,7 @@ fun InterestInputRow(
         Card(
             modifier = Modifier.weight(1f).testTag("TextFieldWithErrorStateCard"),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
               OutlinedTextField(
                   value = newInterest,
@@ -446,7 +448,7 @@ fun InterestEditBox(category: String, interest: String, onRemove: () -> Unit) {
               IconButton(
                   onClick = onRemove,
                   modifier =
-                      Modifier.size(18.dp) // Optional: Adjust size of the IconButton
+                      Modifier.size(TEXT_FONTSIZE.dp) // Optional: Adjust size of the IconButton
                           .testTag("removeInterest-$interest")) {
                     Icon(
                         imageVector = Icons.Default.Close,
