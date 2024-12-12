@@ -23,14 +23,14 @@ fun ExportActivityToCalendarButton(activity: Activity, context: Context = LocalC
 
         val startMillis = calendar.timeInMillis
 
-          // For the end time, we assume the `duration` field is in the format HH:mm (e.g., "02:00").
-          val durationParts = activity.duration.split(":")
-          val hours = durationParts[0].toInt()
-          val minutes = durationParts[1].toInt()
+        // For the end time, we assume the `duration` field is in the format HH:mm (e.g., "02:00").
+        val durationParts = activity.duration.split(":")
+        val hours = durationParts[0].toInt()
+        val minutes = durationParts[1].toInt()
 
-          calendar.add(Calendar.HOUR, hours)
-          calendar.add(Calendar.MINUTE, minutes)
-          val endMillis = calendar.timeInMillis
+        calendar.add(Calendar.HOUR, hours)
+        calendar.add(Calendar.MINUTE, minutes)
+        val endMillis = calendar.timeInMillis
 
         exportToCalendar(
             context = context,
@@ -53,26 +53,33 @@ fun exportToCalendar(
     startMillis: Long,
     endMillis: Long
 ) {
-    if (activityTitle.isNotEmpty() && location.isNotEmpty() && description.isNotEmpty()) {
-        val intent = Intent(Intent.ACTION_INSERT).apply {
-            data = CalendarContract.Events.CONTENT_URI
-            putExtra(CalendarContract.Events.TITLE, activityTitle)
-            putExtra(CalendarContract.Events.EVENT_LOCATION, location)
-            putExtra(CalendarContract.Events.DESCRIPTION, description)
-            putExtra(CalendarContract.Events.ALL_DAY, false)
-            putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
-            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMillis)
-            putExtra(CalendarContract.Events.EVENT_TIMEZONE, "Europe/Zurich") // timezone is fixed, should be dynamic
+  if (activityTitle.isNotEmpty() && location.isNotEmpty() && description.isNotEmpty()) {
+    val intent =
+        Intent(Intent.ACTION_INSERT).apply {
+          data = CalendarContract.Events.CONTENT_URI
+          putExtra(CalendarContract.Events.TITLE, activityTitle)
+          putExtra(CalendarContract.Events.EVENT_LOCATION, location)
+          putExtra(CalendarContract.Events.DESCRIPTION, description)
+          putExtra(CalendarContract.Events.ALL_DAY, false)
+          putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
+          putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMillis)
+          putExtra(
+              CalendarContract.Events.EVENT_TIMEZONE,
+              "Europe/Zurich") // timezone is fixed, should be dynamic
         }
 
-        // Check if an app exists to handle the intent
-        if (intent.resolveActivity(context.packageManager) != null) {
-            context.startActivity(intent)
-        } else {
-            Toast.makeText(context, "No apps available to handle calendar events", Toast.LENGTH_SHORT).show()
-        }
+    // Check if an app exists to handle the intent
+    if (intent.resolveActivity(context.packageManager) != null) {
+      context.startActivity(intent)
     } else {
-        Toast.makeText(context, "This activity is missing data. Unable to export to calendar.", Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, "No apps available to handle calendar events", Toast.LENGTH_SHORT)
+          .show()
     }
+  } else {
+    Toast.makeText(
+            context,
+            "This activity is missing data. Unable to export to calendar.",
+            Toast.LENGTH_SHORT)
+        .show()
+  }
 }
-
