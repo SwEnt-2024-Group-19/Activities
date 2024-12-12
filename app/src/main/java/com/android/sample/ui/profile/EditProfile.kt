@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.view.CameraController
@@ -165,17 +166,10 @@ fun EditProfileScreen(
                       isPictureRemoved = true // Mark picture for removal
                     })
 
-                Button(
-                    onClick = {
-                      performOfflineAwareAction(
-                          context = context,
-                          networkManager = networkManager,
-                          onPerform = { showDialogImage = true },
-                      )
-                    },
-                    modifier = Modifier.testTag("uploadPicture")) {
-                      Text("Modify Profile Picture")
-                    }
+                ModifyPictureButton(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerformAction = { showDialogImage = true })
 
                 OutlinedTextField(
                     value = name,
@@ -456,5 +450,22 @@ fun InterestEditBox(category: String, interest: String, onRemove: () -> Unit) {
                         modifier = Modifier.fillMaxSize())
                   }
             }
+      }
+}
+
+@Composable
+fun ModifyPictureButton(
+    context: Context,
+    networkManager: NetworkManager,
+    onPerformAction: () -> Unit,
+    modifier: Modifier = Modifier.testTag("uploadPicture")
+) {
+  Button(
+      onClick = {
+        performOfflineAwareAction(
+            context = context, networkManager = networkManager, onPerform = onPerformAction)
+      },
+      modifier = modifier) {
+        Text("Modify Profile Picture")
       }
 }
