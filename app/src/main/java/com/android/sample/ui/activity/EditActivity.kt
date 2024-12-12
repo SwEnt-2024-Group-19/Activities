@@ -438,14 +438,14 @@ fun EditActivityScreen(
                           text = {
                             Text(
                                 text =
-                                    location.fullName.take(TOP_TITLE_SIZE) +
-                                        if (location.fullName.length > TOP_TITLE_SIZE) "..."
+                                    location.name.take(TOP_TITLE_SIZE) +
+                                        if (location.name.length > TOP_TITLE_SIZE) "..."
                                         else "", // Limit name length
                                 maxLines = 1 // Ensure name doesn't overflow
                                 )
                           },
                           onClick = {
-                            locationViewModel.setQuery(location.fullName)
+                            locationViewModel.setQuery(location.name)
                             selectedLocation = location
                             showDropdown = false // Close dropdown on selection
                           },

@@ -109,8 +109,8 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
           Location(
               latitude = it["latitude"] as? Double ?: 0.0,
               longitude = it["longitude"] as? Double ?: 0.0,
-              fullName = fullName,
-              name = name)
+              name = fullName,
+              shortName = name)
         } ?: Location(0.0, 0.0, "No Location", "No Location")
 
     return Activity(

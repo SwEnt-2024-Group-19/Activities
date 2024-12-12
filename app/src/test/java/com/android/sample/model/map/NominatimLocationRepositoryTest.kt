@@ -14,7 +14,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
@@ -76,7 +75,7 @@ class NominatimLocationRepositoryTest {
 
     // Then
     assertEquals(1, result?.size)
-    assertEquals("Central Park", result?.first()?.name)
+    assertEquals("Central Park", result?.first()?.shortName)
     result?.first()?.latitude?.let { assertEquals(40.785091, it, 0.00001) }
     result?.first()?.longitude?.let { assertEquals(-73.968285, it, 0.00001) }
   }
