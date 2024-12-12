@@ -22,20 +22,30 @@ val interestStringValues =
     mapOf(
         categories[0] to
             listOf( // Sport
-                "Basketball", "Cycling", "Football", "Running", "Swimming", "Tennis", "Volleyball", "Yoga", "Other sports"
-                ),
+                "Basketball",
+                "Cycling",
+                "Football",
+                "Running",
+                "Swimming",
+                "Tennis",
+                "Volleyball",
+                "Yoga",
+                "Other sports"),
         categories[1] to
             listOf( // Culture
-                "Art", "History", "Science", "Travel", "Other culture"
-                ),
+                "Art", "History", "Science", "Travel", "Other culture"),
         categories[2] to
             listOf( // Skills
-                "Cooking", "Dancing", "Programming", "Writing", "Drawing", "Photography", "Other skills"
-                ),
+                "Cooking",
+                "Dancing",
+                "Programming",
+                "Writing",
+                "Drawing",
+                "Photography",
+                "Other skills"),
         categories[3] to
             listOf( // Entertainment
-                "Movies", "Music", "Reading", "TV Shows", "Video Games", "Other entertainment"
-                ))
+                "Movies", "Music", "Reading", "TV Shows", "Video Games", "Other entertainment"))
 
 val interestsCategories = interestStringValues.keys.toList()
 val categoryOf =

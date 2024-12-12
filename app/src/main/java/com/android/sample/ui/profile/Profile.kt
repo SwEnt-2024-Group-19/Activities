@@ -47,8 +47,8 @@ import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
-import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
+import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.PlusButtonToCreate

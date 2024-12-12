@@ -52,13 +52,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
+import com.android.sample.model.activity.Category
+import com.android.sample.model.activity.categories
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.Interest
-import com.android.sample.model.profile.InterestCategories
-import com.android.sample.model.profile.InterestCategoriesColors
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.model.profile.interestStringValues
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
@@ -67,6 +69,7 @@ import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
+import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
@@ -261,15 +264,11 @@ fun EditProfileScreen(
       })
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<Interest>) -> Unit) {
 
   var newListInterests by remember { mutableStateOf(initialInterests) }
-  val categories = InterestCategories
-  var selectedCategory by remember { mutableStateOf("") }
-  var expanded by remember { mutableStateOf(false) }
-  var newInterest by remember { mutableStateOf("") }
+  var newInterest: Interest? by remember { mutableStateOf(null) }
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
 
@@ -278,14 +277,7 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
       verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
       horizontalAlignment = Alignment.CenterHorizontally) {
         // Input Row
-        InterestInputRow(
-            categories = InterestCategories,
-            selectedCategory = selectedCategory,
-            onCategoryChange = { selectedCategory = it },
-            expanded = expanded,
-            onExpandChange = { expanded = !expanded },
-            newInterest = newInterest,
-            onInterestChange = { newInterest = it })
+        InterestInputRow(onInterestChange = { newInterest = it })
         Spacer(Modifier.height(STANDARD_PADDING.dp))
         // Add Button
         Button(
@@ -294,21 +286,15 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
                   context = context,
                   networkManager = networkManager,
                   onPerform = {
-                    if (newInterest.isNotBlank() &&
-                        selectedCategory.isNotBlank() &&
-                        selectedCategory != "None") {
-                      val updatedList = newListInterests + Interest(selectedCategory, newInterest)
+                    if (newInterest != null) {
+                      val updatedList = newListInterests + newInterest!!
                       newListInterests = updatedList
-                      newInterest = ""
-                      selectedCategory = ""
+                      newInterest = null
                       onUpdateInterests(updatedList)
                     }
                   })
             },
-            enabled =
-                newInterest.isNotBlank() &&
-                    selectedCategory.isNotBlank() &&
-                    selectedCategory != "None",
+            enabled = newInterest != null,
             modifier = Modifier.testTag("addInterestButton"),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
               Text("Add Interest")
@@ -319,8 +305,7 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
             horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
               items(newListInterests.size) { interest ->
                 InterestEditBox(
-                    category = newListInterests[interest].category,
-                    interest = newListInterests[interest].interest,
+                    interest = newListInterests[interest],
                     onRemove = {
                       performOfflineAwareAction(
                           context = context,
@@ -338,15 +323,13 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InterestInputRow(
-    categories: List<String>,
-    selectedCategory: String,
-    onCategoryChange: (String) -> Unit,
-    expanded: Boolean,
-    onExpandChange: (Boolean) -> Unit,
-    newInterest: String,
-    onInterestChange: (String) -> Unit
-) {
+fun InterestInputRow(onInterestChange: (Interest?) -> Unit) {
+  var selectedCategory by remember { mutableStateOf<Category?>(null) }
+  var expandedCategory by remember { mutableStateOf(false) }
+  var selectedInterest by remember { mutableStateOf<String?>(null) }
+  var expandedInterest by remember { mutableStateOf(false) }
+  val context = LocalContext.current
+
   Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
@@ -356,34 +339,40 @@ fun InterestInputRow(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
-              ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = onExpandChange) {
-                OutlinedTextField(
-                    value = selectedCategory,
-                    onValueChange = { onCategoryChange(it) },
-                    label = { Text("Category") },
-                    readOnly = true,
-                    modifier = Modifier.menuAnchor().testTag("categoryDropdown"),
-                    colors =
-                        TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            errorIndicatorColor = Color.Transparent,
-                            errorContainerColor = Color.Transparent))
+              ExposedDropdownMenuBox(
+                  expanded = expandedCategory, onExpandedChange = { expandedCategory = it }) {
+                    OutlinedTextField(
+                        value =
+                            selectedCategory?.name
+                                ?: context.getString(R.string.select_activity_category),
+                        onValueChange = { selectedCategory = Category.valueOf(it) },
+                        label = { Text("Category") },
+                        readOnly = true,
+                        modifier = Modifier.menuAnchor().testTag("categoryDropdown"),
+                        colors =
+                            TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                errorIndicatorColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent))
 
-                ExposedDropdownMenu(
-                    expanded = expanded, onDismissRequest = { onExpandChange(false) }) {
-                      categories.forEach { category ->
-                        DropdownMenuItem(
-                            text = { Text(category) },
-                            onClick = {
-                              onCategoryChange(category)
-                              onExpandChange(false)
-                            })
-                      }
-                    }
-              }
+                    ExposedDropdownMenu(
+                        expanded = expandedCategory,
+                        onDismissRequest = { expandedCategory = false }) {
+                          categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category.name) },
+                                onClick = {
+                                  selectedCategory = category
+                                  selectedInterest = null
+                                  onInterestChange(null)
+                                  expandedCategory = false
+                                })
+                          }
+                        }
+                  }
             }
 
         // New Interest Input
@@ -392,36 +381,48 @@ fun InterestInputRow(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
-              OutlinedTextField(
-                  value = newInterest,
-                  onValueChange = { onInterestChange(it) },
-                  label = { Text("New Interest") },
-                  enabled = selectedCategory.isNotEmpty() && selectedCategory != "None",
-                  modifier = Modifier.testTag("newInterestInput"),
-                  colors =
-                      TextFieldDefaults.colors(
-                          unfocusedContainerColor = Color.Transparent,
-                          focusedContainerColor = Color.Transparent,
-                          focusedIndicatorColor = Color.Transparent,
-                          unfocusedIndicatorColor = Color.Transparent,
-                          errorIndicatorColor = Color.Transparent,
-                          errorContainerColor = Color.Transparent,
-                          disabledContainerColor = Color.Transparent,
-                          disabledIndicatorColor = Color.Transparent,
-                      ),
-                  singleLine = true)
+              ExposedDropdownMenuBox(
+                  expanded = expandedInterest, onExpandedChange = { expandedInterest = it }) {
+                    OutlinedTextField(
+                        value =
+                            selectedInterest ?: context.getString(R.string.select_activity_type),
+                        onValueChange = { selectedInterest = it },
+                        label = { Text("Interest") },
+                        readOnly = true,
+                        modifier = Modifier.menuAnchor().testTag("interestDropdown"),
+                        colors =
+                            TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                errorIndicatorColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent))
+
+                    ExposedDropdownMenu(
+                        expanded = expandedInterest,
+                        onDismissRequest = { expandedInterest = false }) {
+                          interestStringValues[selectedCategory]?.forEach { interest ->
+                            DropdownMenuItem(
+                                text = { Text(interest) },
+                                onClick = {
+                                  selectedInterest = interest
+                                  onInterestChange(Interest(interest, selectedCategory!!))
+                                  expandedInterest = false
+                                })
+                          }
+                        }
+                  }
             }
       }
 }
 
 @Composable
-fun InterestEditBox(category: String, interest: String, onRemove: () -> Unit) {
-  val backgroundColor = InterestCategoriesColors[category] ?: Color.LightGray
-
+fun InterestEditBox(interest: Interest, onRemove: () -> Unit) {
   Box(
       modifier =
           Modifier.background(
-                  color = backgroundColor,
+                  color = colorOfCategory(interest.category),
                   shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
               .padding(horizontal = MEDIUM_PADDING.dp)
               .testTag("$interest"),
@@ -434,7 +435,7 @@ fun InterestEditBox(category: String, interest: String, onRemove: () -> Unit) {
             modifier = Modifier.fillMaxWidth() // Allows Row to take full width of the Box
             ) {
               Text(
-                  text = interest,
+                  text = interest.name,
                   fontSize = SUBTITLE_FONTSIZE.sp,
                   color = Color.Black,
                   modifier =

@@ -10,9 +10,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.activity.categories
 import com.android.sample.model.image.ImageRepositoryFirestore
@@ -29,7 +27,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
@@ -179,5 +176,4 @@ class EditProfileScreenTest {
     // Verify the "Remove Image" action was performed
     composeTestRule.onNodeWithTag("profilePicture").assertExists()
   }
-
 }
