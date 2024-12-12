@@ -126,4 +126,28 @@ class LocationViewModelTest {
           assertEquals(2.34f, distance, 0.05f)
         }
       }
+
+  @Test
+  fun `parseBody should correctly parse locations with shortName and name`() = runTest {
+    // Given
+    val mockLocations =
+        listOf(
+            Location(1.0, 2.0, "Short Name 1", "Name 1"),
+            Location(3.0, 4.0, "Short Name 2", "Name 2"))
+    whenever(mockRepository.search(any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(List<Location>) -> Unit>(1)
+      onSuccess(mockLocations)
+    }
+
+    // When
+    viewModel.setQuery("Test Query")
+    val suggestions = viewModel.locationSuggestions.first()
+
+    // Then
+    assertEquals(2, suggestions.size)
+    assertEquals("Short Name 1", suggestions[0].shortName)
+    assertEquals("Name 1", suggestions[0].name)
+    assertEquals("Short Name 2", suggestions[1].shortName)
+    assertEquals("Name 2", suggestions[1].name)
+  }
 }
