@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -343,6 +344,83 @@ class ImageRepositoryFirestoreTest {
         {
           errorOccurred = true
           assertTrue("Error should have been triggered", errorOccurred)
+        })
+  }
+
+  @Test
+  fun removeAllActivityImages_success() {
+    val activityId = "testActivityId"
+    `when`(mockStorageRef.child("activities/$activityId")).thenReturn(mockStorageRef)
+    `when`(mockStorageRef.listAll()).thenReturn(Tasks.forResult(mockListResult))
+    `when`(mockListResult.items).thenReturn(listOf(mockStorageRef, mockStorageRef))
+    `when`(mockStorageRef.delete()).thenReturn(Tasks.forResult(null))
+
+    val deletionTasks = mockListResult.items.map { it.delete() }
+    // Correctly mocking the whenAll to return a Task<Void>
+    val mockVoidTask: Task<Void> =
+        Tasks.forResult(null) // This should simulate the task completion.
+    `when`(Tasks.whenAll(deletionTasks)).thenReturn(mockVoidTask)
+
+    var success = false
+    imageRepository.removeAllActivityImages(
+        activityId,
+        {
+          success = true
+
+          assertTrue("Success callback should be triggered", success)
+        },
+        { throw it })
+  }
+
+  @Test
+  fun removeAllActivityImages_failure() {
+    val activityId = "testActivityId"
+    val exception = Exception("Failed to list or delete images")
+    `when`(mockStorageRef.child("activities/$activityId")).thenReturn(mockStorageRef)
+    `when`(mockStorageRef.listAll()).thenReturn(Tasks.forException(exception))
+
+    var errorOccurred = false
+    imageRepository.removeAllActivityImages(
+        activityId,
+        { throw AssertionError("This should not be called") },
+        {
+          errorOccurred = true
+          assertEquals("Exception should match", exception, it)
+          assertTrue("Failure callback should be triggered", errorOccurred)
+        })
+  }
+
+  @Test
+  fun deleteProfilePicture_success() {
+    val userId = "testUserId"
+    `when`(mockStorageRef.child("users/$userId/profile_picture.jpg")).thenReturn(mockStorageRef)
+    `when`(mockStorageRef.delete()).thenReturn(Tasks.forResult(null))
+
+    var success = false
+    imageRepository.deleteProfilePicture(
+        userId,
+        {
+          success = true
+          assertTrue("Success callback should be triggered", success)
+        },
+        { throw it })
+  }
+
+  @Test
+  fun deleteProfilePicture_failure() {
+    val userId = "testUserId"
+    val exception = Exception("Failed to delete profile picture")
+    `when`(mockStorageRef.child("users/$userId/profile_picture.jpg")).thenReturn(mockStorageRef)
+    `when`(mockStorageRef.delete()).thenReturn(Tasks.forException(exception))
+
+    var errorOccurred = false
+    imageRepository.deleteProfilePicture(
+        userId,
+        { throw AssertionError("This should not be called") },
+        {
+          errorOccurred = true
+          assertEquals("Exception should match", exception, it)
+          assertTrue("Failure callback should be triggered", errorOccurred)
         })
   }
 }
