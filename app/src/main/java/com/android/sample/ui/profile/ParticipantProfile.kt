@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
@@ -126,11 +125,7 @@ fun ParticipantProfileContent(
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
                     contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
-                      user.interests?.let { interests ->
-                        items(interests.size) { index ->
-                          InterestBox(interest = user.interests[index].interest)
-                        }
-                      }
+                      user.interests?.map { item { InterestBox(interest = it) } }
                     }
               }
 

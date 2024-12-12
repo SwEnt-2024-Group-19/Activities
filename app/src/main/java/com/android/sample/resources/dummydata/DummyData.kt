@@ -3,6 +3,7 @@ package com.android.sample.resources.dummydata
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.Interest
@@ -16,8 +17,8 @@ val timestamp = Timestamp.now()
 val location = Location(46.519962, 6.633597, "EPFL")
 val location2 = Location(46.5, 6.6, "Lausanne")
 val locationList = listOf(location, location2)
-val interest1 = Interest("Sport", "Cycling")
-val interest2 = Interest("Indoor Activity", "Reading")
+val interest1 = Interest("Reading", Category.ENTERTAINMENT)
+val interest2 = Interest("Hiking", Category.SPORT)
 val interest3 = listOf(interest1, interest2)
 val activity =
     Activity(

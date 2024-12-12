@@ -1,5 +1,6 @@
 package com.android.sample.model.profile
 
+import com.android.sample.model.activity.Category
 import com.android.sample.resources.dummydata.testUser
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
@@ -27,10 +28,8 @@ class ProfilesRepositoryFirestoreTest {
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
-  val mockInterests =
-      listOf(
-          mapOf("category" to "Indoor Activity", "interest" to "reading"),
-          mapOf("category" to "Outdoor Activity", "interest" to "hiking"))
+  private val mockInterests =
+      listOf(Interest("Movies", Category.ENTERTAINMENT), Interest("Programming", Category.SKILLS))
   private lateinit var profileRepositoryFirestore: ProfilesRepositoryFirestore
 
   @Before
@@ -204,11 +203,14 @@ class ProfilesRepositoryFirestoreTest {
   fun `documentToUser returns User when document is valid`() {
     // Arrange
     // When the function `get` is called with the argument "interests", return mockInterests
+    val interestsDocument =
+        mockInterests.map { mapOf("name" to it.name, "category" to it.category.name) }
+
     val document = mock(DocumentSnapshot::class.java)
     `when`(document.id).thenReturn("12345")
     `when`(document.getString("name")).thenReturn("John")
     `when`(document.getString("surname")).thenReturn("Doe")
-    `when`(document.get("interests")).thenReturn(mockInterests)
+    `when`(document.get("interests")).thenReturn(interestsDocument)
     `when`(document.get("activities")).thenReturn(listOf("running", "swimming"))
     `when`(document.getString("photo")).thenReturn("photo_url")
     `when`(document.get("likedActivities")).thenReturn(listOf("cycling"))
@@ -222,7 +224,8 @@ class ProfilesRepositoryFirestoreTest {
     assertEquals("John", user?.name)
     assertEquals("Doe", user?.surname)
     assertEquals(
-        listOf(Interest("Indoor Activity", "reading"), Interest("Outdoor Activity", "hiking")),
+        listOf(
+            Interest("Movies", Category.ENTERTAINMENT), Interest("Programming", Category.SKILLS)),
         user?.interests)
     assertEquals(listOf("running", "swimming"), user?.activities)
     assertEquals("photo_url", user?.photo)
