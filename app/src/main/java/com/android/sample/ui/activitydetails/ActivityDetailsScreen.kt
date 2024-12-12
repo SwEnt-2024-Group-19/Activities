@@ -76,7 +76,7 @@ import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -249,7 +249,7 @@ fun ActivityDetailsScreen(
                     Text(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
-                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION))
+                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
                     PaymentInfoScreen(price ?: 0.0)
                   }
 

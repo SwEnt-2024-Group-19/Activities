@@ -96,6 +96,7 @@ converterGson = "2.9.0"
 uiDesktop = "1.7.0"
 workRuntimeKtx = "2.10.0"
 gamesActivity = "3.0.5"
+core = "1.46.0"
 
 
 [libraries]
@@ -183,6 +184,7 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-v210 = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
 androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
 androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
+core = { group = "com.google.ar", name = "core", version.ref = "core" }
 
 
 
