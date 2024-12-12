@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
@@ -48,8 +49,10 @@ import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BIG_PADDING
+import com.android.sample.resources.C.Tag.CREATED_ACTIVITIES
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.DARK_GRAY
+import com.android.sample.resources.C.Tag.ENROLLED_ACTIVITIES
 import com.android.sample.resources.C.Tag.HALF_SCREEN_TEXT_FIELD_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
@@ -58,6 +61,7 @@ import com.android.sample.resources.C.Tag.LIGHT_PURPLE_COLOR
 import com.android.sample.resources.C.Tag.MAXIMUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.NORMAL_PADDING
+import com.android.sample.resources.C.Tag.PAST_ACTIVITIES
 import com.android.sample.resources.C.Tag.ROW_WIDTH
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -360,7 +364,7 @@ fun UserProfile(
     listActivitiesViewModel: ListActivitiesViewModel,
     uid: String
 ) {
-  var activityType by remember { mutableIntStateOf(0) }
+  var activityType by remember { mutableIntStateOf(CREATED_ACTIVITIES) }
   val uiState by listActivitiesViewModel.uiState.collectAsState()
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val userActivities =
@@ -449,9 +453,9 @@ fun UserProfile(
                   verticalAlignment = Alignment.Top,
                   modifier = Modifier.fillMaxWidth().testTag("activityTypeRow")) {
                     IconButton(
-                        onClick = { activityType = 0 },
+                        onClick = { activityType = CREATED_ACTIVITIES },
                         modifier =
-                            if (activityType == 0)
+                            if (activityType == CREATED_ACTIVITIES)
                                 Modifier.background(Color.LightGray, shape = CircleShape)
                                     .testTag("createdActivities")
                             else Modifier.testTag("createdActivities")) {
@@ -459,18 +463,18 @@ fun UserProfile(
                         }
 
                     IconButton(
-                        onClick = { activityType = 1 },
+                        onClick = { activityType = ENROLLED_ACTIVITIES },
                         modifier =
-                            if (activityType == 1)
+                            if (activityType == ENROLLED_ACTIVITIES)
                                 Modifier.background(Color.LightGray, shape = CircleShape)
                                     .testTag("enrolledActivities")
                             else Modifier.testTag("enrolledActivities")) {
                           Icon(Icons.Outlined.Groups, contentDescription = "Enrolled")
                         }
                     IconButton(
-                        onClick = { activityType = 2 },
+                        onClick = { activityType = PAST_ACTIVITIES },
                         modifier =
-                            if (activityType == 2)
+                            if (activityType == PAST_ACTIVITIES)
                                 Modifier.background(Color.LightGray, shape = CircleShape)
                                     .testTag("passedActivities")
                             else Modifier.testTag("passedActivities")) {
@@ -510,7 +514,7 @@ fun DisplayActivitiesList(
 ) {
   var listToShow = emptyList<Activity>()
   when (activityType) {
-    2 -> {
+    PAST_ACTIVITIES -> {
       listToShow =
           userActivities.filter {
             hourDateViewModel.combineDateAndTime(
@@ -518,7 +522,7 @@ fun DisplayActivitiesList(
                 Timestamp.now()
           }
     }
-    0 -> {
+    CREATED_ACTIVITIES -> {
       listToShow =
           userActivities.filter {
             it.creator == user.id &&
@@ -527,7 +531,7 @@ fun DisplayActivitiesList(
                     Timestamp.now()
           }
     }
-    1 -> {
+    ENROLLED_ACTIVITIES -> {
       listToShow =
           userActivities.filter {
             (it.creator != user.id || it.participants.map { it.id }.contains(user.id)) &&
@@ -537,7 +541,7 @@ fun DisplayActivitiesList(
           }
     }
   }
-  val remainingTime = activityType != 2
+  val remainingTime = activityType != PAST_ACTIVITIES
 
   if (listToShow.isEmpty()) {
     if (uid == "") {
@@ -664,7 +668,7 @@ fun ShowInterests(user: User) {
             contentPadding = PaddingValues(horizontal = MEDIUM_PADDING.dp)) {
               user.interests?.let { interests ->
                 items(interests.size) { index ->
-                  InterestBox(interest = user.interests[index].interest)
+                  InterestBox(interest = user.interests[index])
                 }
               }
             }
