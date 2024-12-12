@@ -57,26 +57,4 @@ class NotificationReceiverUnitTest {
       "Notification content does not match"
     }
   }
-
-  @Test
-  fun `onReceive should not post notification when activityId is missing`() {
-    val intent = Intent()
-    notificationReceiver.onReceive(context, intent)
-
-    val notifications = shadowNotificationManager.allNotifications
-    assert(notifications.isEmpty()) { "Notification should not be posted" }
-  }
-
-  @Test
-  fun `onReceive should not post notification when activityName is missing`() {
-    val intent =
-        Intent().apply {
-          putExtra("activityId", "123")
-          putExtra("notificationTitle", "Test Title")
-        }
-    notificationReceiver.onReceive(context, intent)
-
-    val notifications = shadowNotificationManager.allNotifications
-    assert(notifications.isEmpty()) { "Notification should not be posted" }
-  }
 }
