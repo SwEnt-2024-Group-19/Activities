@@ -20,6 +20,10 @@ object C {
     val ERROR_TEXTFIELD_PADDING_TOP = 5.dp
     val ERROR_TEXTFIELD_FONT_SIZE = 12.sp
 
+    const val CREATED_ACTIVITIES=0
+    const val ENROLLED_ACTIVITIES=1
+    const val PAST_ACTIVITIES=2
+
     const val STANDARD_PADDING = 8
     const val ROW_WIDTH = 408
 

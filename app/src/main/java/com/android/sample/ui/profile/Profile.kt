@@ -159,13 +159,13 @@ fun LoadingScreen(navigationActions: NavigationActions) {
             Modifier.fillMaxSize().padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
-                  text = "You do not have a profile",
+                  text =LocalContext.current.getString(R.string.no_profile),
                   modifier = Modifier.testTag("loadingText"),
                   color = Color.Black)
               Button(
                   onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
                   modifier = Modifier.testTag("signInButton")) {
-                    Text("Go to Sign In Page")
+                    Text(LocalContext.current.getString(R.string.go_to_sign_in_page))
                   }
             }
       }
@@ -419,7 +419,7 @@ fun UserProfile(
                 DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                   DropdownMenuItem(
                       modifier = Modifier.testTag("logoutMenuItem"),
-                      text = { Text("Logout") },
+                      text = { Text(LocalContext.current.getString(R.string.logout)) },
                       onClick = {
                         performOfflineAwareAction(
                             context = context,
@@ -434,7 +434,7 @@ fun UserProfile(
                       enabled = Firebase.auth.currentUser?.isAnonymous == false)
                   DropdownMenuItem(
                       modifier = Modifier.testTag("editProfileMenuItem"),
-                      text = { Text("Edit profile") },
+                      text = { Text(LocalContext.current.getString(R.string.edit_profile)) },
                       onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
                 }
               }
@@ -545,14 +545,14 @@ fun DisplayActivitiesList(
 
   if (listToShow.isEmpty()) {
     if (uid == "") {
-      if (activityType == 2) {
-        Text("You have no past activities yet!", modifier = Modifier.testTag("noActivitiesText"))
+      if (activityType == PAST_ACTIVITIES) {
+        Text(LocalContext.current.getString(R.string.no_past_activities), modifier = Modifier.testTag("noActivitiesText"))
       } else {
         PlusButtonToCreate(navigationActions = navigationActions, activityType)
       }
     } else {
       Text(
-          "This participant has no activity in this section yet !",
+          LocalContext.current.getString(R.string.participant_no_activities),
           modifier = Modifier.testTag("noActivitiesText"))
     }
   } else {
