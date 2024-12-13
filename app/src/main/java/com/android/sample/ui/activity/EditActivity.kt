@@ -504,13 +504,6 @@ fun EditActivityScreen(
                           },
                           modifier = Modifier.padding(STANDARD_PADDING.dp))
                     }
-
-                    if (locationSuggestions.size > 3) {
-                      DropdownMenuItem(
-                          text = { Text("More...") },
-                          onClick = { /* TODO: Define behavior for 'More...' */},
-                          modifier = Modifier.padding(STANDARD_PADDING.dp))
-                    }
                   }
             }
 
