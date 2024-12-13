@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 open class HourDateViewModel : ViewModel() {
 
@@ -49,17 +50,26 @@ open class HourDateViewModel : ViewModel() {
 
   fun combineDateAndTime(date: Timestamp, time: String): Timestamp {
     // Convert Firebase Timestamp to LocalDate
-    val localDate = date.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+    try {
+      // Convert Firebase Timestamp to LocalDate
+      val localDate = date.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+      val formatter = DateTimeFormatter.ofPattern("HH:mm")
+      val localTime = LocalTime.parse(time, formatter) // Parse the time using the provided format
 
-    val localTime = LocalTime.parse(time, formatter) // Assuming "hh:mm" format
+      // Combine LocalDate and LocalTime to LocalDateTime
+      val combinedDateTime = LocalDateTime.of(localDate, localTime)
 
-    // Combine LocalDate and LocalTime to LocalDateTime
-    val combinedDateTime = LocalDateTime.of(localDate, localTime)
-
-    // Convert back to Firebase Timestamp
-    return Timestamp(
-        combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000, 0)
+      // Convert back to Firebase Timestamp
+      return Timestamp(
+          combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000, 0)
+    } catch (e: DateTimeParseException) {
+      // Log the error or handle it as needed
+      println("Failed to parse time, error: ${e.message}")
+      val defaultDateTime = LocalDateTime.now()
+      return Timestamp(
+          defaultDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000,
+          0) // Or return a default Timestamp if that fits your use case
+    }
   }
 }

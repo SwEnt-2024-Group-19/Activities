@@ -5,6 +5,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.android.sample.model.activity.Category
+import com.android.sample.model.profile.Interest
+import com.android.sample.model.profile.User
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -73,5 +76,69 @@ class NotificationHelperUnitTest {
     Mockito.verify(alarmManager, Mockito.times(2))
         .setExactAndAllowWhileIdle(
             Mockito.eq(AlarmManager.RTC_WAKEUP), Mockito.anyLong(), Mockito.eq(pendingIntent))
+  }
+
+  @Test
+  fun testSendDeletionNotification() {
+    // Given
+    notificationHelper = NotificationHelper(context)
+    val activityId = "a1"
+    val activityName = "Test Activity"
+    val notificationTitle = "Activity Deleted"
+    val participants =
+        listOf(
+            User(
+                id = "u1",
+                name = "Alice",
+                surname = "Smith",
+                interests =
+                    listOf(
+                        Interest("Cycling", Category.SPORT), Interest("Running", Category.SPORT)),
+                activities = listOf("a1", "a2"),
+                photo = null,
+                likedActivities = listOf("a1")))
+
+    // When
+    notificationHelper.sendDeletionNotification(
+        activityId, activityName, notificationTitle, participants)
+
+    // Then
+    // Verify that PendingIntent.send() was called for each participant
+    Mockito.verify(pendingIntent, Mockito.times(participants.size)).send()
+
+    // Verify that cancelNotification was called
+    Mockito.verify(alarmManager).cancel(pendingIntent)
+  }
+
+  @Test
+  fun testSendDeletionNotificationHandlesSendFailure() {
+    // Given
+    notificationHelper = NotificationHelper(context)
+    val activityId = "a1"
+    val activityName = "Test Activity"
+    val notificationTitle = "Activity Deleted"
+    val participants =
+        listOf(
+            User(
+                id = "u1",
+                name = "Alice",
+                surname = "Smith",
+                interests =
+                    listOf(
+                        Interest("Cycling", Category.SPORT), Interest("Running", Category.SPORT)),
+                activities = listOf("a1", "a2"),
+                photo = null,
+                likedActivities = listOf("a1")))
+
+    // Setup pendingIntent to throw exception
+    Mockito.doThrow(PendingIntent.CanceledException::class.java).`when`(pendingIntent).send()
+
+    // When
+    notificationHelper.sendDeletionNotification(
+        activityId, activityName, notificationTitle, participants)
+
+    // Then
+    // Verify that the code handles the exception
+    Mockito.verify(alarmManager).cancel(pendingIntent)
   }
 }
