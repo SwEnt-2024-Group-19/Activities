@@ -12,17 +12,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
 @Composable
 fun NoInternetScreen() {
   val isSpinning = true
+  val spinningDuration = 1500
+  val fadingDuration = 1000
   Box(
       modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
       contentAlignment = Alignment.Center) {
@@ -37,7 +41,8 @@ fun NoInternetScreen() {
                   targetValue = 360f,
                   animationSpec =
                       infiniteRepeatable(
-                          animation = tween(durationMillis = 1500, easing = LinearEasing)),
+                          animation =
+                              tween(durationMillis = spinningDuration, easing = LinearEasing)),
                   label = "")
 
           // Animation for fading
@@ -47,7 +52,7 @@ fun NoInternetScreen() {
                   targetValue = 1f,
                   animationSpec =
                       infiniteRepeatable(
-                          animation = tween(durationMillis = 1000, easing = LinearEasing),
+                          animation = tween(durationMillis = fadingDuration, easing = LinearEasing),
                           repeatMode = RepeatMode.Reverse),
                   label = "")
 
@@ -58,10 +63,11 @@ fun NoInternetScreen() {
                 Image(
                     painter = logo,
                     contentDescription = "Loading Logo",
-                    modifier = Modifier.size(200.dp).graphicsLayer(rotationZ = rotation))
+                    modifier =
+                        Modifier.size((2 * IMAGE_SIZE).dp).graphicsLayer(rotationZ = rotation))
                 Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
                 Text(
-                    text = "No Internet Connection",
+                    text = stringResource(R.string.no_internet_connection),
                     style =
                         TextStyle(
                             fontSize = TITLE_FONTSIZE.sp,
@@ -73,7 +79,9 @@ fun NoInternetScreen() {
               }
         } else {
           Image(
-              painter = logo, contentDescription = "Loading Logo", modifier = Modifier.size(100.dp))
+              painter = logo,
+              contentDescription = "Loading Logo",
+              modifier = Modifier.size(IMAGE_SIZE.dp))
         }
       }
 }
