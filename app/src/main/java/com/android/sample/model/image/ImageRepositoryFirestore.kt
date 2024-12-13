@@ -6,6 +6,8 @@ import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ListResult
+import com.google.firebase.storage.StorageReference
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
@@ -30,11 +32,30 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         .putBytes(baos.toByteArray())
         .addOnSuccessListener {
           profilePicRef.downloadUrl.addOnSuccessListener { uri ->
-            updateFirestoreUserPhoto(userId, uri.toString(), onSuccess, onFailure)
+              firestore
+              .collection("users")
+              .document(userId)
+              .update("photo", uri.toString())
+              .addOnSuccessListener { onSuccess(uri.toString()) }
+              .addOnFailureListener { onFailure(it) }
           }
         }
         .addOnFailureListener { onFailure(it) }
   }
+
+  /*fun updateFirestoreUserPhoto(
+      userId: String,
+      photoUrl: String,
+      onSuccess: (String) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    firestore
+        .collection("users")
+        .document(userId)
+        .update("photo", photoUrl)
+        .addOnSuccessListener { onSuccess(photoUrl) }
+        .addOnFailureListener { onFailure(it) }
+  }*/
 
   override fun uploadActivityImages(
       activityId: String,
@@ -43,42 +64,108 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
       onFailure: (Exception) -> Unit
   ) {
     val activityFolderRef = storageRef.child("activities/$activityId")
+    deleteExistingImages(activityFolderRef, bitmaps, onSuccess, onFailure)
+  }
+
+  fun deleteExistingImages(
+      activityFolderRef: StorageReference,
+      bitmaps: List<Bitmap>,
+      onSuccess: (List<String>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
     activityFolderRef
         .listAll()
         .addOnSuccessListener { listResult ->
-          val deletionTasks = listResult.items.map { it.delete() }
-          Tasks.whenAllSuccess<Void>(deletionTasks)
-              .addOnSuccessListener {
-                val uploadedImageUrls = mutableListOf<String>()
-                var uploadCount = 0
-
-                bitmaps.forEach { bitmap ->
-                  val fileRef = activityFolderRef.child("image_${System.currentTimeMillis()}.jpg")
-                  val baos = ByteArrayOutputStream()
-                  bitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, baos)
-
-                  fileRef
-                      .putBytes(baos.toByteArray())
-                      .addOnSuccessListener {
-                        fileRef.downloadUrl.addOnSuccessListener { uri ->
-                          uploadedImageUrls.add(uri.toString())
-                          uploadCount++
-                          if (uploadCount == bitmaps.size) {
-                            firestore
-                                .collection("activities")
-                                .document(activityId)
-                                .update("images", uploadedImageUrls)
-                                .addOnSuccessListener { onSuccess(uploadedImageUrls) }
-                                .addOnFailureListener { onFailure(it) }
-                          }
-                        }
-                      }
-                      .addOnFailureListener { onFailure(it) }
-                }
-              }
-              .addOnFailureListener { onFailure(it) }
+          handleDeletionSuccess(listResult, activityFolderRef, bitmaps, onSuccess, onFailure)
         }
-        .addOnFailureListener { onFailure(it) }
+        .addOnFailureListener(onFailure)
+  }
+
+  fun handleDeletionSuccess(
+      listResult: ListResult,
+      activityFolderRef: StorageReference,
+      bitmaps: List<Bitmap>,
+      onSuccess: (List<String>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    val deletionTasks = listResult.items.map { it.delete() }
+    Tasks.whenAllSuccess<Void>(deletionTasks)
+        .addOnSuccessListener {
+          uploadImagesAndCollectUrls(activityFolderRef, bitmaps, onSuccess, onFailure)
+        }
+        .addOnFailureListener(onFailure)
+  }
+
+  fun uploadImagesAndCollectUrls(
+      activityFolderRef: StorageReference,
+      bitmaps: List<Bitmap>,
+      onSuccess: (List<String>) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    val uploadedImageUrls = mutableListOf<String>()
+    val uploadCount = intArrayOf(0) // Using an array to hold mutable integer
+
+    bitmaps.forEach { bitmap ->
+      val fileRef = activityFolderRef.child("image_${System.currentTimeMillis()}.jpg")
+      val baos = ByteArrayOutputStream()
+      bitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, baos)
+
+      fileRef
+          .putBytes(baos.toByteArray())
+          .addOnSuccessListener {
+            handleImageUploadSuccess(
+                fileRef,
+                uploadedImageUrls,
+                uploadCount,
+                bitmaps.size,
+                onSuccess,
+                onFailure,
+                activityFolderRef.parent!!.path)
+          }
+          .addOnFailureListener(onFailure)
+    }
+  }
+
+  fun handleImageUploadSuccess(
+      fileRef: StorageReference,
+      uploadedImageUrls: MutableList<String>,
+      uploadCount: IntArray,
+      totalImages: Int,
+      onSuccess: (List<String>) -> Unit,
+      onFailure: (Exception) -> Unit,
+      activityId: String
+  ) {
+    fileRef.downloadUrl.addOnSuccessListener { uri ->
+      processSuccessfulUpload(
+          uri.toString(),
+          uploadedImageUrls,
+          uploadCount,
+          totalImages,
+          onSuccess,
+          onFailure,
+          activityId)
+    }
+  }
+
+  fun processSuccessfulUpload(
+      uri: String,
+      uploadedImageUrls: MutableList<String>,
+      uploadCount: IntArray,
+      totalImages: Int,
+      onSuccess: (List<String>) -> Unit,
+      onFailure: (Exception) -> Unit,
+      activityId: String
+  ) {
+    uploadedImageUrls.add(uri)
+    uploadCount[0]++ // Increment the mutable integer in the array
+    if (uploadCount[0] == totalImages) {
+      firestore
+          .collection("activities")
+          .document(activityId)
+          .update("images", uploadedImageUrls)
+          .addOnSuccessListener { onSuccess(uploadedImageUrls) }
+          .addOnFailureListener(onFailure)
+    }
   }
 
   override fun fetchProfileImageUrl(
@@ -148,9 +235,6 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
     activityFolderRef
         .listAll()
         .addOnSuccessListener { listResult ->
-          Log.d(
-              "ImageRepositoryFirestore",
-              "Starting deletion of ${listResult.items.size} images for activity: activityId")
 
           // Create deletion tasks for each file
           val deletionTasks = listResult.items.map { it.delete() }
@@ -188,16 +272,4 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { onFailure(it) }
   }
-    fun updateFirestoreUserPhoto(
-        userId: String,
-        photoUrl: String,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        firestore.collection("users").document(userId)
-            .update("photo", photoUrl)
-            .addOnSuccessListener { onSuccess(photoUrl) }
-            .addOnFailureListener { onFailure(it) }
-    }
-
 }
