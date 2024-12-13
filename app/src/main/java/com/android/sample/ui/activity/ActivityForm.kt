@@ -129,7 +129,10 @@ fun ActivityForm(
       value = title,
       onValueChange = onTitleChange,
       label = { Text("Title") },
-      modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputTitleCreate"),
+      modifier = Modifier
+          .padding(STANDARD_PADDING.dp)
+          .fillMaxWidth()
+          .testTag("inputTitleCreate"),
       placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
       singleLine = true,
   )
@@ -140,17 +143,25 @@ fun ActivityForm(
       onValueChange = onDescriptionChange,
       label = { Text("Description") },
       modifier =
-          Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
+      Modifier
+          .padding(STANDARD_PADDING.dp)
+          .fillMaxWidth()
+          .testTag("inputDescriptionCreate"),
       placeholder = { Text(text = stringResource(id = R.string.request_activity_description)) })
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
   OutlinedButton(
       onClick = onClickDate,
-      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .padding(STANDARD_PADDING.dp)
+          .testTag("inputDateCreate"),
   ) {
     Icon(
         Icons.Filled.CalendarMonth,
         contentDescription = "select date",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+        modifier = Modifier
+            .padding(end = STANDARD_PADDING.dp)
+            .testTag("iconDateCreate"))
     if (dateIsSet)
         Text(
             "Selected date: ${dueDate.toDate().toString().take(11)}," +
@@ -168,12 +179,17 @@ fun ActivityForm(
   OutlinedButton(
       onClick = onClickStartingTime,
       modifier =
-          Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputStartTimeCreate"),
+      Modifier
+          .fillMaxWidth()
+          .padding(STANDARD_PADDING.dp)
+          .testTag("inputStartTimeCreate"),
   ) {
     Icon(
         Icons.Filled.AccessTime,
         contentDescription = "select start time",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconStartTimeCreate"))
+        modifier = Modifier
+            .padding(end = STANDARD_PADDING.dp)
+            .testTag("iconStartTimeCreate"))
     if (startTimeIsSet) Text("Start time: ${startTime} (click to change)")
     else Text("Select start time")
   }
@@ -186,15 +202,19 @@ fun ActivityForm(
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
   OutlinedButton(
       onClick = onClickDurationTime,
-      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .padding(STANDARD_PADDING.dp)
+          .testTag("inputEndTimeCreate"),
   ) {
     Icon(
         Icons.Filled.HourglassTop,
         contentDescription = "select duration",
         modifier =
-            Modifier.padding(end = STANDARD_PADDING.dp)
-                .align(Alignment.CenterVertically)
-                .testTag("iconEndTimeCreate"))
+        Modifier
+            .padding(end = STANDARD_PADDING.dp)
+            .align(Alignment.CenterVertically)
+            .testTag("iconEndTimeCreate"))
     if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
     else Text("Select End Time")
   }
@@ -210,7 +230,10 @@ fun ActivityForm(
       value = price,
       onValueChange = onPriceChange,
       label = { Text("Price") },
-      modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPriceCreate"),
+      modifier = Modifier
+          .padding(STANDARD_PADDING.dp)
+          .fillMaxWidth()
+          .testTag("inputPriceCreate"),
       placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
       singleLine = true,
   )
@@ -219,7 +242,10 @@ fun ActivityForm(
       value = placesMax,
       onValueChange = onPlacesMaxChange,
       label = { Text("Total Places") },
-      modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPlacesCreate"),
+      modifier = Modifier
+          .padding(STANDARD_PADDING.dp)
+          .fillMaxWidth()
+          .testTag("inputPlacesCreate"),
       placeholder = { Text(text = stringResource(id = R.string.request_placesMax_activity)) },
       singleLine = true,
   )
@@ -231,7 +257,10 @@ fun ActivityForm(
         label = { Text("Location") },
         placeholder = { Text("Enter an Address or Location") },
         modifier =
-            Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputLocationCreate"),
+        Modifier
+            .padding(STANDARD_PADDING.dp)
+            .fillMaxWidth()
+            .testTag("inputLocationCreate"),
         singleLine = true)
 
     // Dropdown menu for location suggestions
@@ -253,110 +282,53 @@ fun ActivityForm(
                 onClick = { onLocationClick(location) },
                 modifier = Modifier.padding(STANDARD_PADDING.dp))
           }
-
-          if (locationSuggestions.size > 3) {
+        if (locationSuggestions.size > 3) {
             DropdownMenuItem(
                 text = { Text("More...") },
                 onClick = {},
                 modifier = Modifier.padding(STANDARD_PADDING.dp))
-          }
         }
+    }
   }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-  if (locationSuggestions.size > 3) {
-    DropdownMenuItem(
-        text = { Text("More...") },
-        onClick = { /* TODO: Define behavior for 'More...' */},
-        modifier = Modifier.padding(STANDARD_PADDING.dp))
-  }
 
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-  ExposedDropdownMenuBox(
-      modifier = Modifier.testTag("chooseTypeMenu").fillMaxWidth().padding(STANDARD_PADDING.dp),
-      expanded = expandedType,
-      onExpandedChange = onExpandedTypeChange) {
-        OutlinedTextField(
-            readOnly = true,
-            value = selectedOptionType,
-            onValueChange = {},
-            label = { Text(context.getString(R.string.activity_type)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            modifier = Modifier.menuAnchor().fillMaxWidth().testTag("typeTextField"))
-        ExposedDropdownMenu(
-            expanded = expandedType,
-            onDismissRequest = onDismissType,
-            modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-              types.forEach { selectionOption ->
-                DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                    text = { Text(selectionOption.name) },
-                    onClick = { onSelectType(selectionOption) })
-              }
-            }
-      }
+    MyDropDownMenu(
+        mode = "type",
+        expanded = expandedType,
+        onExpandChange = onExpandedTypeChange,
+        onDismiss = onDismissType,
+        valueItem = selectedOptionType,
+        onSelect = { type -> onSelectType(type as ActivityType) },
+        context = context,
+        listItems = types
+    )
 
-  ExposedDropdownMenuBox(
-      modifier = Modifier.testTag("chooseCategoryMenu").fillMaxWidth().padding(STANDARD_PADDING.dp),
-      expanded = expandedCategory,
-      onExpandedChange = onExpandedCategoryChange) {
-        OutlinedTextField(
-            readOnly = true,
-            value =
-                selectedOptionCategory?.name
-                    ?: context.getString(R.string.select_activity_category),
-            onValueChange = {},
-            label = { Text(context.getString(R.string.activity_category)) },
-            trailingIcon = {
-              ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
-            },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
-        ExposedDropdownMenu(
-            expanded = expandedCategory,
-            onDismissRequest = onDismissCategory,
-            modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-              interestsCategories.forEach {
-                DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                    text = { Text(it.name) },
-                    onClick = { onSelectCategory(it) })
-              }
-            }
-      }
+  MyDropDownMenu(
+        mode = "category",
+        expanded = expandedCategory,
+        onExpandChange = onExpandedCategoryChange,
+        onDismiss = onDismissCategory,
+        valueItem = selectedOptionCategory?.name ?: context.getString(R.string.select_activity_category),
+        onSelect = { category -> onSelectCategory(category as Category) },
+        context = context,
+        listItems = Category.values().toList()
+  )
 
   if (selectedOptionCategory != null) {
     Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-    ExposedDropdownMenuBox(
-        modifier =
-            Modifier.testTag("chooseInterestMenu").fillMaxWidth().padding(STANDARD_PADDING.dp),
+    MyDropDownMenu(
+        mode = "interest",
         expanded = expandedInterest,
-        onExpandedChange = onInterestExpandChange) {
-          OutlinedTextField(
-              readOnly = true,
-              value = selectedOptionInterest ?: context.getString(R.string.select_activity_type),
-              onValueChange = {},
-              label = { Text("Activity Interest") },
-              trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInterest)
-              },
-              colors = ExposedDropdownMenuDefaults.textFieldColors(),
-              modifier = Modifier.menuAnchor().fillMaxWidth().testTag("interestTextField"))
-          ExposedDropdownMenu(
-              expanded = expandedInterest,
-              onDismissRequest = onInterestDismiss,
-              modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                interestStringValues[selectedOptionCategory]?.forEach { selectionOption ->
-                  DropdownMenuItem(
-                      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                      text = { Text(selectionOption) },
-                      onClick = { onInterestSelect(selectionOption) },
-                  )
-                }
-              }
-        }
+        onExpandChange = onInterestExpandChange,
+        onDismiss = onInterestDismiss,
+        valueItem = selectedOptionInterest ?: context.getString(R.string.select_activity_interest),
+        onSelect = { interest -> onInterestSelect(interest as String) },
+        context = context,
+        listItems = interestStringValues[selectedOptionCategory]?: listOf()
+    )
   }
 
   Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
@@ -364,7 +336,10 @@ fun ActivityForm(
   Button(
       onClick = onOpenUserDialog,
       modifier =
-          Modifier.width(BUTTON_WIDTH.dp).height(BUTTON_HEIGHT.dp).testTag("addAttendeeButton")) {
+      Modifier
+          .width(BUTTON_WIDTH.dp)
+          .height(BUTTON_HEIGHT.dp)
+          .testTag("addAttendeeButton")) {
         Row(
             horizontalArrangement =
                 Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
@@ -379,7 +354,10 @@ fun ActivityForm(
       }
   if (attendees.isNotEmpty()) {
     LazyRow(
-        modifier = Modifier.fillMaxHeight().height(85.dp).padding(STANDARD_PADDING.dp),
+        modifier = Modifier
+            .fillMaxHeight()
+            .height(85.dp)
+            .padding(STANDARD_PADDING.dp),
     ) {
       items(attendees.size) { index ->
         AttendantPreview(
@@ -397,4 +375,87 @@ fun ActivityForm(
         onAddUser = onAddUser,
     )
   }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyDropDownMenu(
+    mode: String,
+    expanded : Boolean,
+    onExpandChange : (Boolean) -> Unit,
+    onDismiss: () -> Unit,
+    valueItem : String ?,
+    onSelect: (Any) -> Unit,
+    context: Context,
+    listItems : List<Any> = listOf(Any())
+){
+    ExposedDropdownMenuBox(
+        modifier = Modifier
+            .testTag(
+                when (mode) {
+                    "category" -> "chooseCategoryMenu"
+                    "type" -> "chooseTypeMenu"
+                    else -> "chooseInterestMenu"
+                }
+            )
+            .fillMaxWidth()
+            .padding(STANDARD_PADDING.dp),
+        expanded = expanded,
+        onExpandedChange = onExpandChange) {
+        OutlinedTextField(
+            readOnly = true,
+            value =
+            valueItem?: when(mode){
+                "category" -> context.getString(R.string.select_activity_category)
+                "type" -> context.getString(R.string.select_activity_type)
+                "interest" -> context.getString(R.string.select_activity_interest)
+                else -> ""
+            },
+            onValueChange = {},
+            label = { when (mode) {
+                "category" -> Text(context.getString(R.string.activity_category))
+                "type" -> Text(context.getString(R.string.activity_type))
+                "interest" -> Text(context.getString(R.string.activity_interest))
+                else -> {
+                }
+            }
+                    },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+                .testTag(
+                    when (mode) {
+                        "category" -> "categoryTextField"
+                        "type" -> "typeTextField"
+                        "interest" -> "interestTextField"
+                        else -> ""
+                    }
+                ))
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = onDismiss,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(STANDARD_PADDING.dp)) {
+            listItems.forEach {
+                DropdownMenuItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
+                    text = { when (it) {
+                        is Category -> Text(it.name)
+                        is String -> Text(it)
+                        is ActivityType -> Text(it.name)
+                        else -> {
+                        }
+                    }
+                    },
+                    onClick = { onSelect(it) })
+            }
+        }
+    }
 }
