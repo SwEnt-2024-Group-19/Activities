@@ -85,7 +85,7 @@ fun EditActivityScreen(
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
   var selectedLocation by remember {
-    mutableStateOf(activity?.location ?: Location(0.0, 0.0, "Origin"))
+    mutableStateOf(activity?.location ?: Location(0.0, 0.0, "name", "Origin"))
   }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
