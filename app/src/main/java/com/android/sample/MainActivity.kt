@@ -192,7 +192,11 @@ fun NavGraph(
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
-        ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel, imageViewModel)
+        ProfileScreen(
+            userProfileViewModel = profileViewModel,
+            navigationActions = navigationActions,
+            listActivitiesViewModel = listActivitiesViewModel,
+            imageViewModel = imageViewModel)
       }
       composable(Screen.EDIT_PROFILE) {
         EditProfileScreen(profileViewModel, navigationActions, imageViewModel)

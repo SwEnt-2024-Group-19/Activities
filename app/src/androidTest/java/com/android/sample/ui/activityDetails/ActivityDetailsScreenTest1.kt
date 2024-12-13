@@ -504,7 +504,8 @@ class ActivityDetailsScreenAndroidTest {
   fun distanceIsCorrectlyDisplayedInMeters() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    mockLocationViewModel.setCurrentLocation(Location(46.52, 6.64, "Close to EPFL"))
+    mockLocationViewModel.setCurrentLocation(
+        Location(46.52, 6.64, "Close to EPFL", "Close to EPFL"))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -520,7 +521,7 @@ class ActivityDetailsScreenAndroidTest {
   fun distanceIsCorrectlyDisplayedInKilometers() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    mockLocationViewModel.setCurrentLocation(Location(50.0, 5.0, "Random Point"))
+    mockLocationViewModel.setCurrentLocation(Location(50.0, 5.0, "Random Point", "Random Point"))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,

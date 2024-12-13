@@ -20,7 +20,12 @@ object C {
     val ERROR_TEXTFIELD_PADDING_TOP = 5.dp
     val ERROR_TEXTFIELD_FONT_SIZE = 12.sp
 
+    const val CREATED_ACTIVITIES = 0
+    const val ENROLLED_ACTIVITIES = 1
+    const val PAST_ACTIVITIES = 2
+
     const val STANDARD_PADDING = 8
+    const val ROW_WIDTH = 408
 
     const val HALF_SCREEN_TEXT_FIELD_PADDING = 120
 
@@ -33,8 +38,12 @@ object C {
     const val AUTH_BUTTON_HEIGHT = 60
 
     const val LARGE_BUTTON_HEIGHT = 50
-
+    const val LARGE_FONT_WEIGHT = 500
+    const val VERY_LARGE_FONT_WEIGHT = 600
+    const val MAXIMUM_FONT_WEIGHT = 700
     const val MEDIUM_PADDING = 16
+    const val NORMAL_PADDING = 10
+    const val BIG_PADDING = 20
 
     const val LARGE_PADDING = 24
 
@@ -52,11 +61,12 @@ object C {
     const val SUBTITLE_FONTSIZE = 16
 
     const val WHITE_COLOR = 0xFFFFFFFF
-    const val LIGHT_PURPLE_COLOR = 0xFFD1C4E9
+    const val LIGHT_PURPLE_COLOR = 0xFF8B6EA2
     const val DARK_BLUE_COLOR = 0xFF4A148C
 
     const val BLACK_COLOR = 0xFF000000
     const val PURPLE_COLOR = 0xFF6200EE
+    const val DARK_GRAY = 0xFF212121
 
     const val SUCCESS_COLOR = 0xFF048531
 

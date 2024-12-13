@@ -85,10 +85,11 @@ fun SignUpScreen(navigationActions: NavigationActions) {
           item {
             Image(
                 painter =
-                    painterResource(id = R.drawable.google_logo), // Ensure this drawable exists
+                    painterResource(
+                        id = R.drawable.aptivity_logo_with_text), // Ensure this drawable exists
                 contentDescription = "App Logo",
-                modifier = Modifier.size(IMAGE_SIZE.dp))
-            Spacer(modifier = Modifier.height((2 * LARGE_PADDING).dp))
+                modifier = Modifier.size((3 * IMAGE_SIZE).dp))
+            Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
           }
           item {
             // Email field

@@ -73,6 +73,10 @@ constructor(private val repository: ProfilesRepository, private val localDatabas
     }
   }
 
+  fun getUserData(userId: String, onResult: (User?) -> Unit) {
+    repository.getUser(userId = userId, onSuccess = onResult, onFailure = { onResult(null) })
+  }
+
   fun clearUserData() {
     userState_.value = null
   }
