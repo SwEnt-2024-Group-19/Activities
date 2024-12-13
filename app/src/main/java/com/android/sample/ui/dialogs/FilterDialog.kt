@@ -1,5 +1,6 @@
 package com.android.sample.ui.dialogs
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,6 +53,7 @@ fun FilterDialog(
             distance: Double?,
             onlyPRO: Boolean?) -> Unit,
 ) {
+  val context = LocalContext.current
   val hourDateViewModel = HourDateViewModel()
   var maxPrice by remember { mutableStateOf(DEFAULT_MAX_PRICE) }
   var availablePlaces by remember { mutableStateOf<Int?>(null) }
@@ -294,16 +297,37 @@ fun FilterDialog(
 
                   Button(
                       onClick = {
-                        onFilter(
-                            maxPrice.toDouble(),
-                            availablePlaces,
-                            startDateTimestamp,
-                            endDateTimestamp,
-                            startTime,
-                            endTime,
-                            distance?.toDouble(),
-                            onlyPRO)
-                        onDismiss()
+                        if (endDateTimestamp != null && endDateTimestamp!! < startDateTimestamp) {
+                          Toast.makeText(
+                                  context,
+                                  "Filter failed, end date is before start date",
+                                  Toast.LENGTH_SHORT)
+                              .show()
+                        } else {
+                          if (startTime != null &&
+                              endTime != null &&
+                              hourDateViewModel.combineDateAndTime(
+                                  startDateTimestamp, startTime!!) >
+                                  hourDateViewModel.combineDateAndTime(
+                                      endDateTimestamp!!, endTime!!)) {
+                            Toast.makeText(
+                                    context,
+                                    "Filter failed, start time is after end time",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          } else {
+                            onFilter(
+                                maxPrice.toDouble(),
+                                availablePlaces,
+                                startDateTimestamp,
+                                endDateTimestamp,
+                                startTime,
+                                endTime,
+                                distance?.toDouble(),
+                                onlyPRO)
+                            onDismiss()
+                          }
+                        }
                       },
                       modifier = Modifier.testTag("filterButton")) {
                         Text("Filter")

@@ -33,26 +33,3 @@ fun MyDatePicker(
             }
       }
 }
-
-@Composable
-fun MyEndDatePicker(
-    onDateSelected: (Timestamp) -> Unit,
-    isOpen: Boolean,
-    initialDate: LocalDate?,
-    onCloseRequest: (MaterialDialogState) -> Unit
-) {
-  MaterialDialog(
-      onCloseRequest = onCloseRequest,
-      dialogState = rememberMaterialDialogState(isOpen),
-      buttons = {
-        positiveButton("Ok")
-        negativeButton("Cancel")
-      }) {
-        datepicker(
-            initialDate = initialDate ?: LocalDate.now(),
-            title = "Select a date",
-            allowedDateValidator = { date -> date.isAfter((initialDate?.minusDays(1))) }) {
-              onDateSelected(Timestamp(it.atStartOfDay().toInstant(ZoneOffset.MIN)))
-            }
-      }
-}
