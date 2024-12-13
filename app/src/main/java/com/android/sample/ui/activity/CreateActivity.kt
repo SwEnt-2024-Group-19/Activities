@@ -194,7 +194,11 @@ fun CreateActivityScreen(
                   onDescriptionChange = { description = it },
                   onClickDate = { dateIsOpen = true },
                   onCloseDate = { dateIsOpen = false },
-                  onSelectDate = { dueDate = it },
+                  onSelectDate = {
+                    dueDate = it
+                    dateIsOpen = false
+                    dateIsSet = true
+                  },
                   dueDate = dueDate,
                   dateIsOpen = dateIsOpen,
                   dateIsSet = dateIsSet,
