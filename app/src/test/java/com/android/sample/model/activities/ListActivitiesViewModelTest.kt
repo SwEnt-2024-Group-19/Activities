@@ -6,6 +6,7 @@ import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.activityBiking
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -203,5 +204,53 @@ class ListActivitiesViewModelTest {
     verify(activitiesRepository).updateActivity(any(), any(), any())
 
     assertEquals(expectedActivity, capturedActivity)
+  }
+
+  @Test
+  fun `verify initial fetch of activities`() = runBlocking {
+    val dummyActivities = listOf(activityBiking)
+    `when`(activitiesRepository.getActivities(any(), any())).thenAnswer {
+      val onSuccess = it.arguments[0] as (List<Activity>) -> Unit
+      onSuccess(dummyActivities)
+    }
+
+    listActivitiesViewModel.getActivities()
+
+    val uiState = listActivitiesViewModel.uiState.first()
+    assertThat(uiState is ListActivitiesViewModel.ActivitiesUiState.Success, `is`(true))
+    val successState = uiState as ListActivitiesViewModel.ActivitiesUiState.Success
+    assertEquals(dummyActivities, successState.activities)
+  }
+
+  @Test
+  fun `verify addActivity updates state`() = runBlocking {
+    val dummyActivity = activityBiking
+    `when`(activitiesRepository.addActivity(eq(dummyActivity), any(), any())).thenAnswer {
+      val onSuccess = it.arguments[1] as () -> Unit
+      onSuccess()
+    }
+
+    listActivitiesViewModel.addActivity(dummyActivity)
+
+    verify(activitiesRepository).addActivity(eq(dummyActivity), any(), any())
+    val uiState = listActivitiesViewModel.uiState.first()
+    assertThat(uiState is ListActivitiesViewModel.ActivitiesUiState.Success, `is`(true))
+  }
+
+  @Test
+  fun `verify filters update ViewModel state`() {
+    listActivitiesViewModel.updateFilterState(
+        price = 50.0,
+        placesAvailable = 5,
+        minDateTimestamp = Timestamp(1635678900L, 0),
+        maxDateTimestamp = Timestamp(1638270900L, 0),
+        startTime = "08:00",
+        endTime = "20:00",
+        distance = 15.0,
+        seeOnlyPRO = true)
+
+    assertThat(listActivitiesViewModel.maxPrice, `is`(50.0))
+    assertThat(listActivitiesViewModel.availablePlaces, `is`(5))
+    assertThat(listActivitiesViewModel.onlyPRO, `is`(true))
   }
 }

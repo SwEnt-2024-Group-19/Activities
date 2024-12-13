@@ -25,6 +25,9 @@ object C {
     const val PAST_ACTIVITIES = 2
 
     const val STANDARD_PADDING = 8
+
+    const val MEDIUM_FONTSIZE = 18
+    const val LARGE_FONTSIZE = 24
     const val ROW_WIDTH = 408
 
     const val HALF_SCREEN_TEXT_FIELD_PADDING = 120

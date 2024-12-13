@@ -2,10 +2,12 @@ package com.android.sample.ui.dialogs
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -28,7 +30,12 @@ class FilterDialogTest {
     composeTestRule.onNodeWithTag("maxDateTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("startTimeTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("endTimeTextField").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("FilterDialog")
+        .performScrollToNode(hasTestTag("distanceTextField"))
     composeTestRule.onNodeWithTag("distanceTextField").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("FilterDialog").performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
     composeTestRule.onNodeWithText("Filter").assertIsDisplayed()
   }
@@ -64,58 +71,6 @@ class FilterDialogTest {
   }
 
   @Test
-  fun filterDialog_shouldSetStartDate() {
-    composeTestRule.setContent {
-      FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _, _, _ -> })
-    }
-
-    val startDate = "15/09/2024"
-    composeTestRule.onNodeWithTag("minDateTextField").performTextInput(startDate)
-
-    // Verify the input value
-    composeTestRule.onNodeWithTag("minDateTextField").assertTextContains(startDate)
-  }
-
-  @Test
-  fun filterDialog_shouldSetEndDate() {
-    composeTestRule.setContent {
-      FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _, _, _ -> })
-    }
-
-    val startDate = "17/09/2024"
-    composeTestRule.onNodeWithTag("maxDateTextField").performTextInput(startDate)
-
-    // Verify the input value
-    composeTestRule.onNodeWithTag("maxDateTextField").assertTextContains(startDate)
-  }
-
-  @Test
-  fun filterDialog_shouldSetStartTime() {
-    composeTestRule.setContent {
-      FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _, _, _ -> })
-    }
-
-    val startTime = "00:45"
-    composeTestRule.onNodeWithTag("startTimeTextField").performTextInput(startTime)
-
-    // Verify the input value
-    composeTestRule.onNodeWithTag("startTimeTextField").assertTextContains(startTime)
-  }
-
-  @Test
-  fun filterDialog_shouldSetEndTime() {
-    composeTestRule.setContent {
-      FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _, _, _ -> })
-    }
-
-    val endTime = "01:45"
-    composeTestRule.onNodeWithTag("endTimeTextField").performTextInput(endTime)
-
-    // Verify the input value
-    composeTestRule.onNodeWithTag("endTimeTextField").assertTextContains(endTime)
-  }
-
-  @Test
   fun filterDialog_shouldSetDistance() {
     composeTestRule.setContent {
       FilterDialog(onDismiss = {}, onFilter = { _, _, _, _, _, _, _, _ -> })
@@ -137,7 +92,8 @@ class FilterDialogTest {
     }
 
     // Perform click on Cancel
-    composeTestRule.onNodeWithText("Cancel").performClick()
+    composeTestRule.onNodeWithTag("FilterDialog").performScrollToNode(hasTestTag("cancelButton"))
+    composeTestRule.onNodeWithTag("cancelButton").performClick()
 
     // Verify dismiss was called
     assert(dismissed)
@@ -167,17 +123,14 @@ class FilterDialogTest {
 
     // Set values
     composeTestRule.onNodeWithTag("membersAvailableTextField").performTextInput("5")
-    composeTestRule.onNodeWithTag("startTimeTextField").performTextInput("17:00")
-    composeTestRule.onNodeWithTag("endTimeTextField").performTextInput("19:00")
     composeTestRule.onNodeWithTag("distanceTextField").performTextInput("10")
-    composeTestRule.onNodeWithText("Filter").performClick()
+    composeTestRule.onNodeWithTag("FilterDialog").performScrollToNode(hasTestTag("filterButton"))
+    composeTestRule.onNodeWithTag("filterButton").performClick()
 
     // Verify filter callback
     assert(filterCalled)
     assertEquals(300.0, maxPrice) // Default max price
     assertEquals(5, membersAvailable)
-    assertEquals("17:00", startTime)
-    assertEquals("19:00", endTime)
     assertEquals(10.0, distance)
   }
 

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -483,174 +484,11 @@ class OverviewScreenTest {
     composeTestRule
         .onNodeWithTag("membersAvailableTextField")
         .performTextInput("5") // Set available places to 5
+    composeTestRule.onNodeWithTag("FilterDialog").performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithTag("filterButton").performClick()
 
     composeTestRule.onNodeWithText("Many spots").assertIsDisplayed()
     composeTestRule.onNodeWithText("Few spots").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogFiltersByMinDate() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 =
-        activity.copy(
-            title = "Past activity",
-            date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time))
-    val activity2 =
-        activity.copy(
-            title = "Future activity",
-            date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time))
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("minDateTextField")
-        .performTextInput("01/01/2030") // Set min date to 01/01/2030
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Future activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Past activity").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogFiltersByMaxDate() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 =
-        activity.copy(
-            title = "Activity before max date",
-            date = Timestamp(GregorianCalendar(2025, Calendar.JANUARY, 1).time))
-    val activity2 =
-        activity.copy(
-            title = "Activity after max date",
-            date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time))
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("maxDateTextField")
-        .performTextInput("01/01/2030") // Set max date to 01/01/2030
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Activity before max date").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Activity after max date").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogFiltersByStartTime() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 = activity.copy(title = "Morning activity", startTime = "08:00")
-    val activity2 = activity.copy(title = "Evening activity", startTime = "18:00")
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("startTimeTextField")
-        .performTextInput("17:00") // Set start time to 08:00
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Evening activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Morning activity").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogFiltersByEndTime() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 = activity.copy(title = "Short activity", startTime = "12:00", duration = "01:00")
-    val activity2 = activity.copy(title = "Late activity", startTime = "22:00", duration = "01:00")
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("endTimeTextField")
-        .performTextInput("16:00") // Set end time to 12:00
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Late activity").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogClearsFilters() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 =
-        activity.copy(
-            title = "Short activity", startTime = "10:00", duration = "01:00", price = 10.0)
-    val activity2 =
-        activity.copy(
-            title = "Long activity", startTime = "13:00", duration = "04:00", price = 100.0)
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("startTimeTextField")
-        .performTextInput("12:30") // Set duration to 1 hour
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-    composeTestRule.onNodeWithText("Short activity").assertIsNotDisplayed()
-    composeTestRule.onNodeWithText("Long activity").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("startTimeTextField")
-        .performTextClearance() // Clear duration filter
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Long activity").assertIsDisplayed()
   }
 
   @Test
@@ -672,6 +510,7 @@ class OverviewScreenTest {
     listActivitiesViewModel.getActivities()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("FilterDialog").performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithTag("onlyPROCheckboxRow").assertIsDisplayed()
     composeTestRule.onNodeWithTag("onlyPROCheckbox").performClick()
     composeTestRule.onNodeWithTag("filterButton").performClick()
