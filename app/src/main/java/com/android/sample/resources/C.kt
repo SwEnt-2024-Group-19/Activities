@@ -30,7 +30,6 @@ object C {
     const val LARGE_FONTSIZE = 24
     const val ROW_WIDTH = 408
 
-
     const val HALF_SCREEN_TEXT_FIELD_PADDING = 120
 
     const val DEFAULT_MAX_PRICE = 300f
