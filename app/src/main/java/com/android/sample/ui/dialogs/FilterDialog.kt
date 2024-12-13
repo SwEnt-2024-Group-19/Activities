@@ -119,8 +119,7 @@ fun FilterDialog(
                     singleLine = true,
                     modifier = Modifier.testTag("membersAvailableTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
-                /////////////////////////////////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////////
+
                 Text(
                     text = "Date Range",
                     modifier =
@@ -134,7 +133,7 @@ fun FilterDialog(
                 ) {
                   Icon(
                       Icons.Filled.CalendarMonth,
-                      contentDescription = "select date",
+                      contentDescription = "select a date from which activities are shown",
                       modifier =
                           Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
                   if (startDateIsSet)
@@ -143,7 +142,7 @@ fun FilterDialog(
                                     startDateTimestamp.toDate().toString().take(11)
                                 }," +
                               "${(startDateTimestamp.toDate().year) + 1900}  (click to change)")
-                  else Text("Select Date for the activity")
+                  else Text("select a date from which activities are shown")
                 }
                 if (startDateIsOpen) {
                   MyDatePicker(
@@ -180,7 +179,7 @@ fun FilterDialog(
                                 endDateTimestamp?.toDate().toString().take(11)
                             }," +
                               "${(endDateTimestamp?.toDate()?.year)?.plus(1900)}  (click to change)")
-                  else Text("Select Date for the activity")
+                  else Text("Select a Date from which activities are hidden")
                 }
                 if (endDateIsOpen) {
                   MyDatePicker(
@@ -295,32 +294,6 @@ fun FilterDialog(
 
                   Button(
                       onClick = {
-                        /*if (startDate != null) {
-                          val calendar = GregorianCalendar()
-                          val parts = startDate!!.split("/")
-                          calendar.set(
-                              parts[2].toInt(),
-                              parts[1].toInt() - 1, // Months are 0-based
-                              parts[0].toInt(),
-                              0,
-                              0,
-                              0)
-                          startDateTimestamp = Timestamp(calendar.time)
-                        }
-                        if (endDate != null) {
-                          val calendar = GregorianCalendar()
-                          val parts = endDate!!.split("/")
-                          calendar.set(
-                              parts[2].toInt(),
-                              parts[1].toInt() - 1, // Months are 0-based
-                              parts[0].toInt(),
-                              0,
-                              0,
-                              0)
-                          endDateTimestamp = Timestamp(calendar.time)
-                        }
-
-                         */
                         onFilter(
                             maxPrice.toDouble(),
                             availablePlaces,
