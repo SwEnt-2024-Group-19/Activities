@@ -77,7 +77,9 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
+import com.android.sample.resources.C.Tag.LARGE_FONTSIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -797,19 +799,19 @@ fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
   Card(
       modifier =
           Modifier.fillMaxWidth()
-              .padding(horizontal = 24.dp, vertical = 16.dp)
+              .padding(horizontal = LARGE_PADDING.dp, vertical = MEDIUM_PADDING.dp)
               .testTag("creatorRow"),
       elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
               Text(
                   text = "${creator.name} ${creator.surname}",
                   style = MaterialTheme.typography.titleLarge,
                   color = MaterialTheme.colorScheme.onSurface,
-                  fontSize = 25.sp,
+                  fontSize = LARGE_FONTSIZE.sp,
                   modifier = Modifier.testTag("creatorName"))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -820,17 +822,17 @@ fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
                         modifier =
                             Modifier.align(Alignment.CenterVertically).testTag("creatorRating"),
                         color = Color.Black,
-                        fontSize = 18.sp)
+                        fontSize = MEDIUM_FONTSIZE.sp)
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = "Full Star",
                         tint = Color.Black,
-                        modifier = Modifier.size(18.dp).testTag("ratingStar"))
+                        modifier = Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar"))
                     Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
                     Text(
                         text = "$nbActivitiesCreated Activities Created",
                         style = MaterialTheme.typography.bodyLarge,
-                        fontSize = 18.sp,
+                        fontSize = MEDIUM_FONTSIZE.sp,
                         modifier = Modifier.testTag("activityCount"))
                   }
             }
