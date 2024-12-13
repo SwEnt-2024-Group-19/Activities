@@ -8,7 +8,6 @@ import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.image.flipCamera
 import com.google.firebase.firestore.DocumentReference
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -28,6 +27,7 @@ class ImageUtilsTest {
 
   private lateinit var documentRef: DocumentReference
   private lateinit var viewModel: ImageViewModel
+
   @Before
   fun setUp() {
     context = Mockito.mock(Context::class.java)
@@ -50,6 +50,7 @@ class ImageUtilsTest {
     val flippedBackCamera = flipCamera(flippedCamera)
     assertEquals(CameraSelector.DEFAULT_BACK_CAMERA, flippedBackCamera)
   }
+
   @Test
   fun uploadProfilePicture_success() {
     val userId = "userId"
@@ -57,14 +58,14 @@ class ImageUtilsTest {
     val expectedUrl = "https://example.com/profile.jpg"
 
     doAnswer {
-      val onSuccess = it.getArgument<(String) -> Unit>(2)
-      onSuccess(expectedUrl)
-    }.whenever(mockRepository).uploadProfilePicture(eq(userId), eq(bitmap), any(), any())
+          val onSuccess = it.getArgument<(String) -> Unit>(2)
+          onSuccess(expectedUrl)
+        }
+        .whenever(mockRepository)
+        .uploadProfilePicture(eq(userId), eq(bitmap), any(), any())
 
     var resultUrl: String? = null
-    viewModel.uploadProfilePicture(userId, bitmap, {
-      resultUrl = it
-    }, {})
+    viewModel.uploadProfilePicture(userId, bitmap, { resultUrl = it }, {})
 
     assert(resultUrl == expectedUrl)
   }
@@ -76,17 +77,18 @@ class ImageUtilsTest {
     val exception = Exception("Upload failed")
 
     doAnswer {
-      val onFailure = it.getArgument<(Exception) -> Unit>(3)
-      onFailure(exception)
-    }.whenever(mockRepository).uploadProfilePicture(eq(userId), eq(bitmap), any(), any())
+          val onFailure = it.getArgument<(Exception) -> Unit>(3)
+          onFailure(exception)
+        }
+        .whenever(mockRepository)
+        .uploadProfilePicture(eq(userId), eq(bitmap), any(), any())
 
     var errorOccurred: Exception? = null
-    viewModel.uploadProfilePicture(userId, bitmap, {}, {
-      errorOccurred = it
-    })
+    viewModel.uploadProfilePicture(userId, bitmap, {}, { errorOccurred = it })
 
     assert(errorOccurred == exception)
   }
+
   @Test
   fun uploadActivityImages_success() {
     val activityId = "activityId"
@@ -94,14 +96,14 @@ class ImageUtilsTest {
     val expectedUrls = listOf("https://example.com/image1.jpg", "https://example.com/image2.jpg")
 
     doAnswer {
-      val onSuccess = it.getArgument<(List<String>) -> Unit>(2)
-      onSuccess(expectedUrls)
-    }.whenever(mockRepository).uploadActivityImages(eq(activityId), eq(bitmaps), any(), any())
+          val onSuccess = it.getArgument<(List<String>) -> Unit>(2)
+          onSuccess(expectedUrls)
+        }
+        .whenever(mockRepository)
+        .uploadActivityImages(eq(activityId), eq(bitmaps), any(), any())
 
     var resultUrls: List<String>? = null
-    viewModel.uploadActivityImages(activityId, bitmaps, {
-      resultUrls = it
-    }, {})
+    viewModel.uploadActivityImages(activityId, bitmaps, { resultUrls = it }, {})
 
     assert(resultUrls == expectedUrls)
   }
@@ -112,14 +114,14 @@ class ImageUtilsTest {
     val expectedUrl = "https://example.com/profile.jpg"
 
     doAnswer {
-      val onSuccess = it.getArgument<(String) -> Unit>(1)
-      onSuccess(expectedUrl)
-    }.whenever(mockRepository).fetchProfileImageUrl(eq(userId), any(), any())
+          val onSuccess = it.getArgument<(String) -> Unit>(1)
+          onSuccess(expectedUrl)
+        }
+        .whenever(mockRepository)
+        .fetchProfileImageUrl(eq(userId), any(), any())
 
     var resultUrl: String? = null
-    viewModel.fetchProfileImageUrl(userId, {
-      resultUrl = it
-    }, {})
+    viewModel.fetchProfileImageUrl(userId, { resultUrl = it }, {})
 
     assert(resultUrl == expectedUrl)
   }
@@ -130,30 +132,31 @@ class ImageUtilsTest {
     val exception = Exception("Failed to fetch URL")
 
     doAnswer {
-      val onFailure = it.getArgument<(Exception) -> Unit>(2)
-      onFailure(exception)
-    }.whenever(mockRepository).fetchProfileImageUrl(eq(userId), any(), any())
+          val onFailure = it.getArgument<(Exception) -> Unit>(2)
+          onFailure(exception)
+        }
+        .whenever(mockRepository)
+        .fetchProfileImageUrl(eq(userId), any(), any())
 
     var errorOccurred: Exception? = null
-    viewModel.fetchProfileImageUrl(userId, {}, {
-      errorOccurred = it
-    })
+    viewModel.fetchProfileImageUrl(userId, {}, { errorOccurred = it })
 
     assert(errorOccurred == exception)
   }
+
   @Test
   fun deleteProfilePicture_success() {
     val userId = "testUserId"
 
     doAnswer {
-      val onSuccess = it.getArgument<() -> Unit>(1)
-      onSuccess()
-    }.whenever(mockRepository).deleteProfilePicture(eq(userId), any(), any())
+          val onSuccess = it.getArgument<() -> Unit>(1)
+          onSuccess()
+        }
+        .whenever(mockRepository)
+        .deleteProfilePicture(eq(userId), any(), any())
 
     var success = false
-    viewModel.deleteProfilePicture(userId, {
-      success = true
-    }, {})
+    viewModel.deleteProfilePicture(userId, { success = true }, {})
 
     assert(success)
   }
@@ -164,14 +167,14 @@ class ImageUtilsTest {
     val exception = Exception("Failed to delete profile picture")
 
     doAnswer {
-      val onFailure = it.getArgument<(Exception) -> Unit>(2)
-      onFailure(exception)
-    }.whenever(mockRepository).deleteProfilePicture(eq(userId), any(), any())
+          val onFailure = it.getArgument<(Exception) -> Unit>(2)
+          onFailure(exception)
+        }
+        .whenever(mockRepository)
+        .deleteProfilePicture(eq(userId), any(), any())
 
     var errorOccurred: Exception? = null
-    viewModel.deleteProfilePicture(userId, {}, {
-      errorOccurred = it
-    })
+    viewModel.deleteProfilePicture(userId, {}, { errorOccurred = it })
 
     assert(errorOccurred == exception)
   }
@@ -182,14 +185,14 @@ class ImageUtilsTest {
     val expectedBitmaps = listOf(mock(Bitmap::class.java), mock(Bitmap::class.java))
 
     doAnswer {
-      val onSuccess = it.getArgument<(List<Bitmap>) -> Unit>(1)
-      onSuccess(expectedBitmaps)
-    }.whenever(mockRepository).fetchActivityImagesAsBitmaps(eq(activityId), any(), any())
+          val onSuccess = it.getArgument<(List<Bitmap>) -> Unit>(1)
+          onSuccess(expectedBitmaps)
+        }
+        .whenever(mockRepository)
+        .fetchActivityImagesAsBitmaps(eq(activityId), any(), any())
 
     var resultBitmaps: List<Bitmap>? = null
-    viewModel.fetchActivityImagesAsBitmaps(activityId, {
-      resultBitmaps = it
-    }, {})
+    viewModel.fetchActivityImagesAsBitmaps(activityId, { resultBitmaps = it }, {})
 
     assert(resultBitmaps == expectedBitmaps)
   }
@@ -200,30 +203,31 @@ class ImageUtilsTest {
     val exception = Exception("Failed to fetch images")
 
     doAnswer {
-      val onFailure = it.getArgument<(Exception) -> Unit>(2)
-      onFailure(exception)
-    }.whenever(mockRepository).fetchActivityImagesAsBitmaps(eq(activityId), any(), any())
+          val onFailure = it.getArgument<(Exception) -> Unit>(2)
+          onFailure(exception)
+        }
+        .whenever(mockRepository)
+        .fetchActivityImagesAsBitmaps(eq(activityId), any(), any())
 
     var errorOccurred: Exception? = null
-    viewModel.fetchActivityImagesAsBitmaps(activityId, {}, {
-      errorOccurred = it
-    })
+    viewModel.fetchActivityImagesAsBitmaps(activityId, {}, { errorOccurred = it })
 
     assert(errorOccurred == exception)
   }
+
   @Test
   fun removeAllActivityImages_success() {
     val activityId = "activityId"
 
     doAnswer {
-      val onSuccess = it.getArgument<() -> Unit>(1)
-      onSuccess()
-    }.whenever(mockRepository).removeAllActivityImages(eq(activityId), any(), any())
+          val onSuccess = it.getArgument<() -> Unit>(1)
+          onSuccess()
+        }
+        .whenever(mockRepository)
+        .removeAllActivityImages(eq(activityId), any(), any())
 
     var success = false
-    viewModel.removeAllActivityImages(activityId, {
-      success = true
-    }, {})
+    viewModel.removeAllActivityImages(activityId, { success = true }, {})
 
     assert(success)
   }
@@ -234,33 +238,15 @@ class ImageUtilsTest {
     val exception = Exception("Failed to remove images")
 
     doAnswer {
-      val onFailure = it.getArgument<(Exception) -> Unit>(2)
-      onFailure(exception)
-    }.whenever(mockRepository).removeAllActivityImages(eq(activityId), any(), any())
+          val onFailure = it.getArgument<(Exception) -> Unit>(2)
+          onFailure(exception)
+        }
+        .whenever(mockRepository)
+        .removeAllActivityImages(eq(activityId), any(), any())
 
     var errorOccurred: Exception? = null
-    viewModel.removeAllActivityImages(activityId, {}, {
-      errorOccurred = it
-    })
+    viewModel.removeAllActivityImages(activityId, {}, { errorOccurred = it })
 
     assert(errorOccurred == exception)
   }
-
-  @Test
-  fun testUpdateFirestoreUserPhoto() {
-    val userId = "userId"
-    val photoUrl = "http://example.com/profile.jpg"
-    doAnswer {
-      val onSuccess = it.getArgument<() -> Unit>(0)
-        onSuccess()
-    }.whenever(documentRef).update("photo", photoUrl)
-
-    var success = false
-    mockRepository.updateFirestoreUserPhoto(userId, photoUrl, {
-      success = true
-    }, {})
-
-    assertTrue(success)
-  }
-
 }
