@@ -279,7 +279,7 @@ fun ActivityDetailsScreen(
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Column {
                       Text(
-                          text = location?.name ?: "No location",
+                          text = location?.shortName ?: "No location",
                           modifier = Modifier.testTag("locationText"))
                       if (distance != null) {
                         val distanceString =

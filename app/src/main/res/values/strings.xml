@@ -30,6 +30,17 @@
     <string name="invalid_price_format">Invalid price format</string>
     <string name="invalid_places_format">Invalid places format</string>
     <string name="invalid_no_location">You must select a location</string>
+    <string name="activity_type">Activity Type</string>
+    <string name="activity_category">Activity Category</string>
+    <string name="select_activity_type">Select an interest</string>
+    <string name="select_activity_category">Select a category</string>
+    <string name="invalid_interest_category">You must select an interest and a category</string>
+    <string name="no_profile">You do not have a profile</string>
+    <string name="go_to_sign_in_page">"Go to Sign In Page"</string>
+    <string name="logout">Logout</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="no_past_activities">You have no past activities yet!</string>
+    <string name="participant_no_activities">This participant has no activity in this section yet !</string>
 
 
 </resources>

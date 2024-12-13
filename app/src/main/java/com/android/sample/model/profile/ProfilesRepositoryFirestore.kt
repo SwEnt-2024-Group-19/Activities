@@ -1,6 +1,7 @@
 package com.android.sample.model.profile
 
 import android.util.Log
+import com.android.sample.model.activity.categories
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,24 +30,23 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
   }
 
   fun documentToUser(document: DocumentSnapshot): User? {
+    val interestsData = document.get("interests") as? List<*>
+    val interests: List<Interest> =
+        interestsData?.mapNotNull { interestData ->
+          val interest = interestData as? Map<*, *> ?: return@mapNotNull null
+          val name = interest["name"] as? String ?: return@mapNotNull null
+          val categoryData = interest["category"] as? String ?: return@mapNotNull null
+          val category = categories.find { it.name == categoryData } ?: return@mapNotNull null
+          if (category != categoryOf[name]) return@mapNotNull null
+          Interest(name = name, category = category)
+        } ?: return null
+
     return try {
       User(
           id = document.id,
           name = document.getString("name") ?: return null,
           surname = document.getString("surname") ?: return null,
-          interests =
-              (document.get("interests") as? List<*>)?.mapNotNull { interestData ->
-                // Ensure interestData is a map and extract category and interest
-                (interestData as? Map<*, *>)?.let {
-                  val category = it["category"] as? String
-                  val interest = it["interest"] as? String
-                  if (category != null && interest != null) {
-                    Interest(category, interest)
-                  } else {
-                    null
-                  }
-                }
-              },
+          interests = interests,
           activities =
               (document.get("activities") as? List<*>)?.filterIsInstance<String>() ?: return null,
           photo = document.getString("photo") ?: return null,
