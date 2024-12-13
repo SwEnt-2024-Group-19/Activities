@@ -153,7 +153,11 @@ fun NavGraph(
       }
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(
-            listActivitiesViewModel, navigationActions, locationViewModel, imageViewModel)
+            listActivitiesViewModel,
+            navigationActions,
+            locationViewModel,
+            imageViewModel,
+            profileViewModel)
       }
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(
