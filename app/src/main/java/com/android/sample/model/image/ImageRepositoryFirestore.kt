@@ -32,18 +32,13 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         .putBytes(baos.toByteArray())
         .addOnSuccessListener {
           profilePicRef.downloadUrl.addOnSuccessListener { uri ->
-              firestore
-              .collection("users")
-              .document(userId)
-              .update("photo", uri.toString())
-              .addOnSuccessListener { onSuccess(uri.toString()) }
-              .addOnFailureListener { onFailure(it) }
+            updateFirestoreUserPhoto(userId, uri.toString(), onSuccess, onFailure)
           }
         }
         .addOnFailureListener { onFailure(it) }
   }
 
-  /*fun updateFirestoreUserPhoto(
+  fun updateFirestoreUserPhoto(
       userId: String,
       photoUrl: String,
       onSuccess: (String) -> Unit,
@@ -55,7 +50,7 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         .update("photo", photoUrl)
         .addOnSuccessListener { onSuccess(photoUrl) }
         .addOnFailureListener { onFailure(it) }
-  }*/
+  }
 
   override fun uploadActivityImages(
       activityId: String,
