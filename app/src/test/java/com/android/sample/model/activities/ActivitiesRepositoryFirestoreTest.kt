@@ -239,4 +239,45 @@ class ActivitiesRepositoryFirestoreTest {
     assertEquals(ActivityStatus.ACTIVE, result.status)
     assertEquals(ActivityType.INDIVIDUAL, result.type)
   }
+
+  @Test
+  fun deleteActivityById_successfulDeletion_callsOnSuccess() {
+    `when`(mockDocumentReference.delete()).thenReturn(Tasks.forResult<Void>(null))
+
+    var successCallbackCalled = false
+
+    activitiesRepositoryFirestore.deleteActivityById(
+        id = "testId",
+        onSuccess = { successCallbackCalled = true },
+        onFailure = { fail("Failure callback should not be called") })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assertTrue("Success callback should be called", successCallbackCalled)
+  }
+
+  @Test
+  fun addActivity_successfulAddition_callsOnSuccess() {
+    `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult<Void>(null))
+
+    var successCallbackCalled = false
+
+    activitiesRepositoryFirestore.addActivity(
+        activity = activity,
+        onSuccess = { successCallbackCalled = true },
+        onFailure = { fail("Failure callback should not be called") })
+
+    shadowOf(Looper.getMainLooper()).idle()
+
+    assertTrue("Success callback should be called", successCallbackCalled)
+  }
+
+  @Test
+  fun documentToActivity_handlesNullDataGracefully() {
+    val nullActivity =
+        activitiesRepositoryFirestore.documentToActivity(data = emptyMap(), documentId = "testId")
+
+    assertNotNull("Returned activity should not be null", nullActivity)
+    assertEquals("Activity title should be default", "No Title", nullActivity?.title)
+  }
 }
