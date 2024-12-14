@@ -252,12 +252,6 @@ fun ActivityForm(
                 onClick = { onLocationClick(location) },
                 modifier = Modifier.padding(STANDARD_PADDING.dp))
           }
-          if (locationSuggestions.size > 3) {
-            DropdownMenuItem(
-                text = { Text("More...") },
-                onClick = {},
-                modifier = Modifier.padding(STANDARD_PADDING.dp))
-          }
         }
   }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
