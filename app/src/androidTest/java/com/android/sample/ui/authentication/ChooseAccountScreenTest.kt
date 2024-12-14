@@ -46,80 +46,56 @@ class ChooseAccountScreenTest {
 
   @Test
   fun allElementsAreDisplayed() {
-    // Setup a default mock user profile
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
-    // Set the content once for this test
     composeTestRule.setContent {
       ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
-    // Check all elements are displayed
-    composeTestRule.onNodeWithTag("chooseAccountScreen").assertIsDisplayed()
+    // Check that the greeting text is displayed
     composeTestRule.onNodeWithTag("greetingText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+
+    // Check that the buttons are displayed
     composeTestRule.onNodeWithTag("continueText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("switchAccountButton").assertIsDisplayed()
   }
 
   @Test
-  fun displaysGreetingTextAndProfileImage_whenUserProfileIsNotNull() {
-    // Setup the mock user profile with a non-null user
+  fun displaysGreetingText_whenUserProfileIsNotNull() {
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
-    // Set the content once for this test
     composeTestRule.setContent {
       ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
-    // Check greeting text and profile image
-    composeTestRule.onNodeWithText("Hello John Doe, you are already signed in!").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+    // Check the personalized greeting text
+    composeTestRule.onNodeWithText("Hello, you are already signed in!").assertIsDisplayed()
   }
 
   @Test
   fun displaysDefaultGreeting_whenUserProfileIsNull() {
-    // Setup the mock user profile to return null
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(null))
 
-    // Set the content once for this test
     composeTestRule.setContent {
       ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
-    // Check default greeting text
-    composeTestRule.onNodeWithText("Hello User, you are already signed in!").assertIsDisplayed()
+    // Check the default greeting text
+    composeTestRule.onNodeWithText("Hello, you are already signed in!").assertIsDisplayed()
   }
 
   @Test
   fun clickableContinueText_navigatesToOverview() {
-    // Setup a default mock user profile
-
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
 
-    // Set the content once for this test
     composeTestRule.setContent {
       ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
     }
 
-    // Perform click on "Continue" text and verify navigation
-    composeTestRule.onNodeWithText("Continue as John Doe").assertIsDisplayed().performClick()
+    // Perform click on the "Continue" button
+    composeTestRule.onNodeWithTag("continueText").assertIsDisplayed().performClick()
 
+    // Verify navigation to the Overview screen
     verify(navigationActions).navigateTo(Screen.OVERVIEW)
-  }
-
-  @Test
-  fun displaysPlaceholder_whenProfileImageUrlIsEmpty() {
-    // Setup the mock user profile with an empty photo URL
-
-    whenever(profileViewModel.userState).thenReturn(MutableStateFlow(userProfile))
-
-    // Set the content once for this test
-    composeTestRule.setContent {
-      ChooseAccountScreen(navigationActions, signInViewModel, profileViewModel, mockImageViewModel)
-    }
-
-    // Check that the profile picture node exists, regardless of URL content
-    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
   }
 }

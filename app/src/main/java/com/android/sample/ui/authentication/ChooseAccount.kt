@@ -84,7 +84,7 @@ fun ChooseAccountScreen(
     // Greeting Text
     item {
       Text(
-          text = "Hello, you are already signed in!",
+          text = stringResource(R.string.already_signed_in_message),
           fontSize = TITLE_FONTSIZE.sp,
           fontWeight = FontWeight.Bold,
           textAlign = TextAlign.Center,
@@ -103,11 +103,7 @@ fun ChooseAccountScreen(
           shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
               OutlinedButton(
-                  onClick = {
-                    if (profileViewModel.userState.value != null) {
-                      navigationActions.navigateTo(Screen.OVERVIEW)
-                    } else navigationActions.navigateTo(Screen.CREATE_PROFILE)
-                  },
+                  onClick = { navigationActions.navigateTo(Screen.CREATE_PROFILE) },
                   shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
                   modifier =
                       Modifier.height(BUTTON_HEIGHT_MD.dp).fillMaxWidth().testTag("continueText"),
