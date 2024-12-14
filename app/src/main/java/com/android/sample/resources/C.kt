@@ -99,6 +99,10 @@ object C {
 
     const val LINE_STROKE = 1
 
+    // ANIMATIONS
+    const val SPINNING_DURATION = 1500
+    const val FADING_DURATION = 1000
+
     fun colorOfCategory(category: Category): Color {
       val colorCode =
           when (category) {
