@@ -30,9 +30,12 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,6 +64,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -72,11 +76,14 @@ import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
+import com.android.sample.resources.C.Tag.LARGE_FONTSIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -152,6 +159,15 @@ fun ActivityDetailsScreen(
     // Update the activity with the modified comments list
     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
   }
+
+  val creatorID = activity?.creator ?: ""
+  var creator by remember {
+    mutableStateOf(User(creatorID, "anonymous", "anonymous", listOf(), listOf(), "", listOf()))
+  }
+  activity?.participants?.firstOrNull { it.id == creatorID }?.let { creator = it }
+  val uiState by listActivityViewModel.uiState.collectAsState()
+  val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+  val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
 
   Scaffold(
       topBar = {
@@ -249,7 +265,7 @@ fun ActivityDetailsScreen(
                     Text(
                         text = if (price != null) "${price.toString()} CHF" else "not defined yet",
                         modifier = Modifier.testTag("priceText"))
-                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION))
+                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
                     PaymentInfoScreen(price ?: 0.0)
                   }
 
@@ -263,7 +279,7 @@ fun ActivityDetailsScreen(
                     Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                     Column {
                       Text(
-                          text = location?.name ?: "No location",
+                          text = location?.shortName ?: "No location",
                           modifier = Modifier.testTag("locationText"))
                       if (distance != null) {
                         val distanceString =
@@ -314,6 +330,7 @@ fun ActivityDetailsScreen(
                   }
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
+              CreatorRow(creator, nbActivitiesCreated)
               // Participants section
               Text(
                   text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
@@ -771,4 +788,49 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
           tint = if (isLiked) Color.Black else Color.LightGray)
     }
   }
+}
+
+@Composable
+fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
+  Card(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(horizontal = LARGE_PADDING.dp, vertical = MEDIUM_PADDING.dp)
+              .testTag("creatorRow"),
+      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+              Text(
+                  text = "${creator.name} ${creator.surname}",
+                  style = MaterialTheme.typography.titleLarge,
+                  color = MaterialTheme.colorScheme.onSurface,
+                  fontSize = LARGE_FONTSIZE.sp,
+                  modifier = Modifier.testTag("creatorName"))
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+                  modifier = Modifier.padding(all = SMALL_PADDING.dp)) {
+                    Text(
+                        text = "Blank",
+                        modifier =
+                            Modifier.align(Alignment.CenterVertically).testTag("creatorRating"),
+                        color = Color.Black,
+                        fontSize = MEDIUM_FONTSIZE.sp)
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "Full Star",
+                        tint = Color.Black,
+                        modifier = Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar"))
+                    Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
+                    Text(
+                        text = "$nbActivitiesCreated Activities Created",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = MEDIUM_FONTSIZE.sp,
+                        modifier = Modifier.testTag("activityCount"))
+                  }
+            }
+      }
 }

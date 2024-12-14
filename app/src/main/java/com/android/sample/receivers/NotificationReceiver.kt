@@ -20,14 +20,27 @@ class NotificationReceiver : BroadcastReceiver() {
     // Early return if required notification data is missing, preventing incomplete notification
     val activityName = intent.getStringExtra("activityName") ?: return
     val title = intent.getStringExtra("notificationTitle") ?: return
+    val isDeletionNotification = intent.getBooleanExtra("isDeletionNotification", false)
+
+    val contentText =
+        if (isDeletionNotification) {
+          "Join or create another activity!"
+        } else {
+          "Reminder: $activityName"
+        }
 
     val notification =
         NotificationCompat.Builder(context, "activity_reminders")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
-            .setContentText("Reminder: $activityName")
+            .setContentText(contentText)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .apply {
+              if (isDeletionNotification) {
+                setCategory(NotificationCompat.CATEGORY_EVENT)
+              }
+            }
             .build()
 
     val notificationManager =

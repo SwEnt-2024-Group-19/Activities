@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.view.CameraController
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -25,14 +25,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,17 +52,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.sample.R
+import com.android.sample.model.activity.Category
+import com.android.sample.model.activity.categories
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.Interest
-import com.android.sample.model.profile.InterestCategories
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.model.profile.interestStringValues
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
-import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
+import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
@@ -158,17 +169,10 @@ fun EditProfileScreen(
                       isPictureRemoved = true // Mark picture for removal
                     })
 
-                Button(
-                    onClick = {
-                      performOfflineAwareAction(
-                          context = context,
-                          networkManager = networkManager,
-                          onPerform = { showDialogImage = true },
-                      )
-                    },
-                    modifier = Modifier.testTag("uploadPicture")) {
-                      Text("Modify Profile Picture")
-                    }
+                ModifyPictureButton(
+                    context = context,
+                    networkManager = networkManager,
+                    onPerformAction = { showDialogImage = true })
 
                 OutlinedTextField(
                     value = name,
@@ -260,105 +264,209 @@ fun EditProfileScreen(
       })
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<Interest>) -> Unit) {
 
   var newListInterests by remember { mutableStateOf(initialInterests) }
-  val categories = InterestCategories
-  var selectedCategory by remember { mutableStateOf("") }
-  var expanded by remember { mutableStateOf(false) }
-  var newInterest by remember { mutableStateOf("") }
+  var newInterest: Interest? by remember { mutableStateOf(null) }
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
 
-  Row(verticalAlignment = Alignment.CenterVertically) {
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-      OutlinedTextField(
-          value = selectedCategory,
-          onValueChange = { selectedCategory = it },
-          label = { Text("Category") },
-          readOnly = true,
-          modifier = Modifier.menuAnchor().width(LARGE_IMAGE_SIZE.dp).testTag("categoryDropdown"))
-
-      ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-        categories.forEach { category ->
-          DropdownMenuItem(
-              text = { Text(category) },
-              onClick = {
-                selectedCategory = category
-                expanded = false
-              })
-        }
-      }
-    }
-
-    OutlinedTextField(
-        value = newInterest,
-        onValueChange = { newInterest = it },
-        label = { Text("New Interest") },
-        enabled = selectedCategory.isNotEmpty() && selectedCategory != "None",
-        modifier = Modifier.width(LARGE_IMAGE_SIZE.dp).testTag("newInterestInput"))
-  }
-
-  Row(verticalAlignment = Alignment.CenterVertically) {
-    Button(
-        onClick = {
-          performOfflineAwareAction(
-              context = context,
-              networkManager = networkManager,
-              onPerform = {
-                if (newInterest.isNotBlank() &&
-                    selectedCategory.isNotBlank() &&
-                    selectedCategory != "None") {
-                  val updatedList = newListInterests + Interest(selectedCategory, newInterest)
-                  newListInterests = updatedList
-                  newInterest = ""
-                  selectedCategory = ""
-                  onUpdateInterests(updatedList)
-                }
-              })
-        },
-        enabled =
-            newInterest.isNotBlank() && selectedCategory.isNotBlank() && selectedCategory != "None",
-        modifier = Modifier.testTag("addInterestButton")) {
-          Text("Add")
-        }
-  }
-
-  LazyRow(
-      modifier = Modifier.testTag("interestsList"),
-      horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
-        items(newListInterests.size) { interest ->
-          InterestEditBox(
-              interest = newListInterests[interest].interest,
-              onRemove = {
-                performOfflineAwareAction(
-                    context = context,
-                    networkManager = networkManager,
-                    onPerform = {
-                      val updatedList = newListInterests - newListInterests[interest]
+  Column(
+      modifier = Modifier.fillMaxWidth(),
+      verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+      horizontalAlignment = Alignment.CenterHorizontally) {
+        // Input Row
+        InterestInputRow(onInterestChange = { newInterest = it })
+        Spacer(Modifier.height(STANDARD_PADDING.dp))
+        // Add Button
+        Button(
+            onClick = {
+              performOfflineAwareAction(
+                  context = context,
+                  networkManager = networkManager,
+                  onPerform = {
+                    if (newInterest != null) {
+                      val updatedList = newListInterests + newInterest!!
                       newListInterests = updatedList
+                      newInterest = null
                       onUpdateInterests(updatedList)
+                    }
+                  })
+            },
+            enabled = newInterest != null,
+            modifier = Modifier.testTag("addInterestButton"),
+            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+              Text("Add Interest")
+            }
+        // Interests List
+        LazyRow(
+            modifier = Modifier.testTag("interestsList"),
+            horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
+              items(newListInterests.size) { interest ->
+                InterestEditBox(
+                    interest = newListInterests[interest],
+                    onRemove = {
+                      performOfflineAwareAction(
+                          context = context,
+                          networkManager = networkManager,
+                          onPerform = {
+                            val updatedList = newListInterests - newListInterests[interest]
+                            newListInterests = updatedList
+                            onUpdateInterests(updatedList)
+                          })
                     })
-              })
-        }
+              }
+            }
+      }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InterestInputRow(onInterestChange: (Interest?) -> Unit) {
+  var selectedCategory by remember { mutableStateOf<Category?>(null) }
+  var expandedCategory by remember { mutableStateOf(false) }
+  var selectedInterest by remember { mutableStateOf<String?>(null) }
+  var expandedInterest by remember { mutableStateOf(false) }
+  val context = LocalContext.current
+
+  Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
+        // Category Dropdown
+        Card(
+            modifier = Modifier.weight(1f).testTag("TextFieldWithErrorStateCard"),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+              ExposedDropdownMenuBox(
+                  expanded = expandedCategory, onExpandedChange = { expandedCategory = it }) {
+                    OutlinedTextField(
+                        value =
+                            selectedCategory?.name
+                                ?: context.getString(R.string.select_activity_category),
+                        onValueChange = { selectedCategory = Category.valueOf(it) },
+                        label = { Text("Category") },
+                        readOnly = true,
+                        modifier = Modifier.menuAnchor().testTag("categoryDropdown"),
+                        colors =
+                            TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                errorIndicatorColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent))
+
+                    ExposedDropdownMenu(
+                        expanded = expandedCategory,
+                        onDismissRequest = { expandedCategory = false }) {
+                          categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category.name) },
+                                onClick = {
+                                  selectedCategory = category
+                                  selectedInterest = null
+                                  onInterestChange(null)
+                                  expandedCategory = false
+                                })
+                          }
+                        }
+                  }
+            }
+
+        // New Interest Input
+        Card(
+            modifier = Modifier.weight(1f).testTag("TextFieldWithErrorStateCard"),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+              ExposedDropdownMenuBox(
+                  expanded = expandedInterest, onExpandedChange = { expandedInterest = it }) {
+                    OutlinedTextField(
+                        value =
+                            selectedInterest ?: context.getString(R.string.select_activity_type),
+                        onValueChange = { selectedInterest = it },
+                        label = { Text("Interest") },
+                        readOnly = true,
+                        modifier = Modifier.menuAnchor().testTag("interestDropdown"),
+                        colors =
+                            TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                errorIndicatorColor = Color.Transparent,
+                                errorContainerColor = Color.Transparent))
+
+                    ExposedDropdownMenu(
+                        expanded = expandedInterest,
+                        onDismissRequest = { expandedInterest = false }) {
+                          interestStringValues[selectedCategory]?.forEach { interest ->
+                            DropdownMenuItem(
+                                text = { Text(interest) },
+                                onClick = {
+                                  selectedInterest = interest
+                                  onInterestChange(Interest(interest, selectedCategory!!))
+                                  expandedInterest = false
+                                })
+                          }
+                        }
+                  }
+            }
       }
 }
 
 @Composable
-fun InterestEditBox(interest: String, onRemove: () -> Unit) {
+fun InterestEditBox(interest: Interest, onRemove: () -> Unit) {
   Box(
       modifier =
-          Modifier.background(Color.LightGray, RoundedCornerShape(STANDARD_PADDING.dp))
-              .padding(horizontal = MEDIUM_PADDING.dp, vertical = STANDARD_PADDING.dp)
-              .testTag("$interest")) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Text(text = interest, fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
-          Spacer(Modifier.width(STANDARD_PADDING.dp))
-          IconButton(onClick = onRemove, modifier = Modifier.testTag("removeInterest-$interest")) {
-            Icon(imageVector = Icons.Default.Close, contentDescription = "Remove")
-          }
-        }
+          Modifier.background(
+                  color = colorOfCategory(interest.category),
+                  shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
+              .padding(horizontal = MEDIUM_PADDING.dp)
+              .testTag("$interest"),
+      contentAlignment = Alignment.Center // Ensures content is centered within the Box
+      ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement =
+                Arrangement.SpaceBetween, // Ensures spacing between Text and Icon
+            modifier = Modifier.fillMaxWidth() // Allows Row to take full width of the Box
+            ) {
+              Text(
+                  text = interest.name,
+                  fontSize = SUBTITLE_FONTSIZE.sp,
+                  color = Color.Black,
+                  modifier =
+                      Modifier.padding(vertical = MEDIUM_PADDING.dp, horizontal = SMALL_PADDING.dp))
+              IconButton(
+                  onClick = onRemove,
+                  modifier =
+                      Modifier.size(TEXT_FONTSIZE.dp) // Optional: Adjust size of the IconButton
+                          .testTag("removeInterest-$interest")) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Remove",
+                        modifier = Modifier.fillMaxSize())
+                  }
+            }
+      }
+}
+
+@Composable
+fun ModifyPictureButton(
+    context: Context,
+    networkManager: NetworkManager,
+    onPerformAction: () -> Unit,
+    modifier: Modifier = Modifier.testTag("uploadPicture")
+) {
+  Button(
+      onClick = {
+        performOfflineAwareAction(
+            context = context, networkManager = networkManager, onPerform = onPerformAction)
+      },
+      modifier = modifier) {
+        Text("Modify Profile Picture")
       }
 }

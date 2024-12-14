@@ -226,7 +226,8 @@ fun ListActivitiesScreen(
                           else {
                             it.title.contains(searchText, ignoreCase = true) ||
                                 it.description.contains(searchText, ignoreCase = true) ||
-                                it.location?.name?.contains(searchText, ignoreCase = true) ?: false
+                                it.location?.shortName?.contains(searchText, ignoreCase = true)
+                                    ?: false
                           }
                         }
                       }
@@ -420,7 +421,7 @@ fun ActivityCard(
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
                 Text(
-                    text = activity.location?.name ?: "No location",
+                    text = activity.location?.shortName ?: "No location",
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontStyle = FontStyle.Italic, color = Color.Gray),

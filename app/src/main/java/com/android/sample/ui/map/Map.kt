@@ -143,7 +143,7 @@ fun MapScreen(
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
-          NoInternetScreen(padding)
+          NoInternetScreen()
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
@@ -206,7 +206,7 @@ fun MapScreen(
 
                     Marker(
                         state = currentLocationMarkerState,
-                        title = it.name,
+                        title = it.shortName,
                         snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
                         icon =
                             BitmapDescriptorFactory.fromBitmap(
@@ -324,7 +324,7 @@ fun DisplayActivity(activity: Activity) {
                 modifier = Modifier.testTag("locationIcon"))
             Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
             Text(
-                text = "Location: ${activity.location!!.name}",
+                text = "Location: ${activity.location!!.shortName}",
                 modifier = Modifier.testTag("locationText"))
           }
     }
