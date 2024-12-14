@@ -42,7 +42,7 @@ import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.User
 import com.android.sample.model.profile.interestStringValues
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -298,7 +298,9 @@ fun ActivityForm(
   Button(
       onClick = onOpenUserDialog,
       modifier =
-          Modifier.width(BUTTON_WIDTH.dp).height(BUTTON_HEIGHT.dp).testTag("addAttendeeButton")) {
+          Modifier.width(BUTTON_WIDTH.dp)
+              .height(BUTTON_HEIGHT_SM.dp)
+              .testTag("addAttendeeButton")) {
         Row(
             horizontalArrangement =
                 Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),

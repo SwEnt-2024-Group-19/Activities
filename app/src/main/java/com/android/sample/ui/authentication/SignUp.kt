@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
@@ -171,7 +171,7 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                 onClick = { navigationActions.navigateTo(Screen.AUTH) },
                 modifier =
                     Modifier.width(BUTTON_WIDTH.dp)
-                        .height(BUTTON_HEIGHT.dp)
+                        .height(BUTTON_HEIGHT_SM.dp)
                         .testTag("GoToSignInButton")) {
                   Text("Already an account?", fontSize = SUBTITLE_FONTSIZE.sp)
                 }

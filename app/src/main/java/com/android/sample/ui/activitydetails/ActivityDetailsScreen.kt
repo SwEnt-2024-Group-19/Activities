@@ -75,7 +75,7 @@ import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.LARGE_FONTSIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
@@ -359,7 +359,7 @@ fun ActivityDetailsScreen(
                         if (participant.photo == null) {
                           Box(
                               modifier =
-                                  Modifier.size(BUTTON_HEIGHT.dp)
+                                  Modifier.size(BUTTON_HEIGHT_SM.dp)
                                       .background(Color.Gray, shape = RoundedCornerShape(8.dp))
                                       .padding(STANDARD_PADDING.dp)) {
                                 Image(
@@ -373,7 +373,7 @@ fun ActivityDetailsScreen(
                           // Profile Picture
                           ProfileImage(
                               userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT.dp).clip(CircleShape),
+                              modifier = Modifier.size(BUTTON_HEIGHT_SM.dp).clip(CircleShape),
                               imageViewModel = imageViewModel)
                         }
                         Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
