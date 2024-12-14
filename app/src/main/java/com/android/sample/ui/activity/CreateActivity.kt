@@ -141,7 +141,7 @@ fun CreateActivityScreen(
       },
       content = { paddingValues ->
         if (!networkManager.isNetworkAvailable()) {
-          NoInternetScreen(paddingValues = paddingValues)
+          NoInternetScreen()
         } else {
           if (isCamOpen) {
             CameraScreen(

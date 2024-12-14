@@ -143,7 +143,7 @@ fun MapScreen(
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
-          NoInternetScreen(padding)
+          NoInternetScreen()
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
