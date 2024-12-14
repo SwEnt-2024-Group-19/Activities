@@ -52,11 +52,12 @@ import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.components.AttendantPreview
 import com.android.sample.ui.components.MyDatePicker
 import com.android.sample.ui.components.MyTimePicker
+import com.android.sample.ui.components.TextFieldWithErrorState
+import com.android.sample.ui.components.TextFieldWithIcon
 import com.android.sample.ui.dialogs.AddUserDialog
 import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialogState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityForm(
     context: Context,
@@ -124,24 +125,38 @@ fun ActivityForm(
   Carousel(openDialog = onOpenDialogImage, itemsList = selectedImages, deleteImage = onDeleteImage)
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
   RemainingPlace(title, maxTitleSize)
-  OutlinedTextField(
-      value = title,
-      onValueChange = onTitleChange,
-      label = { Text("Title") },
-      modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputTitleCreate"),
-      placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
-      singleLine = true,
-  )
+    TextFieldWithErrorState(
+        value = title,
+        onValueChange = onTitleChange,
+        label = stringResource(id = R.string.request_activity_title),
+        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputTitleCreate"),
+        validation = { title ->
+          when {
+              title.isEmpty() -> "Title must not be empty"
+            title.length > maxTitleSize -> "Title is too long"
+            else -> null
+          }
+        },
+        testTag = "inputTitleCreate",
+        errorTestTag = "TitleErrorText"
+    )
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
   RemainingPlace(description, maxDescriptionSize)
-  OutlinedTextField(
-      value = description,
-      onValueChange = onDescriptionChange,
-      label = { Text("Description") },
-      modifier =
-          Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
-      placeholder = { Text(text = stringResource(id = R.string.request_activity_description)) })
-  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+    TextFieldWithErrorState(
+        value = description,
+        onValueChange = onDescriptionChange,
+        label = stringResource(id = R.string.request_activity_description),
+        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
+        validation = { description ->
+            when {
+                description.isEmpty() -> "Description must not be empty"
+            description.length > maxDescriptionSize -> "Description is too long"
+            else -> null
+            }
+        },
+        testTag = "inputDescriptionCreate",
+        errorTestTag = "DescriptionErrorText"
+    )
   OutlinedButton(
       onClick = onClickDate,
       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
@@ -205,33 +220,53 @@ fun ActivityForm(
   }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-  OutlinedTextField(
-      value = price,
-      onValueChange = onPriceChange,
-      label = { Text("Price") },
-      modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPriceCreate"),
-      placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
-      singleLine = true,
-  )
+    TextFieldWithErrorState(
+        value = price,
+        onValueChange = onPriceChange,
+        label = stringResource(id = R.string.request_price_activity),
+        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPriceCreate"),
+        validation = { price ->
+          when {
+              price.isEmpty() -> "Price must not be empty"
+            price.toIntOrNull() == null -> "Price must be a number"
+            else -> null
+          }
+        },
+        testTag = "inputPriceCreate",
+        errorTestTag = "PriceErrorText"
+    )
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-  OutlinedTextField(
-      value = placesMax,
-      onValueChange = onPlacesMaxChange,
-      label = { Text("Total Places") },
-      modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPlacesCreate"),
-      placeholder = { Text(text = stringResource(id = R.string.request_placesMax_activity)) },
-      singleLine = true,
-  )
+    TextFieldWithErrorState(
+        value = placesMax,
+        onValueChange = onPlacesMaxChange,
+        label = stringResource(id = R.string.request_placesMax_activity),
+        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPlacesCreate"),
+        validation = { placesMax ->
+          when {
+              placesMax.isEmpty() -> "Places must not be empty"
+            placesMax.toIntOrNull() == null -> "Places must be a number"
+            else -> null
+          }
+        },
+        testTag = "inputPlacesCreate",
+        errorTestTag = "PlacesErrorText"
+    )
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
   Box {
-    OutlinedTextField(
-        value = locationQuery,
-        onValueChange = onLocationQueryChange,
-        label = { Text("Location") },
-        placeholder = { Text("Enter an Address or Location") },
-        modifier =
-            Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputLocationCreate"),
-        singleLine = true)
+      TextFieldWithErrorState(
+            value = locationQuery,
+            onValueChange = onLocationQueryChange,
+            label = stringResource(id = R.string.request_location_activity),
+            modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputLocationCreate"),
+            validation = { locationQuery ->
+                when {
+                locationQuery.isEmpty() -> "Location must not be empty"
+                else -> null
+                }
+            },
+            testTag = "inputLocationCreate",
+            errorTestTag = "LocationErrorText"
+      )
 
     // Dropdown menu for location suggestions
     DropdownMenu(
@@ -359,17 +394,14 @@ fun MyDropDownMenu(
               .padding(STANDARD_PADDING.dp),
       expanded = expanded,
       onExpandedChange = onExpandChange) {
-        OutlinedTextField(
-            readOnly = true,
-            value =
-                valueItem
-                    ?: when (mode) {
-                      "category" -> context.getString(R.string.select_activity_category)
-                      "type" -> context.getString(R.string.select_activity_type)
-                      "interest" -> context.getString(R.string.select_activity_interest)
-                      else -> ""
-                    },
-            onValueChange = {},
+      TextFieldWithIcon(
+          value = valueItem
+              ?: when (mode) {
+                "category" -> context.getString(R.string.select_activity_category)
+                "type" -> context.getString(R.string.select_activity_type)
+                "interest" -> context.getString(R.string.select_activity_interest)
+                else -> ""
+              },
             label = {
               when (mode) {
                 "category" -> Text(context.getString(R.string.activity_category))
@@ -378,18 +410,16 @@ fun MyDropDownMenu(
                 else -> {}
               }
             },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            modifier =
-                Modifier.menuAnchor()
-                    .fillMaxWidth()
-                    .testTag(
-                        when (mode) {
-                          "category" -> "categoryTextField"
-                          "type" -> "typeTextField"
-                          "interest" -> "interestTextField"
-                          else -> ""
-                        }))
+            icon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            testTag = when (mode) {
+              "category" -> "categoryTextField"
+              "type" -> "typeTextField"
+              "interest" -> "interestTextField"
+              else -> ""
+            },
+          modifier = Modifier.menuAnchor()
+                   .fillMaxWidth(),
+          )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismiss,

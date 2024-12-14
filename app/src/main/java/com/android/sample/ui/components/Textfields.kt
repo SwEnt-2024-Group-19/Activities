@@ -39,7 +39,9 @@ fun PasswordTextField(
 ) {
   Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_MD)) {
     Card(
-        modifier = Modifier.fillMaxWidth().testTag("PasswordCard"),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("PasswordCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
         shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
@@ -48,12 +50,16 @@ fun PasswordTextField(
               BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
             } else null) {
           // Box to remove padding discrepancies
-          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+          Box(modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 0.dp, vertical = 0.dp)) {
             OutlinedTextField(
                 value = password,
                 onValueChange = onPasswordChange,
                 label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth().testTag("PasswordTextField"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("PasswordTextField"),
                 shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
                 visualTransformation =
                     if (isPasswordVisible) VisualTransformation.None
@@ -84,9 +90,10 @@ fun PasswordTextField(
           text = it,
           color = Color.Red,
           modifier =
-              Modifier.align(Alignment.Start)
-                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
-                  .testTag("PasswordErrorText"))
+          Modifier
+              .align(Alignment.Start)
+              .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
+              .testTag("PasswordErrorText"))
     }
   }
 }
@@ -99,7 +106,9 @@ fun EmailTextField(
 ) {
   Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_MD)) {
     Card(
-        modifier = Modifier.fillMaxWidth().testTag("EmailCard"),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("EmailCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
         shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
@@ -108,12 +117,16 @@ fun EmailTextField(
               BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
             } else null) {
           // Box to ensure alignment and padding consistency
-          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+          Box(modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 0.dp, vertical = 0.dp)) {
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth().testTag("EmailTextField"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("EmailTextField"),
                 shape =
                     RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp), // Matches the Card shape
                 isError = emailError != null,
@@ -132,9 +145,10 @@ fun EmailTextField(
           text = it,
           color = Color.Red,
           modifier =
-              Modifier.align(Alignment.Start)
-                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
-                  .testTag("EmailErrorText"))
+          Modifier
+              .align(Alignment.Start)
+              .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
+              .testTag("EmailErrorText"))
     }
   }
 }
@@ -157,12 +171,16 @@ fun TextFieldWithErrorState(
 
   Column(modifier = modifier) {
     Card(
-        modifier = Modifier.fillMaxWidth().testTag("TextFieldWithErrorStateCard"),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("TextFieldWithErrorStateCard"),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
         shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
         border = if (error != null) BorderStroke(BORDER_STROKE_SM.dp, Color.Red) else null) {
-          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+          Box(modifier = Modifier
+              .fillMaxWidth()
+              .padding(horizontal = 0.dp, vertical = 0.dp)) {
             OutlinedTextField(
                 value = value,
                 onValueChange = { newValue ->
@@ -171,7 +189,9 @@ fun TextFieldWithErrorState(
                 },
                 label = { Text(label) },
                 isError = error != null,
-                modifier = Modifier.fillMaxWidth().testTag(testTag ?: "TextFieldWithErrorState"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(testTag ?: "TextFieldWithErrorState"),
                 shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
                 colors =
                     TextFieldDefaults.colors(
@@ -190,8 +210,47 @@ fun TextFieldWithErrorState(
           color = Color.Red,
           fontSize = ERROR_TEXTFIELD_FONT_SIZE,
           modifier =
-              Modifier.padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
-                  .testTag(errorTestTag))
+          Modifier
+              .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
+              .testTag(errorTestTag))
     }
   }
+}
+
+@Composable
+fun TextFieldWithIcon(
+    value: String,
+    modifier: Modifier,
+    label: @Composable () -> Unit,
+    icon: @Composable () -> Unit,
+    testTag: String,
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("TextFieldWithIconCard"),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)){
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                readOnly = true,
+                leadingIcon = icon,
+                value = value,
+                onValueChange = {},
+                colors =
+                TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent),
+                label = label,
+                modifier = modifier
+                    .testTag(testTag),
+                shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
+                singleLine = true)
+        }
+    }
 }
