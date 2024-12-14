@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.User
@@ -25,6 +26,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.camera.randomDefaultProfileImage
 
 @Composable
 fun AttendantPreview(
@@ -41,10 +43,7 @@ fun AttendantPreview(
               .border(LINE_STROKE.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
               .testTag("attendeeRow${index}")) {
         if (user.id == "") {
-          Icon(
-              Icons.Default.Person,
-              contentDescription = "Person",
-              modifier = Modifier.align(Alignment.CenterVertically))
+          painterResource(id = randomDefaultProfileImage())
         } else {
           ProfileImage(
               userId = user.id,
