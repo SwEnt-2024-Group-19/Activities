@@ -57,7 +57,7 @@ import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.model.profile.categoryOf
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.LARGE_PADDING
@@ -393,7 +393,7 @@ fun CreateActivityScreen(
                   },
                   modifier =
                       Modifier.width(BUTTON_WIDTH.dp)
-                          .height(BUTTON_HEIGHT.dp)
+                          .height(BUTTON_HEIGHT_SM.dp)
                           .testTag("createButton")
                           .align(Alignment.CenterHorizontally),
               ) {

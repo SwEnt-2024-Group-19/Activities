@@ -29,7 +29,7 @@ import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_IN_BUTTON_DEFAULT
@@ -280,7 +280,8 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
                 context = context, networkManager = networkManager, onPerform = onSignInClick)
           },
           shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
-          modifier = Modifier.height(BUTTON_HEIGHT.dp).fillMaxWidth().testTag("GoogleSignInButton"),
+          modifier =
+              Modifier.height(BUTTON_HEIGHT_SM.dp).fillMaxWidth().testTag("GoogleSignInButton"),
           border = BorderStroke(LINE_STROKE.dp, Color.Transparent) // Transparent indicator
           ) {
             Image(
