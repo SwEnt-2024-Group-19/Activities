@@ -58,7 +58,7 @@ import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PURPLE_COLOR
@@ -137,7 +137,7 @@ fun ListActivitiesScreen(
           }
           Box(
               modifier =
-                  Modifier.height(BUTTON_HEIGHT.dp)
+                  Modifier.height(BUTTON_HEIGHT_SM.dp)
                       .testTag("segmentedButtonRow")
                       .fillMaxWidth()
                       .padding(horizontal = STANDARD_PADDING.dp)) {

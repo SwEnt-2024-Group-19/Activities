@@ -43,6 +43,7 @@
     <string name="edit_profile">Edit Profile</string>
     <string name="no_past_activities">You have no past activities yet!</string>
     <string name="participant_no_activities">This participant has no activity in this section yet !</string>
-
-
+    <string name="complete_profile_creation_message">Complete profile creation</string>
+    <string name="switch_account_message">Switch Account</string>
+    <string name="already_signed_in_message">Hello, you are already signed in!</string>
 </resources>
