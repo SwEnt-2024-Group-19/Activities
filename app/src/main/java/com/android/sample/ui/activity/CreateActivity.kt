@@ -403,22 +403,17 @@ fun CreateActivityScreen(
                   },
                   modifier =
                       Modifier.width(BUTTON_WIDTH.dp)
+                          .background(Color(PRIMARY))
                           .height(BUTTON_HEIGHT.dp)
                           .testTag("createButton")
                           .align(Alignment.CenterHorizontally),
               ) {
-                Row(
-                    horizontalArrangement =
-                        Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
                   Icon(
                       Icons.Filled.Add,
                       contentDescription = "add a new activity",
                   )
                   Text(text = stringResource(id = R.string.button_create_activity))
                 }
-              }
               Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
             }
           }
