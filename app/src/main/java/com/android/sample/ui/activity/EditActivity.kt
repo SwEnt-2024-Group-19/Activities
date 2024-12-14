@@ -7,37 +7,24 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.HourglassTop
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -53,9 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
@@ -66,26 +51,19 @@ import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
+import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.categoryOf
-import com.android.sample.model.profile.interestStringValues
-import com.android.sample.model.profile.interestsCategories
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
-import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
 import com.android.sample.ui.camera.CameraScreen
-import com.android.sample.ui.camera.Carousel
 import com.android.sample.ui.camera.GalleryScreen
-import com.android.sample.ui.components.AttendantPreview
-import com.android.sample.ui.components.MyDatePicker
-import com.android.sample.ui.components.MyTimePicker
 import com.android.sample.ui.dialogs.AddImageDialog
-import com.android.sample.ui.dialogs.AddUserDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,7 +72,8 @@ fun EditActivityScreen(
     listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     locationViewModel: LocationViewModel,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+    profileViewModel: ProfileViewModel
 ) {
   val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
@@ -106,7 +85,7 @@ fun EditActivityScreen(
   var description by remember { mutableStateOf(activity?.description ?: "") }
   val creator by remember { mutableStateOf(activity?.creator ?: "") }
   var selectedLocation by remember {
-    mutableStateOf(activity?.location ?: Location(0.0, 0.0, "Origin", "Origin"))
+    mutableStateOf(activity?.location ?: Location(0.0, 0.0, "name", "Origin"))
   }
   var price by remember { mutableStateOf(activity?.price.toString()) }
   var maxPlaces by remember { mutableStateOf(activity?.maxPlaces.toString()) }
@@ -205,359 +184,110 @@ fun EditActivityScreen(
                     isCamOpen = true
                   })
             }
-            Carousel(
-                openDialog = { showDialogImage = true },
-                itemsList = selectedImages,
-                deleteImage = { bitmap -> selectedImages = selectedImages.filter { it != bitmap } })
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            RemainingPlace(title, maxTitleLength)
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                label = { Text("Title") },
-                modifier =
-                    Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputTitleEdit"),
-                placeholder = { Text(text = stringResource(id = R.string.request_activity_title)) },
-                singleLine = true,
-            )
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            RemainingPlace(description, maxDescriptionLength)
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description") },
-                modifier =
-                    Modifier.padding(STANDARD_PADDING.dp)
-                        .fillMaxWidth()
-                        .testTag("inputDescriptionEdit"),
-                placeholder = {
-                  Text(text = stringResource(id = R.string.request_activity_description))
+            ActivityForm(
+                context = context,
+                selectedImages = selectedImages,
+                onOpenDialogImage = { showDialogImage = true },
+                onDeleteImage = { bitmap -> selectedImages -= (bitmap) },
+                title = title,
+                onTitleChange = { title = it },
+                maxTitleSize = maxTitleLength,
+                description = description,
+                maxDescriptionSize = maxDescriptionLength,
+                onDescriptionChange = { description = it },
+                onClickDate = { dateIsOpen = true },
+                onCloseDate = { dateIsOpen = false },
+                onSelectDate = {
+                  dueDate = it
+                  dateIsOpen = false
                 },
-            )
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            OutlinedButton(
-                onClick = { dateIsOpen = true },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(STANDARD_PADDING.dp)
-                        .testTag("changeDateButton"),
-            ) {
-              Icon(
-                  Icons.Default.CalendarMonth,
-                  contentDescription = "Change Date",
-                  modifier = Modifier.testTag("changeDateIcon"),
-              )
-              Text(
-                  "Change Date (Actual: ${dueDate.toDate().toString().take(11)}," +
-                      "${dueDate.toDate().year + 1900})")
-            }
-            if (dateIsOpen) {
-              MyDatePicker(
-                  onCloseRequest = { dateIsOpen = false },
-                  onDateSelected = { date ->
-                    dueDate = date
-                    dateIsOpen = false
-                  },
-                  isOpen = dateIsOpen,
-                  initialDate =
-                      dueDate
-                          .toDate()
-                          .toInstant()
-                          .atZone(java.time.ZoneId.systemDefault())
-                          .toLocalDate(),
-              )
-            }
-
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            OutlinedButton(
-                onClick = { timeIsOpen = true },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(STANDARD_PADDING.dp)
-                        .testTag("changeTimeButton"),
-            ) {
-              Icon(
-                  Icons.Default.Schedule,
-                  contentDescription = "Change Time",
-                  modifier = Modifier.testTag("changeTimeIcon"),
-              )
-              Text("Change Start Time (Actual: ${startTime})")
-            }
-            if (timeIsOpen) {
-              MyTimePicker(
-                  onTimeSelected = { time ->
-                    startTime =
-                        time
-                            .toInstant()
-                            .atZone(java.time.ZoneId.systemDefault())
-                            .toLocalTime()
-                            .toString()
-                    timeIsOpen = false
-                  },
-                  isOpen = timeIsOpen,
-                  onCloseRequest = { timeIsOpen = false },
-              )
-            }
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            OutlinedButton(
-                onClick = { durationIsOpen = true },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(STANDARD_PADDING.dp)
-                        .testTag("changeEndingTimeButton"),
-            ) {
-              Icon(
-                  Icons.Default.HourglassTop,
-                  contentDescription = "Change Ending Time",
-                  modifier = Modifier.testTag("changeEndingTimeIcon"))
-              Text("Change Ending Time (Actual: ${duration})")
-            }
-            if (durationIsOpen) {
-              MyTimePicker(
-                  onTimeSelected = { time ->
-                    duration =
-                        time
-                            .toInstant()
-                            .atZone(java.time.ZoneId.systemDefault())
-                            .toLocalTime()
-                            .toString()
-                    durationIsOpen = false
-                  },
-                  isOpen = durationIsOpen,
-                  onCloseRequest = { durationIsOpen = false },
-              )
-            }
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-            OutlinedTextField(
-                value = price,
-                onValueChange = { price = it },
-                label = { Text("Price") },
-                modifier =
-                    Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPriceEdit"),
-                placeholder = { Text(text = stringResource(id = R.string.request_price_activity)) },
-                singleLine = true,
-            )
-
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            OutlinedTextField(
-                value = maxPlaces,
-                onValueChange = { maxPlaces = it },
-                label = { Text("Total Places") },
-                modifier =
-                    Modifier.padding(STANDARD_PADDING.dp)
-                        .fillMaxWidth()
-                        .testTag("inputPlacesLeftEdit"),
-                placeholder = {
-                  Text(text = stringResource(id = R.string.request_placesMax_activity))
+                dueDate = dueDate,
+                dateIsOpen = dateIsOpen,
+                dateIsSet = true,
+                onClickStartingTime = { timeIsOpen = true },
+                startTimeIsOpen = timeIsOpen,
+                startTimeIsSet = true,
+                onStartTimeSelected = { time ->
+                  startTime =
+                      time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
+                  timeIsOpen = false
                 },
-                singleLine = true,
-            )
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-            ExposedDropdownMenuBox(
-                modifier =
-                    Modifier.testTag("chooseTypeMenu").fillMaxWidth().padding(STANDARD_PADDING.dp),
-                expanded = expandedType,
-                onExpandedChange = { expandedType = !expandedType }) {
-                  OutlinedTextField(
-                      readOnly = true,
-                      value = selectedOptionType,
-                      onValueChange = {},
-                      label = { Text("Activity Type") },
-                      trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedType)
-                      },
-                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth())
-                  ExposedDropdownMenu(
-                      expanded = expandedType,
-                      onDismissRequest = { expandedType = false },
-                      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                        types.forEach { selectionOption ->
-                          DropdownMenuItem(
-                              modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                              text = { Text(selectionOption.name) },
-                              onClick = {
-                                selectedOptionType = selectionOption.name
-                                expandedType = false
-                              })
-                        }
-                      }
-                }
-
-            ExposedDropdownMenuBox(
-                modifier =
-                    Modifier.testTag("chooseCategoryMenu")
-                        .align(Alignment.CenterHorizontally)
-                        .fillMaxWidth()
-                        .padding(STANDARD_PADDING.dp),
-                expanded = expandedCategory,
-                onExpandedChange = { expandedCategory = !expandedCategory }) {
-                  OutlinedTextField(
-                      readOnly = true,
-                      value =
-                          selectedOptionCategory?.name
-                              ?: context.getString(R.string.select_activity_category),
-                      onValueChange = {},
-                      label = { Text(context.getString(R.string.activity_category)) },
-                      trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory)
-                      },
-                      colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                      modifier = Modifier.menuAnchor().fillMaxWidth().testTag("categoryTextField"))
-                  ExposedDropdownMenu(
-                      expanded = expandedCategory,
-                      onDismissRequest = { expandedCategory = false },
-                      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                        interestsCategories.forEach {
-                          DropdownMenuItem(
-                              modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                              text = { Text(it.name) },
-                              onClick = {
-                                selectedOptionCategory = it
-                                expandedCategory = false
-                                selectedOptionInterest =
-                                    context.getString(R.string.select_activity_type)
-                              })
-                        }
-                      }
-                }
-
-            if (selectedOptionCategory != null) {
-              Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
-
-              ExposedDropdownMenuBox(
-                  modifier =
-                      Modifier.testTag("chooseInterestMenu")
-                          .align(Alignment.CenterHorizontally)
-                          .fillMaxWidth()
-                          .padding(STANDARD_PADDING.dp),
-                  expanded = expandedInterest,
-                  onExpandedChange = { expandedInterest = !expandedInterest }) {
-                    OutlinedTextField(
-                        readOnly = true,
-                        value =
-                            selectedOptionInterest
-                                ?: context.getString(R.string.select_activity_type),
-                        onValueChange = {},
-                        label = { Text("Activity Interest") },
-                        trailingIcon = {
-                          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedInterest)
-                        },
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier =
-                            Modifier.menuAnchor().fillMaxWidth().testTag("interestTextField"))
-                    ExposedDropdownMenu(
-                        expanded = expandedInterest,
-                        onDismissRequest = { expandedInterest = false },
-                        modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-                          interestStringValues[selectedOptionCategory]?.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
-                                text = { Text(selectionOption) },
-                                onClick = {
-                                  selectedOptionInterest = selectionOption
-                                  expandedInterest = false
-                                })
-                          }
-                        }
-                  }
-            }
-
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-            Box {
-              OutlinedTextField(
-                  value = locationQuery,
-                  onValueChange = {
-                    locationViewModel.setQuery(it)
-                    showDropdown = it != "" // Show dropdown when user starts typing
-                  },
-                  label = { Text("Location") },
-                  placeholder = { Text("Enter an Address or Location") },
-                  modifier =
-                      Modifier.padding(STANDARD_PADDING.dp)
-                          .fillMaxWidth()
-                          .testTag("inputLocationEdit"),
-                  singleLine = true)
-
-              // Dropdown menu for location suggestions
-              DropdownMenu(
-                  expanded = showDropdown && locationSuggestions.isNotEmpty(),
-                  onDismissRequest = { showDropdown = false },
-                  properties = PopupProperties(focusable = false)) {
-                    locationSuggestions.filterNotNull().take(3).forEach { location ->
-                      DropdownMenuItem(
-                          text = {
-                            Text(
-                                text =
-                                    location.name.take(TOP_TITLE_SIZE) +
-                                        if (location.name.length > TOP_TITLE_SIZE) "..."
-                                        else "", // Limit name length
-                                maxLines = 1 // Ensure name doesn't overflow
-                                )
-                          },
-                          onClick = {
-                            locationViewModel.setQuery(location.name)
-                            selectedLocation = location
-                            showDropdown = false // Close dropdown on selection
-                          },
-                          modifier = Modifier.padding(STANDARD_PADDING.dp))
+                startTime = startTime ?: "00:00",
+                onCloseStartTime = { timeIsOpen = false },
+                onClickDurationTime = { durationIsOpen = true },
+                durationIsOpen = durationIsOpen,
+                durationIsSet = true,
+                onSelectDuration = { time ->
+                  duration =
+                      time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
+                  durationIsOpen = false
+                },
+                onCloseDuration = { durationIsOpen = false },
+                duration = duration,
+                price = price,
+                onPriceChange = { price = it },
+                placesMax = maxPlaces,
+                onPlacesMaxChange = { maxPlaces = it },
+                locationQuery = locationQuery,
+                onLocationQueryChange = {
+                  locationViewModel.setQuery(it)
+                  showDropdown = it != "" // Show dropdown when user starts typing
+                },
+                showDropdown = showDropdown,
+                locationSuggestions = locationSuggestions,
+                onDismissLocation = { showDropdown = false },
+                onLocationClick = { location ->
+                  locationViewModel.setQuery(location.name)
+                  selectedLocation = location
+                  showDropdown = false // Close dropdown on selection
+                },
+                expandedType = expandedType,
+                onExpandedTypeChange = { expandedType = !expandedType },
+                onSelectType = { selectionOption ->
+                  selectedOptionType = selectionOption.name
+                  expandedType = false
+                },
+                onDismissType = { expandedType = false },
+                selectedOptionType = selectedOptionType,
+                expandedCategory = expandedCategory,
+                onExpandedCategoryChange = { expandedCategory = !expandedCategory },
+                onDismissCategory = { expandedCategory = false },
+                selectedOptionCategory = selectedOptionCategory,
+                selectedOptionInterest = selectedOptionInterest,
+                expandedInterest = expandedInterest,
+                onInterestExpandChange = { expandedInterest = !expandedInterest },
+                onInterestDismiss = { expandedInterest = false },
+                onInterestSelect = { selectionOption ->
+                  selectedOptionInterest = selectionOption
+                  expandedInterest = false
+                },
+                onSelectCategory = {
+                  selectedOptionCategory = it
+                  expandedCategory = false
+                },
+                attendees = attendees,
+                showDialogUser = showDialog,
+                deleteAttendant = { user -> attendees -= user },
+                onDismissUserDialog = { showDialog = false },
+                onAddUser = { user -> attendees += user },
+                onOpenUserDialog = { showDialog = true },
+                onProfileClick = { user ->
+                  if (user.id == creator) {
+                    navigationActions.navigateTo(Screen.PROFILE)
+                  } else if (user.id == "") {
+                    Toast.makeText(context, "This user is not registered", Toast.LENGTH_SHORT)
+                        .show()
+                  } else {
+                    profileViewModel.clearUserData()
+                    profileViewModel.fetchUserData(user.id)
+                    profileViewModel.userState.value?.let {
+                      listActivityViewModel.selectUser(it)
+                      navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
                     }
                   }
-            }
-
-            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-            Button(
-                onClick = { showDialog = true },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(STANDARD_PADDING.dp)
-                        .testTag("addAttendeeButton"),
-            ) {
-              Row(
-                  horizontalArrangement =
-                      Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
-                  verticalAlignment = Alignment.CenterVertically,
-              ) {
-                Icon(
-                    Icons.Filled.Add,
-                    contentDescription = "add a new attendee",
-                )
-                Text("Add Attendee")
-              }
-            }
-            if (attendees.isNotEmpty()) {
-              LazyRow(
-                  modifier = Modifier.fillMaxHeight().height(85.dp).padding(STANDARD_PADDING.dp),
-              ) {
-                items(attendees.size) { index ->
-                  AttendantPreview(
-                      onProfileClick = {
-                        if (attendees[index].id == creator) {
-                          navigationActions.navigateTo(Screen.PROFILE)
-                        } else if (attendees[index].id == "") {
-                          Toast.makeText(context, "This user is not registered", Toast.LENGTH_SHORT)
-                              .show()
-                        } else {
-                          listActivityViewModel.selectUser(attendees[index])
-                          navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
-                        }
-                      },
-                      imageViewModel = imageViewModel,
-                      deleteAttendant = { user -> attendees = attendees.filter { it != user } },
-                      user = attendees[index],
-                      index = index)
-                }
-              }
-            }
-            if (showDialog) {
-              AddUserDialog(
-                  onDismiss = { showDialog = false },
-                  onAddUser = { user -> attendees = attendees + user },
-              )
-            }
+                },
+                imageViewModel = imageViewModel,
+            )
             Spacer(Modifier.height(MEDIUM_PADDING.dp))
 
             Button(
