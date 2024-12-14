@@ -1,41 +1,78 @@
 package com.android.sample.ui.components
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
+import com.android.sample.resources.C.Tag.FADING_DURATION
+import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
-import com.android.sample.resources.C.Tag.MEDIUM_PADDING
-import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.SPINNING_DURATION
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
 @Composable
-fun NoInternetScreen(paddingValues: PaddingValues) {
-  Column(
-      horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-      verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
-      modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-        Image(
-            painter = painterResource(id = R.drawable.no_signal),
-            contentDescription = R.string.no_internet_connection.toString())
-        Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
-        Text(
-            text = R.string.no_internet_connection.toString(),
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = TITLE_FONTSIZE.sp))
-        Spacer(modifier = Modifier.padding(MEDIUM_PADDING.dp))
-        Text(
-            text = R.string.internet_connection_ask.toString(),
-            style = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = SUBTITLE_FONTSIZE.sp))
+fun NoInternetScreen() {
+  Box(
+      modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
+      contentAlignment = Alignment.Center) {
+        val logo = painterResource(id = R.drawable.aptivity)
+        val infiniteTransition = rememberInfiniteTransition(label = "")
+
+        // Animation for rotation
+        val rotation by
+            infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 360f,
+                animationSpec =
+                    infiniteRepeatable(
+                        animation =
+                            tween(durationMillis = SPINNING_DURATION, easing = LinearEasing)),
+                label = "")
+
+        // Animation for fading
+        val alpha by
+            infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 1f,
+                animationSpec =
+                    infiniteRepeatable(
+                        animation = tween(durationMillis = FADING_DURATION, easing = LinearEasing),
+                        repeatMode = RepeatMode.Reverse),
+                label = "")
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier) {
+              Image(
+                  painter = logo,
+                  contentDescription = "Loading Logo",
+                  modifier = Modifier.size((2 * IMAGE_SIZE).dp).graphicsLayer(rotationZ = rotation))
+              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
+              Text(
+                  text = stringResource(R.string.no_internet_connection),
+                  style =
+                      TextStyle(
+                          fontSize = TITLE_FONTSIZE.sp,
+                          fontWeight = FontWeight.Bold,
+                          color = Color.Black // Ensure text is visible on the dark background
+                          ),
+                  modifier = Modifier.graphicsLayer(alpha = alpha) // Apply alpha animation
+                  )
+            }
       }
 }
