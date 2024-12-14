@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -62,6 +64,7 @@ import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.PRIMARY
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
@@ -136,7 +139,14 @@ fun CreateActivityScreen(
       modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
       topBar = {
         TopAppBar(
-            title = { Text(text = stringResource(id = R.string.title_screen_create_activity)) },
+            modifier = Modifier.testTag("createActivityTopBar").
+                background(Color(PRIMARY)),
+            title = { Text(
+                modifier = Modifier.testTag("createActivityTopTitle"),
+                text = stringResource(id = R.string.title_screen_create_activity),
+                textAlign = TextAlign.Center,
+                color = Color.White,
+            ) },
         )
       },
       content = { paddingValues ->
