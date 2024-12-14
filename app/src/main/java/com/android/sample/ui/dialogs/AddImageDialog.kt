@@ -1,6 +1,7 @@
 package com.android.sample.ui.dialogs
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,9 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,12 +26,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
 @Composable
@@ -42,10 +49,9 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
           )) {
         Column(
             modifier =
-                Modifier.fillMaxWidth()
-                    .height(200.dp)
+                Modifier
                     .background(
-                        color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
+                        color = Color.White, shape = RoundedCornerShape(size = ROUNDED_CORNER_SHAPE_DEFAULT.dp))
                     .testTag("addImageDialog"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,40 +61,46 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
               style =
                   TextStyle(
                       color = Color.Black,
-                      fontSize = TITLE_FONTSIZE.sp,
-                      fontWeight = FontWeight.Bold),
+                      fontSize = TITLE_FONTSIZE.sp),
           )
-
-          Button(
+          TextButton(
               onClick = onGalleryClick,
               modifier =
-                  Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("galleryButton")) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.background(Color.Transparent)) {
+                  Modifier.fillMaxWidth()
+                      .padding(STANDARD_PADDING.dp)
+                      .testTag("galleryButton")
+                      .border(width = BORDER_STROKE_SM.dp, color = Color.Cyan, shape = RoundedCornerShape(
+                          ROUNDED_CORNER_SHAPE_DEFAULT.dp))) {
                       Text(
                           text = "Choose from gallery",
-                          style = TextStyle(color = Color.Black, fontSize = MEDIUM_PADDING.sp))
+                          style = TextStyle(color = Color.Black, fontSize = SUBTITLE_FONTSIZE.sp))
                       Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-                      Icon(Icons.Filled.PhotoLibrary, contentDescription = "Choose from gallery")
-                    }
+                      Icon(Icons.Filled.PhotoLibrary, contentDescription = "Choose from gallery",
+                          tint = Color.Gray)
               }
-          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-          Button(
+          TextButton(
               onClick = onCameraClick,
               modifier =
-                  Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("cameraButton")) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.background(Color.Transparent)) {
+                  Modifier.fillMaxWidth()
+                      .padding(STANDARD_PADDING.dp)
+                      .testTag("cameraButton")
+                      .border(width = BORDER_STROKE_SM.dp, color = Color.Cyan, shape = RoundedCornerShape(
+                          ROUNDED_CORNER_SHAPE_DEFAULT.dp))) {
+
                       Text(
                           text = "Take pictures with camera",
-                          style = TextStyle(color = Color.Black, fontSize = MEDIUM_PADDING.sp))
+                          style = TextStyle(color = Color.Black, fontSize = SUBTITLE_FONTSIZE.sp))
                       Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-                      Icon(Icons.Filled.PhotoCamera, contentDescription = "Choose from gallery")
+                      Icon(Icons.Filled.PhotoCamera, contentDescription = "Choose from gallery",
+                          tint = Color.Gray)
                     }
-              }
         }
       }
+}
+
+@Preview
+@Composable
+fun AddImageDialogPreview() {
+  AddImageDialog({}, {}, {})
 }
