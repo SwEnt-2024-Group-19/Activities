@@ -1,10 +1,12 @@
 package com.android.sample.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonRemove
@@ -42,7 +44,10 @@ fun AttendantPreview(
               .border(LINE_STROKE.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
               .testTag("attendeeRow${index}")) {
         if (user.id == "") {
-          painterResource(id = randomDefaultProfileImage())
+          Image(
+              painter = painterResource(randomDefaultProfileImage()),
+              contentDescription = "Person",
+              modifier = Modifier.padding(end = MEDIUM_PADDING.dp).size(SMALL_IMAGE_SIZE.dp))
         } else {
           ProfileImage(
               userId = user.id,
