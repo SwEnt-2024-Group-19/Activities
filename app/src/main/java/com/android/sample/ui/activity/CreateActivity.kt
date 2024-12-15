@@ -139,14 +139,15 @@ fun CreateActivityScreen(
       modifier = Modifier.fillMaxSize().testTag("createActivityScreen"),
       topBar = {
         TopAppBar(
-            modifier = Modifier.testTag("createActivityTopBar").
-                background(Color(PRIMARY)),
-            title = { Text(
-                modifier = Modifier.testTag("createActivityTopTitle"),
-                text = stringResource(id = R.string.title_screen_create_activity),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-            ) },
+            modifier = Modifier.testTag("createActivityTopBar").background(Color(PRIMARY)),
+            title = {
+              Text(
+                  modifier = Modifier.testTag("createActivityTopTitle"),
+                  text = stringResource(id = R.string.title_screen_create_activity),
+                  textAlign = TextAlign.Center,
+                  color = Color.White,
+              )
+            },
         )
       },
       content = { paddingValues ->
@@ -313,16 +314,14 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    }
-                    else if(attendees.size>= placesMax.toInt()){
-                        Toast.makeText(
-                                context,
-                                context.getString(R.string.max_places_exceed),
-                                Toast.LENGTH_SHORT)
-                            .show()
-                        return@Button
-                    }
-                    else if (creator == "") {
+                    } else if (attendees.size >= placesMax.toInt()) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.max_places_exceed),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (creator == "") {
                       Toast.makeText(
                               context,
                               context.getString(R.string.login_check_in_create),
@@ -417,12 +416,12 @@ fun CreateActivityScreen(
                           .testTag("createButton")
                           .align(Alignment.CenterHorizontally),
               ) {
-                  Icon(
-                      Icons.Filled.Add,
-                      contentDescription = "add a new activity",
-                  )
-                  Text(text = stringResource(id = R.string.button_create_activity))
-                }
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = "add a new activity",
+                )
+                Text(text = stringResource(id = R.string.button_create_activity))
+              }
               Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
             }
           }

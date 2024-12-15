@@ -3,17 +3,13 @@ package com.android.sample.ui.dialogs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,7 +28,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
-import com.android.sample.resources.C.Tag.PRIMARY
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 
 @Composable
@@ -56,11 +51,11 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
         ) {
           var name by remember { mutableStateOf("") }
           var surname by remember { mutableStateOf("") }
-            Text(
-                text = "Add a user",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.testTag("addUserDialogTitle"),
-            )
+          Text(
+              text = "Add a user",
+              style = MaterialTheme.typography.titleLarge,
+              modifier = Modifier.testTag("addUserDialogTitle"),
+          )
           OutlinedTextField(
               modifier = Modifier.testTag("nameTextFieldUser"),
               value = name,
@@ -77,10 +72,8 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
               singleLine = true,
           )
           TextButton(
-              modifier = Modifier
-                  .testTag("addUserButton")
-                  .fillMaxWidth()
-                  .padding(MEDIUM_PADDING.dp),
+              modifier =
+                  Modifier.testTag("addUserButton").fillMaxWidth().padding(MEDIUM_PADDING.dp),
               onClick = {
                 onAddUser(
                     User(
@@ -94,10 +87,11 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
                     ))
                 onDismiss()
               }) {
-              Icon(
-                  imageVector = Icons.Default.Add,
-                  contentDescription = "Add user",
-                  tint = Color.DarkGray,)
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add user",
+                    tint = Color.DarkGray,
+                )
                 Text(
                     "Add user",
                     color = Color.DarkGray,
