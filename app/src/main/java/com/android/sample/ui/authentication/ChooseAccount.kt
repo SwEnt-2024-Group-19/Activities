@@ -45,6 +45,7 @@ import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
+import com.android.sample.ui.components.LoadingScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 
@@ -57,8 +58,20 @@ fun ChooseAccountScreen(
 ) {
   // Collect the user profile data from ProfileViewModel
   val userProfile by profileViewModel.userState.collectAsState()
+    val isLoading = userProfile == null // Assume loading state when userProfile is null
+    if (isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingScreen()
+        }
+        return
+    }
+
   if (userProfile != null) {
     navigationActions.navigateTo(Screen.OVERVIEW)
+      return
   }
   val continueMessage = stringResource(R.string.complete_profile_creation_message)
 
