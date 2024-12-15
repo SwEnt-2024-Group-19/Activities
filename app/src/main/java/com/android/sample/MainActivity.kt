@@ -35,7 +35,6 @@ import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
 import com.android.sample.ui.activity.EditActivityScreen
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
-import com.android.sample.ui.authentication.ChooseAccountScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
 import com.android.sample.ui.listActivities.LikedActivitiesScreen
