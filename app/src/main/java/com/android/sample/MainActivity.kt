@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
     if (currentUser != null && currentUser.isAnonymous) {
       auth.signOut()
     }
-    val startDestination = if (auth.currentUser != null) Route.CHOOSE_ACCOUNT else Route.AUTH
+    val startDestination = if (auth.currentUser != null) Route.OVERVIEW else Route.AUTH
     // log current user
     Log.d("MainActivity", "Current user: ${auth.currentUser?.uid}")
 
@@ -131,7 +131,6 @@ fun NavGraph(
 ) {
 
   NavHost(navController = navController, startDestination = startDestination) {
-    composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,

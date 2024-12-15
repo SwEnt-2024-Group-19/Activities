@@ -17,7 +17,6 @@ object Route {
   const val ADD_ACTIVITY = "AddActivity"
   const val LIKED_ACTIVITIES = "LikedActivities"
   const val MAP = "Map"
-  const val CHOOSE_ACCOUNT = "ChooseAccount"
 }
 
 object Screen {
@@ -32,7 +31,6 @@ object Screen {
   const val CREATE_PROFILE = "CreateProfile Screen"
   const val LIKED_ACTIVITIES = "LikedActivities Screen"
   const val MAP = "Map Screen"
-  const val CHOOSE_ACCOUNT = "ChooseAccount Screen"
   const val PARTICIPANT_PROFILE = "Participant profile Screen"
 }
 
