@@ -313,7 +313,16 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (creator == "") {
+                    }
+                    else if(attendees.size>= placesMax.toInt()){
+                        Toast.makeText(
+                                context,
+                                context.getString(R.string.max_places_exceed),
+                                Toast.LENGTH_SHORT)
+                            .show()
+                        return@Button
+                    }
+                    else if (creator == "") {
                       Toast.makeText(
                               context,
                               context.getString(R.string.login_check_in_create),
@@ -380,7 +389,7 @@ fun CreateActivityScreen(
                                 description = description,
                                 date = dueDate,
                                 startTime = startTime,
-                                duration = hourDateViewModel.calculateDuration(startTime, duration),
+                                duration = duration,
                                 price = price.toDouble(),
                                 placesLeft = attendees.size.toLong(),
                                 maxPlaces = placesMax.toLongOrNull() ?: 0,

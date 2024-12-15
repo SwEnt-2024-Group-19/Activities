@@ -59,6 +59,7 @@ import com.android.sample.ui.dialogs.AddUserDialog
 import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialogState
 
+@Suppress("NAME_SHADOWING")
 @Composable
 fun ActivityForm(
     context: Context,
@@ -198,7 +199,8 @@ fun ActivityForm(
         MyTimePicker(
             onTimeSelected = onSelectDuration,
             isOpen = durationIsOpen,
-            onCloseRequest = onCloseDuration)
+            onCloseRequest = onCloseDuration,
+            isAmPm = false)
     }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
   Row(
@@ -220,7 +222,7 @@ fun ActivityForm(
                   .padding(end = STANDARD_PADDING.dp)
                   .testTag("iconStartTimeCreate")
           )
-          if (startTimeIsSet) Text("Start time: ${startTime} (click to change)")
+          if (startTimeIsSet) Text("Start time: $startTime (click to change)")
           else Text("Select start time")
       }
 
@@ -240,8 +242,8 @@ fun ActivityForm(
                   .align(Alignment.CenterVertically)
                   .testTag("iconEndTimeCreate")
           )
-          if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
-          else Text("Select End Time")
+          if (durationIsSet) Text("Duration Time: $duration (click to change)")
+          else Text("Select Duration")
       }
   }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))

@@ -46,4 +46,5 @@
     <string name="complete_profile_creation_message">Complete profile creation</string>
     <string name="switch_account_message">Switch Account</string>
     <string name="already_signed_in_message">Hello, you are already signed in!</string>
+    <string name="max_places_exceed">The number of participants is bigger or equal to the max number of places</string>
 </resources>

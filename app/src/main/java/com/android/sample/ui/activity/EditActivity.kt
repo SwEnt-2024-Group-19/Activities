@@ -92,8 +92,7 @@ fun EditActivityScreen(
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember {
-    mutableStateOf(
-        hourDateViewModel.addDurationToTime(startTime ?: "00:00", activity?.duration ?: "00:01"))
+    mutableStateOf(activity?.duration ?: "00:01")
   }
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
@@ -316,7 +315,15 @@ fun EditActivityScreen(
                           .show()
                       return@Button
                       // we force the start time to be before the end time
-                    } else if (!hourDateViewModel.isBeginGreaterThanEnd(
+                    }
+                    else if(attendees.size>= maxPlaces.toInt()){
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.max_places_exceed),
+                            Toast.LENGTH_SHORT)
+                            .show()
+                        return@Button
+                    }else if (!hourDateViewModel.isBeginGreaterThanEnd(
                         startTime ?: "00:00", duration ?: "00:01")) {
                       Toast.makeText(
                               context,
@@ -349,8 +356,7 @@ fun EditActivityScreen(
                                 description = description,
                                 date = dueDate,
                                 startTime = startTime ?: "",
-                                duration =
-                                    hourDateViewModel.calculateDuration(startTime ?: "", duration),
+                                duration = duration,
                                 price = price.toDouble(),
                                 placesLeft = attendees.size.toLong(),
                                 maxPlaces = maxPlaces.toLongOrNull() ?: 0,
