@@ -244,16 +244,19 @@ class EditActivityScreenTest {
           mockImageViewModel,
           profileViewModel)
     }
+    composeTestRule.waitForIdle()
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputDateCreate"))
     composeTestRule.onNodeWithTag("inputDateCreate").assertIsDisplayed()
 
+    composeTestRule.waitForIdle()
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputStartTimeCreate"))
     composeTestRule.onNodeWithTag("inputStartTimeCreate").assertIsDisplayed()
 
+    composeTestRule.waitForIdle()
     composeTestRule
         .onNodeWithTag("activityEditScreen")
         .performScrollToNode(hasTestTag("inputEndTimeCreate"))
