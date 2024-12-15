@@ -58,20 +58,15 @@ fun ChooseAccountScreen(
 ) {
   // Collect the user profile data from ProfileViewModel
   val userProfile by profileViewModel.userState.collectAsState()
-    val isLoading = userProfile == null // Assume loading state when userProfile is null
-    if (isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LoadingScreen()
-        }
-        return
-    }
+  val isLoading = userProfile == null // Assume loading state when userProfile is null
+  if (isLoading) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { LoadingScreen() }
+    return
+  }
 
   if (userProfile != null) {
     navigationActions.navigateTo(Screen.OVERVIEW)
-      return
+    return
   }
   val continueMessage = stringResource(R.string.complete_profile_creation_message)
 
