@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -129,7 +130,9 @@ fun ActivityForm(
         value = title,
         onValueChange = onTitleChange,
         label = stringResource(id = R.string.request_activity_title),
-        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputTitleCreate"),
+        modifier = Modifier
+            .padding(STANDARD_PADDING.dp)
+            .fillMaxWidth(),
         validation = { title ->
           when {
               title.isEmpty() -> "Title must not be empty"
@@ -146,7 +149,9 @@ fun ActivityForm(
         value = description,
         onValueChange = onDescriptionChange,
         label = stringResource(id = R.string.request_activity_description),
-        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputDescriptionCreate"),
+        modifier = Modifier
+            .padding(STANDARD_PADDING.dp)
+            .fillMaxWidth(),
         validation = { description ->
             when {
                 description.isEmpty() -> "Description must not be empty"
@@ -157,14 +162,19 @@ fun ActivityForm(
         testTag = "inputDescriptionCreate",
         errorTestTag = "DescriptionErrorText"
     )
-  OutlinedButton(
+  TextButton(
       onClick = onClickDate,
-      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .padding(STANDARD_PADDING.dp)
+          .testTag("inputDateCreate"),
   ) {
     Icon(
         Icons.Filled.CalendarMonth,
         contentDescription = "select date",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+        modifier = Modifier
+            .padding(end = STANDARD_PADDING.dp)
+            .testTag("iconDateCreate"))
     if (dateIsSet)
         Text(
             "Selected date: ${dueDate.toDate().toString().take(11)}," +
@@ -178,45 +188,61 @@ fun ActivityForm(
         isOpen = dateIsOpen,
         initialDate = null)
   }
+    if (startTimeIsOpen) {
+        MyTimePicker(
+            onTimeSelected = onStartTimeSelected,
+            isOpen = startTimeIsOpen,
+            onCloseRequest = onCloseStartTime)
+    }
+    if (durationIsOpen) {
+        MyTimePicker(
+            onTimeSelected = onSelectDuration,
+            isOpen = durationIsOpen,
+            onCloseRequest = onCloseDuration)
+    }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-  OutlinedButton(
-      onClick = onClickStartingTime,
-      modifier =
-          Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputStartTimeCreate"),
-  ) {
-    Icon(
-        Icons.Filled.AccessTime,
-        contentDescription = "select start time",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconStartTimeCreate"))
-    if (startTimeIsSet) Text("Start time: ${startTime} (click to change)")
-    else Text("Select start time")
-  }
-  if (startTimeIsOpen) {
-    MyTimePicker(
-        onTimeSelected = onStartTimeSelected,
-        isOpen = startTimeIsOpen,
-        onCloseRequest = onCloseStartTime)
-  }
-  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-  OutlinedButton(
-      onClick = onClickDurationTime,
-      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),
-  ) {
-    Icon(
-        Icons.Filled.HourglassTop,
-        contentDescription = "select duration",
-        modifier =
-            Modifier.padding(end = STANDARD_PADDING.dp)
-                .align(Alignment.CenterVertically)
-                .testTag("iconEndTimeCreate"))
-    if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
-    else Text("Select End Time")
-  }
-  if (durationIsOpen) {
-    MyTimePicker(
-        onTimeSelected = onSelectDuration,
-        isOpen = durationIsOpen,
-        onCloseRequest = onCloseDuration)
+  Row(
+      modifier = Modifier.fillMaxWidth()
+          .padding(STANDARD_PADDING.dp),
+      horizontalArrangement = Arrangement.SpaceEvenly
+  ){
+      TextButton(
+          onClick = onClickStartingTime,
+          modifier =
+          Modifier
+              .padding(STANDARD_PADDING.dp)
+              .testTag("inputStartTimeCreate"),
+      ) {
+          Icon(
+              Icons.Filled.AccessTime,
+              contentDescription = "select start time",
+              modifier = Modifier
+                  .padding(end = STANDARD_PADDING.dp)
+                  .testTag("iconStartTimeCreate")
+          )
+          if (startTimeIsSet) Text("Start time: ${startTime} (click to change)")
+          else Text("Select start time")
+      }
+
+      Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+      TextButton(
+          onClick = onClickDurationTime,
+          modifier = Modifier
+              .padding(STANDARD_PADDING.dp)
+              .testTag("inputEndTimeCreate"),
+      ) {
+          Icon(
+              Icons.Filled.HourglassTop,
+              contentDescription = "select duration",
+              modifier =
+              Modifier
+                  .padding(end = STANDARD_PADDING.dp)
+                  .align(Alignment.CenterVertically)
+                  .testTag("iconEndTimeCreate")
+          )
+          if (durationIsSet) Text("Finishing Time: ${duration} (click to change)")
+          else Text("Select End Time")
+      }
   }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
@@ -224,7 +250,9 @@ fun ActivityForm(
         value = price,
         onValueChange = onPriceChange,
         label = stringResource(id = R.string.request_price_activity),
-        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPriceCreate"),
+        modifier = Modifier
+            .padding(STANDARD_PADDING.dp)
+            .fillMaxWidth(),
         validation = { price ->
           when {
               price.isEmpty() -> "Price must not be empty"
@@ -240,7 +268,9 @@ fun ActivityForm(
         value = placesMax,
         onValueChange = onPlacesMaxChange,
         label = stringResource(id = R.string.request_placesMax_activity),
-        modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputPlacesCreate"),
+        modifier = Modifier
+            .padding(STANDARD_PADDING.dp)
+            .fillMaxWidth(),
         validation = { placesMax ->
           when {
               placesMax.isEmpty() -> "Places must not be empty"
@@ -257,7 +287,9 @@ fun ActivityForm(
             value = locationQuery,
             onValueChange = onLocationQueryChange,
             label = stringResource(id = R.string.request_location_activity),
-            modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth().testTag("inputLocationCreate"),
+            modifier = Modifier
+                .padding(STANDARD_PADDING.dp)
+                .fillMaxWidth(),
             validation = { locationQuery ->
                 when {
                 locationQuery.isEmpty() -> "Location must not be empty"
@@ -333,9 +365,10 @@ fun ActivityForm(
   Button(
       onClick = onOpenUserDialog,
       modifier =
-          Modifier.width(BUTTON_WIDTH.dp)
-              .height(BUTTON_HEIGHT_SM.dp)
-              .testTag("addAttendeeButton")) {
+      Modifier
+          .width(BUTTON_WIDTH.dp)
+          .height(BUTTON_HEIGHT_SM.dp)
+          .testTag("addAttendeeButton")) {
         Row(
             horizontalArrangement =
                 Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
@@ -350,7 +383,10 @@ fun ActivityForm(
       }
   if (attendees.isNotEmpty()) {
     LazyRow(
-        modifier = Modifier.fillMaxHeight().height(85.dp).padding(STANDARD_PADDING.dp),
+        modifier = Modifier
+            .fillMaxHeight()
+            .height(85.dp)
+            .padding(STANDARD_PADDING.dp),
     ) {
       items(attendees.size) { index ->
         AttendantPreview(
@@ -384,14 +420,16 @@ fun MyDropDownMenu(
 ) {
   ExposedDropdownMenuBox(
       modifier =
-          Modifier.testTag(
-                  when (mode) {
-                    "category" -> "chooseCategoryMenu"
-                    "type" -> "chooseTypeMenu"
-                    else -> "chooseInterestMenu"
-                  })
-              .fillMaxWidth()
-              .padding(STANDARD_PADDING.dp),
+      Modifier
+          .testTag(
+              when (mode) {
+                  "category" -> "chooseCategoryMenu"
+                  "type" -> "chooseTypeMenu"
+                  else -> "chooseInterestMenu"
+              }
+          )
+          .fillMaxWidth()
+          .padding(STANDARD_PADDING.dp),
       expanded = expanded,
       onExpandedChange = onExpandChange) {
       TextFieldWithIcon(
@@ -417,16 +455,21 @@ fun MyDropDownMenu(
               "interest" -> "interestTextField"
               else -> ""
             },
-          modifier = Modifier.menuAnchor()
-                   .fillMaxWidth(),
+          modifier = Modifier
+              .menuAnchor()
+              .fillMaxWidth(),
           )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = onDismiss,
-            modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(STANDARD_PADDING.dp)) {
               listItems.forEach {
                 DropdownMenuItem(
-                    modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp),
                     text = {
                       when (it) {
                         is Category -> Text(it.name)
