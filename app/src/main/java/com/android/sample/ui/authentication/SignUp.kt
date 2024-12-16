@@ -66,7 +66,7 @@ fun isValidEmail(email: String): Boolean {
 }
 
 @Composable
-fun SignUpAndProfileCreationScreen(
+fun SignUpScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
     imageViewModel: ImageViewModel

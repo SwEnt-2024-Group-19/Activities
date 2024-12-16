@@ -36,7 +36,7 @@ import com.android.sample.ui.activity.CreateActivityScreen
 import com.android.sample.ui.activity.EditActivityScreen
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.authentication.SignInScreen
-import com.android.sample.ui.authentication.SignUpAndProfileCreationScreen
+import com.android.sample.ui.authentication.SignUpScreen
 import com.android.sample.ui.listActivities.LikedActivitiesScreen
 import com.android.sample.ui.listActivities.ListActivitiesScreen
 import com.android.sample.ui.map.MapScreen
@@ -135,7 +135,7 @@ fun NavGraph(
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
       composable(Screen.SIGN_UP) {
-        SignUpAndProfileCreationScreen(navigationActions, profileViewModel, imageViewModel)
+        SignUpScreen(navigationActions, profileViewModel, imageViewModel)
       }
     }
 

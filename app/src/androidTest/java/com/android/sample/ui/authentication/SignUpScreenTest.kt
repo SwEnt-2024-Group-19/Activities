@@ -36,7 +36,7 @@ class SignUpAndProfileCreationScreenTest {
     mockProfilesRepository = MockProfilesRepository()
     profileViewModel = ProfileViewModel(mockProfilesRepository, mock())
     composeTestRule.setContent {
-      SignUpAndProfileCreationScreen(
+      SignUpScreen(
           navigationActions = navigationActions,
           profileViewModel = profileViewModel,
           imageViewModel = mockImageViewModel)
