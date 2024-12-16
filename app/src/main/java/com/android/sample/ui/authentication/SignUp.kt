@@ -1,58 +1,63 @@
 package com.android.sample.ui.authentication
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.android.sample.R
-import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
-import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
-import com.android.sample.resources.C.Tag.BUTTON_WIDTH
-import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
+import com.android.sample.model.image.ImageViewModel
+import com.android.sample.model.profile.Interest
+import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
-import com.android.sample.resources.C.Tag.IMAGE_SIZE
-import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.MIN_PASSWORD_LENGTH
-import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
-import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
+import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.GalleryScreen
+import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
+import com.android.sample.ui.components.TextFieldWithErrorState
+import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.profile.ManageInterests
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -61,38 +66,109 @@ fun isValidEmail(email: String): Boolean {
 }
 
 @Composable
-fun SignUpScreen(navigationActions: NavigationActions) {
+fun SignUpAndProfileCreationScreen(
+    navigationActions: NavigationActions,
+    profileViewModel: ProfileViewModel,
+    imageViewModel: ImageViewModel
+) {
   val context = LocalContext.current
   val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
-  val emailErrorState = remember {
-    mutableStateOf<String?>(null)
-  } // State for email validation error
-  val passwordErrorState = remember {
-    mutableStateOf<String?>(null)
-  } // State for password validation error
+  val emailErrorState = remember { mutableStateOf<String?>(null) }
+  val passwordErrorState = remember { mutableStateOf<String?>(null) }
   val isPasswordVisible = remember { mutableStateOf(false) }
 
-  Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      content = { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("SignUpScreenColumn"),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-          // App Logo Image
+  var name by remember { mutableStateOf("") }
+  val nameErrorState = remember { mutableStateOf<String?>(null) }
+  var surname by remember { mutableStateOf("") }
+  val surnameErrorState = remember { mutableStateOf<String?>(null) }
+  var interests by remember { mutableStateOf(listOf<Interest>()) }
+  var photo by remember { mutableStateOf("") }
+  var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+  var errorMessage by remember { mutableStateOf<String?>(null) }
+  var showDialogImage by remember { mutableStateOf(false) }
+  var isGalleryOpen by remember { mutableStateOf(false) }
+  var isCamOpen by remember { mutableStateOf(false) }
+  val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+  if (showDialogImage) {
+    AddImageDialog(
+        onDismiss = { showDialogImage = false },
+        onGalleryClick = {
+          showDialogImage = false
+          isGalleryOpen = true
+        },
+        onCameraClick = {
+          showDialogImage = false
+          isCamOpen = true
+        })
+  }
+  if (isGalleryOpen) {
+    GalleryScreen(
+        isGalleryOpen = { isGalleryOpen = false },
+        addImage = { bitmap ->
+          selectedBitmap = bitmap
+          imageViewModel.uploadProfilePicture(
+              uid,
+              bitmap,
+              onSuccess = { url -> photo = url },
+              onFailure = { error ->
+                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
+              })
+        },
+        context = context)
+  }
+  if (isCamOpen) {
+    CameraScreen(
+        paddingValues = PaddingValues(SMALL_PADDING.dp),
+        controller =
+            remember {
+              LifecycleCameraController(context).apply {
+                setEnabledUseCases(CameraController.IMAGE_CAPTURE)
+              }
+            },
+        context = context,
+        isCamOpen = { isCamOpen = false },
+        addElem = { bitmap ->
+          selectedBitmap = bitmap
+          imageViewModel.uploadProfilePicture(
+              uid,
+              bitmap,
+              onSuccess = { url -> photo = url },
+              onFailure = { error ->
+                Log.e(
+                    "SignUpAndProfileCreationScreen",
+                    "Failed to upload profile picture: ${error.message}")
+              })
+        })
+  } else {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = MEDIUM_PADDING.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
+
+          // Profile Picture
           item {
-            Image(
-                painter =
-                    painterResource(
-                        id = R.drawable.aptivity_logo_with_text), // Ensure this drawable exists
-                contentDescription = "App Logo",
-                modifier = Modifier.size((3 * IMAGE_SIZE).dp))
-            Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
+            Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
+            ProfileImage(
+                userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
+                imageViewModel)
+            Box(
+                modifier =
+                    Modifier.testTag("uploadPicture")
+                        .clickable { showDialogImage = true } // Handle click action
+                        .padding(MEDIUM_PADDING.dp)
+                        .background(Color.Transparent)) {
+                  Icon(
+                      imageVector = Icons.Default.AddAPhoto,
+                      contentDescription = "Add a photo",
+                      tint = Color.Black)
+                }
           }
+
+          // Email Field
           item {
-            // Email field
             EmailTextField(
                 email = emailState.value,
                 onEmailChange = {
@@ -100,84 +176,123 @@ fun SignUpScreen(navigationActions: NavigationActions) {
                   emailErrorState.value = if (it.isBlank()) "Email cannot be empty" else null
                 },
                 emailError = emailErrorState.value)
-            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
+
+          // Password Field
           item {
-            // Password field
             PasswordTextField(
                 password = passwordState.value,
                 onPasswordChange = { passwordState.value = it },
                 isPasswordVisible = isPasswordVisible.value,
                 onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
-                passwordError = passwordErrorState.value,
-            )
-            Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
+                passwordError = passwordErrorState.value)
           }
+
+          // Name and Surname Fields
           item {
-            // Sign up button
-            Card(
-                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignUpCard"),
-                colors =
-                    CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-                elevation =
-                    CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
-                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
-            ) {
-              OutlinedButton(
-                  onClick = {
-                    when {
-                      !isValidEmail(emailState.value) -> {
-                        emailErrorState.value =
-                            "Please enter a valid email address" // Set the error message if email
-                        // is
-                        // invalid
-                      }
-                      passwordState.value.isEmpty() -> {
-                        passwordErrorState.value =
-                            "Password cannot be empty" // Set the error message if password is empty
-                      }
-                      passwordState.value.length < MIN_PASSWORD_LENGTH -> {
-                        passwordErrorState.value =
-                            "Password must be at least 6 characters long" // Set the error message
-                        // for
-                        // short passwords
-                      }
-                      else -> {
-                        createUserWithEmailAndPassword(
-                            emailState.value,
-                            passwordState.value,
-                            context,
-                            onSuccess = { navigationActions.navigateTo(Screen.CREATE_PROFILE) })
-                      }
-                    }
-                  },
-                  shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
-                  border =
-                      BorderStroke(BORDER_STROKE_SM.dp, Color.Transparent), // Transparent indicator
-                  modifier =
-                      Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignUpButton"),
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.primary,
-                          contentColor = Color.White)) {
-                    Text("SIGN UP", fontSize = SUBTITLE_FONTSIZE.sp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
+                  TextFieldWithErrorState(
+                      value = name,
+                      onValueChange = { name = it },
+                      label = "Name",
+                      validation = { input ->
+                        if (input.isBlank()) "Name cannot be empty" else null
+                      },
+                      externalError = nameErrorState.value,
+                      errorTestTag = "nameError",
+                      testTag = "nameTextField",
+                      modifier = Modifier.weight(1f))
+                  TextFieldWithErrorState(
+                      value = surname,
+                      onValueChange = { surname = it },
+                      label = "Surname",
+                      validation = { input ->
+                        if (input.isBlank()) "Surname cannot be empty" else null
+                      },
+                      externalError = surnameErrorState.value,
+                      errorTestTag = "surnameError",
+                      testTag = "surnameTextField",
+                      modifier = Modifier.weight(1f))
+                }
+          }
+
+          // Interests Section
+          item {
+            ManageInterests(initialInterests = interests, onUpdateInterests = { interests = it })
+          }
+
+          // Sign Up Button
+          item {
+            Button(
+                onClick = {
+                  // Validate email, password, name, and surname
+                  emailErrorState.value =
+                      if (!isValidEmail(emailState.value)) "Please enter a valid email address"
+                      else null
+                  passwordErrorState.value =
+                      if (passwordState.value.isBlank()) "Password cannot be empty"
+                      else if (passwordState.value.length < MIN_PASSWORD_LENGTH)
+                          "Password must be at least $MIN_PASSWORD_LENGTH characters long"
+                      else null
+                  nameErrorState.value = if (name.isBlank()) "Name cannot be empty" else null
+                  surnameErrorState.value =
+                      if (surname.isBlank()) "Surname cannot be empty" else null
+
+                  // Proceed if no errors
+                  if (emailErrorState.value == null &&
+                      passwordErrorState.value == null &&
+                      nameErrorState.value == null &&
+                      surnameErrorState.value == null) {
+                    createUserWithEmailAndPassword(
+                        emailState.value,
+                        passwordState.value,
+                        context,
+                        onSuccess = {
+                          selectedBitmap?.let { bitmap ->
+                            imageViewModel.uploadProfilePicture(
+                                FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                                bitmap,
+                                onSuccess = { url -> photo = url },
+                                onFailure = { error -> errorMessage = error.message })
+                          }
+                          val userProfile =
+                              User(
+                                  id = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                                  name = name,
+                                  surname = surname,
+                                  interests = interests,
+                                  activities = emptyList(),
+                                  photo = photo,
+                                  likedActivities = emptyList())
+                          profileViewModel.createUserProfile(
+                              userProfile = userProfile,
+                              onSuccess = {
+                                Log.d("SignUp", "Profile created successfully")
+                                profileViewModel.fetchUserData(userProfile.id)
+                                navigationActions.navigateTo(Screen.OVERVIEW)
+                              },
+                              onError = { error -> errorMessage = error.message })
+                        })
                   }
+                },
+                modifier = Modifier.fillMaxWidth().testTag("SignUpButton"),
+            ) {
+              Text("Sign Up")
             }
-            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
+
+          // Already Have an Account Button
           item {
-            // If user already has an account, navigate to the sign in screen
             TextButton(
                 onClick = { navigationActions.navigateTo(Screen.AUTH) },
-                modifier =
-                    Modifier.width(BUTTON_WIDTH.dp)
-                        .height(BUTTON_HEIGHT_SM.dp)
-                        .testTag("GoToSignInButton")) {
-                  Text("Already an account?", fontSize = SUBTITLE_FONTSIZE.sp)
+                modifier = Modifier.testTag("GoToSignInButton")) {
+                  Text("Already an account? Sign-in")
                 }
           }
         }
-      })
+  }
 }
 
 fun createUserWithEmailAndPassword(
