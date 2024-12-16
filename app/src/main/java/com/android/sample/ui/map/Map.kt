@@ -334,7 +334,7 @@ fun DisplayActivity(activity: Activity) {
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth().testTag("activityPrice")) {
           Text(
-              text = "Price: ${activity.price}€",
+              text = "Price: ${activity.price} CHF",
               style = MaterialTheme.typography.bodyMedium,
               modifier = Modifier.testTag("priceText"))
           Text(
