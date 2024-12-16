@@ -13,7 +13,8 @@ import java.time.LocalTime
 fun MyTimePicker(
     onTimeSelected: (Timestamp) -> Unit,
     isOpen: Boolean,
-    onCloseRequest: (MaterialDialogState) -> Unit
+    onCloseRequest: (MaterialDialogState) -> Unit,
+    isAmPm: Boolean = true
 ) {
   MaterialDialog(
       onCloseRequest = onCloseRequest,
@@ -25,10 +26,13 @@ fun MyTimePicker(
         timepicker(
             initialTime = LocalTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES),
             title = "Pick a time",
-        ) {
-          onTimeSelected(
-              Timestamp(
-                  LocalDate.now().atTime(it).atZone(java.time.ZoneId.systemDefault()).toInstant()))
-        }
+            is24HourClock = !isAmPm) {
+              onTimeSelected(
+                  Timestamp(
+                      LocalDate.now()
+                          .atTime(it)
+                          .atZone(java.time.ZoneId.systemDefault())
+                          .toInstant()))
+            }
       }
 }

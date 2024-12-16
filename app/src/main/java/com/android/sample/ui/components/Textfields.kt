@@ -195,3 +195,38 @@ fun TextFieldWithErrorState(
     }
   }
 }
+
+@Composable
+fun TextFieldWithIcon(
+    value: String,
+    modifier: Modifier,
+    label: @Composable () -> Unit,
+    icon: @Composable () -> Unit,
+    testTag: String,
+) {
+  Card(
+      modifier = Modifier.fillMaxWidth().testTag("TextFieldWithIconCard"),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+          OutlinedTextField(
+              readOnly = true,
+              leadingIcon = icon,
+              value = value,
+              onValueChange = {},
+              colors =
+                  TextFieldDefaults.colors(
+                      focusedContainerColor = Color.Transparent,
+                      unfocusedContainerColor = Color.Transparent,
+                      focusedIndicatorColor = Color.Transparent,
+                      unfocusedIndicatorColor = Color.Transparent,
+                      errorIndicatorColor = Color.Transparent,
+                      errorContainerColor = Color.Transparent),
+              label = label,
+              modifier = modifier.testTag(testTag),
+              shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
+              singleLine = true)
+        }
+      }
+}

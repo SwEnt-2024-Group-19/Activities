@@ -40,6 +40,8 @@ object C {
 
     const val BUTTON_HEIGHT_MD = 50
 
+    const val ATTENDANT_PREVIEW_HEIGHT = 85
+
     const val AUTH_BUTTON_HEIGHT = 60
 
     const val LARGE_BUTTON_HEIGHT = 50
@@ -72,7 +74,7 @@ object C {
     const val BLACK_COLOR = 0xFF000000
     const val PURPLE_COLOR = 0xFF6200EE
     const val DARK_GRAY = 0xFF212121
-
+    const val PRIMARY = 0x005697
     const val SUCCESS_COLOR = 0xFF048531
 
     const val IMAGE_SIZE = 100
