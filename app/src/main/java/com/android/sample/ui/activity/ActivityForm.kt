@@ -157,20 +157,7 @@ fun ActivityForm(
       },
       testTag = "inputDescriptionCreate",
       errorTestTag = "DescriptionErrorText")
-  TextButton(
-      onClick = onClickDate,
-      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
-  ) {
-    Icon(
-        Icons.Filled.CalendarMonth,
-        contentDescription = "select date",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
-    if (dateIsSet)
-        Text(
-            "Selected date: ${dueDate.toDate().toString().take(11)}," +
-                "${dueDate.toDate().year + 1900}  (click to change)")
-    else Text("Select Date for the activity")
-  }
+
   if (dateIsOpen) {
     MyDatePicker(
         onCloseRequest = onCloseDate,
@@ -190,36 +177,6 @@ fun ActivityForm(
         isOpen = durationIsOpen,
         onCloseRequest = onCloseDuration,
         isAmPm = false)
-  }
-  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-  TextButton(
-      onClick = onClickStartingTime,
-      modifier =
-          Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputStartTimeCreate"),
-  ) {
-    Icon(
-        Icons.Filled.AccessTime,
-        contentDescription = "select start time",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconStartTimeCreate"))
-    if (startTimeIsSet) Text("Start time: $startTime (click to change)")
-    else Text("Select start time")
-  }
-
-  Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-  TextButton(
-      onClick = onClickDurationTime,
-      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),
-  ) {
-    Icon(
-        Icons.Filled.HourglassTop,
-        contentDescription = "select duration",
-        modifier =
-            Modifier.padding(end = STANDARD_PADDING.dp)
-                .align(Alignment.CenterVertically)
-                .testTag("iconEndTimeCreate"))
-    if (durationIsSet) Text("Duration Time: $duration (click to change)")
-    else Text("Select Duration")
   }
 
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -372,6 +329,49 @@ fun ActivityForm(
         onDismiss = onDismissUserDialog,
         onAddUser = onAddUser,
     )
+  }
+  TextButton(
+      onClick = onClickDate,
+      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
+  ) {
+    Icon(
+        Icons.Filled.CalendarMonth,
+        contentDescription = "select date",
+        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+    if (dateIsSet)
+        Text(
+            "Selected date: ${dueDate.toDate().toString().take(11)}," +
+                "${dueDate.toDate().year + 1900}  (click to change)")
+    else Text("Select Date for the activity")
+  }
+  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+  TextButton(
+      onClick = onClickStartingTime,
+      modifier =
+          Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputStartTimeCreate"),
+  ) {
+    Icon(
+        Icons.Filled.AccessTime,
+        contentDescription = "select start time",
+        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconStartTimeCreate"))
+    if (startTimeIsSet) Text("Start time: $startTime (click to change)")
+    else Text("Select start time")
+  }
+
+  Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+  TextButton(
+      onClick = onClickDurationTime,
+      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),
+  ) {
+    Icon(
+        Icons.Filled.HourglassTop,
+        contentDescription = "select duration",
+        modifier =
+            Modifier.padding(end = STANDARD_PADDING.dp)
+                .align(Alignment.CenterVertically)
+                .testTag("iconEndTimeCreate"))
+    if (durationIsSet) Text("Duration Time: $duration (click to change)")
+    else Text("Select Duration")
   }
 }
 
