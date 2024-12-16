@@ -7,6 +7,7 @@ import android.util.Patterns
 import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,10 +22,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,14 +43,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.MIN_PASSWORD_LENGTH
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
@@ -143,7 +152,8 @@ fun SignUpScreen(
         })
   } else {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = MEDIUM_PADDING.dp),
+        modifier =
+            Modifier.fillMaxSize().padding(horizontal = MEDIUM_PADDING.dp).testTag("SignUpColumn"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
 
@@ -277,10 +287,16 @@ fun SignUpScreen(
                         })
                   }
                 },
-                modifier = Modifier.fillMaxWidth().testTag("SignUpButton"),
-            ) {
-              Text("Sign Up")
-            }
+                modifier =
+                    Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignUpButton"),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                border = BorderStroke(BORDER_STROKE_SM.dp, Color.Transparent),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White)) {
+                  Text("SIGN UP", fontSize = SUBTITLE_FONTSIZE.sp)
+                }
           }
 
           // Already Have an Account Button
