@@ -46,11 +46,13 @@ import coil.compose.AsyncImage
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
+import com.android.sample.model.profile.categoryOf
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -63,10 +65,13 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -148,7 +153,11 @@ fun MapScreen(
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
-                cameraPositionState = cameraPositionState) {
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(
+                    mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
+                        context,
+                        R.raw.map_style))) {
                   (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
                       .activities
                       .filter {
@@ -189,6 +198,7 @@ fun MapScreen(
                                             item.location!!.latitude, item.location!!.longitude)),
                             title = item.title,
                             snippet = item.description,
+                            icon = MapMarkerUtils.getCachedMarkerIcon(context, item.category),
                             onClick = {
                               selectedActivity = item
                               selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }
