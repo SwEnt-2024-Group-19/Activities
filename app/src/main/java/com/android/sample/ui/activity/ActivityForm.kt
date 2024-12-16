@@ -134,8 +134,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { title ->
         when {
-          title.isEmpty() -> "Title must not be empty"
-          title.length > maxTitleSize -> "Title is too long"
+          title.isEmpty() -> R.string.title_empty.toString()
+          title.length > maxTitleSize -> R.string.title_too_long.toString()
           else -> null
         }
       },
@@ -150,8 +150,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { description ->
         when {
-          description.isEmpty() -> "Description must not be empty"
-          description.length > maxDescriptionSize -> "Description is too long"
+          description.isEmpty() -> R.string.description_empty.toString()
+          description.length > maxDescriptionSize -> R.string.description_too_long.toString()
           else -> null
         }
       },
@@ -188,8 +188,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { price ->
         when {
-          price.isEmpty() -> "Price must not be empty"
-          price.toIntOrNull() == null -> "Price must be a number"
+          price.isEmpty() -> R.string.price_empty.toString()
+          price.toIntOrNull() == null -> R.string.price_nan.toString()
           else -> null
         }
       },
@@ -203,8 +203,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { placesMax ->
         when {
-          placesMax.isEmpty() -> "Places must not be empty"
-          placesMax.toIntOrNull() == null -> "Places must be a number"
+          placesMax.isEmpty() -> R.string.places_empty.toString()
+          placesMax.toIntOrNull() == null -> R.string.places_nan.toString()
           else -> null
         }
       },
@@ -219,7 +219,7 @@ fun ActivityForm(
         modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
         validation = { locationQuery ->
           when {
-            locationQuery.isEmpty() -> "Location must not be empty"
+            locationQuery.isEmpty() -> R.string.location_empty.toString()
             else -> null
           }
         },
