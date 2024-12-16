@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.android.sample.R
@@ -55,7 +56,7 @@ import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
-import com.android.sample.ui.components.NoInternetScreen
+import com.android.sample.ui.components.LoadingScreen
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -143,7 +144,7 @@ fun MapScreen(
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
-          NoInternetScreen()
+          LoadingScreen(message = stringResource(R.string.no_internet_connection))
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(

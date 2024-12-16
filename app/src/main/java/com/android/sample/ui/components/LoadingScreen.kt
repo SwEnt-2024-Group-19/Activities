@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,7 +24,7 @@ import com.android.sample.resources.C.Tag.SPINNING_DURATION
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
 @Composable
-fun NoInternetScreen() {
+fun LoadingScreen(message: String = "") {
   Box(
       modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
       contentAlignment = Alignment.Center) {
@@ -64,7 +63,7 @@ fun NoInternetScreen() {
                   modifier = Modifier.size((2 * IMAGE_SIZE).dp).graphicsLayer(rotationZ = rotation))
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               Text(
-                  text = stringResource(R.string.no_internet_connection),
+                  text = message,
                   style =
                       TextStyle(
                           fontSize = TITLE_FONTSIZE.sp,

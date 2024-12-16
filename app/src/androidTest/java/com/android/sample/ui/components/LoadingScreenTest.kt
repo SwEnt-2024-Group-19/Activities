@@ -6,13 +6,13 @@ import androidx.compose.ui.test.onNodeWithText
 import org.junit.Rule
 import org.junit.Test
 
-class NoInternetScreenTest {
+class LoadingScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun NoInternetScreen_displaysCorrectTexts() {
-    composeTestRule.setContent { NoInternetScreen() }
+  fun loadingScreen_displaysCorrectText() {
+    composeTestRule.setContent { LoadingScreen("No internet connection") }
 
     // Directly use the hardcoded expected string for the assertion
     composeTestRule.onNodeWithText("No internet connection").assertIsDisplayed()

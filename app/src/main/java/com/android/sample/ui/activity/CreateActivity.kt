@@ -69,7 +69,7 @@ import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
-import com.android.sample.ui.components.NoInternetScreen
+import com.android.sample.ui.components.LoadingScreen
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -152,7 +152,7 @@ fun CreateActivityScreen(
       },
       content = { paddingValues ->
         if (!networkManager.isNetworkAvailable()) {
-          NoInternetScreen()
+          LoadingScreen(stringResource(id = R.string.no_internet_connection))
         } else {
           if (isCamOpen) {
             CameraScreen(

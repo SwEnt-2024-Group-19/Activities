@@ -35,7 +35,6 @@ import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
 import com.android.sample.ui.activity.EditActivityScreen
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
-import com.android.sample.ui.authentication.ChooseAccountScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
 import com.android.sample.ui.listActivities.LikedActivitiesScreen
@@ -46,7 +45,6 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.android.sample.ui.profile.EditProfileScreen
 import com.android.sample.ui.profile.ParticipantProfileScreen
-import com.android.sample.ui.profile.ProfileCreationScreen
 import com.android.sample.ui.profile.ProfileScreen
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -76,7 +74,7 @@ class MainActivity : ComponentActivity() {
     if (currentUser != null && currentUser.isAnonymous) {
       auth.signOut()
     }
-    val startDestination = if (auth.currentUser != null) Route.CHOOSE_ACCOUNT else Route.AUTH
+    val startDestination = if (auth.currentUser != null) Route.OVERVIEW else Route.AUTH
     // log current user
     Log.d("MainActivity", "Current user: ${auth.currentUser?.uid}")
 
@@ -131,15 +129,13 @@ fun NavGraph(
 ) {
 
   NavHost(navController = navController, startDestination = startDestination) {
-    composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
-      composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
-      composable(Screen.CREATE_PROFILE) {
-        ProfileCreationScreen(profileViewModel, navigationActions, imageViewModel)
+      composable(Screen.SIGN_UP) {
+        SignUpScreen(navigationActions, profileViewModel, imageViewModel)
       }
     }
 
