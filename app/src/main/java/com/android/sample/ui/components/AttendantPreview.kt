@@ -1,14 +1,13 @@
 package com.android.sample.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.User
@@ -27,7 +25,6 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.ProfileImage
-import com.android.sample.ui.camera.randomDefaultProfileImage
 
 @Composable
 fun AttendantPreview(
@@ -44,10 +41,10 @@ fun AttendantPreview(
               .border(LINE_STROKE.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
               .testTag("attendeeRow${index}")) {
         if (user.id == "") {
-          Image(
-              painter = painterResource(randomDefaultProfileImage()),
+          Icon(
+              Icons.Default.Person,
               contentDescription = "Person",
-              modifier = Modifier.padding(end = MEDIUM_PADDING.dp).size(SMALL_IMAGE_SIZE.dp))
+              modifier = Modifier.align(Alignment.CenterVertically))
         } else {
           ProfileImage(
               userId = user.id,

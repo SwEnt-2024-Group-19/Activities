@@ -40,6 +40,8 @@ object C {
 
     const val BUTTON_HEIGHT_MD = 50
 
+    const val ATTENDANT_PREVIEW_HEIGHT = 85
+
     const val AUTH_BUTTON_HEIGHT = 60
 
     const val LARGE_BUTTON_HEIGHT = 50
