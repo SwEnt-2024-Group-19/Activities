@@ -30,6 +30,13 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 
+
+/**
+ * Composable function to display the dialog to add a user.
+ *
+ * @param onDismiss The callback to dismiss the dialog.
+ * @param onAddUser The callback to add the user.
+ */
 @Composable
 fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
   Dialog(
