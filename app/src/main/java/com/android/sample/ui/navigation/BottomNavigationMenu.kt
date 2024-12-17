@@ -19,6 +19,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
+import com.android.sample.resources.C.BOTTOM_ICON_OFFSET
+import com.android.sample.resources.C.BOTTOM_ICON_SCALE
+import com.android.sample.resources.C.BOTTOM_ICON_SELECTOR_HEIGHT
+import com.android.sample.resources.C.BOTTOM_ICON_SELECTOR_WIDTH
+import com.android.sample.resources.C.BOTTOM_NAVIGATION_MENU_HEIGHT
+import com.android.sample.resources.C.NON_SELECTED_TAB_SIZE
+import com.android.sample.resources.C.SELECTED_TAB_SIZE
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
+import com.android.sample.resources.C.Tag.MAIN_COLOR_LIGHT
 
 @Composable
 fun BottomNavigationMenu(
@@ -27,14 +37,17 @@ fun BottomNavigationMenu(
     selectedItem: String
 ) {
   BottomNavigation(
-      modifier = Modifier.fillMaxWidth().height(60.dp).testTag("bottomNavigationMenu"),
-      backgroundColor = Color(0xfff1fdfd)) {
+      modifier =
+          Modifier.fillMaxWidth()
+              .height(BOTTOM_NAVIGATION_MENU_HEIGHT.dp)
+              .testTag("bottomNavigationMenu"),
+      backgroundColor = Color(MAIN_BACKGROUND)) {
         tabList.forEachIndexed { index, tab ->
           val isSelected = tab.route == selectedItem
 
           // Animate scale and offset when selected
-          val scale by animateFloatAsState(if (isSelected) 0.9f else 1f)
-          val offsetY by animateFloatAsState(if (isSelected) -5f else 0f)
+          val scale by animateFloatAsState(if (isSelected) BOTTOM_ICON_SCALE else 1f)
+          val offsetY by animateFloatAsState(if (isSelected) -BOTTOM_ICON_OFFSET else 0f)
 
           BottomNavigationItem(
               icon = {
@@ -55,7 +68,7 @@ fun BottomNavigationMenu(
               selected = isSelected,
               onClick = { onTabSelect(tab) },
               alwaysShowLabel = false,
-              selectedContentColor = Color(0xFF5CE1E6),
+              selectedContentColor = Color(MAIN_COLOR_LIGHT),
               unselectedContentColor = Color.Gray)
         }
       }
@@ -63,7 +76,7 @@ fun BottomNavigationMenu(
 
 @Composable
 fun MiddleButton(isSelected: Boolean) {
-  val middleButtonSize = if (isSelected) 50.dp else 40.dp
+  val middleButtonSize = if (isSelected) SELECTED_TAB_SIZE.dp else NON_SELECTED_TAB_SIZE.dp
   Image(
       painter = painterResource(id = R.drawable.aptivity_logo),
       contentDescription = null,
@@ -71,10 +84,10 @@ fun MiddleButton(isSelected: Boolean) {
   if (isSelected) {
     Box(
         modifier =
-            Modifier.height(5.dp)
-                .width(30.dp)
+            Modifier.height(BOTTOM_ICON_SELECTOR_HEIGHT.dp)
+                .width(BOTTOM_ICON_SELECTOR_WIDTH.dp)
                 .clip(RoundedCornerShape(90))
-                .background(Color(0xFF00499E)))
+                .background(Color(MAIN_COLOR_DARK)))
   }
 }
 
@@ -83,15 +96,15 @@ fun RegularButton(tab: TopLevelDestination, isSelected: Boolean) {
   Icon(
       imageVector = if (isSelected) tab.iconFilled else tab.iconOutlined,
       contentDescription = null,
-      tint = if (isSelected) Color(0xFF00499E) else Color.Gray)
+      tint = if (isSelected) Color(MAIN_COLOR_DARK) else Color.Gray)
   if (isSelected) {
     Spacer(modifier = Modifier.height(4.dp))
     Box(
         modifier =
-            Modifier.height(5.dp)
-                .width(30.dp)
+            Modifier.height(BOTTOM_ICON_SELECTOR_HEIGHT.dp)
+                .width(BOTTOM_ICON_SELECTOR_WIDTH.dp)
                 .clip(RoundedCornerShape(90))
-                .background(Color(0xFF00499E)))
+                .background(Color(MAIN_COLOR_DARK)))
   }
 }
 
