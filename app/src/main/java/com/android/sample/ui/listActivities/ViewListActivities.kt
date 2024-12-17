@@ -426,7 +426,7 @@ fun ActivityCard(
                         imageVector =
                             if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color.Black else Color.Gray,
+                        tint = if (isLiked) Color(PRIMARY_COLOR) else Color.Gray,
                     )
                   }
                 }
