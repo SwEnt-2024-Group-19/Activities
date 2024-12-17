@@ -74,7 +74,7 @@ class ImageRepositoryFirestoreTest {
   }
 
   @Test
-  fun deleteExistingImages_handlesSuccess() {
+  fun deleteExistingImagesThenUploadNewImages_handlesSuccess() {
     val mockListResult: ListResult = mock()
     val activityId = "activityId"
     val bitmaps = listOf(mock(Bitmap::class.java), mock(Bitmap::class.java))
