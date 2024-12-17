@@ -134,8 +134,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { title ->
         when {
-          title.isEmpty() -> R.string.title_empty.toString()
-          title.length > maxTitleSize -> R.string.title_too_long.toString()
+          title.isEmpty() -> context.getString(R.string.title_empty)
+          title.length > maxTitleSize -> context.getString(R.string.title_too_long)
           else -> null
         }
       },
@@ -150,8 +150,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { description ->
         when {
-          description.isEmpty() -> R.string.description_empty.toString()
-          description.length > maxDescriptionSize -> R.string.description_too_long.toString()
+          description.isEmpty() -> context.getString(R.string.description_empty)
+          description.length > maxDescriptionSize -> context.getString(R.string.description_too_long)
           else -> null
         }
       },
@@ -188,8 +188,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { price ->
         when {
-          price.isEmpty() -> R.string.price_empty.toString()
-          price.toIntOrNull() == null -> R.string.price_nan.toString()
+          price.isEmpty() -> context.getString(R.string.price_empty)
+          price.toIntOrNull() == null -> context.getString(R.string.price_nan)
           else -> null
         }
       },
@@ -203,8 +203,8 @@ fun ActivityForm(
       modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
       validation = { placesMax ->
         when {
-          placesMax.isEmpty() -> R.string.places_empty.toString()
-          placesMax.toIntOrNull() == null -> R.string.places_nan.toString()
+          placesMax.isEmpty() -> context.getString(R.string.places_empty)
+          placesMax.toIntOrNull() == null -> context.getString(R.string.places_nan)
           else -> null
         }
       },
@@ -219,7 +219,7 @@ fun ActivityForm(
         modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
         validation = { locationQuery ->
           when {
-            locationQuery.isEmpty() -> R.string.location_empty.toString()
+            locationQuery.isEmpty() -> context.getString(R.string.location_empty)
             else -> null
           }
         },
