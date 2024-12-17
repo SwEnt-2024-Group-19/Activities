@@ -332,14 +332,18 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (price.isNotBlank()  || price.toDoubleOrNull() == null || price.toDouble() < 0) {
+                    } else if (price.isNotBlank() ||
+                        price.toDoubleOrNull() == null ||
+                        price.toDouble() < 0) {
                       Toast.makeText(
                               context,
                               context.getString(R.string.invalid_price_format),
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if ( placesMax.isNotBlank() || placesMax.toLongOrNull() == null ||  placesMax.toLong() <= 0) {
+                    } else if (placesMax.isNotBlank() ||
+                        placesMax.toLongOrNull() == null ||
+                        placesMax.toLong() <= 0) {
                       Toast.makeText(
                               context,
                               context.getString(R.string.invalid_places_format),
@@ -347,12 +351,12 @@ fun CreateActivityScreen(
                           .show()
                       return@Button
                     } else if (attendees.size >= placesMax.toLong()) {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.max_places_exceed),
-                            Toast.LENGTH_SHORT)
-                            .show()
-                        return@Button
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.max_places_exceed),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
                     } else if (selectedLocation == null) {
                       Toast.makeText(
                               context,
