@@ -45,6 +45,7 @@ import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.android.sample.ui.profile.EditProfileScreen
 import com.android.sample.ui.profile.ParticipantProfileScreen
+import com.android.sample.ui.profile.ProfileCreationScreen
 import com.android.sample.ui.profile.ProfileScreen
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -137,6 +138,8 @@ fun NavGraph(
       composable(Screen.SIGN_UP) {
         SignUpScreen(navigationActions, profileViewModel, imageViewModel)
       }
+        composable(Screen.CREATE_PROFILE) {
+            ProfileCreationScreen(profileViewModel, navigationActions, imageViewModel)}
     }
 
     navigation(
