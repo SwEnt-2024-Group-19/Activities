@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -301,6 +302,19 @@ fun ActivityCard(
                 contentDescription = activity.title,
                 modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
+              // Apply a dark gradient overlay at the bottom to improve contrast
+              Box(
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .height(LARGE_IMAGE_SIZE.dp)
+                      .background(
+                          Brush.verticalGradient(
+                              colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
+                              startY = 0f,
+                              endY = 500f
+                          )
+                      )
+              )
 
             // Display the activity name on top of the image
             Text(
