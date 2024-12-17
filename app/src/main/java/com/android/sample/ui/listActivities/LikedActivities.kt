@@ -52,6 +52,7 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.PRIMARY_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
@@ -245,7 +246,7 @@ fun ActivityCard2(
                         imageVector =
                             if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color.Black else Color.Gray)
+                        tint = if (isLiked) Color(PRIMARY_COLOR) else Color.Gray)
                   }
                 }
               }
