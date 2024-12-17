@@ -64,7 +64,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
   val emailErrorState = remember { mutableStateOf<String?>(null) }
   val onProfileExists = { navigationActions.navigateTo(Screen.OVERVIEW) }
 
-  val onProfileMissing = { navigationActions.navigateTo(Screen.SIGN_UP) }
+  val onProfileMissing = { navigationActions.navigateTo(Screen.CREATE_PROFILE) }
 
   val onSignInFailure = { errorMessage: String ->
     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
