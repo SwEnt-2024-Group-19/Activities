@@ -93,6 +93,7 @@ object C {
     const val TOP_TITLE_SIZE = 30
 
     const val TEXT_FONTSIZE = 12
+    const val SMALL_TEXT_FONTSIZE = 9
 
     const val WIDTH_FRACTION_MD = 0.8f
 

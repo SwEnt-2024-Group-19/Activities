@@ -66,6 +66,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PRIMARY_COLOR
 import com.android.sample.resources.C.Tag.PURPLE_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.SMALL_TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.camera.getImageResourceIdForCategory
@@ -158,7 +159,7 @@ fun ListActivitiesScreen(
                           }
                         },
                         checked = index in checkedList) {
-                          Text(label)
+                          Text(label, fontSize = SMALL_TEXT_FONTSIZE.sp)
                         }
                   }
                 }
