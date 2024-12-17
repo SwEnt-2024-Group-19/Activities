@@ -19,6 +19,13 @@ import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.TopLevelDestinations
 
+
+/**
+ * Composable function to display the plus button to create a new activity or to overview.
+ *
+ * @param navigationActions The NavigationActions to handle the navigation.
+ * @param activityType The type of activity to be created.
+ */
 @Composable
 fun PlusButtonToCreate(navigationActions: NavigationActions, activityType: Int) {
   Row(
