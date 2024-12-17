@@ -330,6 +330,20 @@ fun EditActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
+                    } else if (price.toDoubleOrNull() == null) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.invalid_price_format),
+                            Toast.LENGTH_SHORT)
+                            .show()
+                        return@Button
+                    } else if (maxPlaces.toLongOrNull() == null) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.invalid_places_format),
+                            Toast.LENGTH_SHORT)
+                            .show()
+                        return@Button
                     } else if (selectedOptionCategory != null &&
                         selectedOptionCategory != categoryOf[selectedOptionInterest]) {
                       Toast.makeText(
