@@ -330,14 +330,6 @@ fun EditActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (!hourDateViewModel.isBeginGreaterThanEnd(
-                        startTime ?: "00:00", duration ?: "00:01")) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.startTime_before_endTime),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
                     } else if (selectedOptionCategory != null &&
                         selectedOptionCategory != categoryOf[selectedOptionInterest]) {
                       Toast.makeText(
