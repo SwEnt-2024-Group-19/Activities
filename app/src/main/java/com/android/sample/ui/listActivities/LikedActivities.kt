@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -221,6 +225,10 @@ fun ActivityCard2(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
+              Icon(
+                  imageVector = Icons.Filled.CalendarMonth,
+                  contentDescription = "Calendar",
+                  tint = Color(PRIMARY_COLOR))
                 Text(
                     text = formattedDate,
                     style =
@@ -256,6 +264,10 @@ fun ActivityCard2(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
+              Icon(
+                  imageVector = Icons.Filled.LocationOn,
+                  contentDescription = "location",
+                  tint = Color(PRIMARY_COLOR))
                 Text(
                     text = activity.location?.shortName ?: "No location",
                     style =
@@ -263,6 +275,11 @@ fun ActivityCard2(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
                     modifier = Modifier.weight(1f) // Takes up remaining space
                     )
+              Icon(
+                  imageVector = Icons.Filled.Groups,
+                  contentDescription = "Participants",
+                  tint = Color(PRIMARY_COLOR))
+              Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
 
                 Text(
                     text = "${activity.placesLeft}/${activity.maxPlaces}",
