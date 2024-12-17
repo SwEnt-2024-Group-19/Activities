@@ -110,7 +110,7 @@ class ImageRepositoryFirestoreTest {
     `when`(mockListResult.items).thenReturn(listOf(mockStorageRef, mockStorageRef))
 
     // Execute the method under test
-    imageRepository.deleteExistingImages(mockStorageRef, bitmaps, {}, {}, "")
+    imageRepository.deleteExistingImagesThenUploadNewImages(mockStorageRef, bitmaps, {}, {}, "")
 
     // Verify that listAll was called
     verify(mockStorageRef).listAll()
