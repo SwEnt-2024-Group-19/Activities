@@ -70,6 +70,7 @@ import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
@@ -168,6 +169,7 @@ fun ActivityDetailsScreen(
   val uiState by listActivityViewModel.uiState.collectAsState()
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
+    val hourDateViewModel = HourDateViewModel()
 
   Scaffold(
       topBar = {
@@ -397,7 +399,13 @@ fun ActivityDetailsScreen(
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
 
-                if (activity.creator != profile.id) {
+                if (hourDateViewModel.combineDateAndTime(activity.date, activity.startTime) <= Timestamp.now()) {
+                  Text(
+                      text = stringResource(R.string.activity_past),
+                      modifier = Modifier.testTag("archivedActivity"))
+
+                }
+                  else if (activity.creator != profile.id) {
                   Button(
                       onClick = {
                         performOfflineAwareAction(
