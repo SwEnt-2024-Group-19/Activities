@@ -190,8 +190,10 @@ fun ActivityForm(
     onProfileClick: (User) -> Unit,
     imageViewModel: ImageViewModel,
 ) {
+    //Used for displaying images in a carousel
   Carousel(openDialog = onOpenDialogImage, itemsList = selectedImages, deleteImage = onDeleteImage)
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+    //Title section with the remaining characters
   RemainingPlace(title, maxTitleSize)
   TextFieldWithErrorState(
       value = title,
@@ -208,6 +210,7 @@ fun ActivityForm(
       testTag = "inputTitleCreate",
       errorTestTag = "TitleErrorText")
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+    //Description section with the remaining characters
   RemainingPlace(description, maxDescriptionSize)
   TextFieldWithErrorState(
       value = description,
@@ -225,6 +228,7 @@ fun ActivityForm(
       errorTestTag = "DescriptionErrorText")
 
   if (dateIsOpen) {
+      //Date picker displayed iff clicked on the button
     MyDatePicker(
         onCloseRequest = onCloseDate,
         onDateSelected = onSelectDate,
@@ -232,12 +236,14 @@ fun ActivityForm(
         initialDate = null)
   }
   if (startTimeIsOpen) {
+      //Start time picker displayed iff clicked on the button
     MyTimePicker(
         onTimeSelected = onStartTimeSelected,
         isOpen = startTimeIsOpen,
         onCloseRequest = onCloseStartTime)
   }
   if (durationIsOpen) {
+        //Duration time picker displayed iff clicked on the button
     MyTimePicker(
         onTimeSelected = onSelectDuration,
         isOpen = durationIsOpen,
@@ -247,6 +253,7 @@ fun ActivityForm(
 
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
+    //Price, places, location, type, category, interest, and attendees section
   TextFieldWithErrorState(
       value = price,
       onValueChange = onPriceChange,
@@ -391,11 +398,13 @@ fun ActivityForm(
     }
   }
   if (showDialogUser) {
+      //Dialog to add a new user
     AddUserDialog(
         onDismiss = onDismissUserDialog,
         onAddUser = onAddUser,
     )
   }
+    //Button to display the date picker
   TextButton(
       onClick = onClickDate,
       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
@@ -411,6 +420,7 @@ fun ActivityForm(
     else Text("Select Date for the activity")
   }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+    //Button to display the start time picker
   TextButton(
       onClick = onClickStartingTime,
       modifier =
@@ -425,6 +435,7 @@ fun ActivityForm(
   }
 
   Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+    //Button to display the duration time picker
   TextButton(
       onClick = onClickDurationTime,
       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),
@@ -466,6 +477,7 @@ fun MyDropDownMenu(
     listItems: List<Any> = listOf(Any())
 ) {
   ExposedDropdownMenuBox(
+      // Set the test tag based on the mode
       modifier =
           Modifier.testTag(
                   when (mode) {
