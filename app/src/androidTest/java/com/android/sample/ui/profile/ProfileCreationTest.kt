@@ -38,7 +38,6 @@ class ProfileCreationTest {
   private lateinit var mockImageRepository: ImageRepositoryFirestore
 
   // Mock or create a fake ProfilesRepository
-  // private val mockProfilesRepository: ProfilesRepository = mock()
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
