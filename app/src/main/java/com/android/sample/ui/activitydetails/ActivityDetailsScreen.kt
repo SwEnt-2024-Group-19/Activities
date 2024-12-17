@@ -169,7 +169,7 @@ fun ActivityDetailsScreen(
   val uiState by listActivityViewModel.uiState.collectAsState()
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
-    val hourDateViewModel = HourDateViewModel()
+  val hourDateViewModel = HourDateViewModel()
 
   Scaffold(
       topBar = {
@@ -399,13 +399,12 @@ fun ActivityDetailsScreen(
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
 
-                if (hourDateViewModel.combineDateAndTime(activity.date, activity.startTime) <= Timestamp.now()) {
+                if (hourDateViewModel.combineDateAndTime(activity.date, activity.startTime) <=
+                    Timestamp.now()) {
                   Text(
                       text = stringResource(R.string.activity_past),
                       modifier = Modifier.testTag("archivedActivity"))
-
-                }
-                  else if (activity.creator != profile.id) {
+                } else if (activity.creator != profile.id) {
                   Button(
                       onClick = {
                         performOfflineAwareAction(
