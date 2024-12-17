@@ -11,7 +11,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-
 /**
  * Composable function to display a date picker dialog.
  *

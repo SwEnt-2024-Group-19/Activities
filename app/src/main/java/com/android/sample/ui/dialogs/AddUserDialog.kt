@@ -30,7 +30,6 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 
-
 /**
  * Composable function to display the dialog to add a user.
  *

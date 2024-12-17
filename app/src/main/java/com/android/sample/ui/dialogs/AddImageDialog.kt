@@ -32,7 +32,6 @@ import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
-
 /**
  * Composable function to display the dialog to add an image, either from the gallery or the camera.
  *

@@ -51,7 +51,7 @@ fun AttendantPreview(
               .border(LINE_STROKE.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
               .testTag("attendeeRow${index}")) {
         if (user.id == "") {
-            //Guest users have no id
+          // Guest users have no id
           Icon(
               Icons.Default.Person,
               contentDescription = "Person",

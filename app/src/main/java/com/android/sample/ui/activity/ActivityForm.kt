@@ -60,8 +60,8 @@ import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialogState
 
 /**
- * Composable function to display the activity form. Modularized and used in the CreateActivity
- * and EditActivity screens.
+ * Composable function to display the activity form. Modularized and used in the CreateActivity and
+ * EditActivity screens.
  *
  * @param context The context in which the form is displayed.
  * @param selectedImages List of selected images to be displayed in the carousel.
@@ -102,7 +102,8 @@ import com.vanpra.composematerialdialogs.MaterialDialogState
  * @param onDismissLocation Callback to handle the dismissal of the location suggestions dropdown.
  * @param onLocationClick Callback to handle the selection of a location from the suggestions.
  * @param expandedType Boolean indicating if the activity type dropdown is expanded.
- * @param onExpandedTypeChange Callback to handle the expansion change of the activity type dropdown.
+ * @param onExpandedTypeChange Callback to handle the expansion change of the activity type
+ *   dropdown.
  * @param onSelectType Callback to handle the selection of an activity type.
  * @param onDismissType Callback to handle the dismissal of the activity type dropdown.
  * @param selectedOptionType The currently selected activity type.
@@ -190,10 +191,10 @@ fun ActivityForm(
     onProfileClick: (User) -> Unit,
     imageViewModel: ImageViewModel,
 ) {
-    //Used for displaying images in a carousel
+  // Used for displaying images in a carousel
   Carousel(openDialog = onOpenDialogImage, itemsList = selectedImages, deleteImage = onDeleteImage)
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-    //Title section with the remaining characters
+  // Title section with the remaining characters
   RemainingPlace(title, maxTitleSize)
   TextFieldWithErrorState(
       value = title,
@@ -210,7 +211,7 @@ fun ActivityForm(
       testTag = "inputTitleCreate",
       errorTestTag = "TitleErrorText")
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-    //Description section with the remaining characters
+  // Description section with the remaining characters
   RemainingPlace(description, maxDescriptionSize)
   TextFieldWithErrorState(
       value = description,
@@ -228,7 +229,7 @@ fun ActivityForm(
       errorTestTag = "DescriptionErrorText")
 
   if (dateIsOpen) {
-      //Date picker displayed iff clicked on the button
+    // Date picker displayed iff clicked on the button
     MyDatePicker(
         onCloseRequest = onCloseDate,
         onDateSelected = onSelectDate,
@@ -236,14 +237,14 @@ fun ActivityForm(
         initialDate = null)
   }
   if (startTimeIsOpen) {
-      //Start time picker displayed iff clicked on the button
+    // Start time picker displayed iff clicked on the button
     MyTimePicker(
         onTimeSelected = onStartTimeSelected,
         isOpen = startTimeIsOpen,
         onCloseRequest = onCloseStartTime)
   }
   if (durationIsOpen) {
-        //Duration time picker displayed iff clicked on the button
+    // Duration time picker displayed iff clicked on the button
     MyTimePicker(
         onTimeSelected = onSelectDuration,
         isOpen = durationIsOpen,
@@ -253,7 +254,7 @@ fun ActivityForm(
 
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-    //Price, places, location, type, category, interest, and attendees section
+  // Price, places, location, type, category, interest, and attendees section
   TextFieldWithErrorState(
       value = price,
       onValueChange = onPriceChange,
@@ -398,13 +399,13 @@ fun ActivityForm(
     }
   }
   if (showDialogUser) {
-      //Dialog to add a new user
+    // Dialog to add a new user
     AddUserDialog(
         onDismiss = onDismissUserDialog,
         onAddUser = onAddUser,
     )
   }
-    //Button to display the date picker
+  // Button to display the date picker
   TextButton(
       onClick = onClickDate,
       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
@@ -420,7 +421,7 @@ fun ActivityForm(
     else Text("Select Date for the activity")
   }
   Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-    //Button to display the start time picker
+  // Button to display the start time picker
   TextButton(
       onClick = onClickStartingTime,
       modifier =
@@ -435,7 +436,7 @@ fun ActivityForm(
   }
 
   Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-    //Button to display the duration time picker
+  // Button to display the duration time picker
   TextButton(
       onClick = onClickDurationTime,
       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),

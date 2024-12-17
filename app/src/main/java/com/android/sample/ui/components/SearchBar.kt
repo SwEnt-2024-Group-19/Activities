@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 
-
 /**
  * Composable function to display the search bar.
  *

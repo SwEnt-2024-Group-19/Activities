@@ -66,7 +66,6 @@ import com.google.firebase.Timestamp
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
-
 /**
  * Composable function to display the Edit Activity screen. This screen allows the user to edit an
  * existing activity.

@@ -83,7 +83,8 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Composable function to display the Create Activity screen. This screen allows users to create an
- * activity by filling out a form with details such as title, description, date, time, location, etc.
+ * activity by filling out a form with details such as title, description, date, time, location,
+ * etc.
  *
  * @param listActivityViewModel ViewModel for managing the list of activities.
  * @param navigationActions Navigation actions for navigating between screens.
