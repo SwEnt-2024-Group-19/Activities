@@ -3,6 +3,7 @@ package com.android.sample.ui.listActivities
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -152,7 +153,14 @@ fun ListActivitiesScreen(
                 MultiChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                   options.forEachIndexed { index, label ->
                     SegmentedButton(
-                        modifier = Modifier.testTag("segmentedButton$label").fillMaxWidth(),
+                        modifier =Modifier
+                            .testTag("segmentedButton$label")
+                            .fillMaxWidth()
+                            .border(
+                                width = 1.dp,
+                                color = Color(PRIMARY_COLOR),
+                                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size)
+                            ),
                         shape =
                             SegmentedButtonDefaults.itemShape(index = index, count = options.size),
                         onCheckedChange = {
@@ -163,7 +171,7 @@ fun ListActivitiesScreen(
                           }
                         },
                         checked = index in checkedList) {
-                          Text(label, fontSize = SMALL_TEXT_FONTSIZE.sp)
+                          Text(label, fontSize = SMALL_TEXT_FONTSIZE.sp, color = Color(PRIMARY_COLOR))
                         }
                   }
                 }
@@ -449,8 +457,20 @@ fun ActivityCard(
                   imageVector = Icons.Filled.LocationOn,
                   contentDescription = "location",
                   tint = Color(PRIMARY_COLOR))
+              if (distance != null) {
+                val distanceString =
+                          if (distance < 1) {
+                              "${round(distance * 1000).toInt()}m"
+                          } else {
+                              "${round(distance * 10) / 10}km"
+                          }}
                 Text(
-                    text = activity.location?.shortName ?: "No location",
+                    text = (activity.location?.shortName ?: "No location" ) + if (distance != null) {
+                                    if (distance < 1) {
+                                        " | ${round(distance * 1000).toInt()}m"
+                                    } else {
+                                        " | ${round(distance * 10) / 10}km"
+                                    }} else "",
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
@@ -473,23 +493,9 @@ fun ActivityCard(
                         Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
               }
 
-          Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
-          if (distance != null) {
-            val distanceString =
-                "Distance : " +
-                    if (distance < 1) {
-                      "${round(distance * 1000).toInt()}m"
-                    } else {
-                      "${round(distance * 10) / 10}km"
-                    }
-            Text(
-                text = distanceString,
-                modifier =
-                    Modifier.padding(horizontal = MEDIUM_PADDING.dp)
-                        .testTag("distanceText") // Takes up remaining space
-                )
-          }
+
+
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
