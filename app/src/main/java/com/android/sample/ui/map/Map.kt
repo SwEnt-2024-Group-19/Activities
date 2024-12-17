@@ -67,7 +67,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -149,7 +151,11 @@ fun MapScreen(
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
-                cameraPositionState = cameraPositionState) {
+                cameraPositionState = cameraPositionState,
+                properties =
+                    MapProperties(
+                        mapStyleOptions =
+                            MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))) {
                   (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
                       .activities
                       .filter {
@@ -190,6 +196,7 @@ fun MapScreen(
                                             item.location!!.latitude, item.location!!.longitude)),
                             title = item.title,
                             snippet = item.description,
+                            icon = MapMarkerUtils.getCachedMarkerIcon(context, item.category),
                             onClick = {
                               selectedActivity = item
                               selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }

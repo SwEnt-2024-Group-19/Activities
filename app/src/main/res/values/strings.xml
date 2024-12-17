@@ -56,5 +56,6 @@
     <string name="places_empty">Places must not be empty</string>
     <string name="places_nan">Places must be a number</string>
     <string name="location_empty">Location must not be empty</string>
+    <string name="activity_past">The activity is archived.</string>
 
 </resources>

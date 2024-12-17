@@ -66,6 +66,16 @@ import com.google.firebase.Timestamp
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
+/**
+ * Composable function to display the Edit Activity screen. This screen allows the user to edit an
+ * existing activity.
+ *
+ * @param listActivityViewModel ViewModel for managing the list of activities.
+ * @param navigationActions Navigation actions for navigating between screens.
+ * @param locationViewModel ViewModel for managing location data.
+ * @param imageViewModel ViewModel for managing images.
+ * @param profileViewModel ViewModel for managing user profiles.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivityScreen(

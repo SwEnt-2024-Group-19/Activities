@@ -32,6 +32,13 @@ import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
+/**
+ * Composable function to display the dialog to add an image, either from the gallery or the camera.
+ *
+ * @param onDismiss The callback to dismiss the dialog.
+ * @param onGalleryClick The callback to handle the click on the gallery button.
+ * @param onCameraClick The callback to handle the click on the camera button.
+ */
 @Composable
 fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraClick: () -> Unit) {
   Dialog(

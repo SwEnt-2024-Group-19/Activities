@@ -62,6 +62,7 @@ enum class Category {
 }
 
 val categories = Category.values().toList()
+
 val CategoryColorMap =
     mapOf(
         Category.SPORT to SPORT_COLOR,

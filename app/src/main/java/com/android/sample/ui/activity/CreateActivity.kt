@@ -81,6 +81,17 @@ import com.google.firebase.auth.FirebaseAuth
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
+/**
+ * Composable function to display the Create Activity screen. This screen allows users to create an
+ * activity by filling out a form with details such as title, description, date, time, location,
+ * etc.
+ *
+ * @param listActivityViewModel ViewModel for managing the list of activities.
+ * @param navigationActions Navigation actions for navigating between screens.
+ * @param profileViewModel ViewModel for managing user profiles.
+ * @param locationViewModel ViewModel for managing location data.
+ * @param imageViewModel ViewModel for managing images.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateActivityScreen(
@@ -435,6 +446,12 @@ fun CreateActivityScreen(
       })
 }
 
+/**
+ * Composable function to display the remaining character count and a progress indicator.
+ *
+ * @param field The current text input field whose length is being tracked.
+ * @param maxLength The maximum allowed length for the text input field.
+ */
 @Composable
 fun RemainingPlace(field: String, maxLength: Int) {
   Row(
