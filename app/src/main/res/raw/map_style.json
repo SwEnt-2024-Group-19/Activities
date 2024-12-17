@@ -1,0 +1,38 @@
+[
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "saturation": -30
+      },
+      {
+        "lightness": -20
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "saturation": -40
+      },
+      {
+        "lightness": -20
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "saturation": -35
+      },
+      {
+        "lightness": -20
+      }
+    ]
+  }
+]
