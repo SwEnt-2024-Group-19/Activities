@@ -138,8 +138,9 @@ fun NavGraph(
       composable(Screen.SIGN_UP) {
         SignUpScreen(navigationActions, profileViewModel, imageViewModel)
       }
-        composable(Screen.CREATE_PROFILE) {
-            ProfileCreationScreen(profileViewModel, navigationActions, imageViewModel)}
+      composable(Screen.CREATE_PROFILE) {
+        ProfileCreationScreen(profileViewModel, navigationActions, imageViewModel)
+      }
     }
 
     navigation(
