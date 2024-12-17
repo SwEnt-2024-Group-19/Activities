@@ -332,7 +332,7 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (price.isNotBlank() ||
+                    } else if (price.isBlank() ||
                         price.toDoubleOrNull() == null ||
                         price.toDouble() < 0) {
                       Toast.makeText(
@@ -341,7 +341,7 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (placesMax.isNotBlank() ||
+                    } else if (placesMax.isBlank() ||
                         placesMax.toLongOrNull() == null ||
                         placesMax.toLong() <= 0) {
                       Toast.makeText(
