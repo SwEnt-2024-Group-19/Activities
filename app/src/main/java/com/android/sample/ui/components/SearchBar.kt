@@ -16,6 +16,13 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 
+
+/**
+ * Composable function to display the search bar.
+ *
+ * @param onValueChange The callback to handle the value change in the search bar.
+ * @param value The value of the search bar.
+ */
 @Composable
 fun SearchBar(onValueChange: (String) -> Unit, value: String) {
   OutlinedTextField(
