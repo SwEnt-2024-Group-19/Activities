@@ -280,8 +280,8 @@ fun ActivityForm(
       validation = { placesMax ->
         when {
           placesMax.isEmpty() -> context.getString(R.string.places_empty)
-          placesMax.toLongOrNull() == null -> context.getString(R.string.places_nan)
-          price.toLong() <= 0 -> context.getString(R.string.places_neg)
+          placesMax.toIntOrNull() == null -> context.getString(R.string.places_nan)
+          placesMax.toInt() <= 0 -> context.getString(R.string.places_neg)
           else -> null
         }
       },
