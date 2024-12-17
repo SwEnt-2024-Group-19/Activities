@@ -322,25 +322,24 @@ fun EditActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                      // we force the start time to be before the end time
-                    } else if (attendees.size >= maxPlaces.toInt()) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.max_places_exceed),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (price.toDoubleOrNull() == null) {
+                    } else if ( price.isBlank() || price.toDoubleOrNull() == null || price.toDouble() < 0) {
                         Toast.makeText(
                             context,
                             context.getString(R.string.invalid_price_format),
                             Toast.LENGTH_SHORT)
                             .show()
                         return@Button
-                    } else if (maxPlaces.toLongOrNull() == null) {
+                    } else if ( maxPlaces.isBlank() || maxPlaces.toLongOrNull() == null ||  maxPlaces.toLong() <= 0) {
                         Toast.makeText(
                             context,
                             context.getString(R.string.invalid_places_format),
+                            Toast.LENGTH_SHORT)
+                            .show()
+                        return@Button
+                    } else if (attendees.size >= maxPlaces.toLong()) {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.max_places_exceed),
                             Toast.LENGTH_SHORT)
                             .show()
                         return@Button

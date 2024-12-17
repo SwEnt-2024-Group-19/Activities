@@ -264,7 +264,8 @@ fun ActivityForm(
       validation = { price ->
         when {
           price.isEmpty() -> context.getString(R.string.price_empty)
-          price.toIntOrNull() == null -> context.getString(R.string.price_nan)
+          price.toDoubleOrNull() == null -> context.getString(R.string.price_nan)
+            price.toDouble() < 0 -> context.getString(R.string.price_neg)
           else -> null
         }
       },
