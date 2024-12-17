@@ -63,6 +63,7 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.PRIMARY_COLOR
 import com.android.sample.resources.C.Tag.PURPLE_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -345,7 +346,7 @@ fun ActivityCard(
                                 Modifier.padding(SMALL_PADDING.dp)
                                     .testTag("activityStatusPresent")
                                     .background(
-                                        Color(PURPLE_COLOR),
+                                        Color(PRIMARY_COLOR),
                                         shape =
                                             RoundedCornerShape(
                                                 TEXT_FONTSIZE
@@ -370,7 +371,7 @@ fun ActivityCard(
                                 Modifier.padding(TEXT_FONTSIZE.dp)
                                     .testTag("activityStatusEnrolledBox")
                                     .background(
-                                        Color(PURPLE_COLOR),
+                                        Color(PRIMARY_COLOR),
                                         shape =
                                             RoundedCornerShape(
                                                 12.dp)) // Purple background with rounded corners
