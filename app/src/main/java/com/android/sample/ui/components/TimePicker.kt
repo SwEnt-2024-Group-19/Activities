@@ -9,6 +9,14 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
 
+/**
+ * Composable function to display a time picker dialog.
+ *
+ * @param onTimeSelected The callback to handle the selected time.
+ * @param isOpen The state of the dialog.
+ * @param onCloseRequest The callback to handle the dialog close request.
+ * @param isAmPm The flag to show the time picker in 12-hour format.
+ */
 @Composable
 fun MyTimePicker(
     onTimeSelected: (Timestamp) -> Unit,

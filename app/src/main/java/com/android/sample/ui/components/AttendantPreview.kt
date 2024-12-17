@@ -26,6 +26,16 @@ import com.android.sample.resources.C.Tag.SMALL_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.ProfileImage
 
+/**
+ * Composable function to display the preview of the attendant. Once clicked, it navigates to the
+ * profile of the user.
+ *
+ * @param user The user to be displayed.
+ * @param onProfileClick The callback to handle the click on the profile.
+ * @param imageViewModel The ImageViewModel to handle the image operations.
+ * @param deleteAttendant The callback to delete the attendant.
+ * @param index The index of the attendant.
+ */
 @Composable
 fun AttendantPreview(
     user: User,
@@ -41,6 +51,7 @@ fun AttendantPreview(
               .border(LINE_STROKE.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small)
               .testTag("attendeeRow${index}")) {
         if (user.id == "") {
+          // Guest users have no id
           Icon(
               Icons.Default.Person,
               contentDescription = "Person",
