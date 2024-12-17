@@ -265,7 +265,7 @@ fun ActivityForm(
         when {
           price.isEmpty() -> context.getString(R.string.price_empty)
           price.toDoubleOrNull() == null -> context.getString(R.string.price_nan)
-            price.toDouble() < 0 -> context.getString(R.string.price_neg)
+          price.toDouble() < 0 -> context.getString(R.string.price_neg)
           else -> null
         }
       },
@@ -280,7 +280,8 @@ fun ActivityForm(
       validation = { placesMax ->
         when {
           placesMax.isEmpty() -> context.getString(R.string.places_empty)
-          placesMax.toIntOrNull() == null -> context.getString(R.string.places_nan)
+          placesMax.toLongOrNull() == null -> context.getString(R.string.places_nan)
+          price.toLong() <= 0 -> context.getString(R.string.places_neg)
           else -> null
         }
       },

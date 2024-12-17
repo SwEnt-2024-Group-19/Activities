@@ -56,5 +56,6 @@
     <string name="places_empty">Places must not be empty</string>
     <string name="places_nan">Places must be an integer number</string>
     <string name="location_empty">Location must not be empty</string>
-    
+    <string name="price_neg">Price must not be negative</string>
+    <string name="places_neg">Places must not be negative</string>
 </resources>
