@@ -47,6 +47,10 @@ class ImageRepositoryFirestoreTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
+
+    mockStorage = mock(FirebaseStorage::class.java)
+    mockFirestore = mock(FirebaseFirestore::class.java)
+
     `when`(mockStorage.reference).thenReturn(mockStorageRef)
     `when`(mockFirestore.collection("users")).thenReturn(mockCollectionReference)
     `when`(mockCollectionReference.document(anyString())).thenReturn(mockDocumentReference)
@@ -106,7 +110,7 @@ class ImageRepositoryFirestoreTest {
     `when`(mockListResult.items).thenReturn(listOf(mockStorageRef, mockStorageRef))
 
     // Execute the method under test
-    imageRepository.deleteExistingImages(mockStorageRef, bitmaps, {}, {})
+    imageRepository.deleteExistingImages(mockStorageRef, bitmaps, {}, {}, "")
 
     // Verify that listAll was called
     verify(mockStorageRef).listAll()
@@ -120,7 +124,8 @@ class ImageRepositoryFirestoreTest {
     `when`(mockListResult.items).thenReturn(listOf(mockStorageRef))
     `when`(mockStorageRef.delete()).thenReturn(Tasks.forResult(null))
 
-    imageRepository.handleDeletionSuccess(mockListResult, mockActivityFolderRef, bitmaps, {}, {})
+    imageRepository.handleDeletionSuccess(
+        mockListResult, mockActivityFolderRef, bitmaps, {}, {}, "")
 
     verify(mockStorageRef, atLeastOnce()).delete()
   }
@@ -156,7 +161,7 @@ class ImageRepositoryFirestoreTest {
     `when`(mockDocumentReference.update("images", expectedUrls)).thenReturn(Tasks.forResult(null))
 
     // Run the method under test
-    imageRepository.uploadImagesAndCollectUrls(mockStorageRef, bitmaps, {}, {})
+    imageRepository.uploadImagesAndCollectUrls(mockStorageRef, bitmaps, {}, {}, "")
 
     // Verify interactions
     bitmaps.forEach { verify(it).compress(Bitmap.CompressFormat.JPEG, 50, baos) }
@@ -457,27 +462,6 @@ class ImageRepositoryFirestoreTest {
   /** ---------------------------------* */
 
   /** TEST FOR FETCH_ACTIVITY_IMAGES * */
-  @Test
-  fun fetchActivityImageUrls_success() {
-    val activityId = "activityId"
-    val expectedUrls = listOf("https://example.com/image1.jpg", "https://example.com/image2.jpg")
-
-    `when`(mockFirestore.collection("activities")).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document("activityId")).thenReturn(mockDocumentReference)
-    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
-    `when`(mockDocumentSnapshot.exists()).thenReturn(true)
-    `when`(mockDocumentSnapshot["images"]).thenReturn(expectedUrls)
-
-    var resultsUrls = listOf<String>()
-    imageRepository.fetchActivityImageUrls(
-        activityId,
-        {
-          resultsUrls = (it)
-          assertEquals(expectedUrls, resultsUrls)
-        },
-        {})
-  }
-
   interface BitmapHelper {
     fun decodeBitmap(data: ByteArray): Bitmap
   }
@@ -508,28 +492,6 @@ class ImageRepositoryFirestoreTest {
   }
 
   @Test
-  fun fetchActivityImageUrls_failure() {
-    val activityId = "activityId"
-
-    // Ensure the Firestore collection reference is properly mocked
-    `when`(mockFirestore.collection("activities")).thenReturn(mockCollectionReference)
-    `when`(mockCollectionReference.document(activityId)).thenReturn(mockDocumentReference)
-
-    // Setup the failure response for the document fetch
-    `when`(mockDocumentReference.get())
-        .thenReturn(Tasks.forException(Exception("Failed to fetch document")))
-
-    var errorOccurred = false
-    imageRepository.fetchActivityImageUrls(
-        activityId,
-        {},
-        {
-          errorOccurred = true
-          assertTrue("Error should have been triggered", errorOccurred)
-        })
-  }
-
-  @Test
   fun fetchActivityImagesAsBitmaps_failure() {
     val activityId = "activityId"
     val urls = listOf("https://example.com/image1.jpg", "https://example.com/image2.jpg")
@@ -556,6 +518,24 @@ class ImageRepositoryFirestoreTest {
           errorOccurred = true
           assertTrue("Error should have been triggered", errorOccurred)
         })
+  }
+
+  @Test
+  fun testConvertUrlsToBitmaps() {
+    val expectedUrls = listOf("https://example.com/image1.jpg", "https://example.com/image2.jpg")
+    val expectedBitmaps = listOf(mock(Bitmap::class.java), mock(Bitmap::class.java))
+    val fakeImageData = ByteArray(1024) // Assuming image data
+    `when`(mockFirestore.collection("activities")).thenReturn(mockCollectionReference)
+    `when`(mockCollectionReference.document("activityId")).thenReturn(mockDocumentReference)
+    `when`(mockDocumentReference.get()).thenReturn(Tasks.forResult(mockDocumentSnapshot))
+    `when`(mockDocumentSnapshot["images"]).thenReturn(expectedUrls)
+    expectedUrls.forEachIndexed { index, url ->
+      `when`(mockStorage.getReferenceFromUrl(url)).thenReturn(mockStorageRef)
+      `when`(mockStorageRef.getBytes(Long.MAX_VALUE)).thenReturn(Tasks.forResult(fakeImageData))
+      `when`(bitmapHelper.decodeBitmap(fakeImageData)).thenReturn(expectedBitmaps[index])
+    }
+    imageRepository.convertUrlsToBitmaps(
+        expectedUrls, { bitmaps -> assertEquals(expectedBitmaps, bitmaps) }, {})
   }
 
   /** ---------------------------------* */
