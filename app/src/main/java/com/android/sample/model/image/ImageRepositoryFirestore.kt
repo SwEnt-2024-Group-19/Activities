@@ -61,7 +61,7 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
     deleteExistingImagesThenUploadNewImages(activityFolderRef, bitmaps, onSuccess, onFailure, activityId)
   }
 
-  fun deleteExistingImages(
+  fun deleteExistingImagesThenUploadNewImages(
       activityFolderRef: StorageReference,
       bitmaps: List<Bitmap>,
       onSuccess: (List<String>) -> Unit,
