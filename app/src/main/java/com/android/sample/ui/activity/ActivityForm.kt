@@ -151,7 +151,8 @@ fun ActivityForm(
       validation = { description ->
         when {
           description.isEmpty() -> context.getString(R.string.description_empty)
-          description.length > maxDescriptionSize -> context.getString(R.string.description_too_long)
+          description.length > maxDescriptionSize ->
+              context.getString(R.string.description_too_long)
           else -> null
         }
       },
