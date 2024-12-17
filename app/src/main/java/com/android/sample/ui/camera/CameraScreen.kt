@@ -20,6 +20,15 @@ import androidx.compose.ui.platform.testTag
 import com.android.sample.model.image.flipCamera
 import com.android.sample.model.image.takePhoto
 
+/**
+ * Composable function to display the Camera Screen.
+ *
+ * @param paddingValues The padding values to be applied to the screen.
+ * @param controller The LifecycleCameraController to control the camera.
+ * @param context The context in which the camera is used.
+ * @param isCamOpen Callback to handle the camera open state.
+ * @param addElem Callback to add the captured photo as a Bitmap.
+ */
 @Composable
 fun CameraScreen(
     paddingValues: PaddingValues,

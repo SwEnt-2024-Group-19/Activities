@@ -37,6 +37,12 @@ import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
 
+/**
+ * Composable function to display the camera preview.
+ *
+ * @param controller The LifecycleCameraController to control the camera.
+ * @param modifier The Modifier to be applied to the camera preview.
+ */
 @Composable
 fun CameraPreview(
     controller: LifecycleCameraController,
@@ -54,6 +60,13 @@ fun CameraPreview(
   )
 }
 
+/**
+ * Composable function to display a carousel of images with an option to add and delete images.
+ *
+ * @param openDialog Callback to open the dialog for adding a new image.
+ * @param itemsList List of Bitmap images to be displayed in the carousel.
+ * @param deleteImage Callback to delete an image from the carousel.
+ */
 @Composable
 fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitmap) -> Unit) {
   Row(modifier = Modifier.padding(STANDARD_PADDING.dp).height(120.dp)) {
@@ -92,6 +105,13 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
   }
 }
 
+/**
+ * Composable function to display a carousel of images with no option to add and delete images.
+ *
+ * @param openDialog Callback to open the dialog for adding a new image.
+ * @param itemsList List of Bitmap images to be displayed in the carousel.
+ * @param deleteImage Callback to delete an image from the carousel.
+ */
 @Composable
 fun CarouselNoModif(itemsList: List<Bitmap>, category: Category) {
   Row(modifier = Modifier.padding(8.dp).height(120.dp)) {
