@@ -339,13 +339,6 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.startTime_before_endTime),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
                     } else if (price.toDoubleOrNull() == null) {
                       Toast.makeText(
                               context,
