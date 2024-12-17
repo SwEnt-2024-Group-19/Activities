@@ -284,62 +284,51 @@ class ActivitiesRepositoryFirestoreTest {
 
   @Test
   fun `test documentToActivity with valid data`() {
-    val data = mapOf(
-      "title" to "Sample Activity",
-      "description" to "This is a sample activity",
-      "date" to Timestamp.now(),
-      "startTime" to "10:00",
-      "duration" to "02:00",
-      "price" to 20.0,
-      "location" to mapOf(
-        "latitude" to 46.519962,
-        "longitude" to 6.633597,
-        "name" to "EPFL, Lausanne"
-      ),
-      "creator" to "user123",
-      "images" to listOf("image1.jpg", "image2.jpg"),
-      "placesLeft" to 5L,
-      "maxPlaces" to 10L,
-      "status" to "ACTIVE",
-      "type" to "PRO",
-      "participants" to listOf(
+    val data =
         mapOf(
-          "name" to "John",
-          "surname" to "Doe",
-          "id" to "user123",
-          "interests" to listOf(
-            mapOf(
-              "name" to "Cycling",
-              "category" to "SPORT"
-            )
-          ),
-          "activities" to listOf("activity1"),
-          "photo" to "photo.jpg",
-          "likedActivities" to listOf("activity1")
-        )
-      ),
-      "comments" to listOf(
-        mapOf(
-          "uid" to "comment1",
-          "userId" to "user123",
-          "userName" to "John Doe",
-          "content" to "Great activity!",
-          "timestamp" to Timestamp.now(),
-          "replies" to listOf(
-            mapOf(
-              "uid" to "reply1",
-              "userId" to "user456",
-              "userName" to "Jane Doe",
-              "content" to "I agree!",
-              "timestamp" to Timestamp.now()
-            )
-          )
-        )
-      ),
-      "likes" to mapOf("user123" to true),
-      "category" to "SPORT",
-      "subcategory" to "Cycling"
-    )
+            "title" to "Sample Activity",
+            "description" to "This is a sample activity",
+            "date" to Timestamp.now(),
+            "startTime" to "10:00",
+            "duration" to "02:00",
+            "price" to 20.0,
+            "location" to
+                mapOf("latitude" to 46.519962, "longitude" to 6.633597, "name" to "EPFL, Lausanne"),
+            "creator" to "user123",
+            "images" to listOf("image1.jpg", "image2.jpg"),
+            "placesLeft" to 5L,
+            "maxPlaces" to 10L,
+            "status" to "ACTIVE",
+            "type" to "PRO",
+            "participants" to
+                listOf(
+                    mapOf(
+                        "name" to "John",
+                        "surname" to "Doe",
+                        "id" to "user123",
+                        "interests" to listOf(mapOf("name" to "Cycling", "category" to "SPORT")),
+                        "activities" to listOf("activity1"),
+                        "photo" to "photo.jpg",
+                        "likedActivities" to listOf("activity1"))),
+            "comments" to
+                listOf(
+                    mapOf(
+                        "uid" to "comment1",
+                        "userId" to "user123",
+                        "userName" to "John Doe",
+                        "content" to "Great activity!",
+                        "timestamp" to Timestamp.now(),
+                        "replies" to
+                            listOf(
+                                mapOf(
+                                    "uid" to "reply1",
+                                    "userId" to "user456",
+                                    "userName" to "Jane Doe",
+                                    "content" to "I agree!",
+                                    "timestamp" to Timestamp.now())))),
+            "likes" to mapOf("user123" to true),
+            "category" to "SPORT",
+            "subcategory" to "Cycling")
 
     val documentId = "activity123"
     val activity = activitiesRepositoryFirestore.documentToActivity(data, documentId)
@@ -350,7 +339,7 @@ class ActivitiesRepositoryFirestoreTest {
     assertEquals("This is a sample activity", activity?.description)
     assertEquals("10:00", activity?.startTime)
     assertEquals("02:00", activity?.duration)
-    assertEquals(20.0, activity?.price?:0.0, 0.0)
+    assertEquals(20.0, activity?.price ?: 0.0, 0.0)
     assertEquals("user123", activity?.creator)
     assertEquals(5L, activity?.placesLeft)
     assertEquals(10L, activity?.maxPlaces)
@@ -365,23 +354,20 @@ class ActivitiesRepositoryFirestoreTest {
 
   @Test
   fun `test documentToActivity with missing optional fields`() {
-    val data = mapOf(
-      "title" to "Sample Activity",
-      "description" to "This is a sample activity",
-      "date" to Timestamp.now(),
-      "startTime" to "10:00",
-      "duration" to "02:00",
-      "price" to 20.0,
-      "location" to mapOf(
-        "latitude" to 46.519962,
-        "longitude" to 6.633597,
-        "name" to "EPFL, Lausanne"
-      ),
-      "creator" to "user123",
-      "status" to "ACTIVE",
-      "type" to "PRO",
-      "category" to "SPORT"
-    )
+    val data =
+        mapOf(
+            "title" to "Sample Activity",
+            "description" to "This is a sample activity",
+            "date" to Timestamp.now(),
+            "startTime" to "10:00",
+            "duration" to "02:00",
+            "price" to 20.0,
+            "location" to
+                mapOf("latitude" to 46.519962, "longitude" to 6.633597, "name" to "EPFL, Lausanne"),
+            "creator" to "user123",
+            "status" to "ACTIVE",
+            "type" to "PRO",
+            "category" to "SPORT")
 
     val documentId = "activity123"
     val activity = activitiesRepositoryFirestore.documentToActivity(data, documentId)
@@ -392,7 +378,7 @@ class ActivitiesRepositoryFirestoreTest {
     assertEquals("This is a sample activity", activity?.description)
     assertEquals("10:00", activity?.startTime)
     assertEquals("02:00", activity?.duration)
-    assertEquals(20.0, activity?.price?:0.0, 0.0)
+    assertEquals(20.0, activity?.price ?: 0.0, 0.0)
     assertEquals("user123", activity?.creator)
     assertEquals(0L, activity?.placesLeft)
     assertEquals(0L, activity?.maxPlaces)
