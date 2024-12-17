@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.resources.dummydata.activityBiking
 import com.android.sample.resources.dummydata.documentId
 import com.android.sample.resources.dummydata.validData
@@ -279,5 +280,128 @@ class ActivitiesRepositoryFirestoreTest {
 
     assertNotNull("Returned activity should not be null", nullActivity)
     assertEquals("Activity title should be default", "No Title", nullActivity?.title)
+  }
+
+  @Test
+  fun `test documentToActivity with valid data`() {
+    val data = mapOf(
+      "title" to "Sample Activity",
+      "description" to "This is a sample activity",
+      "date" to Timestamp.now(),
+      "startTime" to "10:00",
+      "duration" to "02:00",
+      "price" to 20.0,
+      "location" to mapOf(
+        "latitude" to 46.519962,
+        "longitude" to 6.633597,
+        "name" to "EPFL, Lausanne"
+      ),
+      "creator" to "user123",
+      "images" to listOf("image1.jpg", "image2.jpg"),
+      "placesLeft" to 5L,
+      "maxPlaces" to 10L,
+      "status" to "ACTIVE",
+      "type" to "PRO",
+      "participants" to listOf(
+        mapOf(
+          "name" to "John",
+          "surname" to "Doe",
+          "id" to "user123",
+          "interests" to listOf(
+            mapOf(
+              "name" to "Cycling",
+              "category" to "SPORT"
+            )
+          ),
+          "activities" to listOf("activity1"),
+          "photo" to "photo.jpg",
+          "likedActivities" to listOf("activity1")
+        )
+      ),
+      "comments" to listOf(
+        mapOf(
+          "uid" to "comment1",
+          "userId" to "user123",
+          "userName" to "John Doe",
+          "content" to "Great activity!",
+          "timestamp" to Timestamp.now(),
+          "replies" to listOf(
+            mapOf(
+              "uid" to "reply1",
+              "userId" to "user456",
+              "userName" to "Jane Doe",
+              "content" to "I agree!",
+              "timestamp" to Timestamp.now()
+            )
+          )
+        )
+      ),
+      "likes" to mapOf("user123" to true),
+      "category" to "SPORT",
+      "subcategory" to "Cycling"
+    )
+
+    val documentId = "activity123"
+    val activity = activitiesRepositoryFirestore.documentToActivity(data, documentId)
+
+    assertNotNull(activity)
+    assertEquals("activity123", activity?.uid)
+    assertEquals("Sample Activity", activity?.title)
+    assertEquals("This is a sample activity", activity?.description)
+    assertEquals("10:00", activity?.startTime)
+    assertEquals("02:00", activity?.duration)
+    assertEquals(20.0, activity?.price?:0.0, 0.0)
+    assertEquals("user123", activity?.creator)
+    assertEquals(5L, activity?.placesLeft)
+    assertEquals(10L, activity?.maxPlaces)
+    assertEquals(ActivityStatus.ACTIVE, activity?.status)
+    assertEquals(ActivityType.PRO, activity?.type)
+    assertEquals(1, activity?.participants?.size)
+    assertEquals(1, activity?.comments?.size)
+    assertEquals(1, activity?.likes?.size)
+    assertEquals(Category.SPORT, activity?.category)
+    assertEquals("Cycling", activity?.subcategory)
+  }
+
+  @Test
+  fun `test documentToActivity with missing optional fields`() {
+    val data = mapOf(
+      "title" to "Sample Activity",
+      "description" to "This is a sample activity",
+      "date" to Timestamp.now(),
+      "startTime" to "10:00",
+      "duration" to "02:00",
+      "price" to 20.0,
+      "location" to mapOf(
+        "latitude" to 46.519962,
+        "longitude" to 6.633597,
+        "name" to "EPFL, Lausanne"
+      ),
+      "creator" to "user123",
+      "status" to "ACTIVE",
+      "type" to "PRO",
+      "category" to "SPORT"
+    )
+
+    val documentId = "activity123"
+    val activity = activitiesRepositoryFirestore.documentToActivity(data, documentId)
+
+    assertNotNull(activity)
+    assertEquals("activity123", activity?.uid)
+    assertEquals("Sample Activity", activity?.title)
+    assertEquals("This is a sample activity", activity?.description)
+    assertEquals("10:00", activity?.startTime)
+    assertEquals("02:00", activity?.duration)
+    assertEquals(20.0, activity?.price?:0.0, 0.0)
+    assertEquals("user123", activity?.creator)
+    assertEquals(0L, activity?.placesLeft)
+    assertEquals(0L, activity?.maxPlaces)
+    assertEquals(ActivityStatus.ACTIVE, activity?.status)
+    assertEquals(ActivityType.PRO, activity?.type)
+    assertEquals(0, activity?.participants?.size)
+    assertEquals(0, activity?.comments?.size)
+    assertEquals(0, activity?.likes?.size)
+    assertEquals(Category.SPORT, activity?.category)
+    assertEquals("None", activity?.subcategory)
   }
 }
