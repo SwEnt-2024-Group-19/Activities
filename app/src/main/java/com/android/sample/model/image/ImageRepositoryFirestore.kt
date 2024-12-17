@@ -58,7 +58,7 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
       onFailure: (Exception) -> Unit
   ) {
     val activityFolderRef = storageRef.child("activities/$activityId")
-    deleteExistingImages(activityFolderRef, bitmaps, onSuccess, onFailure, activityId)
+    deleteExistingImagesThenUploadNewImages(activityFolderRef, bitmaps, onSuccess, onFailure, activityId)
   }
 
   fun deleteExistingImages(
