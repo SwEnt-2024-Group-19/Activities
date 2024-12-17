@@ -59,6 +59,72 @@ import com.android.sample.ui.dialogs.AddUserDialog
 import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialogState
 
+/**
+ * Composable function to display the activity form. Modularized and used in the CreateActivity
+ * and EditActivity screens.
+ *
+ * @param context The context in which the form is displayed.
+ * @param selectedImages List of selected images to be displayed in the carousel.
+ * @param onOpenDialogImage Callback to open the image dialog.
+ * @param onDeleteImage Callback to delete an image from the selected images.
+ * @param onTitleChange Callback to handle changes in the title input field.
+ * @param title The current value of the title input field.
+ * @param maxTitleSize The maximum allowed size for the title.
+ * @param onDescriptionChange Callback to handle changes in the description input field.
+ * @param description The current value of the description input field.
+ * @param maxDescriptionSize The maximum allowed size for the description.
+ * @param onClickDate Callback to handle the click event for the date picker.
+ * @param onCloseDate Callback to handle the close event for the date picker.
+ * @param onSelectDate Callback to handle the selection of a date.
+ * @param dueDate The currently selected due date.
+ * @param dateIsOpen Boolean indicating if the date picker is open.
+ * @param dateIsSet Boolean indicating if the date has been set.
+ * @param onClickStartingTime Callback to handle the click event for the starting time picker.
+ * @param startTimeIsOpen Boolean indicating if the starting time picker is open.
+ * @param startTimeIsSet Boolean indicating if the starting time has been set.
+ * @param onStartTimeSelected Callback to handle the selection of a starting time.
+ * @param startTime The currently selected starting time.
+ * @param onCloseStartTime Callback to handle the close event for the starting time picker.
+ * @param onClickDurationTime Callback to handle the click event for the duration time picker.
+ * @param durationIsOpen Boolean indicating if the duration time picker is open.
+ * @param durationIsSet Boolean indicating if the duration time has been set.
+ * @param onSelectDuration Callback to handle the selection of a duration time.
+ * @param onCloseDuration Callback to handle the close event for the duration time picker.
+ * @param duration The currently selected duration time.
+ * @param price The current value of the price input field.
+ * @param onPriceChange Callback to handle changes in the price input field.
+ * @param placesMax The current value of the maximum places input field.
+ * @param onPlacesMaxChange Callback to handle changes in the maximum places input field.
+ * @param locationQuery The current value of the location query input field.
+ * @param onLocationQueryChange Callback to handle changes in the location query input field.
+ * @param showDropdown Boolean indicating if the location suggestions dropdown is shown.
+ * @param locationSuggestions List of location suggestions to be displayed in the dropdown.
+ * @param onDismissLocation Callback to handle the dismissal of the location suggestions dropdown.
+ * @param onLocationClick Callback to handle the selection of a location from the suggestions.
+ * @param expandedType Boolean indicating if the activity type dropdown is expanded.
+ * @param onExpandedTypeChange Callback to handle the expansion change of the activity type dropdown.
+ * @param onSelectType Callback to handle the selection of an activity type.
+ * @param onDismissType Callback to handle the dismissal of the activity type dropdown.
+ * @param selectedOptionType The currently selected activity type.
+ * @param expandedCategory Boolean indicating if the category dropdown is expanded.
+ * @param onExpandedCategoryChange Callback to handle the expansion change of the category dropdown.
+ * @param onDismissCategory Callback to handle the dismissal of the category dropdown.
+ * @param selectedOptionCategory The currently selected category.
+ * @param selectedOptionInterest The currently selected interest.
+ * @param expandedInterest Boolean indicating if the interest dropdown is expanded.
+ * @param onInterestExpandChange Callback to handle the expansion change of the interest dropdown.
+ * @param onInterestDismiss Callback to handle the dismissal of the interest dropdown.
+ * @param onInterestSelect Callback to handle the selection of an interest.
+ * @param onSelectCategory Callback to handle the selection of a category.
+ * @param attendees List of attendees to be displayed.
+ * @param showDialogUser Boolean indicating if the user dialog is shown.
+ * @param deleteAttendant Callback to handle the deletion of an attendant.
+ * @param onDismissUserDialog Callback to handle the dismissal of the user dialog.
+ * @param onAddUser Callback to handle the addition of a user.
+ * @param onOpenUserDialog Callback to handle the opening of the user dialog.
+ * @param onProfileClick Callback to handle the click event on a user's profile.
+ * @param imageViewModel The view model for the image.
+ */
 @Suppress("NAME_SHADOWING")
 @Composable
 fun ActivityForm(
@@ -375,6 +441,18 @@ fun ActivityForm(
   }
 }
 
+/**
+ * Composable function to display a dropdown menu with different modes.
+ *
+ * @param mode The mode of the dropdown menu (e.g., "category", "type", "interest").
+ * @param expanded Boolean indicating if the dropdown menu is expanded.
+ * @param onExpandChange Callback to handle the expansion change of the dropdown menu.
+ * @param onDismiss Callback to handle the dismissal of the dropdown menu.
+ * @param valueItem The currently selected value item.
+ * @param onSelect Callback to handle the selection of an item from the dropdown menu.
+ * @param context The context in which the dropdown menu is displayed.
+ * @param listItems List of items to be displayed in the dropdown menu.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyDropDownMenu(
