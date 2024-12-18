@@ -358,7 +358,7 @@ fun ActivityCard(
                                               RoundedCornerShape(
                                                   TEXT_FONTSIZE
                                                       .dp)) // Purple background with rounded
-                                                            // corners
+                                      // corners
                                       .padding(
                                           horizontal = SMALL_PADDING.dp,
                                           vertical = SMALL_PADDING.dp)) {
