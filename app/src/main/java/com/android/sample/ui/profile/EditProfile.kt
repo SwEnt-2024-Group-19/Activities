@@ -2,7 +2,6 @@ package com.android.sample.ui.profile
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
@@ -206,11 +205,7 @@ fun EditProfileScreen(
                             onSuccess = {
                               photo = null // Clear photo reference
                             },
-                            onFailure = { error ->
-                              Log.e(
-                                  "EditProfileScreen",
-                                  "Failed to remove profile picture: ${error.message}")
-                            })
+                            onFailure = { error -> })
                       }
                       selectedImage?.let { bitmap ->
                         imageViewModel.uploadProfilePicture(
@@ -219,11 +214,7 @@ fun EditProfileScreen(
                             onSuccess = { url ->
                               photo = url // Update photo URL in profile
                             },
-                            onFailure = { error ->
-                              Log.e(
-                                  "EditProfileScreen",
-                                  "Failed to upload profile picture: ${error.message}")
-                            })
+                            onFailure = { error -> })
                       }
                       try {
                         profileViewModel.updateProfile(
@@ -248,11 +239,7 @@ fun EditProfileScreen(
                                   onSuccess = { url ->
                                     photo = url // Update photo URL in profile
                                   },
-                                  onFailure = { error ->
-                                    Log.e(
-                                        "EditProfileScreen",
-                                        "Failed to upload profile picture: ${error.message}")
-                                  })
+                                  onFailure = { error -> })
                             }
                           })
                     },

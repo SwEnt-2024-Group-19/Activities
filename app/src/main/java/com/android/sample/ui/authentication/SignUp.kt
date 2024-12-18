@@ -2,7 +2,6 @@ package com.android.sample.ui.authentication
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import androidx.camera.view.CameraController
@@ -118,12 +117,7 @@ fun SignUpScreen(
         addImage = { bitmap ->
           selectedBitmap = bitmap
           imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
+              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { error -> })
         },
         context = context)
   }
@@ -141,14 +135,7 @@ fun SignUpScreen(
         addElem = { bitmap ->
           selectedBitmap = bitmap
           imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e(
-                    "SignUpAndProfileCreationScreen",
-                    "Failed to upload profile picture: ${error.message}")
-              })
+              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { error -> })
         })
   } else {
     LazyColumn(
@@ -279,7 +266,6 @@ fun SignUpScreen(
                           profileViewModel.createUserProfile(
                               userProfile = userProfile,
                               onSuccess = {
-                                Log.d("SignUp", "Profile created successfully")
                                 profileViewModel.fetchUserData(userProfile.id)
                                 navigationActions.navigateTo(Screen.OVERVIEW)
                               },
@@ -321,12 +307,10 @@ fun createUserWithEmailAndPassword(
     ->
     if (createTask.isSuccessful) {
       // User successfully created
-      Log.d("UserCreation", "createUserWithEmail:success")
       Toast.makeText(context, "Account created successfully!", Toast.LENGTH_LONG).show()
       onSuccess()
     } else {
       // User creation failed, display an error message
-      Log.w("UserCreation", "createUserWithEmail:failure", createTask.exception)
       Toast.makeText(context, "Account creation failed! Please try again.", Toast.LENGTH_LONG)
           .show()
     }

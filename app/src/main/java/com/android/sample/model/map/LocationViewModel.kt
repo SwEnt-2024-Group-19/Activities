@@ -1,6 +1,5 @@
 package com.android.sample.model.map
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -38,13 +37,7 @@ constructor(
           onSuccess = { locations ->
             _locationSuggestions.value = locations.distinct() // Filter out repetitive updates
           },
-          onFailure = { throwable ->
-            _locationSuggestions.value = emptyList()
-            Log.e(
-                "LocationSuggestions",
-                "Failed to fetch suggestions: ${throwable.message}",
-                throwable)
-          })
+          onFailure = { throwable -> _locationSuggestions.value = emptyList() })
     } else {
       _locationSuggestions.value = emptyList()
     }
@@ -59,9 +52,7 @@ constructor(
       (repository as? NominatimLocationRepository)?.startLocationUpdates { location ->
         _currentLocation.value = location
       }
-    } else {
-      Log.e("LocationViewModel", "Location permission not granted")
-    }
+    } else {}
   }
 
   fun stopTrackingLocation() {

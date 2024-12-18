@@ -362,10 +362,7 @@ fun EditActivityScreen(
                             activity?.uid ?: "",
                             selectedImages.toList(),
                             { urls -> items = urls },
-                            { error ->
-                              Log.e(
-                                  "EditActivityScreen", "Failed to upload images: ${error.message}")
-                            })
+                            { error -> })
                         val updatedActivity =
                             Activity(
                                 uid = activity?.uid ?: "",
@@ -419,12 +416,7 @@ fun EditActivityScreen(
                     ),
                 onClick = {
                   listActivityViewModel.deleteActivityById(activity?.uid ?: "")
-                  imageViewModel.removeAllActivityImages(
-                      activity?.uid ?: "",
-                      { Log.d("EditActivityScreen", "Images removed") },
-                      { error ->
-                        Log.e("EditActivityScreen", "Failed to remove images: ${error.message}")
-                      })
+                  imageViewModel.removeAllActivityImages(activity?.uid ?: "", {}, { error -> })
 
                   navigationActions.navigateTo(Screen.PROFILE)
                 },

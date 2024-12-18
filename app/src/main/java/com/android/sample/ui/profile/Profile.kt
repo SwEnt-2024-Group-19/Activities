@@ -3,7 +3,6 @@ package com.android.sample.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -196,9 +195,7 @@ fun ActivityRow(
         var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
 
         imageViewModel.fetchActivityImagesAsBitmaps(
-            activity.uid,
-            onSuccess = { urls -> bitmaps = urls },
-            onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+            activity.uid, onSuccess = { urls -> bitmaps = urls }, onFailure = {})
 
         // Display image
         if (activity.images.isNotEmpty() && bitmaps.isNotEmpty()) {

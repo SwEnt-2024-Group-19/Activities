@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -77,8 +76,6 @@ class MainActivity : ComponentActivity() {
     }
     val startDestination = if (auth.currentUser != null) Route.OVERVIEW else Route.AUTH
     // log current user
-    Log.d("MainActivity", "Current user: ${auth.currentUser?.uid}")
-
     setContent {
       Surface(
           modifier = Modifier.fillMaxSize().semantics { testTag = C.Tag.main_screen_container },

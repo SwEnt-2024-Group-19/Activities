@@ -1,7 +1,6 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
@@ -106,12 +105,7 @@ fun ProfileCreationScreen(
         addImage = { bitmap ->
           selectedBitmap = bitmap
           imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
+              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { error -> })
         },
         context = context)
   }
@@ -129,12 +123,7 @@ fun ProfileCreationScreen(
         addElem = { bitmap ->
           selectedBitmap = bitmap
           imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
+              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { error -> })
         })
   } else {
     Column(
@@ -244,7 +233,6 @@ fun ProfileCreationScreen(
                         viewModel.createUserProfile(
                             userProfile = userProfile,
                             onSuccess = {
-                              Log.d("ProfileCreation", "Profile created successfully")
                               viewModel.fetchUserData(uid)
                               navigationActions.navigateTo(Screen.OVERVIEW)
                             },
