@@ -51,6 +51,7 @@ import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.DefaultImageCarousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.EmailTextField
@@ -93,6 +94,7 @@ fun SignUpScreen(
   var showDialogImage by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
   var isCamOpen by remember { mutableStateOf(false) }
+  var isDefaultImageOpen by remember { mutableStateOf(false) }
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
   if (showDialogImage) {
@@ -105,23 +107,20 @@ fun SignUpScreen(
         onCameraClick = {
           showDialogImage = false
           isCamOpen = true
-        })
+        },
+        onSelectDefault = {
+          showDialogImage = false
+          isDefaultImageOpen = true
+        },
+        default = true)
   }
   if (isGalleryOpen) {
     GalleryScreen(
         isGalleryOpen = { isGalleryOpen = false },
-        addImage = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
-        },
+        addImage = { bitmap -> selectedBitmap = bitmap },
         context = context)
   }
+
   if (isCamOpen) {
     CameraScreen(
         paddingValues = PaddingValues(SMALL_PADDING.dp),
@@ -133,18 +132,7 @@ fun SignUpScreen(
             },
         context = context,
         isCamOpen = { isCamOpen = false },
-        addElem = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e(
-                    "SignUpAndProfileCreationScreen",
-                    "Failed to upload profile picture: ${error.message}")
-              })
-        })
+        addElem = { bitmap -> selectedBitmap = bitmap })
   } else {
     LazyColumn(
         modifier =
@@ -158,7 +146,18 @@ fun SignUpScreen(
             ProfileImage(
                 userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
                 modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
-                imageViewModel)
+                imageViewModel,
+                bitmap = selectedBitmap,
+                editing = true)
+            if (isDefaultImageOpen) {
+              DefaultImageCarousel(
+                  onImageSelected = { bitmap ->
+                    selectedBitmap = bitmap
+                    isDefaultImageOpen = false
+                  },
+                  context = context,
+                  onDismiss = { isDefaultImageOpen = false })
+            }
             ModifyPictureButton(showDialogImage = { showDialogImage = true })
           }
 

@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.model.activity.Activity
+import com.android.sample.R
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
@@ -189,6 +190,33 @@ class SignUpAndProfileCreationScreenTest {
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
     composeTestRule.onNodeWithTag("cameraButton").performClick()
     composeTestRule.onNodeWithTag(("cameraScreen")).assertIsDisplayed()
+  }
+
+  @Test
+  fun testCameraButtonOpensGalleryScreen() {
+    composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("profilePicture"))
+    composeTestRule.onNodeWithTag("profilePicture").performClick()
+    composeTestRule
+        .onNodeWithTag("SignUpColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+        .performClick()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("galleryButton").performClick()
+  }
+
+  @Test
+  fun testCameraButtonOpensDefaultImageCarousel() {
+    composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("profilePicture"))
+    composeTestRule.onNodeWithTag("profilePicture").performClick()
+    composeTestRule
+        .onNodeWithTag("SignUpColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+        .performClick()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("defaultImageButton").performClick()
+
+    composeTestRule.onNodeWithTag("DefaultImageCarousel").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ImageCard_${R.drawable.dog_avatar}").performClick()
   }
 
   @Test
