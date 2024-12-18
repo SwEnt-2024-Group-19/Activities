@@ -381,7 +381,7 @@ fun ActivityCard(
                                       MaterialTheme.typography.bodySmall.copy(
                                           color = Color.White,
                                           fontWeight = FontWeight.SemiBold),
-                                  modifier = Modifier.testTag("yourActivityStatus"))
+                                  modifier = Modifier.testTag("yourActivityStatus").padding(horizontal = STANDARD_PADDING.dp))
                             }
                       }
                       if (profile.id != activity.creator ||
@@ -405,7 +405,7 @@ fun ActivityCard(
                                       MaterialTheme.typography.bodySmall.copy(
                                           color = Color.White,
                                           fontWeight = FontWeight.SemiBold),
-                                  modifier = Modifier.testTag("enrolledText"))
+                                  modifier = Modifier.testTag("enrolledText").padding(horizontal = STANDARD_PADDING.dp))
                             }
                       }
                     }}
