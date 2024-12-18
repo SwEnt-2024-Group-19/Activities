@@ -35,14 +35,6 @@ class ImageViewModel @Inject constructor(private val repository: ImageRepository
     repository.fetchProfileImageUrl(userId, onSuccess, onFailure)
   }
 
-  fun fetchActivityImageUrls(
-      activityId: String,
-      onSuccess: (List<String>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    repository.fetchActivityImageUrls(activityId, onSuccess, onFailure)
-  }
-
   fun fetchActivityImagesAsBitmaps(
       activityId: String,
       onSuccess: (List<Bitmap>) -> Unit,

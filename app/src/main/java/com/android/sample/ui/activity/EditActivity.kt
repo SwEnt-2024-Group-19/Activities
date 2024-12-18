@@ -113,6 +113,7 @@ fun EditActivityScreen(
   val maxDescriptionLength = 500
   val maxTitleLength = 50
   val locationQuery by locationViewModel.query.collectAsState()
+  locationViewModel.setQuery(selectedLocation.name)
   var showDropdown by remember { mutableStateOf(false) }
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
@@ -322,19 +323,28 @@ fun EditActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                      // we force the start time to be before the end time
-                    } else if (attendees.size >= maxPlaces.toInt()) {
+                    } else if (price.isBlank() ||
+                        price.toDoubleOrNull() == null ||
+                        price.toDouble() < 0) {
                       Toast.makeText(
                               context,
-                              context.getString(R.string.max_places_exceed),
+                              context.getString(R.string.invalid_price_format),
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (!hourDateViewModel.isBeginGreaterThanEnd(
-                        startTime ?: "00:00", duration ?: "00:01")) {
+                    } else if (maxPlaces.isBlank() ||
+                        maxPlaces.toLongOrNull() == null ||
+                        maxPlaces.toLong() <= 0) {
                       Toast.makeText(
                               context,
-                              context.getString(R.string.startTime_before_endTime),
+                              context.getString(R.string.invalid_places_format),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (attendees.size >= maxPlaces.toLong()) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.max_places_exceed),
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button

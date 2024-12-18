@@ -1,15 +1,25 @@
 package com.android.sample.model.activity
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.sample.App
+import com.android.sample.R
+import com.android.sample.model.hour_date.HourDateViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
+import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
+import com.android.sample.model.profile.categoryOf
+import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -377,6 +387,156 @@ constructor(
 
     cachedScores_[activity.uid] = score
     return score
+  }
+
+  fun isButtonEnabled(
+      title: String,
+      description: String,
+      price: String,
+      placesMax: String,
+      selectedOptionCategory: String?,
+      selectedLocation: String?,
+      selectedOptionType: String,
+      startTime: String,
+      duration: String,
+      dueDate: Timestamp
+  ): Boolean {
+    return title.isNotEmpty() &&
+        description.isNotEmpty() &&
+        price.isNotEmpty() &&
+        placesMax.isNotEmpty() &&
+        selectedLocation != null &&
+        selectedOptionType != "Select a type" &&
+        selectedOptionCategory != null &&
+        startTime.isNotEmpty() &&
+        duration.isNotEmpty() &&
+        dueDate.toDate().after(Timestamp.now().toDate())
+  }
+
+  open fun validateActivityCreation(
+      context: Context,
+      activityDateTime: Long,
+      attendees: List<User>,
+      placesMax: String,
+      creator: String,
+      hourDateViewModel: HourDateViewModel,
+      startTime: String,
+      duration: String,
+      price: String,
+      selectedLocation: Location?,
+      selectedOptionCategory: Category?,
+      selectedOptionInterest: String?
+  ): Boolean {
+    return when {
+      activityDateTime - System.currentTimeMillis() < TimeUnit.HOURS.toMillis(1) -> {
+        Toast.makeText(context, context.getString(R.string.schedule_activity), Toast.LENGTH_SHORT)
+            .show()
+        false
+      }
+      attendees.size >= placesMax.toInt() -> {
+        Toast.makeText(context, context.getString(R.string.max_places_exceed), Toast.LENGTH_SHORT)
+            .show()
+        false
+      }
+      creator == "" -> {
+        Toast.makeText(
+                context, context.getString(R.string.login_check_in_create), Toast.LENGTH_SHORT)
+            .show()
+        false
+      }
+      price.toDoubleOrNull() == null -> {
+        Toast.makeText(
+                context, context.getString(R.string.invalid_price_format), Toast.LENGTH_SHORT)
+            .show()
+        false
+      }
+      placesMax.toLongOrNull() == null -> {
+        Toast.makeText(
+                context, context.getString(R.string.invalid_places_format), Toast.LENGTH_SHORT)
+            .show()
+        false
+      }
+      selectedLocation == null -> {
+        Toast.makeText(context, context.getString(R.string.invalid_no_location), Toast.LENGTH_SHORT)
+            .show()
+        false
+      }
+      selectedOptionCategory != null &&
+          categoryOf[selectedOptionInterest] != selectedOptionCategory -> {
+        Toast.makeText(
+                context, context.getString(R.string.invalid_interest_category), Toast.LENGTH_SHORT)
+            .show()
+        false
+      }
+      else -> true
+    }
+  }
+
+  open fun createActivity(
+      activityId: String,
+      listActivityViewModel: ListActivitiesViewModel,
+      hourDateViewModel: HourDateViewModel,
+      dueDate: Timestamp,
+      startTime: String,
+      attendees: List<User>,
+      profileViewModel: ProfileViewModel,
+      imageViewModel: ImageViewModel,
+      selectedImages: List<Bitmap>,
+      items: MutableList<String>,
+      title: String,
+      description: String,
+      duration: String,
+      price: String,
+      placesMax: String,
+      creator: String,
+      selectedLocation: Location?,
+      selectedOptionType: String,
+      selectedOptionCategory: Category?,
+      selectedOptionInterest: String?,
+      navigationActions: NavigationActions,
+      context: Context,
+      addUser: (User) -> Unit,
+  ) {
+    if (selectedOptionType == ActivityType.INDIVIDUAL.name)
+        profileViewModel.userState.value?.let { addUser(it) }
+    try {
+      imageViewModel.uploadActivityImages(
+          activityId,
+          selectedImages,
+          onSuccess = { imageUrls ->
+            items.addAll(imageUrls) // Store URLs in items to retrieve later
+          },
+          onFailure = { exception ->
+            Toast.makeText(
+                    context, "Failed to upload images: ${exception.message}", Toast.LENGTH_SHORT)
+                .show()
+          })
+      val activity =
+          Activity(
+              uid = activityId,
+              title = title,
+              description = description,
+              date = dueDate,
+              startTime = startTime,
+              duration = duration,
+              price = price.toDouble(),
+              placesLeft = attendees.size.toLong(),
+              maxPlaces = placesMax.toLongOrNull() ?: 0,
+              creator = creator,
+              status = ActivityStatus.ACTIVE,
+              location = selectedLocation,
+              images = items,
+              participants = attendees,
+              type = types.find { it.name == selectedOptionType } ?: types[1],
+              comments = listOf(),
+              category = selectedOptionCategory ?: categories[0],
+              subcategory = selectedOptionInterest ?: "")
+      listActivityViewModel.addActivity(activity)
+      profileViewModel.addActivity(creator, activity.uid)
+      navigationActions.navigateTo(Screen.OVERVIEW)
+    } catch (_: NumberFormatException) {
+      println("There is an error")
+    }
   }
 
   sealed class ActivitiesUiState {

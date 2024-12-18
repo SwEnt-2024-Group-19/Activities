@@ -78,6 +78,7 @@ import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
@@ -179,9 +180,10 @@ fun ActivityRow(
     userProfileViewModel: ProfileViewModel,
     navigationActions: NavigationActions,
     remainingTime: Boolean,
-    userId: String,
+    user: User,
+    isParticipant: Boolean = false,
     context: Context = LocalContext.current,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
 ) {
 
   Row(
@@ -242,9 +244,9 @@ fun ActivityRow(
                   overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.testTag("activityDescription"))
             }
-        if (!remainingTime) {
-          ReviewActivityButtons(activity.likes[userId]) { review ->
-            listActivitiesViewModel.reviewActivity(activity, userId, review)
+        if (!remainingTime && !isParticipant) {
+          ReviewActivityButtons(activity.likes[user.id]) { review ->
+            listActivitiesViewModel.reviewActivity(activity, user.id, review)
           }
         }
       }
@@ -382,7 +384,7 @@ fun UserProfile(
           BottomNavigationMenu(
               onTabSelect = { route -> navigationActions.navigateTo(route) },
               tabList = LIST_TOP_LEVEL_DESTINATION,
-              selectedItem = navigationActions.currentRoute())
+              selectedItem = Route.PROFILE)
         }
       },
       topBar = {
@@ -494,7 +496,8 @@ fun UserProfile(
                         profileViewModel,
                         listActivitiesViewModel,
                         imageViewModel,
-                        uid)
+                        uid,
+                    )
                   }
             }
       }
@@ -510,7 +513,7 @@ fun DisplayActivitiesList(
     userProfileViewModel: ProfileViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
     imageViewModel: ImageViewModel,
-    uid: String
+    uid: String,
 ) {
   var listToShow = emptyList<Activity>()
   when (activityType) {
@@ -565,7 +568,8 @@ fun DisplayActivitiesList(
             listActivitiesViewModel = listActivitiesViewModel,
             navigationActions = navigationActions,
             userProfileViewModel = userProfileViewModel,
-            userId = user.id,
+            user = user,
+            isParticipant = uid != "",
             remainingTime = remainingTime,
             imageViewModel = imageViewModel)
         Spacer(modifier = Modifier.height(NORMAL_PADDING.dp))
