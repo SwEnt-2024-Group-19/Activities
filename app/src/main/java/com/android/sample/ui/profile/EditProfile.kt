@@ -75,6 +75,7 @@ import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.DefaultImageCarousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.TextFieldWithErrorState
@@ -103,7 +104,7 @@ fun EditProfileScreen(
   var showDialogImage by remember { mutableStateOf(false) }
   var photo by remember { mutableStateOf(profile.photo) }
   val scrollState = rememberScrollState()
-
+  var isDefaultImageSelected by remember { mutableStateOf(false) }
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
@@ -134,7 +135,12 @@ fun EditProfileScreen(
               onCameraClick = {
                 showDialogImage = false
                 isCamOpen = true
-              })
+              },
+              onSelectDefault = {
+                showDialogImage = false
+                isDefaultImageSelected = true
+              },
+              default = true)
         }
 
         if (isGalleryOpen) {
@@ -143,6 +149,7 @@ fun EditProfileScreen(
               addImage = { bitmap -> selectedImage = bitmap },
               context = context)
         }
+
         if (isCamOpen) {
           CameraScreen(
               paddingValues = paddingValues,
@@ -166,17 +173,22 @@ fun EditProfileScreen(
               verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
               horizontalAlignment = Alignment.CenterHorizontally, // Ensures horizontal centering
           ) {
-            Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
             ProfileImage(
                 userId = profile.id,
                 modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
                 imageViewModel,
                 editing = true,
-                bitmap = selectedImage,
-                onRemoveImage = {
-                  selectedImage = null
-                  isPictureRemoved = true // Mark picture for removal
-                })
+                bitmap = selectedImage)
+            Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
+            if (isDefaultImageSelected) {
+              DefaultImageCarousel(
+                  onImageSelected = { bitmap ->
+                    selectedImage = bitmap
+                    isDefaultImageSelected = false
+                  },
+                  context = context,
+                  onDismiss = { isDefaultImageSelected = false })
+            }
 
             ModifyPictureButton(showDialogImage = { showDialogImage = true })
 

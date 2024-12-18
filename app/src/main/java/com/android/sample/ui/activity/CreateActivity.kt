@@ -132,7 +132,7 @@ fun CreateActivityScreen(
   var selectedLocation by remember { mutableStateOf<Location?>(null) }
   // Add scroll
   val scrollState = rememberScrollState()
-
+  var isDefaultPictureOpen by remember { mutableStateOf(false) }
   // Attendees
   val attendees_: List<User> = listOf<User>()
   var attendees: List<User> by remember { mutableStateOf(attendees_) }
@@ -193,7 +193,8 @@ fun CreateActivityScreen(
                     onCameraClick = {
                       showDialogImage = false
                       isCamOpen = true
-                    })
+                    },
+                    onSelectDefault = { showDialogImage = false })
               }
               ActivityForm(
                   context = context,
