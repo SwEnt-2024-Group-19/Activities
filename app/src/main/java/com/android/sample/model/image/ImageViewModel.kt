@@ -1,21 +1,37 @@
 package com.android.sample.model.image
 
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class ImageViewModel @Inject constructor(private val repository: ImageRepositoryFirestore) :
-    ViewModel() {
+class ImageViewModel
+@Inject
+constructor(
+    private val repository: ImageRepositoryFirestore,
+    private val sharedPreferences: SharedPreferences
+) : ViewModel() {
 
   fun uploadProfilePicture(
       userId: String,
       bitmap: Bitmap,
-      onSuccess: (String) -> Unit,
+      onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    repository.uploadProfilePicture(userId, bitmap, onSuccess, onFailure)
+    repository.uploadProfilePicture(
+        userId,
+        bitmap,
+        { url ->
+          cacheProfilePicture(userId, url)
+          onSuccess()
+        },
+        onFailure)
+  }
+
+  private fun cacheProfilePicture(userId: String, url: String) {
+    sharedPreferences.edit().putString(userId, url).apply()
   }
 
   fun uploadActivityImages(
