@@ -346,7 +346,6 @@ fun CreateActivityScreen(
                           context,
                           addUser = { user -> attendees += user },
                       )
-
                     }
                   },
                   modifier =
