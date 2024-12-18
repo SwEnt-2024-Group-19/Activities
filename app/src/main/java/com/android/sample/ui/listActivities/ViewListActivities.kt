@@ -108,7 +108,7 @@ fun ListActivitiesScreen(
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
-      topBar = { SearchBar(onValueChange = { searchText = it }, value = searchText) },
+      topBar = { SearchBar(onValueChange = { searchText = it }, value = searchText,{showFilterDialog = true}) },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
