@@ -164,8 +164,7 @@ fun LoadingScreen(navigationActions: NavigationActions, selectedRoute: String) {
               modifier = Modifier.align(Alignment.Center).fillMaxWidth(WIDTH_FRACTION_MD)) {
                 Text(
                     text = "You are not logged in. Login or Register to see your liked activities.",
-                    modifier =
-                        Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("loadingText"),
+                    modifier = Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("loadingText"),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center)
