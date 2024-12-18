@@ -112,7 +112,7 @@ fun SignUpScreen(
         addImage = { bitmap ->
           selectedBitmap = bitmap
           imageViewModel.uploadProfilePicture(
-              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { error -> })
+              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { _ -> })
         },
         context = context)
   }
@@ -130,7 +130,7 @@ fun SignUpScreen(
         addElem = { bitmap ->
           selectedBitmap = bitmap
           imageViewModel.uploadProfilePicture(
-              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { error -> })
+              uid, bitmap, onSuccess = { url -> photo = url }, onFailure = { _ -> })
         })
   } else {
     LazyColumn(

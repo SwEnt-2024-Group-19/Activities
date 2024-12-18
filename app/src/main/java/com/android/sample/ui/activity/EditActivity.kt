@@ -362,7 +362,7 @@ fun EditActivityScreen(
                             activity?.uid ?: "",
                             selectedImages.toList(),
                             { urls -> items = urls },
-                            { error -> })
+                            { _ -> })
                         val updatedActivity =
                             Activity(
                                 uid = activity?.uid ?: "",
@@ -416,7 +416,7 @@ fun EditActivityScreen(
                     ),
                 onClick = {
                   listActivityViewModel.deleteActivityById(activity?.uid ?: "")
-                  imageViewModel.removeAllActivityImages(activity?.uid ?: "", {}, { error -> })
+                  imageViewModel.removeAllActivityImages(activity?.uid ?: "", {}, { _ -> })
 
                   navigationActions.navigateTo(Screen.PROFILE)
                 },

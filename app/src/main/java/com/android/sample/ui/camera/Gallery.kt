@@ -66,7 +66,7 @@ fun ProfileImage(
   // Fetch the profile image URL from Firebase Storage
   LaunchedEffect(userId) {
     imageViewModel.fetchProfileImageUrl(
-        userId = userId, onSuccess = { url -> imageUrl = url }, onFailure = { error -> })
+        userId = userId, onSuccess = { url -> imageUrl = url }, onFailure = { _ -> })
   }
 
   LaunchedEffect(bitmap) {
@@ -106,7 +106,7 @@ fun ProfileImage(
         }
       }
 
-  Box() {
+  Box {
     Image(
         painter = painter,
         contentDescription = "Profile Image",

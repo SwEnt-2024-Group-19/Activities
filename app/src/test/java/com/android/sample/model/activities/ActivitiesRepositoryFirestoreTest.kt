@@ -396,14 +396,6 @@ class ActivitiesRepositoryFirestoreTest {
     assertEquals("None", activity?.subcategory)
   }
 
-  val mockQuerySnapshot = mock<QuerySnapshot>()
-  val mockDocumentSnapshot1 = mock<DocumentSnapshot>()
-  val mockDocumentSnapshot2 = mock<DocumentSnapshot>()
-
-  // Sample Data
-  val activityData1 = mapOf("name" to "Hiking", "location" to "Mountain", "date" to "2024-12-20")
-  val activityData2 = mapOf("name" to "Swimming", "location" to "Beach", "date" to "2024-12-25")
-
   // Setup Mock Behavior
 
   @Test

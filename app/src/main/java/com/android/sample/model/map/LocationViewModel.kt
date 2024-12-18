@@ -37,7 +37,7 @@ constructor(
           onSuccess = { locations ->
             _locationSuggestions.value = locations.distinct() // Filter out repetitive updates
           },
-          onFailure = { throwable -> _locationSuggestions.value = emptyList() })
+          onFailure = { _ -> _locationSuggestions.value = emptyList() })
     } else {
       _locationSuggestions.value = emptyList()
     }
@@ -52,7 +52,7 @@ constructor(
       (repository as? NominatimLocationRepository)?.startLocationUpdates { location ->
         _currentLocation.value = location
       }
-    } else {}
+    }
   }
 
   fun stopTrackingLocation() {

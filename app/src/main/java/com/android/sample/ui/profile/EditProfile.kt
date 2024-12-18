@@ -239,7 +239,7 @@ fun EditProfileScreen(
                                 onSuccess = {
                                   photo = null // Clear photo reference
                                 },
-                                onFailure = { error -> })
+                                onFailure = { _ -> })
                           }
                           selectedImage?.let { bitmap ->
                             imageViewModel.uploadProfilePicture(
@@ -248,7 +248,7 @@ fun EditProfileScreen(
                                 onSuccess = { url ->
                                   photo = url // Update photo URL in profile
                                 },
-                                onFailure = { error -> })
+                                onFailure = { _ -> })
                           }
                           try {
                             profileViewModel.updateProfile(
@@ -273,7 +273,7 @@ fun EditProfileScreen(
                                       onSuccess = { url ->
                                         photo = url // Update photo URL in profile
                                       },
-                                      onFailure = { error -> })
+                                      onFailure = { _ -> })
                                 }
                               })
                         }
