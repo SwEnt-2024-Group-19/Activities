@@ -325,13 +325,6 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (attendees.size >= placesMax.toInt()) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.max_places_exceed),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
                     } else if (creator == "") {
                       Toast.makeText(
                               context,
@@ -339,24 +332,28 @@ fun CreateActivityScreen(
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (!hourDateViewModel.isBeginGreaterThanEnd(startTime, duration)) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.startTime_before_endTime),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (price.toDoubleOrNull() == null) {
+                    } else if (price.isBlank() ||
+                        price.toDoubleOrNull() == null ||
+                        price.toDouble() < 0) {
                       Toast.makeText(
                               context,
                               context.getString(R.string.invalid_price_format),
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
-                    } else if (placesMax.toLongOrNull() == null) {
+                    } else if (placesMax.isBlank() ||
+                        placesMax.toLongOrNull() == null ||
+                        placesMax.toLong() <= 0) {
                       Toast.makeText(
                               context,
                               context.getString(R.string.invalid_places_format),
+                              Toast.LENGTH_SHORT)
+                          .show()
+                      return@Button
+                    } else if (attendees.size >= placesMax.toLong()) {
+                      Toast.makeText(
+                              context,
+                              context.getString(R.string.max_places_exceed),
                               Toast.LENGTH_SHORT)
                           .show()
                       return@Button
