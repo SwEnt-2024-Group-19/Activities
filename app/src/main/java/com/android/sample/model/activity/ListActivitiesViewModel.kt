@@ -130,13 +130,12 @@ constructor(
                                 activity = activity, isCreator = activity.creator == currentUser.id)
                       }
                     },
-                    onFailure = {_ ->})
+                    onFailure = { _ -> })
               }
-            }catch (_: Exception) {
-            }
+            } catch (_: Exception) {}
           }
         },
-        { _ ->  })
+        { _ -> })
   }
 
   /**
@@ -160,7 +159,7 @@ constructor(
                             activity = activity, isCreator = activity.creator == currentUser.id)
                   }
                 },
-                onFailure = { })
+                onFailure = {})
           }
         },
         {})

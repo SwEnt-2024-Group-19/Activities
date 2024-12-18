@@ -29,7 +29,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -45,7 +44,6 @@ class ActivitiesRepositoryFirestoreTest {
   @Mock private lateinit var mockFirestore: FirebaseFirestore
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference
-  @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
   @Mock private lateinit var mockActivityQuerySnapshot: QuerySnapshot
 
   private lateinit var activitiesRepositoryFirestore: ActivitiesRepositoryFirestore
