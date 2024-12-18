@@ -89,7 +89,7 @@ object RepositoryModule {
 
   @Provides
   @Singleton
-  fun provideSharePreferences(@ApplicationContext context: Context): SharedPreferences {
+  fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
     return context.getSharedPreferences("shared_preferences", Context.MODE_PRIVATE)
   }
 }
