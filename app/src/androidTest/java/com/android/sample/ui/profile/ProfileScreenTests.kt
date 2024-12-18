@@ -99,7 +99,7 @@ class ProfileScreenTest {
           listActivitiesViewModel = listActivitiesViewModel,
           imageViewModel = mockImageViewModel)
     }
-    composeTestRule.onNodeWithTag("loadingText").assertTextEquals("You do not have a profile")
+    composeTestRule.onNodeWithTag("loadingText").assertTextEquals("You are not logged in. Login or Register to see your liked activities.")
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
   }
 
@@ -364,7 +364,7 @@ class ProfileScreenTest {
 
   @Test
   fun loadingScreen() {
-    composeTestRule.setContent { LoadingScreen(navigationActions) }
+    composeTestRule.setContent { LoadingScreen(navigationActions,"") }
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("signInButton").assertIsDisplayed()

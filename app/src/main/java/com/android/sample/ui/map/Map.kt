@@ -57,7 +57,7 @@ import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.camera.getImageResourceIdForCategory
-import com.android.sample.ui.components.LoadingScreen
+import com.android.sample.ui.components.WaitingScreen
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -147,7 +147,7 @@ fun MapScreen(
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
-          LoadingScreen(message = stringResource(R.string.no_internet_connection))
+          WaitingScreen(message = stringResource(R.string.no_internet_connection))
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(

@@ -24,7 +24,7 @@ import com.android.sample.resources.C.Tag.SPINNING_DURATION
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
 @Composable
-fun LoadingScreen(message: String = "") {
+fun WaitingScreen(message: String = "") {
   Box(
       modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)),
       contentAlignment = Alignment.Center) {
