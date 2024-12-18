@@ -5,9 +5,7 @@ import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,12 +19,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -149,18 +144,6 @@ fun ProfileCreationScreen(
               imageViewModel,
               bitmap = selectedBitmap,
               editing = true)
-
-          Box(
-              modifier =
-                  Modifier.testTag("uploadPicture")
-                      .clickable { showDialogImage = true } // Handle click action
-                      .padding(MEDIUM_PADDING.dp)
-                      .background(Color.Transparent)) {
-                Icon(
-                    imageVector = Icons.Default.AddAPhoto,
-                    contentDescription = "Add a photo",
-                    tint = Color.Black)
-              }
           if (isDefaultImageOpen) {
             DefaultImageCarousel(
                 onImageSelected = { bitmap ->
@@ -170,6 +153,7 @@ fun ProfileCreationScreen(
                 context = context,
                 onDismiss = { isDefaultImageOpen = false })
           }
+          ModifyPictureButton(showDialogImage = { showDialogImage = true })
           Spacer(modifier = Modifier.padding((2 * LARGE_PADDING).dp))
 
           Row(

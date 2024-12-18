@@ -1,11 +1,11 @@
 package com.android.sample.ui.profile
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -61,19 +62,24 @@ import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.model.profile.interestStringValues
+import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
+import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
+import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.resources.C.Tag.colorOfCategory
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.DefaultImageCarousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.components.TextFieldWithErrorState
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.NavigationActions
@@ -90,7 +96,9 @@ fun EditProfileScreen(
           ?: return Text(text = "No profile selected.", color = Color.Red)
 
   var name by remember { mutableStateOf(profile.name) }
+  val nameErrorState = remember { mutableStateOf<String?>(null) }
   var surname by remember { mutableStateOf(profile.surname) }
+  val surnameErrorState = remember { mutableStateOf<String?>(null) }
   var interests by remember { mutableStateOf(profile.interests) }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
@@ -163,15 +171,19 @@ fun EditProfileScreen(
                       .padding(MEDIUM_PADDING.dp)
                       .testTag("editProfileContent")
                       .verticalScroll(scrollState),
-              verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
-                ProfileImage(
+<
+            verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+            horizontalAlignment = Alignment.CenterHorizontally, // Ensures horizontal centering
+          ) {   
+            ProfileImage(
                     userId = profile.id,
                     modifier =
                         Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
                     imageViewModel,
                     editing = true,
                     bitmap = selectedImage)
-                if (isDefaultImageSelected) {
+            Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
+            if (isDefaultImageSelected) {
                   DefaultImageCarousel(
                       onImageSelected = { bitmap ->
                         selectedImage = bitmap
@@ -179,98 +191,129 @@ fun EditProfileScreen(
                       },
                       context = context,
                       onDismiss = { isDefaultImageSelected = false })
+               }
+
+            ModifyPictureButton(showDialogImage = { showDialogImage = true })
+
+            Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp)) {
+                  TextFieldWithErrorState(
+                      value = name,
+                      onValueChange = { name = it },
+                      label = "Name",
+                      validation = { input ->
+                        if (input.isBlank()) "Name cannot be empty" else null
+                      },
+                      externalError = nameErrorState.value,
+                      modifier = Modifier.weight(1f),
+                      errorTestTag = "nameError",
+                      testTag = "inputProfileName")
+                  TextFieldWithErrorState(
+                      value = surname,
+                      onValueChange = { surname = it },
+                      label = "Surname",
+                      validation = { input ->
+                        if (input.isBlank()) "Surname cannot be empty" else null
+                      },
+                      externalError = surnameErrorState.value,
+                      modifier = Modifier.weight(1f),
+                      errorTestTag = "surnameError",
+                      testTag = "inputProfileSurname")
                 }
-                ModifyPictureButton(
-                    context = context,
-                    networkManager = networkManager,
-                    onPerformAction = { showDialogImage = true })
 
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
-                    placeholder = { Text("Your Name") },
-                    modifier = Modifier.fillMaxWidth().testTag("inputProfileName"))
-                OutlinedTextField(
-                    value = surname,
-                    onValueChange = { surname = it },
-                    label = { Text("Surname") },
-                    placeholder = { Text("Your surname") },
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .height(IMAGE_SIZE.dp)
-                            .testTag("inputProfileSurname"))
+            // Interest list and add button
+            Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
 
-                // Interest list and add button
+            var newListInterests by remember { mutableStateOf(interests ?: emptyList()) }
 
-                var newListInterests by remember { mutableStateOf(interests ?: emptyList()) }
+            ManageInterests(
+                initialInterests = interests ?: emptyList(),
+                onUpdateInterests = { newListInterests = it })
 
-                ManageInterests(
-                    initialInterests = interests ?: emptyList(),
-                    onUpdateInterests = { newListInterests = it })
+            Spacer(modifier = Modifier.padding(EXTRA_LARGE_PADDING.dp))
 
-                Button(
-                    onClick = {
-                      if (isPictureRemoved) {
-                        imageViewModel.deleteProfilePicture(
-                            profile.id,
-                            onSuccess = {
-                              photo = null // Clear photo reference
-                            },
-                            onFailure = { error ->
-                              Log.e(
-                                  "EditProfileScreen",
-                                  "Failed to remove profile picture: ${error.message}")
-                            })
+            Card(
+                modifier =
+                    Modifier.fillMaxWidth(WIDTH_FRACTION_MD).testTag("ProfileCreationButtonCard"),
+                colors =
+                    CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+                elevation =
+                    CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                  Button(
+                      onClick = {
+                        nameErrorState.value = if (name.isBlank()) "Name cannot be empty" else null
+                        surnameErrorState.value =
+                            if (surname.isBlank()) "Surname cannot be empty" else null
+                        if (nameErrorState.value == null && surnameErrorState.value == null) {
+                          if (isPictureRemoved) {
+                            imageViewModel.deleteProfilePicture(
+                                profile.id,
+                                onSuccess = {
+                                  photo = null // Clear photo reference
+                                },
+                                onFailure = { error ->
+                                  Log.e(
+                                      "EditProfileScreen",
+                                      "Failed to remove profile picture: ${error.message}")
+                                })
+                          }
+                          selectedImage?.let { bitmap ->
+                            imageViewModel.uploadProfilePicture(
+                                profile.id,
+                                bitmap,
+                                onSuccess = { url ->
+                                  photo = url // Update photo URL in profile
+                                },
+                                onFailure = { error ->
+                                  Log.e(
+                                      "EditProfileScreen",
+                                      "Failed to upload profile picture: ${error.message}")
+                                })
+                          }
+                          try {
+                            profileViewModel.updateProfile(
+                                User(
+                                    id = profile.id,
+                                    name = name,
+                                    surname = surname,
+                                    interests = newListInterests,
+                                    activities = profile.activities,
+                                    photo = photo,
+                                    likedActivities = profile.likedActivities))
+                            navigationActions.goBack()
+                          } catch (_: NumberFormatException) {}
+                          performOfflineAwareAction(
+                              context = context,
+                              networkManager = networkManager,
+                              onPerform = {
+                                selectedImage?.let { bitmap ->
+                                  imageViewModel.uploadProfilePicture(
+                                      profile.id,
+                                      bitmap,
+                                      onSuccess = { url ->
+                                        photo = url // Update photo URL in profile
+                                      },
+                                      onFailure = { error ->
+                                        Log.e(
+                                            "EditProfileScreen",
+                                            "Failed to upload profile picture: ${error.message}")
+                                      })
+                                }
+                              })
+                        }
+                      },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .height(AUTH_BUTTON_HEIGHT.dp)
+                              .testTag("profileSaveButton"),
+                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                        Text("Save", fontSize = SUBTITLE_FONTSIZE.sp)
                       }
-                      selectedImage?.let { bitmap ->
-                        imageViewModel.uploadProfilePicture(
-                            profile.id,
-                            bitmap,
-                            onSuccess = { url ->
-                              photo = url // Update photo URL in profile
-                            },
-                            onFailure = { error ->
-                              Log.e(
-                                  "EditProfileScreen",
-                                  "Failed to upload profile picture: ${error.message}")
-                            })
-                      }
-                      try {
-                        profileViewModel.updateProfile(
-                            User(
-                                id = profile.id,
-                                name = name,
-                                surname = surname,
-                                interests = newListInterests,
-                                activities = profile.activities,
-                                photo = photo,
-                                likedActivities = profile.likedActivities))
-                        navigationActions.goBack()
-                      } catch (_: NumberFormatException) {}
-                      performOfflineAwareAction(
-                          context = context,
-                          networkManager = networkManager,
-                          onPerform = {
-                            selectedImage?.let { bitmap ->
-                              imageViewModel.uploadProfilePicture(
-                                  profile.id,
-                                  bitmap,
-                                  onSuccess = { url ->
-                                    photo = url // Update photo URL in profile
-                                  },
-                                  onFailure = { error ->
-                                    Log.e(
-                                        "EditProfileScreen",
-                                        "Failed to upload profile picture: ${error.message}")
-                                  })
-                            }
-                          })
-                    },
-                    modifier = Modifier.fillMaxWidth().testTag("profileSaveButton")) {
-                      Text("Save", color = Color.White)
-                    }
-              }
+                }
+          }
         }
       })
 }
@@ -467,17 +510,18 @@ fun InterestEditBox(interest: Interest, onRemove: () -> Unit) {
 
 @Composable
 fun ModifyPictureButton(
-    context: Context,
-    networkManager: NetworkManager,
-    onPerformAction: () -> Unit,
+    showDialogImage: () -> Unit,
     modifier: Modifier = Modifier.testTag("uploadPicture")
 ) {
-  Button(
-      onClick = {
-        performOfflineAwareAction(
-            context = context, networkManager = networkManager, onPerform = onPerformAction)
-      },
-      modifier = modifier) {
-        Text("Modify Profile Picture")
+  Box(
+      modifier =
+          modifier
+              .clickable { showDialogImage() } // Handle click action
+              .padding(MEDIUM_PADDING.dp)
+              .background(Color.Transparent)) {
+        Icon(
+            imageVector = Icons.Default.AddAPhoto,
+            contentDescription = "Add a photo",
+            tint = Color.Black)
       }
 }

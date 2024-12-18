@@ -253,7 +253,7 @@ val userWithActivities =
         surname = "A",
         photo = "",
         interests = interest3,
-        activities = listOf(),
+        activities = listOf("activity1", "activity2", "activity3"),
         likedActivities = listOf(activityBiking.uid))
 
 const val email = "test@example.com"

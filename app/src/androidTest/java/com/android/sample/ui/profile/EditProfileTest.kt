@@ -11,6 +11,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.R
 import com.android.sample.model.activity.categories
@@ -194,5 +196,39 @@ class EditProfileScreenTest {
 
     // Verify the "Remove Image" action was performed
     composeTestRule.onNodeWithTag("profilePicture").assertExists()
+  }
+
+  @Test
+  fun testErrorClearedAfterValidInput() {
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
+
+    // Input invalid data and trigger error
+    composeTestRule.onNodeWithTag("inputProfileName").performTextReplacement("")
+    composeTestRule.onNodeWithTag("inputProfileSurname").performTextReplacement("")
+
+    composeTestRule.onNodeWithTag("profileSaveButton").performClick()
+    composeTestRule.onNodeWithTag("nameError").assertTextEquals("Name cannot be empty")
+
+    // Correct the error
+    composeTestRule.onNodeWithTag("inputProfileName").performTextInput("John")
+    composeTestRule.onNodeWithTag("profileSaveButton").performClick()
+
+    // Check that the error message is cleared
+    composeTestRule.onNodeWithTag("nameError").assertDoesNotExist()
+  }
+
+  @Test
+  fun testNavigateBackWithUnmodifiedFields() {
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
+
+    // Click the Go Back button without making changes
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
+
+    // Verify navigation action
+    verify(navigationActions).goBack()
   }
 }
