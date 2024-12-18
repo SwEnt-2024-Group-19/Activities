@@ -132,6 +132,7 @@ fun CreateActivityScreen(
   val maxTitleLength = 50
   val maxDescriptionLength = 500
   val locationQuery by locationViewModel.query.collectAsState()
+    locationViewModel.setQuery("")
   var showDropdown by remember { mutableStateOf(false) }
   //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
   val locationSuggestions by
