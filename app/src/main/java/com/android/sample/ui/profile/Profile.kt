@@ -18,9 +18,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.HourglassFull
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,6 +56,7 @@ import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.LIGHT_PURPLE_COLOR
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MAXIMUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.NORMAL_PADDING
@@ -466,35 +465,70 @@ fun UserProfile(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.Top,
                   modifier = Modifier.fillMaxWidth().testTag("activityTypeRow")) {
-                    IconButton(
-                        onClick = { activityType = CREATED_ACTIVITIES },
+                    Text(
+                        "Created",
                         modifier =
-                            if (activityType == CREATED_ACTIVITIES)
-                                Modifier.background(Color.LightGray, shape = CircleShape)
-                                    .testTag("createdActivities")
-                            else Modifier.testTag("createdActivities")) {
-                          Icon(Icons.Outlined.Edit, contentDescription = "Created")
-                        }
+                            Modifier.testTag("createdActivities").clickable {
+                              activityType = CREATED_ACTIVITIES
+                            },
+                        style =
+                            if (activityType == CREATED_ACTIVITIES) {
+                              TextStyle(
+                                  textDecoration =
+                                      TextDecoration.Underline // Applique le soulignement
+                                  )
+                            } else TextStyle(),
+                        color =
+                            if (activityType == CREATED_ACTIVITIES) Color(MAIN_COLOR_DARK)
+                            else Color.Gray,
+                        fontWeight =
+                            if (activityType == CREATED_ACTIVITIES) FontWeight.Bold
+                            else FontWeight.Normal,
+                    )
 
-                    IconButton(
-                        onClick = { activityType = ENROLLED_ACTIVITIES },
+                    Text(
+                        "Enrolled",
                         modifier =
-                            if (activityType == ENROLLED_ACTIVITIES)
-                                Modifier.background(Color.LightGray, shape = CircleShape)
-                                    .testTag("enrolledActivities")
-                            else Modifier.testTag("enrolledActivities")) {
-                          Icon(Icons.Outlined.Groups, contentDescription = "Enrolled")
-                        }
-                    IconButton(
-                        onClick = { activityType = PAST_ACTIVITIES },
+                            Modifier.testTag("enrolledActivities").clickable {
+                              activityType = ENROLLED_ACTIVITIES
+                            },
+                        style =
+                            if (activityType == ENROLLED_ACTIVITIES) {
+                              TextStyle(
+                                  textDecoration =
+                                      TextDecoration.Underline // Applique le soulignement
+                                  )
+                            } else TextStyle(),
+                        color =
+                            if (activityType == ENROLLED_ACTIVITIES) Color(MAIN_COLOR_DARK)
+                            else Color.Gray,
+                        fontWeight =
+                            if (activityType == ENROLLED_ACTIVITIES) FontWeight.Bold
+                            else FontWeight.Normal,
+                    )
+
+                    Text(
+                        "Passed",
                         modifier =
-                            if (activityType == PAST_ACTIVITIES)
-                                Modifier.background(Color.LightGray, shape = CircleShape)
-                                    .testTag("passedActivities")
-                            else Modifier.testTag("passedActivities")) {
-                          Icon(Icons.Outlined.HourglassFull, contentDescription = "Passed")
-                        }
+                            Modifier.testTag("passedActivities").clickable {
+                              activityType = PAST_ACTIVITIES
+                            },
+                        style =
+                            if (activityType == PAST_ACTIVITIES) {
+                              TextStyle(
+                                  textDecoration =
+                                      TextDecoration.Underline // Applique le soulignement
+                                  )
+                            } else TextStyle(),
+                        color =
+                            if (activityType == PAST_ACTIVITIES) Color(MAIN_COLOR_DARK)
+                            else Color.Gray,
+                        fontWeight =
+                            if (activityType == PAST_ACTIVITIES) FontWeight.Bold
+                            else FontWeight.Normal,
+                    )
                   }
+
               Column(
                   verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.Top),
                   horizontalAlignment = Alignment.Start,
