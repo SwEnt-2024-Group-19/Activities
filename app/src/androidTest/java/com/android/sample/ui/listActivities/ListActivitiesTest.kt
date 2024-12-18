@@ -312,7 +312,22 @@ class OverviewScreenTest {
         composeTestRule.onNodeWithTag("iconlocation", useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithTag("iconcalendar", useUnmergedTree = true).assertIsDisplayed()
     }
-
+    @Test
+    fun interestsAreCorrectlyDisplayed(){
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        val activity1 = activity.copy(subcategory = "Basketball")
+        composeTestRule.setContent {
+            ActivityCard(
+                navigationActions = navigationActions,
+                listActivitiesViewModel = listActivitiesViewModel,
+                profileViewModel = userProfileViewModel,
+                profile = testUser,
+                activity = activity1)
+        }
+        composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("interestPresent", useUnmergedTree = true)
+        composeTestRule.onNodeWithText("Basketball", useUnmergedTree = true).assertIsDisplayed()
+    }
   @Test
   fun changeIconWhenActivityNotLiked() {
     userProfileViewModel = mock(ProfileViewModel::class.java)
