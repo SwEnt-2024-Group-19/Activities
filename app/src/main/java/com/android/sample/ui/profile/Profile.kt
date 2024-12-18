@@ -62,6 +62,7 @@ import com.android.sample.resources.C.Tag.MAXIMUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.NORMAL_PADDING
 import com.android.sample.resources.C.Tag.PAST_ACTIVITIES
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.ROW_WIDTH
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -112,7 +113,7 @@ fun ProfileScreen(
         }
 
     when (user) {
-      null -> LoadingScreen(navigationActions)
+      null -> LoadingScreen(navigationActions, selectedRoute = Route.PROFILE)
       else -> {
         UserProfile(
             user,
@@ -147,28 +148,39 @@ fun ProfileScreen(
 }
 
 @Composable
-fun LoadingScreen(navigationActions: NavigationActions) {
+fun LoadingScreen(navigationActions: NavigationActions, selectedRoute: String) {
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+      modifier = Modifier.testTag("loadingScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
-      }) { innerPadding ->
-        Column(
-            Modifier.fillMaxSize().padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(
-                  text = LocalContext.current.getString(R.string.no_profile),
-                  modifier = Modifier.testTag("loadingText"),
-                  color = Color.Black)
-              Button(
-                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                  modifier = Modifier.testTag("signInButton")) {
-                    Text(LocalContext.current.getString(R.string.go_to_sign_in_page))
-                  }
-            }
+            selectedItem = selectedRoute)
+      }) { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+          Column(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center,
+              modifier = Modifier.align(Alignment.Center).fillMaxWidth(WIDTH_FRACTION_MD)) {
+                Text(
+                    text = "You are not logged in. Login or Register to see your liked activities.",
+                    modifier = Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("loadingText"),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center)
+                Card(
+                    shape = RoundedCornerShape(MEDIUM_PADDING.dp),
+                    modifier =
+                        Modifier.padding(MEDIUM_PADDING.dp).testTag("DefaultImageCarousel")) {
+                      Button(
+                          onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                          modifier = Modifier.testTag("signInButton"),
+                          shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                            Text("Go to Sign Up Page", style = MaterialTheme.typography.labelLarge)
+                          }
+                    }
+              }
+        }
       }
 }
 
