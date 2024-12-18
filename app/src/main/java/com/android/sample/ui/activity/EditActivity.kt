@@ -190,7 +190,8 @@ fun EditActivityScreen(
                   onCameraClick = {
                     showDialogImage = false
                     isCamOpen = true
-                  })
+                  },
+                  onSelectDefault = { showDialogImage = false })
             }
             ActivityForm(
                 context = context,

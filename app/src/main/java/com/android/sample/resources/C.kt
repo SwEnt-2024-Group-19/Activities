@@ -29,6 +29,7 @@ object C {
     const val ENROLLED_ACTIVITIES = 1
     const val PAST_ACTIVITIES = 2
 
+    const val CARD_IAMGES_SIZE = 120
     const val STANDARD_PADDING = 8
 
     const val MEDIUM_FONTSIZE = 18
