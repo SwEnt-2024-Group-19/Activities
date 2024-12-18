@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Icon
@@ -40,7 +41,13 @@ import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
  * @param onCameraClick The callback to handle the click on the camera button.
  */
 @Composable
-fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraClick: () -> Unit) {
+fun AddImageDialog(
+    onDismiss: () -> Unit,
+    onGalleryClick: () -> Unit,
+    onCameraClick: () -> Unit,
+    onSelectDefault: () -> Unit,
+    default: Boolean = false
+) {
   Dialog(
       onDismissRequest = onDismiss,
       properties =
@@ -100,6 +107,25 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
                     contentDescription = "Choose from gallery",
                     tint = Color.Gray)
               }
+
+          if (default) {
+            TextButton(
+                onClick = onSelectDefault,
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(STANDARD_PADDING.dp)
+                        .testTag("defaultImageButton")
+                        .border(
+                            width = BORDER_STROKE_SM.dp,
+                            color = Color.Cyan,
+                            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))) {
+                  Text(
+                      text = "Select default picture",
+                      style = TextStyle(color = Color.Black, fontSize = SUBTITLE_FONTSIZE.sp))
+                  Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+                  Icon(Icons.Filled.AddToPhotos, contentDescription = "Default", tint = Color.Gray)
+                }
+          }
         }
       }
 }
@@ -107,5 +133,5 @@ fun AddImageDialog(onDismiss: () -> Unit, onGalleryClick: () -> Unit, onCameraCl
 @Preview
 @Composable
 fun AddImageDialogPreview() {
-  AddImageDialog({}, {}, {})
+  AddImageDialog({}, {}, {}, {}, default = true)
 }
