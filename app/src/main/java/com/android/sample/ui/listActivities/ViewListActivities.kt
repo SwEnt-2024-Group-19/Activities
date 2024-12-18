@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -116,12 +118,6 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.OVERVIEW)
       },
-//      floatingActionButton = {
-//        FloatingActionButton(
-//            onClick = { showFilterDialog = true }, modifier = Modifier.testTag("filterDialog")) {
-//              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
-//            }
-//      }
   ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
           if (showFilterDialog) {
@@ -217,7 +213,7 @@ fun ListActivitiesScreen(
                         color = MaterialTheme.colorScheme.onSurface)
                   }
                 } else {
-                  var filteredActivities =
+                  val filteredActivities =
                       activitiesList.filter {
                         if (it.price > viewModel.maxPrice) false
                         else if (viewModel.availablePlaces != null &&
@@ -336,7 +332,7 @@ fun ActivityCard(
                           )
                       )
               )
-              DisplayInterests(activity)
+
             // Display the activity name on top of the image
             Text(
                 text = activity.title,
@@ -349,17 +345,22 @@ fun ActivityCard(
                     Modifier.align(Alignment.BottomStart)
                         .padding(MEDIUM_PADDING.dp)
                         .testTag("titleActivity"))
+              Row(
+                  modifier =
+                  Modifier.align(Alignment.TopEnd)
+                      .padding(SMALL_PADDING.dp)
+                      .testTag("activityStatus").fillMaxWidth(),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically) {
+
+            DisplayInterests(activity)
 
             if (profile != null) {
               if (profile.activities?.contains(activity.uid) == true) {
-                Row(
-                    modifier =
-                        Modifier.align(Alignment.TopEnd)
-                            .padding(SMALL_PADDING.dp)
-                            .testTag("activityStatus"),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically) {
 
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
                       if (profile.id == activity.creator) {
                         Box(
                             modifier =
@@ -379,7 +380,6 @@ fun ActivityCard(
                                   style =
                                       MaterialTheme.typography.bodySmall.copy(
                                           color = Color.White,
-                                          fontStyle = FontStyle.Italic,
                                           fontWeight = FontWeight.SemiBold),
                                   modifier = Modifier.testTag("yourActivityStatus"))
                             }
@@ -404,12 +404,11 @@ fun ActivityCard(
                                   style =
                                       MaterialTheme.typography.bodySmall.copy(
                                           color = Color.White,
-                                          fontStyle = FontStyle.Italic,
                                           fontWeight = FontWeight.SemiBold),
                                   modifier = Modifier.testTag("enrolledText"))
                             }
                       }
-                    }
+                    }}
               }
             }
           }
@@ -420,10 +419,8 @@ fun ActivityCard(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
-              Icon(
-                  imageVector = Icons.Filled.CalendarMonth,
-                  contentDescription = "Calendar",
-                  tint = Color(PRIMARY_COLOR))
+              DisplayIcon(Icons.Filled.CalendarMonth, "Calendar")
+
                 Text(
                     text = formattedDate,
                     style =
@@ -460,17 +457,9 @@ fun ActivityCard(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
-              Icon(
-                  imageVector = Icons.Filled.LocationOn,
-                  contentDescription = "location",
-                  tint = Color(PRIMARY_COLOR))
-              if (distance != null) {
-                val distanceString =
-                          if (distance < 1) {
-                              "${round(distance * 1000).toInt()}m"
-                          } else {
-                              "${round(distance * 10) / 10}km"
-                          }}
+              DisplayIcon(Icons.Filled.LocationOn, "location")
+
+
                 Text(
                     text = (activity.location?.shortName ?: "No location" ) + if (distance != null) {
                                     if (distance < 1) {
@@ -481,12 +470,10 @@ fun ActivityCard(
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
-                    modifier = Modifier.weight(1f) // Takes up remaining space
+                    modifier = Modifier.weight(1f).testTag("locationAndDistance") // Takes up remaining space
                     )
-              Icon(
-                  imageVector = Icons.Filled.Groups,
-                  contentDescription = "Participants",
-                  tint = Color(PRIMARY_COLOR))
+              DisplayIcon(Icons.Filled.Groups, "Participants")
+
               Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
 
                 Text(
@@ -524,10 +511,16 @@ fun ActivityCard(
 
 @Composable
 fun DisplayInterests(activity:Activity){
+
+    if(activity.subcategory.contains("Other") || activity.subcategory=="None") {
+        return
+    }
+
+
     Box(
         modifier =
-        Modifier.padding(SMALL_PADDING.dp)
-            .testTag("activityStatusPresent")
+        Modifier.padding(8.dp)
+            .testTag("interestPresent")
             .background(
                 CategoryColorMap[activity.category] ?: Color.Gray,
                 shape =
@@ -541,11 +534,18 @@ fun DisplayInterests(activity:Activity){
                 text = activity.subcategory,
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = Color(PRIMARY_COLOR),
-                    fontStyle = FontStyle.Italic
+                    fontWeight = FontWeight.SemiBold
                 ),
-                modifier = Modifier.padding(SMALL_PADDING.dp)
+                modifier =Modifier.testTag("subcategoryText")
             )
         }
     }
-
+@Composable
+fun DisplayIcon(imageVector: ImageVector, contentDescription: String) {
+    Icon(
+        imageVector =imageVector,
+        contentDescription = contentDescription,
+        tint = Color(PRIMARY_COLOR),
+        modifier = Modifier.testTag("icon$imageVector"))
+}
 

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -344,8 +345,8 @@ class OverviewScreenTest {
           distance = 0.5503f)
     }
     composeTestRule
-        .onNodeWithTag("distanceText", useUnmergedTree = true)
-        .assertTextContains("Distance : 550m")
+        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .assertTextContains("550m", substring = true)
   }
 
   @Test
@@ -361,8 +362,8 @@ class OverviewScreenTest {
           distance = 12.354f)
     }
     composeTestRule
-        .onNodeWithTag("distanceText", useUnmergedTree = true)
-        .assertTextContains("Distance : 12.4km")
+        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .assertTextContains("12.4km", substring = true)
   }
 
   @Test
@@ -377,7 +378,7 @@ class OverviewScreenTest {
           activity = activity,
           distance = null)
     }
-    composeTestRule.onNodeWithTag("distanceText", useUnmergedTree = true).assertIsNotDisplayed()
+    composeTestRule.onNodeWithTag("locationAndDistance", useUnmergedTree = true).assertTextEquals("EPFL") //there is only the location, not the distance
   }
 
   @Test
