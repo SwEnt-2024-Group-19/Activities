@@ -181,10 +181,9 @@ fun ActivityRow(
     navigationActions: NavigationActions,
     remainingTime: Boolean,
     user: User,
-    isParticipant: Boolean=false,
+    isParticipant: Boolean = false,
     context: Context = LocalContext.current,
     imageViewModel: ImageViewModel,
-
 ) {
 
   Row(
@@ -497,7 +496,8 @@ fun UserProfile(
                         profileViewModel,
                         listActivitiesViewModel,
                         imageViewModel,
-                        uid,)
+                        uid,
+                    )
                   }
             }
       }
@@ -569,7 +569,7 @@ fun DisplayActivitiesList(
             navigationActions = navigationActions,
             userProfileViewModel = userProfileViewModel,
             user = user,
-            isParticipant= uid != "",
+            isParticipant = uid != "",
             remainingTime = remainingTime,
             imageViewModel = imageViewModel)
         Spacer(modifier = Modifier.height(NORMAL_PADDING.dp))
