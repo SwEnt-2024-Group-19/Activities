@@ -52,9 +52,11 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -101,7 +103,7 @@ fun LikedActivitiesScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.Center)) {
+                    modifier = Modifier.align(Alignment.Center).fillMaxWidth(WIDTH_FRACTION_MD)) {
                       Text(
                           text =
                               "You are not logged in. Login or Register to see your liked activities.",
@@ -111,12 +113,19 @@ fun LikedActivitiesScreen(
                           color = MaterialTheme.colorScheme.onSurface,
                           style = MaterialTheme.typography.bodyMedium,
                           textAlign = TextAlign.Center)
-                      Button(
-                          onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                          modifier = Modifier.testTag("signInButton"),
-                      ) {
-                        Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
-                      }
+                      Card(
+                          shape = RoundedCornerShape(MEDIUM_PADDING.dp),
+                          modifier =
+                              Modifier.padding(MEDIUM_PADDING.dp).testTag("DefaultImageCarousel")) {
+                            Button(
+                                onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                                modifier = Modifier.testTag("signInButton"),
+                                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                                  Text(
+                                      "Go to Sign Up Page",
+                                      style = MaterialTheme.typography.labelLarge)
+                                }
+                          }
                     }
               }
               if (likedActivitiesList != null) {
