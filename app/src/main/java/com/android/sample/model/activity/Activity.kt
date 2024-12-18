@@ -4,6 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.CULTURE_COLOR
+import com.android.sample.resources.C.Tag.ENTERTAINMENT_COLOR
+import com.android.sample.resources.C.Tag.SKILLS_COLOR
+import com.android.sample.resources.C.Tag.SPORT_COLOR
 import com.google.firebase.Timestamp
 
 @Entity(tableName = "activities")
@@ -15,6 +19,7 @@ data class Activity(
     var startTime: String,
     var duration: String,
     var category: Category = Category.SPORT,
+    var subcategory: String = "None",
     var price: Double,
     var location: Location?,
     var creator: String,
@@ -57,3 +62,11 @@ enum class Category {
 }
 
 val categories = Category.values().toList()
+
+val CategoryColorMap =
+    mapOf(
+        Category.SPORT to SPORT_COLOR,
+        Category.CULTURE to CULTURE_COLOR,
+        Category.SKILLS to SKILLS_COLOR,
+        Category.ENTERTAINMENT to ENTERTAINMENT_COLOR,
+    )

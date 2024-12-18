@@ -41,12 +41,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
@@ -54,7 +56,7 @@ import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
-import com.android.sample.ui.components.NoInternetScreen
+import com.android.sample.ui.components.LoadingScreen
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -65,7 +67,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -89,6 +93,7 @@ fun MapScreen(
   var showBottomSheet by remember { mutableStateOf(false) }
   val previousScreen = navigationActions.getPreviousRoute()
   var showFilterDialog by remember { mutableStateOf(false) }
+  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
   HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
 
   val firstLocation =
@@ -141,12 +146,16 @@ fun MapScreen(
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
-          NoInternetScreen(padding)
+          LoadingScreen(message = stringResource(R.string.no_internet_connection))
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
-                cameraPositionState = cameraPositionState) {
+                cameraPositionState = cameraPositionState,
+                properties =
+                    MapProperties(
+                        mapStyleOptions =
+                            MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))) {
                   (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
                       .activities
                       .filter {
@@ -158,8 +167,21 @@ fun MapScreen(
                         else if (listActivitiesViewModel.minDate != null &&
                             it.date < listActivitiesViewModel.minDate!!)
                             false
-                        else if (listActivitiesViewModel.duration != null &&
-                            it.duration != listActivitiesViewModel.duration)
+                        else if (listActivitiesViewModel.maxDate != null &&
+                            it.date > listActivitiesViewModel.maxDate!!)
+                            false
+                        else if (listActivitiesViewModel.startTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                it.startTime, listActivitiesViewModel.startTime!!))
+                            false
+                        else if (listActivitiesViewModel.endTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                listActivitiesViewModel.endTime!!,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
+                            false
+                        else if (listActivitiesViewModel.distance != null &&
+                            listActivitiesViewModel.distance!! <
+                                locationViewModel.getDistanceFromCurrentLocation(it.location)!!)
                             false
                         else if (listActivitiesViewModel.onlyPRO && it.type != ActivityType.PRO)
                             false
@@ -174,6 +196,7 @@ fun MapScreen(
                                             item.location!!.latitude, item.location!!.longitude)),
                             title = item.title,
                             snippet = item.description,
+                            icon = MapMarkerUtils.getCachedMarkerIcon(context, item.category),
                             onClick = {
                               selectedActivity = item
                               selectedActivity?.let { listActivitiesViewModel.selectActivity(it) }
@@ -191,7 +214,7 @@ fun MapScreen(
 
                     Marker(
                         state = currentLocationMarkerState,
-                        title = it.name,
+                        title = it.shortName,
                         snippet = "Lat: ${it.latitude}, Lon: ${it.longitude}",
                         icon =
                             BitmapDescriptorFactory.fromBitmap(
@@ -211,9 +234,24 @@ fun MapScreen(
   if (showFilterDialog) {
     FilterDialog(
         onDismiss = { showFilterDialog = false },
-        onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+        onFilter = {
+            price,
+            placesAvailable,
+            minDateTimestamp,
+            maxDateTimestamp,
+            startTime,
+            endTime,
+            distance,
+            seeOnlyPRO ->
           listActivitiesViewModel.updateFilterState(
-              price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+              price,
+              placesAvailable,
+              minDateTimestamp,
+              maxDateTimestamp,
+              startTime,
+              endTime,
+              distance,
+              seeOnlyPRO)
         })
   }
   if (showBottomSheet) {
@@ -294,7 +332,7 @@ fun DisplayActivity(activity: Activity) {
                 modifier = Modifier.testTag("locationIcon"))
             Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
             Text(
-                text = "Location: ${activity.location!!.name}",
+                text = "Location: ${activity.location!!.shortName}",
                 modifier = Modifier.testTag("locationText"))
           }
     }
@@ -304,7 +342,7 @@ fun DisplayActivity(activity: Activity) {
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth().testTag("activityPrice")) {
           Text(
-              text = "Price: ${activity.price}€",
+              text = "Price: ${activity.price} CHF",
               style = MaterialTheme.typography.bodyMedium,
               modifier = Modifier.testTag("priceText"))
           Text(

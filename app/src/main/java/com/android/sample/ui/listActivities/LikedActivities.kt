@@ -59,6 +59,7 @@ import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -83,7 +84,7 @@ fun LikedActivitiesScreen(
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
+            selectedItem = Route.LIKED_ACTIVITIES)
       }) { paddingValues ->
         Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
           val likedActivitiesList =
@@ -256,7 +257,7 @@ fun ActivityCard2(
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
                 Text(
-                    text = activity.location?.name ?: "No location",
+                    text = activity.location?.shortName ?: "No location",
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontStyle = FontStyle.Italic, color = Color.Gray),

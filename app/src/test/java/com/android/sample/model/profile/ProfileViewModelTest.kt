@@ -226,4 +226,43 @@ class ProfileViewModelTest {
     // Verify that the DAO's insert method was called
     verify(mockUserDao).insert(testUser)
   }
+
+  @Test
+  fun getUserDataInvokesOnResultWithNullOnFailure() {
+
+    val userId = "testUserId"
+    val exception = Exception("Repository failure")
+    val onResult = mock<(User?) -> Unit>()
+
+    `when`(profilesRepository.getUser(eq(userId), any(), any())).thenAnswer {
+      val onFailure = it.getArgument<(Exception) -> Unit>(2)
+      onFailure(exception)
+    }
+
+    // Act
+    profileViewModel.getUserData(userId, onResult)
+
+    verify(onResult).invoke(null)
+
+    verify(profilesRepository).getUser(eq(userId), any(), any())
+  }
+
+  @Test
+  fun getUserDataInvokesOnResultOnSuccess() {
+
+    val userId = testUser.id
+    val expectedUser = testUser
+    val onResult = mock<(User?) -> Unit>()
+
+    `when`(profilesRepository.getUser(eq(userId), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(User?) -> Unit>(1)
+      onSuccess(expectedUser)
+    }
+
+    profileViewModel.getUserData(userId, onResult)
+
+    verify(onResult).invoke(expectedUser)
+
+    verify(profilesRepository).getUser(eq(userId), any(), any())
+  }
 }

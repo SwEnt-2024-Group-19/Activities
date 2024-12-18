@@ -58,7 +58,7 @@ import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PURPLE_COLOR
@@ -71,6 +71,7 @@ import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -103,7 +104,7 @@ fun ListActivitiesScreen(
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
+            selectedItem = Route.OVERVIEW)
       },
       floatingActionButton = {
         FloatingActionButton(
@@ -115,14 +116,29 @@ fun ListActivitiesScreen(
           if (showFilterDialog) {
             FilterDialog(
                 onDismiss = { showFilterDialog = false },
-                onFilter = { price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO ->
+                onFilter = {
+                    price,
+                    placesAvailable,
+                    minDateTimestamp,
+                    maxDateTimestamp,
+                    startTime,
+                    endTime,
+                    distance,
+                    seeOnlyPRO ->
                   viewModel.updateFilterState(
-                      price, placesAvailable, minDateTimestamp, acDuration, seeOnlyPRO)
+                      price,
+                      placesAvailable,
+                      minDateTimestamp,
+                      maxDateTimestamp,
+                      startTime,
+                      endTime,
+                      distance,
+                      seeOnlyPRO)
                 })
           }
           Box(
               modifier =
-                  Modifier.height(BUTTON_HEIGHT.dp)
+                  Modifier.height(BUTTON_HEIGHT_SM.dp)
                       .testTag("segmentedButtonRow")
                       .fillMaxWidth()
                       .padding(horizontal = STANDARD_PADDING.dp)) {
@@ -190,7 +206,20 @@ fun ListActivitiesScreen(
                             (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
                             false
                         else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
-                        else if (viewModel.duration != null && it.duration != viewModel.duration)
+                        else if (viewModel.maxDate != null && it.date > viewModel.maxDate!!) false
+                        else if (viewModel.startTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                it.startTime, viewModel.startTime!!))
+                            false
+                        else if (viewModel.endTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                viewModel.endTime!!,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
+                            false
+                        else if (viewModel.distance != null &&
+                            viewModel.distance!! <
+                                (locationViewModel.getDistanceFromCurrentLocation(it.location)
+                                    ?: 0f))
                             false
                         else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
                         else {
@@ -198,7 +227,8 @@ fun ListActivitiesScreen(
                           else {
                             it.title.contains(searchText, ignoreCase = true) ||
                                 it.description.contains(searchText, ignoreCase = true) ||
-                                it.location?.name?.contains(searchText, ignoreCase = true) ?: false
+                                it.location?.shortName?.contains(searchText, ignoreCase = true)
+                                    ?: false
                           }
                         }
                       }
@@ -392,7 +422,7 @@ fun ActivityCard(
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
                 Text(
-                    text = activity.location?.name ?: "No location",
+                    text = activity.location?.shortName ?: "No location",
                     style =
                         MaterialTheme.typography.bodySmall.copy(
                             fontStyle = FontStyle.Italic, color = Color.Gray),

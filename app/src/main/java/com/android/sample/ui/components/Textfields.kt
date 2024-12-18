@@ -1,8 +1,11 @@
 package com.android.sample.ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -19,14 +22,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
-import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_START
-import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_PADDING_TOP
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
-import com.android.sample.resources.C.Tag.SMALL_PADDING
-import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 
 @Composable
 fun PasswordTextField(
@@ -36,32 +37,55 @@ fun PasswordTextField(
     onPasswordVisibilityChange: () -> Unit,
     passwordError: String?
 ) {
-  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION)) {
-    OutlinedTextField(
-        value = password,
-        modifier = Modifier.fillMaxWidth().testTag("PasswordTextField"),
-        onValueChange = onPasswordChange,
-        label = { Text("Password") },
-        visualTransformation =
-            if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        isError = passwordError != null,
-        trailingIcon = {
-          IconButton(onClick = onPasswordVisibilityChange) {
-            Icon(
-                imageVector =
-                    if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                contentDescription = if (isPasswordVisible) "Hide password" else "Show password")
+  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_MD)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().testTag("PasswordCard"),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+        border =
+            if (passwordError != null) {
+              BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
+            } else null) {
+          // Box to remove padding discrepancies
+          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+            OutlinedTextField(
+                value = password,
+                onValueChange = onPasswordChange,
+                label = { Text("Password") },
+                modifier = Modifier.fillMaxWidth().testTag("PasswordTextField"),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                visualTransformation =
+                    if (isPasswordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
+                isError = passwordError != null,
+                trailingIcon = {
+                  IconButton(onClick = onPasswordVisibilityChange) {
+                    Icon(
+                        imageVector =
+                            if (isPasswordVisible) Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff,
+                        contentDescription =
+                            if (isPasswordVisible) "Hide password" else "Show password")
+                  }
+                },
+                colors =
+                    TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent))
           }
-        },
-    )
+        }
     passwordError?.let {
       Text(
           text = it,
           color = Color.Red,
-          fontSize = SUBTITLE_FONTSIZE.sp,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = MEDIUM_PADDING.dp, top = SMALL_PADDING.dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
                   .testTag("PasswordErrorText"))
     }
   }
@@ -73,23 +97,43 @@ fun EmailTextField(
     onEmailChange: (String) -> Unit,
     emailError: String?,
 ) {
-  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION)) {
-    OutlinedTextField(
-        value = email,
-        onValueChange = onEmailChange,
-        label = { Text("Email") },
-        isError = emailError != null,
-        modifier = Modifier.fillMaxWidth().testTag("EmailTextField"))
-
-    // Display the error message if there is an error
+  Column(modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_MD)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().testTag("EmailCard"),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+        border =
+            if (emailError != null) {
+              BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
+            } else null) {
+          // Box to ensure alignment and padding consistency
+          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+            OutlinedTextField(
+                value = email,
+                onValueChange = onEmailChange,
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth().testTag("EmailTextField"),
+                shape =
+                    RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp), // Matches the Card shape
+                isError = emailError != null,
+                colors =
+                    TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent))
+          }
+        }
     emailError?.let {
       Text(
           text = it,
           color = Color.Red,
-          fontSize = SUBTITLE_FONTSIZE.sp,
           modifier =
               Modifier.align(Alignment.Start)
-                  .padding(start = MEDIUM_PADDING.dp, top = SMALL_PADDING.dp)
+                  .padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
                   .testTag("EmailErrorText"))
     }
   }
@@ -103,6 +147,7 @@ fun TextFieldWithErrorState(
     modifier: Modifier = Modifier,
     validation: (String) -> String?,
     externalError: String? = null,
+    testTag: String? = null,
     errorTestTag: String
 ) {
   var internalError by remember { mutableStateOf<String?>(null) }
@@ -110,25 +155,78 @@ fun TextFieldWithErrorState(
   // Show external error if present, otherwise use internal error
   val error = externalError ?: internalError
 
-  Column() {
-    OutlinedTextField(
-        value = value,
-        onValueChange = { newValue ->
-          onValueChange(newValue)
-          internalError = validation(newValue)
-        },
-        label = { Text(label) },
-        isError = error != null,
-        modifier = modifier)
+  Column(modifier = modifier) {
+    Card(
+        modifier = Modifier.fillMaxWidth().testTag("TextFieldWithErrorStateCard"),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+        border = if (error != null) BorderStroke(BORDER_STROKE_SM.dp, Color.Red) else null) {
+          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = { newValue ->
+                  onValueChange(newValue)
+                  internalError = validation(newValue)
+                },
+                label = { Text(label) },
+                isError = error != null,
+                modifier = Modifier.fillMaxWidth().testTag(testTag ?: "TextFieldWithErrorState"),
+                shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
+                colors =
+                    TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+                        errorContainerColor = Color.Transparent),
+                singleLine = true)
+          }
+        }
     error?.let {
       Text(
           text = it,
           color = Color.Red,
           fontSize = ERROR_TEXTFIELD_FONT_SIZE,
           modifier =
-              Modifier.align(Alignment.Start)
-                  .padding(start = ERROR_TEXTFIELD_PADDING_START, top = ERROR_TEXTFIELD_PADDING_TOP)
+              Modifier.padding(start = MEDIUM_PADDING.dp, top = (MEDIUM_PADDING / 2).dp)
                   .testTag(errorTestTag))
     }
   }
+}
+
+@Composable
+fun TextFieldWithIcon(
+    value: String,
+    modifier: Modifier,
+    label: @Composable () -> Unit,
+    icon: @Composable () -> Unit,
+    testTag: String,
+) {
+  Card(
+      modifier = Modifier.fillMaxWidth().testTag("TextFieldWithIconCard"),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+          OutlinedTextField(
+              readOnly = true,
+              leadingIcon = icon,
+              value = value,
+              onValueChange = {},
+              colors =
+                  TextFieldDefaults.colors(
+                      focusedContainerColor = Color.Transparent,
+                      unfocusedContainerColor = Color.Transparent,
+                      focusedIndicatorColor = Color.Transparent,
+                      unfocusedIndicatorColor = Color.Transparent,
+                      errorIndicatorColor = Color.Transparent,
+                      errorContainerColor = Color.Transparent),
+              label = label,
+              modifier = modifier.testTag(testTag),
+              shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
+              singleLine = true)
+        }
+      }
 }

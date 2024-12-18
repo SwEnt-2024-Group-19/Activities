@@ -1,14 +1,24 @@
 package com.android.sample.ui.dialogs
 
-import android.icu.util.GregorianCalendar
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.HourglassTop
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -16,13 +26,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.sample.R
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.resources.C.Tag.DEFAULT_MAX_PRICE
 import com.android.sample.resources.C.Tag.DIALOG_PADDING
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_PADDING
+import com.android.sample.ui.components.MyDatePicker
+import com.android.sample.ui.components.MyTimePicker
 import com.google.firebase.Timestamp
+import java.time.ZoneId
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -32,16 +46,31 @@ fun FilterDialog(
         (
             price: Double?,
             membersAvailable: Int?,
-            schedule: Timestamp?,
-            duration: String?,
+            minDate: Timestamp?,
+            maxDate: Timestamp?,
+            startTime: String?,
+            endTime: String?,
+            distance: Double?,
             onlyPRO: Boolean?) -> Unit,
 ) {
+  val context = LocalContext.current
+  val hourDateViewModel = HourDateViewModel()
   var maxPrice by remember { mutableStateOf(DEFAULT_MAX_PRICE) }
   var availablePlaces by remember { mutableStateOf<Int?>(null) }
-  var minDate by remember { mutableStateOf<String?>(null) }
-  var minDateTimestamp by remember { mutableStateOf<Timestamp?>(null) }
-  var duration by remember { mutableStateOf<String?>(null) }
+  var startDateTimestamp by remember { mutableStateOf<Timestamp>(Timestamp.now()) }
+  var endDateTimestamp by remember { mutableStateOf<Timestamp?>(null) }
+  var startTime by remember { mutableStateOf<String?>(null) }
+  var endTime by remember { mutableStateOf<String?>(null) }
   var onlyPRO by remember { mutableStateOf<Boolean?>(false) }
+  var distance by remember { mutableStateOf<String?>(null) }
+  var startDateIsOpen by remember { mutableStateOf(false) }
+  var endDateIsOpen by remember { mutableStateOf(false) }
+  var startDateIsSet by remember { mutableStateOf(false) }
+  var endDateIsSet by remember { mutableStateOf(false) }
+  var startTimeIsOpen by remember { mutableStateOf(false) }
+  var startTimeIsSet by remember { mutableStateOf(false) }
+  var durationIsOpen by remember { mutableStateOf(false) }
+  var durationIsSet by remember { mutableStateOf(false) }
 
   Dialog(
       onDismissRequest = { onDismiss() },
@@ -52,6 +81,7 @@ fun FilterDialog(
                     .height(DIALOG_PADDING.dp)
                     .background(
                         color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
+                    .verticalScroll(rememberScrollState())
                     .testTag("FilterDialog"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -89,25 +119,155 @@ fun FilterDialog(
                     value = availablePlaces?.toString() ?: "",
                     onValueChange = { availablePlaces = it.toIntOrNull() },
                     label = { Text("Members Available") },
+                    singleLine = true,
                     modifier = Modifier.testTag("membersAvailableTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
 
+                Text(
+                    text = "Date Range",
+                    modifier =
+                        Modifier.padding(top = STANDARD_PADDING.dp).testTag("dateRangeLabel"))
+                OutlinedButton(
+                    onClick = { startDateIsOpen = true },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(STANDARD_PADDING.dp)
+                            .testTag("minDateTextField"),
+                ) {
+                  Icon(
+                      Icons.Filled.CalendarMonth,
+                      contentDescription = "select a date from which activities are shown",
+                      modifier =
+                          Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+                  if (startDateIsSet)
+                      Text(
+                          "you selected activities after: ${
+                                    startDateTimestamp.toDate().toString().take(11)
+                                }," +
+                              "${(startDateTimestamp.toDate().year) + 1900}  (click to change)")
+                  else Text("select a date from which activities are shown")
+                }
+                if (startDateIsOpen) {
+                  MyDatePicker(
+                      onCloseRequest = { startDateIsOpen = false },
+                      onDateSelected = { date ->
+                        startDateTimestamp = date
+                        startDateIsOpen = false
+                        startDateIsSet = true
+                      },
+                      isOpen = startDateIsOpen,
+                      initialDate =
+                          startDateTimestamp
+                              .toDate()
+                              .toInstant()
+                              .atZone(ZoneId.systemDefault())
+                              .toLocalDate())
+                }
+                Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                OutlinedButton(
+                    onClick = { endDateIsOpen = true },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(STANDARD_PADDING.dp)
+                            .testTag("maxDateTextField"),
+                ) {
+                  Icon(
+                      Icons.Filled.CalendarMonth,
+                      contentDescription = "select end date",
+                      modifier =
+                          Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+                  if (endDateIsSet)
+                      Text(
+                          "you selected activities before: ${
+                                endDateTimestamp?.toDate().toString().take(11)
+                            }," +
+                              "${(endDateTimestamp?.toDate()?.year)?.plus(1900)}  (click to change)")
+                  else Text("Select a Date from which activities are hidden")
+                }
+                if (endDateIsOpen) {
+                  MyDatePicker(
+                      onCloseRequest = { endDateIsOpen = false },
+                      onDateSelected = { date ->
+                        endDateTimestamp = date
+                        endDateIsOpen = false
+                        endDateIsSet = true
+                      },
+                      isOpen = endDateIsOpen,
+                      initialDate =
+                          startDateTimestamp
+                              .toDate()
+                              .toInstant()
+                              .atZone(ZoneId.systemDefault())
+                              .toLocalDate())
+                }
+                Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                Text(
+                    text = "Date Range",
+                    modifier =
+                        Modifier.padding(top = STANDARD_PADDING.dp).testTag("dateRangeLabel"))
+                OutlinedButton(
+                    onClick = { startTimeIsOpen = true },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(STANDARD_PADDING.dp)
+                            .testTag("startTimeTextField"),
+                ) {
+                  Icon(
+                      Icons.Filled.AccessTime,
+                      contentDescription = "select start time",
+                      modifier =
+                          Modifier.padding(end = STANDARD_PADDING.dp)
+                              .testTag("iconStartTimeCreate"))
+                  if (startTimeIsSet) Text("Start time: $startTime (click to change)")
+                  else Text("Select start time")
+                }
+                if (startTimeIsOpen) {
+                  MyTimePicker(
+                      onTimeSelected = { time ->
+                        startTime =
+                            time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
+                        startTimeIsOpen = false
+                        startTimeIsSet = true
+                      },
+                      isOpen = startTimeIsOpen,
+                      onCloseRequest = { startTimeIsOpen = false })
+                }
+
+                Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                OutlinedButton(
+                    onClick = { durationIsOpen = true },
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(STANDARD_PADDING.dp)
+                            .testTag("endTimeTextField"),
+                ) {
+                  Icon(
+                      Icons.Filled.HourglassTop,
+                      contentDescription = "select duration",
+                      modifier =
+                          Modifier.padding(end = STANDARD_PADDING.dp)
+                              .align(Alignment.CenterVertically))
+                  if (durationIsSet) Text("Finishing Time: $endTime (click to change)")
+                  else Text("Select End Time")
+                }
+                if (durationIsOpen) {
+                  MyTimePicker(
+                      onTimeSelected = { time ->
+                        endTime =
+                            time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime().toString()
+                        durationIsOpen = false
+                        durationIsSet = true
+                      },
+                      isOpen = durationIsOpen,
+                      onCloseRequest = { durationIsOpen = false })
+                }
                 OutlinedTextField(
-                    value = minDate ?: "",
-                    onValueChange = { minDate = it },
-                    label = { Text("startDate") },
-                    modifier = Modifier.testTag("minDateTextField"),
-                    placeholder = {
-                      androidx.compose.material3.Text(
-                          text = stringResource(id = R.string.request_date_activity_withFormat))
-                    },
+                    value = distance ?: "",
+                    onValueChange = { distance = it },
+                    label = { Text("distance") },
+                    modifier = Modifier.testTag("distanceTextField"),
+                    placeholder = { Text(text = "exp: 10.5 km") },
                     singleLine = true,
-                    shape = RoundedCornerShape(TEXT_PADDING.dp))
-                OutlinedTextField(
-                    value = duration ?: "",
-                    onValueChange = { duration = it },
-                    label = { Text("Duration") },
-                    modifier = Modifier.testTag("durationTextField"),
                     shape = RoundedCornerShape(TEXT_PADDING.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
                 Row(
@@ -124,9 +284,9 @@ fun FilterDialog(
                       "Only see PRO activities",
                   )
                 }
+
                 Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
                 PROinfo()
-
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                   TextButton(
                       onClick = { onDismiss() }, modifier = Modifier.testTag("cancelButton")) {
@@ -137,25 +297,37 @@ fun FilterDialog(
 
                   Button(
                       onClick = {
-                        if (minDate != null) {
-                          val calendar = GregorianCalendar()
-                          val parts = minDate!!.split("/")
-                          calendar.set(
-                              parts[2].toInt(),
-                              parts[1].toInt() - 1, // Months are 0-based
-                              parts[0].toInt(),
-                              0,
-                              0,
-                              0)
-                          minDateTimestamp = Timestamp(calendar.time)
+                        if (endDateTimestamp != null && endDateTimestamp!! < startDateTimestamp) {
+                          Toast.makeText(
+                                  context,
+                                  "Filter failed, end date is before start date",
+                                  Toast.LENGTH_SHORT)
+                              .show()
+                        } else {
+                          if (startTime != null &&
+                              endTime != null &&
+                              hourDateViewModel.combineDateAndTime(
+                                  startDateTimestamp, startTime!!) >
+                                  hourDateViewModel.combineDateAndTime(
+                                      endDateTimestamp!!, endTime!!)) {
+                            Toast.makeText(
+                                    context,
+                                    "Filter failed, start time is after end time",
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          } else {
+                            onFilter(
+                                maxPrice.toDouble(),
+                                availablePlaces,
+                                startDateTimestamp,
+                                endDateTimestamp,
+                                startTime,
+                                endTime,
+                                distance?.toDouble(),
+                                onlyPRO)
+                            onDismiss()
+                          }
                         }
-                        onFilter(
-                            maxPrice.toDouble(),
-                            availablePlaces,
-                            minDateTimestamp,
-                            duration,
-                            onlyPRO)
-                        onDismiss()
                       },
                       modifier = Modifier.testTag("filterButton")) {
                         Text("Filter")
@@ -174,12 +346,12 @@ fun PROinfo() {
       modifier = Modifier.fillMaxWidth().testTag("PROSection")) {
         androidx.compose.material3.IconButton(
             modifier = Modifier.testTag("infoIconButton"), onClick = { showDialog = true }) {
-              androidx.compose.material3.Icon(
+              Icon(
                   painter = painterResource(id = android.R.drawable.ic_dialog_info),
                   contentDescription = "Info",
                   tint = Color.Gray)
             }
-        androidx.compose.material3.Text(
+        Text(
             text = "PRO info",
             style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("PROInfo"))
@@ -192,16 +364,16 @@ fun PROinfo() {
         confirmButton = {
           androidx.compose.material3.TextButton(
               modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
-                androidx.compose.material3.Text(text = stringResource(id = R.string.ok))
+                Text(text = stringResource(id = R.string.ok))
               }
         },
         title = {
-          androidx.compose.material3.Text(
+          Text(
               modifier = Modifier.testTag("PROInfoTitle"),
               text = stringResource(id = R.string.PRO_info))
         },
         text = {
-          androidx.compose.material3.Text(
+          Text(
               modifier = Modifier.testTag("PROInfoText"),
               text = stringResource(id = R.string.PRO_explanation))
         })

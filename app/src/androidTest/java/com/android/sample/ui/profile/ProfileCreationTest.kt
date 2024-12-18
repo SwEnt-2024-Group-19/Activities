@@ -1,6 +1,7 @@
 package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -37,7 +38,6 @@ class ProfileCreationTest {
   private lateinit var mockImageRepository: ImageRepositoryFirestore
 
   // Mock or create a fake ProfilesRepository
-  // private val mockProfilesRepository: ProfilesRepository = mock()
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -108,15 +108,17 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("nameTextField").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("surnameTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("newInterestInput").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
     composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
     composeTestRule.onNodeWithTag("interestsLists")
     composeTestRule.onNodeWithTag("categoryDropdown").performClick()
-    composeTestRule.onNodeWithText("Sport").performClick()
-    composeTestRule.onNodeWithTag("newInterestInput").performTextInput("Android")
+    composeTestRule.onNodeWithText("SPORT").performClick()
+    composeTestRule.onNodeWithTag("interestDropdown").performClick()
+    composeTestRule.onNodeWithText("Football").performClick()
+
+    composeTestRule.onNodeWithTag("addInterestButton").assertIsEnabled()
     composeTestRule.onNodeWithTag("addInterestButton").performClick()
 
     composeTestRule

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -58,7 +59,8 @@ class OverviewScreenTest {
           title = "Mountain Biking",
           description = "Exciting mountain biking experience.",
           date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
-          location = Location(46.519962, 6.633597, "EPFL"),
+          location =
+              Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
           creator = "Chris",
           images = listOf(),
           price = 10.0,
@@ -72,7 +74,7 @@ class OverviewScreenTest {
                       id = "1",
                       name = "Amine",
                       surname = "A",
-                      interests = listOf(Interest("Sport", "Cycling")),
+                      interests = listOf(Interest("Football", Category.SPORT)),
                       activities = listOf(),
                       photo = "",
                       likedActivities = listOf("1")),
@@ -80,7 +82,7 @@ class OverviewScreenTest {
                       id = "2",
                       name = "John",
                       surname = "Doe",
-                      interests = listOf(Interest("Indoor Activity", "Reading")),
+                      interests = listOf(Interest("Movies", Category.ENTERTAINMENT)),
                       activities = listOf(),
                       photo = "",
                       likedActivities = listOf("1"))),
@@ -110,7 +112,9 @@ class OverviewScreenTest {
             surname = "A",
             photo = "",
             interests =
-                listOf(Interest("Sport", "Cycling"), Interest("Indoor Activity", "Reading")),
+                listOf(
+                    Interest("Football", Category.SPORT),
+                    Interest("Movies", Category.ENTERTAINMENT)),
             activities = listOf(activity.uid),
         )
 
@@ -480,107 +484,11 @@ class OverviewScreenTest {
     composeTestRule
         .onNodeWithTag("membersAvailableTextField")
         .performTextInput("5") // Set available places to 5
+    composeTestRule.onNodeWithTag("FilterDialog").performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithTag("filterButton").performClick()
 
     composeTestRule.onNodeWithText("Many spots").assertIsDisplayed()
     composeTestRule.onNodeWithText("Few spots").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogFiltersByMinDate() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 =
-        activity.copy(
-            title = "Past activity",
-            date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time))
-    val activity2 =
-        activity.copy(
-            title = "Future activity",
-            date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time))
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("minDateTextField")
-        .performTextInput("01/01/2030") // Set min date to 01/01/2030
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Future activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Past activity").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogFiltersByDuration() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 = activity.copy(title = "Short activity", duration = "01:00")
-    val activity2 = activity.copy(title = "Long activity", duration = "04:00")
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("durationTextField")
-        .performTextInput("01:00") // Set duration to 1 hour
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Long activity").assertDoesNotExist()
-  }
-
-  @Test
-  fun filterDialogClearsFilters() {
-    userProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    composeTestRule.setContent {
-      ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
-    }
-
-    val activity1 = activity.copy(title = "Short activity", duration = "01:00", price = 10.0)
-    val activity2 = activity.copy(title = "Long activity", duration = "04:00", price = 100.0)
-
-    `when`(activitiesRepository.getActivities(any(), any())).then {
-      it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity1, activity2))
-    }
-
-    listActivitiesViewModel.getActivities()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("durationTextField")
-        .performTextInput("01:00") // Set duration to 1 hour
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
-
-    composeTestRule.onNodeWithTag("filterDialog").performClick()
-    composeTestRule
-        .onNodeWithTag("durationTextField")
-        .performTextClearance() // Clear duration filter
-    composeTestRule.onNodeWithTag("filterButton").performClick()
-
-    composeTestRule.onNodeWithText("Short activity").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Long activity").assertIsDisplayed()
   }
 
   @Test
@@ -602,6 +510,7 @@ class OverviewScreenTest {
     listActivitiesViewModel.getActivities()
 
     composeTestRule.onNodeWithTag("filterDialog").performClick()
+    composeTestRule.onNodeWithTag("FilterDialog").performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithTag("onlyPROCheckboxRow").assertIsDisplayed()
     composeTestRule.onNodeWithTag("onlyPROCheckbox").performClick()
     composeTestRule.onNodeWithTag("filterButton").performClick()

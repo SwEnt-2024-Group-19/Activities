@@ -1,9 +1,13 @@
 package com.android.sample
 
 import android.Manifest
+import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,7 +35,6 @@ import com.android.sample.resources.C
 import com.android.sample.ui.activity.CreateActivityScreen
 import com.android.sample.ui.activity.EditActivityScreen
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
-import com.android.sample.ui.authentication.ChooseAccountScreen
 import com.android.sample.ui.authentication.SignInScreen
 import com.android.sample.ui.authentication.SignUpScreen
 import com.android.sample.ui.listActivities.LikedActivitiesScreen
@@ -51,21 +54,28 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   private val CAMERA_PERMISSION_REQUEST_CODE = 0
   private val LOCATION_PERMISSION_REQUEST_CODE = 1
+  private val NOTIFICATION_PERMISSION_REQUEST_CODE = 2
 
   private lateinit var auth: FirebaseAuth
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
     if (!hasCameraPermissions(applicationContext)) {
       ActivityCompat.requestPermissions(this, CAMERAX_PERMISSIONS, CAMERA_PERMISSION_REQUEST_CODE)
     }
+
+    requestNotificationPermission()
+
+    // Alarm permissions
+    requestAlarmPermission()
 
     auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
     if (currentUser != null && currentUser.isAnonymous) {
       auth.signOut()
     }
-    val startDestination = if (auth.currentUser != null) Route.CHOOSE_ACCOUNT else Route.AUTH
+    val startDestination = if (auth.currentUser != null) Route.OVERVIEW else Route.AUTH
     // log current user
     Log.d("MainActivity", "Current user: ${auth.currentUser?.uid}")
 
@@ -75,6 +85,26 @@ class MainActivity : ComponentActivity() {
           color = MaterialTheme.colorScheme.background) {
             NavGraph(startDestination)
           }
+    }
+  }
+
+  private fun requestNotificationPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+          PackageManager.PERMISSION_GRANTED) {
+        requestPermissions(
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST_CODE)
+      }
+    }
+  }
+
+  private fun requestAlarmPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+      if (!alarmManager.canScheduleExactAlarms()) {
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+        startActivity(intent)
+      }
     }
   }
 
@@ -100,13 +130,14 @@ fun NavGraph(
 ) {
 
   NavHost(navController = navController, startDestination = startDestination) {
-    composable(Route.CHOOSE_ACCOUNT) { ChooseAccountScreen(navigationActions, authViewModel) }
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions, authViewModel) }
-      composable(Screen.SIGN_UP) { SignUpScreen(navigationActions) }
+      composable(Screen.SIGN_UP) {
+        SignUpScreen(navigationActions, profileViewModel, imageViewModel)
+      }
       composable(Screen.CREATE_PROFILE) {
         ProfileCreationScreen(profileViewModel, navigationActions, imageViewModel)
       }
@@ -122,7 +153,11 @@ fun NavGraph(
       }
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(
-            listActivitiesViewModel, navigationActions, locationViewModel, imageViewModel)
+            listActivitiesViewModel,
+            navigationActions,
+            locationViewModel,
+            imageViewModel,
+            profileViewModel)
       }
       composable(Screen.ACTIVITY_DETAILS) {
         ActivityDetailsScreen(
@@ -157,7 +192,11 @@ fun NavGraph(
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
-        ProfileScreen(profileViewModel, navigationActions, listActivitiesViewModel, imageViewModel)
+        ProfileScreen(
+            userProfileViewModel = profileViewModel,
+            navigationActions = navigationActions,
+            listActivitiesViewModel = listActivitiesViewModel,
+            imageViewModel = imageViewModel)
       }
       composable(Screen.EDIT_PROFILE) {
         EditProfileScreen(profileViewModel, navigationActions, imageViewModel)

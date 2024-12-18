@@ -28,10 +28,12 @@ import com.android.sample.model.profile.MockProfilesRepository
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
+import com.android.sample.resources.dummydata.activityListWithPastActivity
 import com.android.sample.model.profile.database.UserDao
 import com.android.sample.resources.dummydata.activityWithParticipants
 import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
+import com.android.sample.ui.activitydetails.CreatorRow
 import com.android.sample.ui.activitydetails.LikeButton
 import com.android.sample.ui.activitydetails.PaymentInfoScreen
 import com.android.sample.ui.navigation.NavigationActions
@@ -65,6 +67,7 @@ class ActivityDetailsScreenAndroidTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
 
+  private lateinit var mockDefaultUiState: ListActivitiesViewModel.ActivitiesUiState
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -79,6 +82,10 @@ class ActivityDetailsScreenAndroidTest {
 
     val activityStateFlow = MutableStateFlow(activityWithParticipants)
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
+
+    mockDefaultUiState =
+        ListActivitiesViewModel.ActivitiesUiState.Success(activityListWithPastActivity)
+    `when`(mockViewModel.uiState).thenReturn(MutableStateFlow(mockDefaultUiState))
 
     mockLocationRepository = mock(LocationRepository::class.java)
 
@@ -301,7 +308,6 @@ class ActivityDetailsScreenAndroidTest {
   @Test
   fun enrollButton_addsUserToActivity() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
-    mockViewModel = mock(ListActivitiesViewModel::class.java)
 
     val testUser = testUser.copy(id = "123")
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
@@ -507,7 +513,8 @@ class ActivityDetailsScreenAndroidTest {
   fun distanceIsCorrectlyDisplayedInMeters() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    mockLocationViewModel.setCurrentLocation(Location(46.52, 6.64, "Close to EPFL"))
+    mockLocationViewModel.setCurrentLocation(
+        Location(46.52, 6.64, "Close to EPFL", "Close to EPFL"))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -523,7 +530,7 @@ class ActivityDetailsScreenAndroidTest {
   fun distanceIsCorrectlyDisplayedInKilometers() {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
-    mockLocationViewModel.setCurrentLocation(Location(50.0, 5.0, "Random Point"))
+    mockLocationViewModel.setCurrentLocation(Location(50.0, 5.0, "Random Point", "Random Point"))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -625,5 +632,26 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("freeInfoText").assertExists()
     composeTestRule.onNodeWithTag("okButton").performClick()
     composeTestRule.onNodeWithTag("infoDialog").assertDoesNotExist()
+  }
+
+  @Test
+  fun creatorRowDisplaysCorrectInformation() {
+    val creator = User("1.203930", "John", "Doe", listOf(), listOf("122"), "2024", listOf())
+    val activitiesCreated = 5
+
+    composeTestRule.setContent {
+      CreatorRow(creator = creator, nbActivitiesCreated = activitiesCreated)
+    }
+
+    composeTestRule.onNodeWithTag("creatorName").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("creatorName").assertTextContains("John Doe")
+
+    composeTestRule.onNodeWithTag("creatorRating").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("creatorRating").assertTextContains("Blank")
+
+    composeTestRule.onNodeWithTag("ratingStar").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("activityCount").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityCount").assertTextContains("5 Activities Created")
   }
 }
