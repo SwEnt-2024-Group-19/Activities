@@ -40,33 +40,17 @@ import com.android.sample.resources.C.Tag.STANDARD_PADDING
 @Composable
 fun SearchBar(onValueChange: (String) -> Unit, value: String, onClickFilter: () -> Unit) {
 
-    SearchBar(
-
-        modifier=
+  OutlinedTextField(
+      value = value,
+      onValueChange = onValueChange,
+      label = { Text("Search") },
+      leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
+      trailingIcon = { IconButton(onClick =  onClickFilter, modifier = Modifier.testTag("filterDialog") ) { Icon(Icons.Sharp.FilterList, contentDescription = "Filter Activities", tint = Color(
+          PRIMARY_COLOR))}},
+      modifier =
           Modifier.testTag("searchBar")
               .clip(shape = RoundedCornerShape(MEDIUM_PADDING.dp))
               .fillMaxWidth()
-              .padding(STANDARD_PADDING.dp).testTag("searchBar"),
-        query = value,
-        onQueryChange = onValueChange,
-        placeholder = {
-            Text("Discover new activities")
-        },
-        onSearch = {},
-        active = false,
-        onActiveChange = {},
-        trailingIcon = { IconButton(onClick =  onClickFilter, modifier = Modifier.testTag("filterDialog") ) { Icon(Icons.Sharp.FilterList, contentDescription = "Filter Activities", tint = Color(
-            PRIMARY_COLOR))
-            }},
-
-        leadingIcon = {
-            IconButton(onClick = {}) {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "" // Add a valid content description
-                )
-            }
-        }
-    ) { }
-
+              .padding(STANDARD_PADDING.dp),
+      singleLine = true)
 }

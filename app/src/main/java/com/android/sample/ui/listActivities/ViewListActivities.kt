@@ -115,12 +115,13 @@ fun ListActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = navigationActions.currentRoute())
       },
-      floatingActionButton = {
-        FloatingActionButton(
-            onClick = { showFilterDialog = true }, modifier = Modifier.testTag("filterDialog")) {
-              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
-            }
-      }) { paddingValues ->
+//      floatingActionButton = {
+//        FloatingActionButton(
+//            onClick = { showFilterDialog = true }, modifier = Modifier.testTag("filterDialog")) {
+//              Icon(Icons.Filled.DensityMedium, contentDescription = "Filter Activities")
+//            }
+//      }
+  ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
           if (showFilterDialog) {
             FilterDialog(
