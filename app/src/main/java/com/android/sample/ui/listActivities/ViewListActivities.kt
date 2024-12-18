@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.CategoryColorMap
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.hour_date.HourDateViewModel
@@ -311,6 +312,9 @@ fun ActivityCard(
         Column {
           // Box for overlaying the title on the image
           Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
+
+
+
             // Display the activity image
             Image(
                 painter = painterResource(getImageResourceIdForCategory(activity.category)),
@@ -330,7 +334,7 @@ fun ActivityCard(
                           )
                       )
               )
-
+              DisplayInterests(activity)
             // Display the activity name on top of the image
             Text(
                 text = activity.title,
@@ -353,6 +357,7 @@ fun ActivityCard(
                             .testTag("activityStatus"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
+
                       if (profile.id == activity.creator) {
                         Box(
                             modifier =
@@ -514,3 +519,31 @@ fun ActivityCard(
         }
       }
 }
+
+@Composable
+fun DisplayInterests(activity:Activity){
+    Box(
+        modifier =
+        Modifier.padding(SMALL_PADDING.dp)
+            .testTag("activityStatusPresent")
+            .background(
+                CategoryColorMap[activity.category] ?: Color.Gray,
+                shape =
+                RoundedCornerShape(
+                    TEXT_FONTSIZE
+                        .dp)) // Purple background with rounded corners
+            .padding(
+                horizontal = SMALL_PADDING.dp,
+                vertical = SMALL_PADDING.dp)) {
+            Text(
+                text = activity.subcategory,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = Color(PRIMARY_COLOR),
+                    fontStyle = FontStyle.Italic
+                ),
+                modifier = Modifier.padding(SMALL_PADDING.dp)
+            )
+        }
+    }
+
+
