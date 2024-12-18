@@ -1,7 +1,6 @@
 package com.android.sample.ui.activity
 
 import android.graphics.Bitmap
-import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
@@ -44,13 +43,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
-import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.ActivityStatus
-import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.activity.categories
-import com.android.sample.model.activity.types
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
@@ -58,7 +52,6 @@ import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.model.profile.categoryOf
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
@@ -75,11 +68,9 @@ import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
-import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 
 /**
  * Composable function to display the Create Activity screen. This screen allows users to create an
@@ -299,16 +290,17 @@ fun CreateActivityScreen(
               Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
               Button(
                   enabled =
-                      title.isNotEmpty() &&
-                          description.isNotEmpty() &&
-                          price.isNotEmpty() &&
-                          placesMax.isNotEmpty() &&
-                          selectedLocation != null &&
-                          selectedOptionType != "Select a type" &&
-                          selectedOptionCategory != null &&
-                          startTime.isNotEmpty() &&
-                          duration.isNotEmpty() &&
-                          dueDate.toDate().after(Timestamp.now().toDate()),
+                      listActivityViewModel.isButtonEnabled(
+                          title = title,
+                          description = description,
+                          dueDate = dueDate,
+                          startTime = startTime,
+                          duration = duration,
+                          price = price,
+                          placesMax = placesMax,
+                          selectedLocation = selectedLocation?.name,
+                          selectedOptionType = selectedOptionType,
+                          selectedOptionCategory = selectedOptionCategory?.name),
                   onClick = {
                     val activityId = listActivityViewModel.getNewUid()
 
@@ -316,105 +308,44 @@ fun CreateActivityScreen(
                         hourDateViewModel.combineDateAndTime(dueDate, startTime)
                     val activityDateTime = activityTimestamps.toInstant().toEpochMilli()
 
-                    // we disable creating activities 1 hour before start time
-                    if (activityDateTime - System.currentTimeMillis() <
-                        TimeUnit.HOURS.toMillis(1)) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.schedule_activity),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (creator == "") {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.login_check_in_create),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (price.isBlank() ||
-                        price.toDoubleOrNull() == null ||
-                        price.toDouble() < 0) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.invalid_price_format),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (placesMax.isBlank() ||
-                        placesMax.toLongOrNull() == null ||
-                        placesMax.toLong() <= 0) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.invalid_places_format),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (attendees.size >= placesMax.toLong()) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.max_places_exceed),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (selectedLocation == null) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.invalid_no_location),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else if (selectedOptionCategory != null &&
-                        categoryOf[selectedOptionInterest] != selectedOptionCategory) {
-                      Toast.makeText(
-                              context,
-                              context.getString(R.string.invalid_interest_category),
-                              Toast.LENGTH_SHORT)
-                          .show()
-                      return@Button
-                    } else {
-                      if (selectedOptionType == ActivityType.INDIVIDUAL.name)
-                          profileViewModel.userState.value?.let { user -> attendees += user }
-                      try {
-                        imageViewModel.uploadActivityImages(
-                            activityId,
-                            selectedImages,
-                            onSuccess = { imageUrls ->
-                              items.addAll(imageUrls) // Store URLs in items to retrieve later
-                            },
-                            onFailure = { exception ->
-                              Toast.makeText(
-                                      context,
-                                      "Failed to upload images: ${exception.message}",
-                                      Toast.LENGTH_SHORT)
-                                  .show()
-                            })
-                        val activity =
-                            Activity(
-                                uid = activityId,
-                                title = title,
-                                description = description,
-                                date = dueDate,
-                                startTime = startTime,
-                                duration = duration,
-                                price = price.toDouble(),
-                                placesLeft = attendees.size.toLong(),
-                                maxPlaces = placesMax.toLongOrNull() ?: 0,
-                                creator = creator,
-                                status = ActivityStatus.ACTIVE,
-                                location = selectedLocation,
-                                images = items,
-                                participants = attendees,
-                                type = types.find { it.name == selectedOptionType } ?: types[1],
-                                comments = listOf(),
-                                category = selectedOptionCategory ?: categories[0],
-                                subcategory = selectedOptionInterest ?: "")
-                        listActivityViewModel.addActivity(activity)
-                        profileViewModel.addActivity(creator, activity.uid)
-                        navigationActions.navigateTo(Screen.OVERVIEW)
-                      } catch (_: NumberFormatException) {
-                        println("There is an error")
-                      }
+                    if (listActivityViewModel.validateActivityCreation(
+                        context,
+                        activityDateTime,
+                        attendees,
+                        placesMax,
+                        creator,
+                        hourDateViewModel,
+                        startTime,
+                        duration,
+                        price,
+                        selectedLocation,
+                        selectedOptionCategory,
+                        selectedOptionInterest)) {
+                      listActivityViewModel.createActivity(
+                          activityId,
+                          listActivityViewModel,
+                          hourDateViewModel,
+                          dueDate,
+                          startTime,
+                          attendees,
+                          profileViewModel,
+                          imageViewModel,
+                          selectedImages,
+                          items,
+                          title,
+                          description,
+                          duration,
+                          price,
+                          placesMax,
+                          creator,
+                          selectedLocation,
+                          selectedOptionType,
+                          selectedOptionCategory,
+                          selectedOptionInterest,
+                          navigationActions,
+                          context,
+                          addUser = { user -> attendees += user },
+                      )
                     }
                   },
                   modifier =
