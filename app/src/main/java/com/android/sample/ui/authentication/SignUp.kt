@@ -146,6 +146,7 @@ fun SignUpScreen(
             ProfileImage(
                 userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
                 modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
+<<<<<<< Updated upstream
                 imageViewModel,
                 bitmap = selectedBitmap,
                 editing = true)
@@ -158,6 +159,9 @@ fun SignUpScreen(
                   context = context,
                   onDismiss = { isDefaultImageOpen = false })
             }
+=======
+                imageViewModel)
+>>>>>>> Stashed changes
             ModifyPictureButton(showDialogImage = { showDialogImage = true })
           }
 
