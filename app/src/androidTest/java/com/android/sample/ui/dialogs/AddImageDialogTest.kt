@@ -1,6 +1,7 @@
 package com.android.sample.ui.dialogs
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import org.junit.Rule
@@ -63,6 +64,7 @@ class AddImageDialogTest {
           default = true)
     }
 
+    composeTestRule.onNodeWithTag("defaultImageButton").assertExists()
     composeTestRule.onNodeWithText("Select default picture").performClick()
     assert(defaultPicture)
   }
