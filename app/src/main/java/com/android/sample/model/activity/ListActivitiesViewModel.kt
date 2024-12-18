@@ -444,12 +444,6 @@ constructor(
             .show()
         false
       }
-      !hourDateViewModel.isBeginGreaterThanEnd(startTime, duration) -> {
-        Toast.makeText(
-                context, context.getString(R.string.startTime_before_endTime), Toast.LENGTH_SHORT)
-            .show()
-        false
-      }
       price.toDoubleOrNull() == null -> {
         Toast.makeText(
                 context, context.getString(R.string.invalid_price_format), Toast.LENGTH_SHORT)
