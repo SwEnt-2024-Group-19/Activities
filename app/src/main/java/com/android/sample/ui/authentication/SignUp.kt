@@ -146,7 +146,6 @@ fun SignUpScreen(
             ProfileImage(
                 userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
                 modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
-
                 imageViewModel,
                 bitmap = selectedBitmap,
                 editing = true)

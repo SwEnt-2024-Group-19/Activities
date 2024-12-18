@@ -171,27 +171,25 @@ fun EditProfileScreen(
                       .padding(MEDIUM_PADDING.dp)
                       .testTag("editProfileContent")
                       .verticalScroll(scrollState),
-<
-            verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
-            horizontalAlignment = Alignment.CenterHorizontally, // Ensures horizontal centering
-          ) {   
+              verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+              horizontalAlignment = Alignment.CenterHorizontally, // Ensures horizontal centering
+          ) {
             ProfileImage(
-                    userId = profile.id,
-                    modifier =
-                        Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
-                    imageViewModel,
-                    editing = true,
-                    bitmap = selectedImage)
+                userId = profile.id,
+                modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
+                imageViewModel,
+                editing = true,
+                bitmap = selectedImage)
             Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
             if (isDefaultImageSelected) {
-                  DefaultImageCarousel(
-                      onImageSelected = { bitmap ->
-                        selectedImage = bitmap
-                        isDefaultImageSelected = false
-                      },
-                      context = context,
-                      onDismiss = { isDefaultImageSelected = false })
-               }
+              DefaultImageCarousel(
+                  onImageSelected = { bitmap ->
+                    selectedImage = bitmap
+                    isDefaultImageSelected = false
+                  },
+                  context = context,
+                  onDismiss = { isDefaultImageSelected = false })
+            }
 
             ModifyPictureButton(showDialogImage = { showDialogImage = true })
 
