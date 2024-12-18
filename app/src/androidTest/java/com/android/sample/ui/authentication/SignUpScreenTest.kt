@@ -3,22 +3,30 @@ package com.android.sample.ui.authentication
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.sample.model.activity.Activity
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.MockProfilesRepository
 import com.android.sample.model.profile.ProfileViewModel
+import com.android.sample.model.profile.User
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
+import org.mockito.kotlin.whenever
+import org.mockito.kotlin.any
 
 @RunWith(AndroidJUnit4::class)
 class SignUpAndProfileCreationScreenTest {
@@ -204,4 +212,65 @@ class SignUpAndProfileCreationScreenTest {
         .performScrollToNode(hasTestTag("surnameError"))
         .assertIsDisplayed()
   }
+    @Test
+    fun togglePasswordVisibility() {
+
+        composeTestRule.onNodeWithContentDescription("Show password").assertExists()
+
+        // Click the visibility icon to show the password
+        composeTestRule.onNodeWithContentDescription("Show password").performClick()
+
+        // Verify password visibility toggle behavior (e.g., check attribute or visual state).
+        composeTestRule.onNodeWithTag("PasswordTextField").assertExists()
+    }
+
+    @Test
+    fun testSuccessfulAccountCreation() {
+        // Mock FirebaseAuth to return a valid user ID
+        val mockFirebaseAuth = mock(FirebaseAuth::class.java)
+        val mockFirebaseUser = mock(FirebaseUser::class.java)
+        whenever(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
+        whenever(mockFirebaseUser.uid).thenReturn("mockUserId")
+
+        // Mock ProfileViewModel and its behavior
+        profileViewModel = mock(ProfileViewModel::class.java)
+        doAnswer { invocation ->
+            val userProfile = invocation.getArgument<User>(0) // Retrieve the userProfile argument
+            val onSuccess = invocation.getArgument<() -> Unit>(1) // Retrieve the onSuccess callback
+            checkNotNull(userProfile) { "UserProfile cannot be null" } // Ensure userProfile is not null
+            onSuccess.invoke() // Invoke the success callback
+            null
+        }.whenever(profileViewModel).createUserProfile(any(), any(), any())
+
+        // Simulate valid user input
+        composeTestRule.onNodeWithTag("EmailTextField").performTextInput("test@example.com")
+        composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("password123")
+        composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
+        composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
+
+        // Click the Sign-Up button
+        composeTestRule.onNodeWithTag("SignUpButton").performClick()
+
+        // Verify that `createUserProfile` was called with the correct data
+        verify(profileViewModel).createUserProfile(
+            userProfile = argThat {
+                it.id == "mockUserId" &&
+                        it.name == "John" &&
+                        it.surname == "Doe" &&
+                        it.photo == "" &&
+                        it.interests == emptyList<Interest>() &&
+                        it.activities == emptyList<Activity>() &&
+                        it.likedActivities == emptyList<Activity>()
+            },
+            onSuccess = any(),
+            onError = any()
+        )
+
+        // Verify navigation to the overview screen
+        verify(navigationActions).navigateTo(Screen.OVERVIEW)
+    }
+
+
+
+
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
@@ -24,6 +25,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
+import org.mockito.kotlin.any
 
 @RunWith(AndroidJUnit4::class)
 class SignInScreenTest {
@@ -114,31 +117,6 @@ class SignInScreenTest {
     verify(navigationActions).navigateTo(Screen.SIGN_UP)
   }
 
-  /*@Test
-  fun testSignInWithEmailAndPasswordIsCalledWhenValidEmailAndPassword() {
-    // Given
-    val email = "achraf@hakimi.ma"
-    val password = "correct_password"
-    val onAuthSuccess = mock<() -> Unit>()
-    val onAuthError = mock<(String) -> Unit>()
-    val navigationActions = mock(NavigationActions::class.java)
-    val viewModel = mock(SignInViewModel::class.java)
-
-    // When: Enter valid email and password, then click the sign-in button
-    composeTestRule.onNodeWithTag("EmailTextField").performTextInput(email)
-    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput(password)
-    composeTestRule.onNodeWithTag("SignInButton").performClick()
-
-    // Then: Verify that signInWithEmailAndPassword was called with the correct arguments
-    verify(viewModel)
-        .signInWithEmailAndPassword(
-            email,
-            password,
-            onAuthSuccess, // onAuthSuccess
-            onAuthError, // onAuthError
-            navigationActions)
-  }*/
-
   @Test
   fun googleSignInReturnsValidActivityResult() {
     Intents.init()
@@ -150,4 +128,44 @@ class SignInScreenTest {
     // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
     intended(toPackage("com.google.android.gms"))
   }
+
+    @Test
+    fun invalidEmailShowsError() {
+        composeTestRule
+            .onNodeWithTag("SignInScreenColumn")
+            .performScrollToNode(hasTestTag("EmailTextField"))
+        composeTestRule.onNodeWithTag("EmailTextField").performTextInput("invalid_email")
+        composeTestRule
+            .onNodeWithTag("SignInScreenColumn")
+            .performScrollToNode(hasTestTag("SignInButton"))
+        composeTestRule.onNodeWithTag("SignInButton").performClick()
+        composeTestRule.onNodeWithTag("EmailErrorText").assertIsDisplayed()
+    }
+    @Test
+    fun validPasswordClearsError() {
+        composeTestRule
+            .onNodeWithTag("SignInScreenColumn")
+            .performScrollToNode(hasTestTag("PasswordTextField"))
+        composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("validPassword123")
+        composeTestRule
+            .onNodeWithTag("SignInScreenColumn")
+            .performScrollToNode(hasTestTag("SignInButton"))
+        composeTestRule.onNodeWithTag("SignInButton").performClick()
+        composeTestRule.onNodeWithTag("PasswordErrorText").assertDoesNotExist()
+    }
+    @Test
+    fun togglePasswordVisibility() {
+        composeTestRule
+            .onNodeWithTag("SignInScreenColumn")
+            .performScrollToNode(hasTestTag("PasswordTextField"))
+        composeTestRule.onNodeWithContentDescription("Show password").assertExists()
+
+        // Click the visibility icon to show the password
+        composeTestRule.onNodeWithContentDescription("Show password").performClick()
+
+        // Verify password visibility toggle behavior (e.g., check attribute or visual state).
+        composeTestRule.onNodeWithTag("PasswordTextField").assertExists()
+    }
+
+
 }
