@@ -243,7 +243,7 @@ fun ActivityRow(
                   overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.testTag("activityDescription"))
             }
-        if (!remainingTime) {
+        if (!remainingTime && userId == "") {
           ReviewActivityButtons(activity.likes[userId]) { review ->
             listActivitiesViewModel.reviewActivity(activity, userId, review)
           }
