@@ -519,7 +519,7 @@ fun DisplayInterests(activity:Activity){
 
     Box(
         modifier =
-        Modifier.padding(8.dp)
+        Modifier.padding(STANDARD_PADDING.dp)
             .testTag("interestPresent")
             .background(
                 CategoryColorMap[activity.category] ?: Color.Gray,
@@ -536,7 +536,7 @@ fun DisplayInterests(activity:Activity){
                     color = Color(PRIMARY_COLOR),
                     fontWeight = FontWeight.SemiBold
                 ),
-                modifier =Modifier.testTag("subcategoryText")
+                modifier =Modifier.testTag("subcategoryText").padding(horizontal= STANDARD_PADDING.dp)
             )
         }
     }
