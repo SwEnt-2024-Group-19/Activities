@@ -262,9 +262,7 @@ fun EditProfileScreen(
                             imageViewModel.uploadProfilePicture(
                                 profile.id,
                                 bitmap,
-                                onSuccess = { url ->
-                                  photo = url // Update photo URL in profile
-                                },
+                                onSuccess = {}, // the photo field is not used anymore
                                 onFailure = { error ->
                                   Log.e(
                                       "EditProfileScreen",
@@ -291,9 +289,7 @@ fun EditProfileScreen(
                                   imageViewModel.uploadProfilePicture(
                                       profile.id,
                                       bitmap,
-                                      onSuccess = { url ->
-                                        photo = url // Update photo URL in profile
-                                      },
+                                      onSuccess = {}, // the photo field is not used anymore
                                       onFailure = { error ->
                                         Log.e(
                                             "EditProfileScreen",
