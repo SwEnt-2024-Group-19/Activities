@@ -46,7 +46,7 @@ fun PlusButtonToCreate(navigationActions: NavigationActions, activityType: Int) 
           } else if (activityType == 1) navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
         }) {
           Icon(
-              imageVector = TopLevelDestinations.ADD_ACTIVITY.icon,
+              imageVector = TopLevelDestinations.ADD_ACTIVITY.iconOutlined,
               contentDescription = TopLevelDestinations.ADD_ACTIVITY.textId,
           )
         }

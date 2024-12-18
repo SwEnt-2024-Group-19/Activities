@@ -20,6 +20,11 @@ object C {
     val ERROR_TEXTFIELD_PADDING_TOP = 5.dp
     val ERROR_TEXTFIELD_FONT_SIZE = 12.sp
 
+    // App colors
+    const val MAIN_COLOR_DARK = 0xFF00499E
+    const val MAIN_COLOR_LIGHT = 0xFF5CE1E6
+    const val MAIN_BACKGROUND = 0xFFF1FDFD
+
     const val CREATED_ACTIVITIES = 0
     const val ENROLLED_ACTIVITIES = 1
     const val PAST_ACTIVITIES = 2
@@ -136,4 +141,13 @@ object C {
     val MUSICAL_ACTIVITY_COLOR = Color(0xFFFBF2C4)
     val ART_ACTIVITY_COLOR = Color(0xFFE4BABE)
   }
+
+  // bottom navigation
+  const val BOTTOM_NAVIGATION_MENU_HEIGHT = 60
+  const val SELECTED_TAB_SIZE = 50
+  const val NON_SELECTED_TAB_SIZE = 40
+  const val BOTTOM_ICON_SELECTOR_HEIGHT = 5
+  const val BOTTOM_ICON_SELECTOR_WIDTH = 30
+  const val BOTTOM_ICON_SCALE = 0.9f
+  const val BOTTOM_ICON_OFFSET = -5f
 }
