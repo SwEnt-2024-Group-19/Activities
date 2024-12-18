@@ -518,7 +518,7 @@ fun DisplayActivitiesList(
       listToShow =
           userActivities.filter {
             hourDateViewModel.combineDateAndTime(
-                it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) <=
+                it.date, it.startTime) <=
                 Timestamp.now()
           }
     }
