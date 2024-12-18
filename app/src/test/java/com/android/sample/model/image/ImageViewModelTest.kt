@@ -1,18 +1,20 @@
 import android.content.ContentResolver
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.camera.core.CameraSelector
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.image.flipCamera
-import com.google.firebase.firestore.DocumentReference
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.doAnswer
+import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -24,20 +26,25 @@ class ImageUtilsTest {
   private lateinit var contentResolver: ContentResolver
   private lateinit var uri: Uri
   private lateinit var mockRepository: ImageRepositoryFirestore
-
-  private lateinit var documentRef: DocumentReference
   private lateinit var viewModel: ImageViewModel
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
 
   @Before
   fun setUp() {
-    context = Mockito.mock(Context::class.java)
-    contentResolver = Mockito.mock(ContentResolver::class.java)
-    uri = Mockito.mock(Uri::class.java)
-    Mockito.`when`(context.contentResolver).thenReturn(contentResolver)
+    context = mock(Context::class.java)
+    contentResolver = mock(ContentResolver::class.java)
+    uri = mock(Uri::class.java)
+    `when`(context.contentResolver).thenReturn(contentResolver)
     // Set up additional mocks as necessary to return a valid bitmap
     MockitoAnnotations.openMocks(this)
     mockRepository = mock(ImageRepositoryFirestore::class.java)
-    viewModel = ImageViewModel(mockRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    `when`(sharedPreferences.edit()).thenReturn(mockEditor)
+    `when`(mockEditor.putString(anyString(), anyString())).thenReturn(mockEditor)
+    doNothing().`when`(mockEditor).apply()
+    viewModel = ImageViewModel(mockRepository, sharedPreferences)
   }
 
   @Test
@@ -65,7 +72,7 @@ class ImageUtilsTest {
         .uploadProfilePicture(eq(userId), eq(bitmap), any(), any())
 
     var resultUrl: String? = null
-    viewModel.uploadProfilePicture(userId, bitmap, { resultUrl = it }, {})
+    viewModel.uploadProfilePicture(userId, bitmap, { url -> resultUrl = url }, {})
 
     assert(resultUrl == expectedUrl)
   }

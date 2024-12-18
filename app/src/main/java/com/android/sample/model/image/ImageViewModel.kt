@@ -17,7 +17,7 @@ constructor(
   fun uploadProfilePicture(
       userId: String,
       bitmap: Bitmap,
-      onSuccess: () -> Unit,
+      onSuccess: (String) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
     repository.uploadProfilePicture(
@@ -25,7 +25,7 @@ constructor(
         bitmap,
         { url ->
           cacheProfilePicture(userId, url)
-          onSuccess()
+          onSuccess(url)
         },
         onFailure)
   }
