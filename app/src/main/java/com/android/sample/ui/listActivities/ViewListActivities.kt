@@ -337,7 +337,7 @@ fun ActivityCard(
                 modifier =
                     Modifier.align(Alignment.TopEnd)
                         .padding(SMALL_PADDING.dp)
-                        .testTag("activityStatus")
+                        .testTag("activityStatusAndInterests")
                         .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically) {
@@ -346,58 +346,64 @@ fun ActivityCard(
                   if (profile != null) {
                     if (profile.activities?.contains(activity.uid) == true) {
 
-                      Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (profile.id == activity.creator) {
-                          Box(
-                              modifier =
-                                  Modifier.padding(SMALL_PADDING.dp)
-                                      .testTag("activityStatusPresent")
-                                      .background(
-                                          Color(PRIMARY_COLOR),
-                                          shape =
-                                              RoundedCornerShape(
-                                                  TEXT_FONTSIZE
-                                                      .dp)) // Purple background with rounded
-                                      // corners
-                                      .padding(
-                                          horizontal = SMALL_PADDING.dp,
-                                          vertical = SMALL_PADDING.dp)) {
-                                Text(
-                                    text = "YOUR ACTIVITY",
-                                    style =
-                                        MaterialTheme.typography.bodySmall.copy(
-                                            color = Color.White, fontWeight = FontWeight.SemiBold),
-                                    modifier =
-                                        Modifier.testTag("yourActivityStatus")
-                                            .padding(horizontal = STANDARD_PADDING.dp))
-                              }
-                        }
-                        if (profile.id != activity.creator ||
-                            activity.participants.find { it.id == profile.id } != null) {
-                          Box(
-                              modifier =
-                                  Modifier.padding(TEXT_FONTSIZE.dp)
-                                      .testTag("activityStatusEnrolledBox")
-                                      .background(
-                                          Color(PRIMARY_COLOR),
-                                          shape =
-                                              RoundedCornerShape(
-                                                  12.dp)) // Purple background with rounded corners
-                                      .padding(
-                                          horizontal = STANDARD_PADDING.dp,
-                                          vertical = SMALL_PADDING.dp) // Inner padding for text
-                              ) {
-                                Text(
-                                    text = "ENROLLED",
-                                    style =
-                                        MaterialTheme.typography.bodySmall.copy(
-                                            color = Color.White, fontWeight = FontWeight.SemiBold),
-                                    modifier =
-                                        Modifier.testTag("enrolledText")
-                                            .padding(horizontal = STANDARD_PADDING.dp))
-                              }
-                        }
-                      }
+                      Row(
+                          verticalAlignment = Alignment.CenterVertically,
+                          modifier = Modifier.testTag("activityStatus")) {
+                            if (profile.id == activity.creator) {
+                              Box(
+                                  modifier =
+                                      Modifier.padding(SMALL_PADDING.dp)
+                                          .testTag("activityStatusPresent")
+                                          .background(
+                                              Color(PRIMARY_COLOR),
+                                              shape =
+                                                  RoundedCornerShape(
+                                                      TEXT_FONTSIZE
+                                                          .dp)) // Purple background with rounded
+                                          // corners
+                                          .padding(
+                                              horizontal = SMALL_PADDING.dp,
+                                              vertical = SMALL_PADDING.dp)) {
+                                    Text(
+                                        text = "YOUR ACTIVITY",
+                                        style =
+                                            MaterialTheme.typography.bodySmall.copy(
+                                                color = Color.White,
+                                                fontWeight = FontWeight.SemiBold),
+                                        modifier =
+                                            Modifier.testTag("yourActivityStatus")
+                                                .padding(horizontal = STANDARD_PADDING.dp))
+                                  }
+                            }
+                            if (profile.id != activity.creator ||
+                                activity.participants.find { it.id == profile.id } != null) {
+                              Box(
+                                  modifier =
+                                      Modifier.padding(TEXT_FONTSIZE.dp)
+                                          .testTag("activityStatusEnrolledBox")
+                                          .background(
+                                              Color(PRIMARY_COLOR),
+                                              shape =
+                                                  RoundedCornerShape(
+                                                      12
+                                                          .dp)) // Purple background with rounded
+                                                                // corners
+                                          .padding(
+                                              horizontal = STANDARD_PADDING.dp,
+                                              vertical = SMALL_PADDING.dp) // Inner padding for text
+                                  ) {
+                                    Text(
+                                        text = "ENROLLED",
+                                        style =
+                                            MaterialTheme.typography.bodySmall.copy(
+                                                color = Color.White,
+                                                fontWeight = FontWeight.SemiBold),
+                                        modifier =
+                                            Modifier.testTag("enrolledText")
+                                                .padding(horizontal = STANDARD_PADDING.dp))
+                                  }
+                            }
+                          }
                     }
                   }
                 }

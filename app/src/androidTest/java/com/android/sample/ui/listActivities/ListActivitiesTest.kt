@@ -326,7 +326,11 @@ class OverviewScreenTest {
           profile = testUser,
           activity = activity1)
     }
+
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityStatusAndInterests", useUnmergedTree = true)
+        .assertExists()
     composeTestRule.onNodeWithTag("interestPresent", useUnmergedTree = true)
     composeTestRule.onNodeWithText("Basketball", useUnmergedTree = true).assertIsDisplayed()
   }
@@ -634,6 +638,9 @@ class OverviewScreenTest {
 
     composeTestRule
         .onNodeWithTag("activityStatusEnrolledBox", useUnmergedTree = true)
+        .assertExists()
+    composeTestRule
+        .onNodeWithTag("activityStatusAndInterests", useUnmergedTree = true)
         .assertExists()
     composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertExists()
     composeTestRule.onNodeWithTag("enrolledText", useUnmergedTree = true).assertExists()
