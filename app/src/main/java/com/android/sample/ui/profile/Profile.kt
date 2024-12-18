@@ -180,9 +180,11 @@ fun ActivityRow(
     userProfileViewModel: ProfileViewModel,
     navigationActions: NavigationActions,
     remainingTime: Boolean,
-    userId: String,
+    user: User,
+    isParticipant: Boolean=false,
     context: Context = LocalContext.current,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+
 ) {
 
   Row(
@@ -243,9 +245,9 @@ fun ActivityRow(
                   overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.testTag("activityDescription"))
             }
-        if (!remainingTime && userId == "") {
-          ReviewActivityButtons(activity.likes[userId]) { review ->
-            listActivitiesViewModel.reviewActivity(activity, userId, review)
+        if (!remainingTime && !isParticipant) {
+          ReviewActivityButtons(activity.likes[user.id]) { review ->
+            listActivitiesViewModel.reviewActivity(activity, user.id, review)
           }
         }
       }
@@ -495,7 +497,7 @@ fun UserProfile(
                         profileViewModel,
                         listActivitiesViewModel,
                         imageViewModel,
-                        uid)
+                        uid,)
                   }
             }
       }
@@ -511,7 +513,7 @@ fun DisplayActivitiesList(
     userProfileViewModel: ProfileViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
     imageViewModel: ImageViewModel,
-    uid: String
+    uid: String,
 ) {
   var listToShow = emptyList<Activity>()
   when (activityType) {
@@ -566,7 +568,8 @@ fun DisplayActivitiesList(
             listActivitiesViewModel = listActivitiesViewModel,
             navigationActions = navigationActions,
             userProfileViewModel = userProfileViewModel,
-            userId = user.id,
+            user = user,
+            isParticipant= uid != "",
             remainingTime = remainingTime,
             imageViewModel = imageViewModel)
         Spacer(modifier = Modifier.height(NORMAL_PADDING.dp))
