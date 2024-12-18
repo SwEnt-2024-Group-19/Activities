@@ -1,13 +1,9 @@
 package com.android.sample.model.activities
 
-import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
-import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -16,7 +12,6 @@ import com.android.sample.resources.dummydata.simpleUser
 import com.android.sample.resources.dummydata.userWithActivities
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
-import hilt_aggregated_deps._dagger_hilt_android_internal_modules_ApplicationContextModule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
@@ -31,7 +26,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.robolectric.RobolectricTestRunner
-import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 class ListActivitiesViewModelTest {
