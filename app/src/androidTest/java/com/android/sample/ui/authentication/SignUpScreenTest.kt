@@ -9,11 +9,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-<<<<<<< Updated upstream
 import com.android.sample.R
-=======
 import com.android.sample.model.activity.Activity
->>>>>>> Stashed changes
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.Interest
@@ -29,8 +26,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
-import org.mockito.kotlin.whenever
 import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class SignUpAndProfileCreationScreenTest {
@@ -243,65 +240,67 @@ class SignUpAndProfileCreationScreenTest {
         .performScrollToNode(hasTestTag("surnameError"))
         .assertIsDisplayed()
   }
-    @Test
-    fun togglePasswordVisibility() {
 
-        composeTestRule.onNodeWithContentDescription("Show password").assertExists()
+  @Test
+  fun togglePasswordVisibility() {
 
-        // Click the visibility icon to show the password
-        composeTestRule.onNodeWithContentDescription("Show password").performClick()
+    composeTestRule.onNodeWithContentDescription("Show password").assertExists()
 
-        // Verify password visibility toggle behavior (e.g., check attribute or visual state).
-        composeTestRule.onNodeWithTag("PasswordTextField").assertExists()
-    }
+    // Click the visibility icon to show the password
+    composeTestRule.onNodeWithContentDescription("Show password").performClick()
 
-    @Test
-    fun testSuccessfulAccountCreation() {
-        // Mock FirebaseAuth to return a valid user ID
-        val mockFirebaseAuth = mock(FirebaseAuth::class.java)
-        val mockFirebaseUser = mock(FirebaseUser::class.java)
-        whenever(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
-        whenever(mockFirebaseUser.uid).thenReturn("mockUserId")
+    // Verify password visibility toggle behavior (e.g., check attribute or visual state).
+    composeTestRule.onNodeWithTag("PasswordTextField").assertExists()
+  }
 
-        // Mock ProfileViewModel and its behavior
-        profileViewModel = mock(ProfileViewModel::class.java)
-        doAnswer { invocation ->
-            val userProfile = invocation.getArgument<User>(0) // Retrieve the userProfile argument
-            val onSuccess = invocation.getArgument<() -> Unit>(1) // Retrieve the onSuccess callback
-            checkNotNull(userProfile) { "UserProfile cannot be null" } // Ensure userProfile is not null
-            onSuccess.invoke() // Invoke the success callback
-            null
-        }.whenever(profileViewModel).createUserProfile(any(), any(), any())
+  @Test
+  fun testSuccessfulAccountCreation() {
+    // Mock FirebaseAuth to return a valid user ID
+    val mockFirebaseAuth = mock(FirebaseAuth::class.java)
+    val mockFirebaseUser = mock(FirebaseUser::class.java)
+    whenever(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
+    whenever(mockFirebaseUser.uid).thenReturn("mockUserId")
 
-        // Simulate valid user input
-        composeTestRule.onNodeWithTag("EmailTextField").performTextInput("test@example.com")
-        composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("password123")
-        composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
-        composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
+    // Mock ProfileViewModel and its behavior
+    profileViewModel = mock(ProfileViewModel::class.java)
+    doAnswer { invocation ->
+          val userProfile = invocation.getArgument<User>(0) // Retrieve the userProfile argument
+          val onSuccess = invocation.getArgument<() -> Unit>(1) // Retrieve the onSuccess callback
+          checkNotNull(userProfile) {
+            "UserProfile cannot be null"
+          } // Ensure userProfile is not null
+          onSuccess.invoke() // Invoke the success callback
+          null
+        }
+        .whenever(profileViewModel)
+        .createUserProfile(any(), any(), any())
 
-        // Click the Sign-Up button
-        composeTestRule.onNodeWithTag("SignUpButton").performClick()
+    // Simulate valid user input
+    composeTestRule.onNodeWithTag("EmailTextField").performTextInput("test@example.com")
+    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput("password123")
+    composeTestRule.onNodeWithTag("nameTextField").performTextInput("John")
+    composeTestRule.onNodeWithTag("surnameTextField").performTextInput("Doe")
 
-        // Verify that `createUserProfile` was called with the correct data
-        verify(profileViewModel).createUserProfile(
-            userProfile = argThat {
-                it.id == "mockUserId" &&
-                        it.name == "John" &&
-                        it.surname == "Doe" &&
-                        it.photo == "" &&
-                        it.interests == emptyList<Interest>() &&
-                        it.activities == emptyList<Activity>() &&
-                        it.likedActivities == emptyList<Activity>()
-            },
+    // Click the Sign-Up button
+    composeTestRule.onNodeWithTag("SignUpButton").performClick()
+
+    // Verify that `createUserProfile` was called with the correct data
+    verify(profileViewModel)
+        .createUserProfile(
+            userProfile =
+                argThat {
+                  it.id == "mockUserId" &&
+                      it.name == "John" &&
+                      it.surname == "Doe" &&
+                      it.photo == "" &&
+                      it.interests == emptyList<Interest>() &&
+                      it.activities == emptyList<Activity>() &&
+                      it.likedActivities == emptyList<Activity>()
+                },
             onSuccess = any(),
-            onError = any()
-        )
+            onError = any())
 
-        // Verify navigation to the overview screen
-        verify(navigationActions).navigateTo(Screen.OVERVIEW)
-    }
-
-
-
-
+    // Verify navigation to the overview screen
+    verify(navigationActions).navigateTo(Screen.OVERVIEW)
+  }
 }
