@@ -78,6 +78,7 @@ import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
+import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
@@ -382,7 +383,7 @@ fun UserProfile(
           BottomNavigationMenu(
               onTabSelect = { route -> navigationActions.navigateTo(route) },
               tabList = LIST_TOP_LEVEL_DESTINATION,
-              selectedItem = navigationActions.currentRoute())
+              selectedItem = Route.PROFILE)
         }
       },
       topBar = {

@@ -1,6 +1,11 @@
 package com.android.sample.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -34,23 +39,44 @@ object Screen {
   const val PARTICIPANT_PROFILE = "Participant profile Screen"
 }
 
-data class TopLevelDestination(val route: String, val icon: ImageVector, val textId: String)
+data class TopLevelDestination(
+    val route: String,
+    val iconOutlined: ImageVector,
+    val iconFilled: ImageVector,
+    val textId: String
+)
 
 object TopLevelDestinations {
   val OVERVIEW =
-      TopLevelDestination(route = Route.OVERVIEW, icon = Icons.Outlined.Menu, textId = "Overview")
+      TopLevelDestination(
+          route = Route.OVERVIEW,
+          iconOutlined = Icons.Outlined.Menu,
+          iconFilled = Icons.Filled.Menu,
+          textId = "Overview")
   val PROFILE =
       TopLevelDestination(
-          route = Route.PROFILE, icon = Icons.Outlined.AccountCircle, textId = "Profile")
+          route = Route.PROFILE,
+          iconOutlined = Icons.Outlined.AccountCircle,
+          iconFilled = Icons.Filled.AccountCircle,
+          textId = "Profile")
   val ADD_ACTIVITY =
       TopLevelDestination(
           route = Route.ADD_ACTIVITY,
-          icon = Icons.Outlined.AddCircleOutline,
+          iconOutlined = Icons.Outlined.AddCircleOutline,
+          iconFilled = Icons.Filled.AddCircleOutline,
           textId = "Add Activity")
   val LIKED_ACTIVITIES =
       TopLevelDestination(
-          route = Route.LIKED_ACTIVITIES, icon = Icons.Outlined.FavoriteBorder, textId = "Liked")
-  val MAP = TopLevelDestination(route = Route.MAP, icon = Icons.Outlined.Map, textId = "Map")
+          route = Route.LIKED_ACTIVITIES,
+          iconOutlined = Icons.Outlined.FavoriteBorder,
+          iconFilled = Icons.Filled.Favorite,
+          textId = "Liked")
+  val MAP =
+      TopLevelDestination(
+          route = Route.MAP,
+          iconOutlined = Icons.Outlined.Map,
+          iconFilled = Icons.Filled.Map,
+          textId = "Map")
 }
 
 val LIST_TOP_LEVEL_DESTINATION =
