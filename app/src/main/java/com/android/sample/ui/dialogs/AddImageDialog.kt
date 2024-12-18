@@ -114,7 +114,7 @@ fun AddImageDialog(
                 modifier =
                     Modifier.fillMaxWidth()
                         .padding(STANDARD_PADDING.dp)
-                        .testTag("cameraButton")
+                        .testTag("defaultImageButton")
                         .border(
                             width = BORDER_STROKE_SM.dp,
                             color = Color.Cyan,
