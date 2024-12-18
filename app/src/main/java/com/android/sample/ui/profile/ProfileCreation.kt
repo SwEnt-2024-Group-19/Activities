@@ -58,6 +58,7 @@ import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.DefaultImageCarousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.TextFieldWithErrorState
@@ -82,6 +83,7 @@ fun ProfileCreationScreen(
   var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
+  var isDefaultImageOpen by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
   val context = LocalContext.current
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -97,22 +99,18 @@ fun ProfileCreationScreen(
         onCameraClick = {
           showDialogImage = false
           isCamOpen = true
-        })
+        },
+        onSelectDefault = {
+          showDialogImage = false
+          isDefaultImageOpen = true
+        },
+        default = true)
   }
 
   if (isGalleryOpen) {
     GalleryScreen(
         isGalleryOpen = { isGalleryOpen = false },
-        addImage = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
-        },
+        addImage = { bitmap -> selectedBitmap = bitmap },
         context = context)
   }
   if (isCamOpen) {
@@ -126,16 +124,7 @@ fun ProfileCreationScreen(
             },
         context = context,
         isCamOpen = { isCamOpen = false },
-        addElem = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
-        })
+        addElem = { bitmap -> selectedBitmap = bitmap })
   } else {
     Column(
         modifier =
@@ -157,7 +146,9 @@ fun ProfileCreationScreen(
               userId = uid,
               modifier =
                   Modifier.size((1.5 * IMAGE_SIZE).dp).clip(CircleShape).testTag("profilePicture"),
-              imageViewModel)
+              imageViewModel,
+              bitmap = selectedBitmap,
+              editing = true)
 
           Box(
               modifier =
@@ -170,7 +161,15 @@ fun ProfileCreationScreen(
                     contentDescription = "Add a photo",
                     tint = Color.Black)
               }
-
+          if (isDefaultImageOpen) {
+            DefaultImageCarousel(
+                onImageSelected = { bitmap ->
+                  selectedBitmap = bitmap
+                  isDefaultImageOpen = false
+                },
+                context = context,
+                onDismiss = { isDefaultImageOpen = false })
+          }
           Spacer(modifier = Modifier.padding((2 * LARGE_PADDING).dp))
 
           Row(
