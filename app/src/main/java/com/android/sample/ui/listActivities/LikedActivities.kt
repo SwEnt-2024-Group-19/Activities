@@ -226,10 +226,10 @@ fun ActivityCard2(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
-              Icon(
-                  imageVector = Icons.Filled.CalendarMonth,
-                  contentDescription = "Calendar",
-                  tint = Color(PRIMARY_COLOR))
+                Icon(
+                    imageVector = Icons.Filled.CalendarMonth,
+                    contentDescription = "Calendar",
+                    tint = Color(PRIMARY_COLOR))
                 Text(
                     text = formattedDate,
                     style =
@@ -265,10 +265,10 @@ fun ActivityCard2(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
-              Icon(
-                  imageVector = Icons.Filled.LocationOn,
-                  contentDescription = "location",
-                  tint = Color(PRIMARY_COLOR))
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = "location",
+                    tint = Color(PRIMARY_COLOR))
                 Text(
                     text = activity.location?.shortName ?: "No location",
                     style =
@@ -276,11 +276,11 @@ fun ActivityCard2(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
                     modifier = Modifier.weight(1f) // Takes up remaining space
                     )
-              Icon(
-                  imageVector = Icons.Filled.Groups,
-                  contentDescription = "Participants",
-                  tint = Color(PRIMARY_COLOR))
-              Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+                Icon(
+                    imageVector = Icons.Filled.Groups,
+                    contentDescription = "Participants",
+                    tint = Color(PRIMARY_COLOR))
+                Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
 
                 Text(
                     text = "${activity.placesLeft}/${activity.maxPlaces}",

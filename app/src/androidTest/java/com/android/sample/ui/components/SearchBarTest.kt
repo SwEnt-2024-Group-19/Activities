@@ -15,7 +15,7 @@ class SearchBarTest {
   @Test
   fun searchBar_updatesValueOnInput() {
     var value = ""
-    composeTestRule.setContent { SearchBar(onValueChange = { value = it }, value = value,{}) }
+    composeTestRule.setContent { SearchBar(onValueChange = { value = it }, value = value, {}) }
 
     val newValue = "New Value"
     composeTestRule.onNodeWithTag("searchBar").performTextInput(newValue)
@@ -24,14 +24,14 @@ class SearchBarTest {
 
   @Test
   fun searchBar_hasSearchIcon() {
-    composeTestRule.setContent { SearchBar(onValueChange = {}, value = "",{}) }
+    composeTestRule.setContent { SearchBar(onValueChange = {}, value = "", {}) }
 
     composeTestRule.onNodeWithContentDescription("Search").assertExists()
   }
 
   @Test
   fun searchBar_clipsWithRoundedCorners() {
-    composeTestRule.setContent { SearchBar(onValueChange = {}, value = "",{}) }
+    composeTestRule.setContent { SearchBar(onValueChange = {}, value = "", {}) }
 
     composeTestRule.onNodeWithTag("searchBar").assertExists()
   }

@@ -296,38 +296,41 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick()
     composeTestRule.onNodeWithText("networking").assertIsDisplayed()
   }
-    @Test
-    fun iconsAreDisplayed(){
-        userProfileViewModel = mock(ProfileViewModel::class.java)
-        composeTestRule.setContent {
-            ActivityCard(
-                navigationActions = navigationActions,
-                listActivitiesViewModel = listActivitiesViewModel,
-                profileViewModel = userProfileViewModel,
-                profile = testUser,
-                activity = activity)
-        }
-        composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("iconparticipants", useUnmergedTree = true).assertIsDisplayed()
-        composeTestRule.onNodeWithTag("iconlocation", useUnmergedTree = true).assertIsDisplayed()
-        composeTestRule.onNodeWithTag("iconcalendar", useUnmergedTree = true).assertIsDisplayed()
+
+  @Test
+  fun iconsAreDisplayed() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity)
     }
-    @Test
-    fun interestsAreCorrectlyDisplayed(){
-        userProfileViewModel = mock(ProfileViewModel::class.java)
-        val activity1 = activity.copy(subcategory = "Basketball")
-        composeTestRule.setContent {
-            ActivityCard(
-                navigationActions = navigationActions,
-                listActivitiesViewModel = listActivitiesViewModel,
-                profileViewModel = userProfileViewModel,
-                profile = testUser,
-                activity = activity1)
-        }
-        composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("interestPresent", useUnmergedTree = true)
-        composeTestRule.onNodeWithText("Basketball", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("iconparticipants", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("iconlocation", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("iconcalendar", useUnmergedTree = true).assertIsDisplayed()
+  }
+
+  @Test
+  fun interestsAreCorrectlyDisplayed() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    val activity1 = activity.copy(subcategory = "Basketball")
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity1)
     }
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("interestPresent", useUnmergedTree = true)
+    composeTestRule.onNodeWithText("Basketball", useUnmergedTree = true).assertIsDisplayed()
+  }
+
   @Test
   fun changeIconWhenActivityNotLiked() {
     userProfileViewModel = mock(ProfileViewModel::class.java)
@@ -409,7 +412,9 @@ class OverviewScreenTest {
           activity = activity,
           distance = null)
     }
-    composeTestRule.onNodeWithTag("locationAndDistance", useUnmergedTree = true).assertTextEquals("EPFL") //there is only the location, not the distance
+    composeTestRule
+        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .assertTextEquals("EPFL") // there is only the location, not the distance
   }
 
   @Test

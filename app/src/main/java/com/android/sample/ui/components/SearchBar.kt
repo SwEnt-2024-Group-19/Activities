@@ -1,25 +1,17 @@
 package com.android.sample.ui.components
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.sharp.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -27,7 +19,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PRIMARY_COLOR
-import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 
 /**
@@ -45,8 +36,14 @@ fun SearchBar(onValueChange: (String) -> Unit, value: String, onClickFilter: () 
       onValueChange = onValueChange,
       label = { Text("Search") },
       leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
-      trailingIcon = { IconButton(onClick =  onClickFilter, modifier = Modifier.testTag("filterDialog") ) { Icon(Icons.Sharp.FilterList, contentDescription = "Filter Activities", tint = Color(
-          PRIMARY_COLOR))}},
+      trailingIcon = {
+        IconButton(onClick = onClickFilter, modifier = Modifier.testTag("filterDialog")) {
+          Icon(
+              Icons.Sharp.FilterList,
+              contentDescription = "Filter Activities",
+              tint = Color(PRIMARY_COLOR))
+        }
+      },
       modifier =
           Modifier.testTag("searchBar")
               .clip(shape = RoundedCornerShape(MEDIUM_PADDING.dp))
