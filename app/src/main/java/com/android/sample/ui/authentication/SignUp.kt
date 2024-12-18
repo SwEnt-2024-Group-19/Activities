@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -49,6 +52,7 @@ import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
+import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.components.TextFieldWithErrorState
@@ -151,6 +155,10 @@ fun SignUpScreen(
           // Profile Picture
           item {
             Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
+            ProfileImage(
+                userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
+                imageViewModel)
             ModifyPictureButton(showDialogImage = { showDialogImage = true })
           }
 
