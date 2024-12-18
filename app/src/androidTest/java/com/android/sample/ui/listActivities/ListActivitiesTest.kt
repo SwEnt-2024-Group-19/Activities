@@ -296,6 +296,22 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("segmentedButtonSKILLS").performClick()
     composeTestRule.onNodeWithText("networking").assertIsDisplayed()
   }
+    @Test
+    fun iconsAreDisplayed(){
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        composeTestRule.setContent {
+            ActivityCard(
+                navigationActions = navigationActions,
+                listActivitiesViewModel = listActivitiesViewModel,
+                profileViewModel = userProfileViewModel,
+                profile = testUser,
+                activity = activity)
+        }
+        composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("iconparticipants", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("iconlocation", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("iconcalendar", useUnmergedTree = true).assertIsDisplayed()
+    }
 
   @Test
   fun changeIconWhenActivityNotLiked() {

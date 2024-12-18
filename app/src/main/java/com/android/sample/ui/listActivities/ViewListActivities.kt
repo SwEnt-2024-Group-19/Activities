@@ -419,7 +419,7 @@ fun ActivityCard(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
-              DisplayIcon(Icons.Filled.CalendarMonth, "Calendar")
+              DisplayIcon(Icons.Filled.CalendarMonth, "calendar")
 
                 Text(
                     text = formattedDate,
@@ -472,7 +472,7 @@ fun ActivityCard(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
                     modifier = Modifier.weight(1f).testTag("locationAndDistance") // Takes up remaining space
                     )
-              DisplayIcon(Icons.Filled.Groups, "Participants")
+              DisplayIcon(Icons.Filled.Groups, "participants")
 
               Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
 
@@ -546,6 +546,6 @@ fun DisplayIcon(imageVector: ImageVector, contentDescription: String) {
         imageVector =imageVector,
         contentDescription = contentDescription,
         tint = Color(PRIMARY_COLOR),
-        modifier = Modifier.testTag("icon$imageVector"))
+        modifier = Modifier.testTag("icon$contentDescription"))
 }
 
