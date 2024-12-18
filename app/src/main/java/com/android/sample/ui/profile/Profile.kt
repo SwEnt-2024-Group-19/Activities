@@ -517,9 +517,7 @@ fun DisplayActivitiesList(
     PAST_ACTIVITIES -> {
       listToShow =
           userActivities.filter {
-            hourDateViewModel.combineDateAndTime(
-                it.date, it.startTime) <=
-                Timestamp.now()
+            hourDateViewModel.combineDateAndTime(it.date, it.startTime) <= Timestamp.now()
           }
     }
     CREATED_ACTIVITIES -> {
