@@ -465,7 +465,6 @@ fun ActivityForm(
         else Text("Select start time")
       }
 
-
   // Button to display the duration time picker
   TextButton(
       onClick = onClickDurationTime,

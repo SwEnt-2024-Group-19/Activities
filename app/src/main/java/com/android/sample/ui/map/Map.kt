@@ -122,53 +122,43 @@ fun MapScreen(
 
   Scaffold(
       floatingActionButton = {
-          if (networkManager.isNetworkAvailable()) {
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
-                  horizontalArrangement = Arrangement.SpaceBetween
-              ) {
-                  FloatingActionButton(
-                      modifier =
-                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("centerOnCurrentLocation"),
-                      onClick = {
-                          coroutineScope.launch {
-                              currentLocation?.let {
-                                  val locationLatLng = LatLng(it.latitude, it.longitude)
-                                  cameraPositionState.animate(
-                                      update = CameraUpdateFactory.newLatLngZoom(
-                                          locationLatLng,
-                                          15f
-                                      ),
-                                      durationMs = 800
-                                  )
-                              }
-                          }
-                      },
-                      containerColor = Color(MAIN_COLOR_DARK)
-                  ) {
+        if (networkManager.isNetworkAvailable()) {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("centerOnCurrentLocation"),
+                    onClick = {
+                      coroutineScope.launch {
+                        currentLocation?.let {
+                          val locationLatLng = LatLng(it.latitude, it.longitude)
+                          cameraPositionState.animate(
+                              update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                              durationMs = 800)
+                        }
+                      }
+                    },
+                    containerColor = Color(MAIN_COLOR_DARK)) {
                       Icon(
                           Icons.Default.MyLocation,
                           contentDescription = "Center on current location",
-                          tint = Color(MAIN_COLOR_LIGHT)
-                      )
-
-                  }
-                  FloatingActionButton(
-                      modifier =
-                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("filterDialogButton"),
-                      onClick = { showFilterDialog = true },
-                      containerColor = Color(MAIN_COLOR_DARK)
-                  ) {
+                          tint = Color(MAIN_COLOR_LIGHT))
+                    }
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("filterDialogButton"),
+                    onClick = { showFilterDialog = true },
+                    containerColor = Color(MAIN_COLOR_DARK)) {
                       Icon(
                           Icons.Default.DensityMedium,
                           contentDescription = "Open filter dialog",
-                          tint = Color(MAIN_COLOR_LIGHT)
-                      )
-                  }
+                          tint = Color(MAIN_COLOR_LIGHT))
+                    }
               }
-          }
+        }
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {

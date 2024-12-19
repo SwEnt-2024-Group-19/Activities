@@ -1,7 +1,6 @@
 package com.android.sample.ui.components
 
 import androidx.compose.runtime.Composable
-
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,34 +30,34 @@ fun MyDatePicker(
     initialDate: LocalDate?,
     onCloseRequest: (MaterialDialogState) -> Unit
 ) {
-    val dialogState = rememberMaterialDialogState(isOpen)
-    MaterialDialog(
-        onCloseRequest = onCloseRequest,
-        dialogState = dialogState,
-        buttons = {
-            positiveButton(
-                text = "Ok",
-                textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold))
-            negativeButton(
-                text = "Cancel",
-                textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold)){
-                onCloseRequest(dialogState)
+  val dialogState = rememberMaterialDialogState(isOpen)
+  MaterialDialog(
+      onCloseRequest = onCloseRequest,
+      dialogState = dialogState,
+      buttons = {
+        positiveButton(
+            text = "Ok",
+            textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold))
+        negativeButton(
+            text = "Cancel",
+            textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold)) {
+              onCloseRequest(dialogState)
             }
-        },
-        backgroundColor = Color(MAIN_BACKGROUND_BUTTON)) {
+      },
+      backgroundColor = Color(MAIN_BACKGROUND_BUTTON)) {
         datepicker(
             initialDate = initialDate ?: LocalDate.now(),
             title = "Select a date",
             allowedDateValidator = { date -> date.isAfter(LocalDate.now().minusDays(1)) },
             colors =
-            DatePickerDefaults.colors(
-                headerBackgroundColor = Color(MAIN_COLOR_DARK),
-                headerTextColor = Color.White,
-                calendarHeaderTextColor = Color(MAIN_COLOR_DARK),
-                dateActiveBackgroundColor = Color(MAIN_COLOR_DARK),
-                dateInactiveBackgroundColor = Color.LightGray,
-            )) {
-            onDateSelected(Timestamp(it.atStartOfDay().toInstant(ZoneOffset.MIN)))
-        }
-    }
+                DatePickerDefaults.colors(
+                    headerBackgroundColor = Color(MAIN_COLOR_DARK),
+                    headerTextColor = Color.White,
+                    calendarHeaderTextColor = Color(MAIN_COLOR_DARK),
+                    dateActiveBackgroundColor = Color(MAIN_COLOR_DARK),
+                    dateInactiveBackgroundColor = Color.LightGray,
+                )) {
+              onDateSelected(Timestamp(it.atStartOfDay().toInstant(ZoneOffset.MIN)))
+            }
+      }
 }

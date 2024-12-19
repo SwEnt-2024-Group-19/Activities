@@ -39,11 +39,11 @@ fun MyTimePicker(
         positiveButton(
             text = "Ok",
             textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold))
-          negativeButton(
+        negativeButton(
             text = "Cancel",
-            textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold)){
+            textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold)) {
               onCloseRequest(dialogState)
-          }
+            }
       },
   ) {
     timepicker(
