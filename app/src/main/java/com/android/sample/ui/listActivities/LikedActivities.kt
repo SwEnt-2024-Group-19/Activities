@@ -47,6 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.model.activity.Activity
@@ -306,12 +307,13 @@ fun ActivityCard2(
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
 
           // Display the activity description
-          Text(
-              text = activity.description,
-              style =
-                  MaterialTheme.typography.bodyMedium.copy(
-                      color = Color.Black, lineHeight = TITLE_FONTSIZE.sp),
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
+            Text(
+                text = activity.description,
+                style =
+                MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis, // add "..." when description is too long
+                modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
         }
       }
