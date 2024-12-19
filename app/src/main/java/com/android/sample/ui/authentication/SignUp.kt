@@ -101,8 +101,8 @@ fun SignUpScreen(
   var isDefaultImageOpen by remember { mutableStateOf(false) }
 
   if (showDialogImage) {
-      // Dialog to let the user choose an image source (Gallery, Camera, or Default)
-      AddImageDialog(
+    // Dialog to let the user choose an image source (Gallery, Camera, or Default)
+    AddImageDialog(
         onDismiss = { showDialogImage = false },
         onGalleryClick = {
           showDialogImage = false

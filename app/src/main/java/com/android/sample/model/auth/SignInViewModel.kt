@@ -60,14 +60,14 @@ constructor(
     }
   }
 
-    /**
-     * Checks if a user profile exists in the `ProfilesRepository`.
-     *
-     * @param uid The unique user ID obtained after authentication.
-     * @param onProfileExists Callback invoked if the profile exists.
-     * @param onProfileMissing Callback invoked if the profile is missing.
-     * @param onFailure Callback invoked on failure with an error message.
-     */
+  /**
+   * Checks if a user profile exists in the `ProfilesRepository`.
+   *
+   * @param uid The unique user ID obtained after authentication.
+   * @param onProfileExists Callback invoked if the profile exists.
+   * @param onProfileMissing Callback invoked if the profile is missing.
+   * @param onFailure Callback invoked on failure with an error message.
+   */
   private fun checkUserProfile(
       uid: String?,
       onProfileExists: () -> Unit,
@@ -75,8 +75,8 @@ constructor(
       onFailure: (String) -> Unit
   ) {
     uid?.let {
-        // Fetch the user profile from the repository
-        profilesRepository.getUser(
+      // Fetch the user profile from the repository
+      profilesRepository.getUser(
           it,
           { user ->
             if (user != null) {

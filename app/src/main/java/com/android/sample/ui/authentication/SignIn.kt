@@ -59,13 +59,13 @@ import kotlinx.coroutines.launch
 fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewModel) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
-    // Mutable states for user inputs, errors, and UI visibility
-    val emailState = remember { mutableStateOf("") }
+  // Mutable states for user inputs, errors, and UI visibility
+  val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
-    val emailErrorState = remember { mutableStateOf<String?>(null) }
+  val emailErrorState = remember { mutableStateOf<String?>(null) }
 
-    val token = stringResource(R.string.default_web_client_id)
+  val token = stringResource(R.string.default_web_client_id)
   val isPasswordVisible = remember { mutableStateOf(false) }
   val onProfileExists = { navigationActions.navigateTo(Screen.OVERVIEW) }
   val onProfileMissing = { navigationActions.navigateTo(Screen.CREATE_PROFILE) }
@@ -113,7 +113,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           }
 
           item {
-              // Password input
+            // Password input
             PasswordTextField(
                 password = passwordState.value,
                 onPasswordChange = {
@@ -127,7 +127,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           }
 
           item {
-              // Sign-in Button
+            // Sign-in Button
             Card(
                 modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignInCard"),
                 colors =

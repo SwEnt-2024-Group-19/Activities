@@ -11,8 +11,8 @@ import kotlinx.coroutines.tasks.await
 /**
  * Repository for managing authentication with Firebase.
  *
- * Handles authentication-related operations such as observing auth state,
- * signing in with email or Google, and signing out.
+ * Handles authentication-related operations such as observing auth state, signing in with email or
+ * Google, and signing out.
  *
  * @param auth FirebaseAuth instance for handling authentication.
  * @param profilesRepository Repository for managing user profiles.
