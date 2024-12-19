@@ -23,7 +23,19 @@ data class MockUsersDatabase(private val users: List<User> = e2e_Users) {
  * @param activities: List of activities
  */
 data class MockActivitiesDatabase(private val activities: List<Activity> = e2e_Activities) {
+
+  /** Get an activity by its ID */
   fun getActivity(activityId: String): Activity? {
     return activities.find { it.uid == activityId }
+  }
+
+  /** Get all activities */
+  fun getActivities(): List<Activity> {
+    return activities
+  }
+
+  /** Add an activity */
+  fun addActivity(activity: Activity) {
+    activities.toMutableList().add(activity)
   }
 }
