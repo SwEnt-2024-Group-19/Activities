@@ -64,12 +64,7 @@ open class HourDateViewModel : ViewModel() {
       return Timestamp(
           combinedDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000, 0)
     } catch (e: DateTimeParseException) {
-      // Log the error or handle it as needed
-      println("Failed to parse time, error: ${e.message}")
-      val defaultDateTime = LocalDateTime.now()
-      return Timestamp(
-          defaultDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000,
-          0) // Or return a default Timestamp if that fits your use case
+      return date // Return a default Timestamp if that doesn't work
     }
   }
 }

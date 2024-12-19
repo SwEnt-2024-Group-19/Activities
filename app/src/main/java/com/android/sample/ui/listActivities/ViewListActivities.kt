@@ -1,7 +1,6 @@
 package com.android.sample.ui.listActivities
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -215,7 +214,6 @@ fun ListActivitiesScreen(
                 activitiesList =
                     activitiesList.filter {
                       // log the activity to see which one faisl in combine date and time
-                      Log.d("Overview", "${it.title}")
                       val activityTimestamp =
                           hourDateViewModel.combineDateAndTime(
                               it.date, it.startTime) // Combine date and startTime
