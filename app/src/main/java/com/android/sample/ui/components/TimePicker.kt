@@ -29,7 +29,6 @@ fun MyTimePicker(
   MaterialDialog(
       onCloseRequest = onCloseRequest,
       dialogState = dialogState,
-      properties = DialogProperties(dismissOnClickOutside = true, dismissOnBackPress = true),
       buttons = {
         positiveButton(text = "Ok")
         negativeButton(text = "Cancel"){
