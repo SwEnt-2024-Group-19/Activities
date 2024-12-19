@@ -37,6 +37,9 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           Interest(name = name, category = category)
         } ?: return null
 
+    val likes = document.get("likes") as? Map<String, Boolean?>
+    val filteredLikes = likes?.filterValues { it != null } as? Map<String, Boolean> ?: emptyMap()
+
     return try {
       User(
           id = document.id,
@@ -48,7 +51,8 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           photo = document.getString("photo") ?: return null,
           likedActivities =
               (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>()
-                  ?: return null)
+                  ?: return null,
+          likes = filteredLikes)
     } catch (e: Exception) {
       null
     }
