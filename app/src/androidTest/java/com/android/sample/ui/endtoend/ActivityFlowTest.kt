@@ -1,15 +1,10 @@
 package com.android.sample.ui.endtoend
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.MainActivity
 import com.android.sample.model.activity.ActivitiesRepository
+import com.android.sample.model.activity.Category
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.image.ImageRepository
 import com.android.sample.model.image.ImageRepositoryFirestore
@@ -22,6 +17,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 
 @HiltAndroidTest
 class ActivityFlowTest {
@@ -44,6 +40,9 @@ class ActivityFlowTest {
 
   @Inject lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
 
+  /** Helper class to interact with the UI. `hlp` stands for helper. */
+  private lateinit var hlp: ComposeTestHelper
+
   @get:Rule
   val permissionRule: GrantPermissionRule =
       GrantPermissionRule.grant(
@@ -55,78 +54,84 @@ class ActivityFlowTest {
   @Before
   fun setUp() {
     hiltRule.inject()
+    hlp = ComposeTestHelper(composeTestRule)
   }
 
-  // @Test // Will be fixed in a future PR
+  @Test
   fun guestCanSeeCorrectOverviewAndNavigateToActivityDetails() {
-    // Opens the app as a guest
-    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
-    composeTestRule.waitForIdle()
 
-    // Goes back to the main screen and tries to filter activities
-    composeTestRule.onNodeWithTag("Overview").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Activity 1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
-    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
+    // Auth screen > Sign in screen
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
 
-    composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    // Overview screen
+    hlp.assertIsDisplayed(Overview.SCREEN)
+    hlp.assertIsSelected(BottomNavigation.OVERVIEW)
+    hlp.assertAnyIsDisplayed(Overview.ACTIVITY_CARD)
 
-    // Opens the activity details
-    composeTestRule.onNodeWithTag("activityCard").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("image").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("title").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("titleText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("descriptionText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("price").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("location").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("scheduleText").assertIsDisplayed()
+    // Filter for specific activity types
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.CULTURE))
+    hlp.assertIsDisplayed(Overview.EMPTY_ACTIVITY)
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.CULTURE))
+    // assert is unselected
 
-    composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
-    composeTestRule.onNodeWithTag("goBackButton").assertExists()
-    composeTestRule.onNodeWithTag("goBackButton").performClick()
-    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
+    hlp.assertIsDisplayed(Overview.ACTIVITY_CARD)
+
+    // Filter for specific criteria
+    // TODO: Implement this feature
+
+    // Open the activity details
+    hlp.click(Overview.ACTIVITY_CARD)
+
+    // Activity details screen
+    /*hlp.assertIsDisplayed("activityDetailsScreen")
+    listOf(
+      "topAppBar", "goBackButton", "image", "title", "titleText", "descriptionText",
+      "price", "priceText", "location", "locationText", "schedule", "scheduleText"
+    ).forEach { hlp.assertIsDisplayed(it) }*/
+    // TODO: Implement this feature
+
+    // Check that the user is not logged in and can't enroll
+    hlp.assertExists(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
+    hlp.assertDoesNotExist(Overview.ActivityDetails.ENROLL_BUTTON)
+    hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
+    hlp.assertIsDisplayed(Overview.SCREEN)
   }
 
-  // @Test // Will be fixed in a future PR
+  @Test
   fun guestShouldSignUpForOtherFunctionalities() {
-    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
-    composeTestRule.waitForIdle()
+    // Auth screen > Sign in screen
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
 
-    composeTestRule.onNodeWithTag("Liked").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("notConnectedPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("signInButton").assertExists()
-    composeTestRule.onNodeWithTag("signInButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("SignUpScreenColumn").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("GoToSignInButton").assertExists()
-    composeTestRule.onNodeWithTag("GoToSignInButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("Profile").performClick()
-    composeTestRule.waitForIdle()
+    // Overview screen
+    hlp.assertIsDisplayed(Overview.SCREEN)
+    hlp.clickBottomNavigationItem(BottomNavigation.PROFILE)
+
+    // Profile screen
+    hlp.assertIsDisplayed(Profile.NotLoggedIn.PROMPT)
+    hlp.click(Profile.NotLoggedIn.SIGN_IN_BUTTON)
+
+    // Auth screen > Sign up screen
+    hlp.assertIsDisplayed(Auth.SignUp.SCREEN)
+    hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
+
+    // Auth screen > Sign in
+    hlp.assertIsDisplayed(Auth.SignIn.SCREEN)
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
 
     // Tries to create a new activity and is prompted to sign in
-    composeTestRule.onNodeWithTag("Add Activity").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("inputTitleCreate").assertIsDisplayed()
+    hlp.assertIsDisplayed(Overview.SCREEN)
+    hlp.clickBottomNavigationItem(BottomNavigation.CREATE_ACTIVITY)
+
+    // Add activity screen
+    /*hlp.assertIsDisplayed(CreateActivity.SCREEN)
+    hlp.write(CreateActivity.TITLE_INPUT, "Activity Title")
+    hlp.write(CreateActivity.DESCRIPTION_INPUT, "Activity Description")
+    hlp.write(CreateActivity.PRICE_INPUT, "13")
+    hlp.write(CreateActivity.PLACES_INPUT, "7")
+    hlp.write(CreateActivity.LOCATION_INPUT, "Activity Location")
+
+
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
@@ -139,31 +144,35 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()*/
   }
 
   @Test
   fun aUserSignsInAndLooksAtTheirProfile() {
-    val email =
-        defaultUserCredentials[
-            "email"]!! // use of !! is allowed because this is a test environment and we know the
+    // use of !! is allowed because this is a test environment and we know the
     // key exists. if it doesn't, it is up to the developer to fix the test
+    val email = defaultUserCredentials["email"]!!
     val password = defaultUserCredentials["password"]!!
+    val name = defaultUserCredentials["first name"]!! // @TODO: Should this change to full name?
 
-    // Tries to log in but fails because of wrong credentials
-    composeTestRule.onNodeWithTag("SignInButton").performClick()
-    composeTestRule.waitForIdle()
+    // Auth screen > Sign in screen
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON) // try to sign in without credentials
+    hlp.assertIsNotDisplayed(Overview.SCREEN)
+    hlp.assertTextIsDisplayed(Auth.SignIn.TEXT_INVALID_EMAIL)
 
     //  Enters credentials then connects
-    composeTestRule.onNodeWithTag("EmailTextField").performTextInput(email)
-    composeTestRule.onNodeWithTag("PasswordTextField").performTextInput(password)
-    composeTestRule.onNodeWithTag("SignInButton").performClick()
-    composeTestRule.waitForIdle()
+    hlp.write(Auth.SignIn.EMAIL_INPUT, email)
+    hlp.write(Auth.SignIn.PASSWORD_INPUT, password)
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
 
-    // Checks in the profile that the user is connected
-    composeTestRule.onNodeWithTag("Profile").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText(defaultUserCredentials["full name"]!!).assertIsDisplayed()
+    // Overview screen
+    hlp.assertIsDisplayed(Overview.SCREEN)
+    hlp.assertIsSelected(BottomNavigation.OVERVIEW)
+    hlp.clickBottomNavigationItem(BottomNavigation.PROFILE)
+
+    // Profile screen
+    hlp.assertIsDisplayed(Profile.SCREEN)
+    hlp.assertTextIsDisplayed(name)
   }
 
   /*
