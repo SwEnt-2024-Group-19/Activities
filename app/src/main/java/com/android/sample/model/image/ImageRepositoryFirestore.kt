@@ -184,19 +184,22 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
       onSuccess: (List<Bitmap>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    val bitmaps = mutableListOf<Bitmap>()
+    // Initialize a list of nulls with the size of urls to hold the Bitmaps in order
+    val bitmaps = MutableList<Bitmap?>(urls.size) { null }
     var successCount = 0
 
-    urls.forEach { url ->
+    urls.forEachIndexed { index, url ->
       val imageRef = storage.getReferenceFromUrl(url)
       imageRef
           .getBytes(Long.MAX_VALUE)
           .addOnSuccessListener { bytes ->
             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            bitmaps.add(bitmap)
+            // Place the bitmap at the correct index
+            bitmaps[index] = bitmap
             successCount++
             if (successCount == urls.size) {
-              onSuccess(bitmaps)
+              // Filter out any null values and return the list of bitmaps
+              onSuccess(bitmaps.filterNotNull())
             }
           }
           .addOnFailureListener { onFailure(it) }
@@ -215,9 +218,17 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         .get()
         .addOnSuccessListener { document ->
           val imageUrls = document["images"] as? List<String> ?: emptyList()
-          convertUrlsToBitmaps(imageUrls, onSuccess, onFailure)
+          val sortedImageUrls = sortUrlsByTimestamp(imageUrls)
+          convertUrlsToBitmaps(sortedImageUrls, onSuccess, onFailure)
         }
         .addOnFailureListener { onFailure(it) }
+  }
+
+  private fun sortUrlsByTimestamp(urls: List<String>): List<String> {
+    return urls.sortedBy { url ->
+      // Extract the timestamp part from the URL
+      url.substringAfterLast("image_").substringBefore('.').toLongOrNull() ?: 0L
+    }
   }
 
   override fun removeAllActivityImages(
