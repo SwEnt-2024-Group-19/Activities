@@ -112,12 +112,19 @@ private val e2e_activity2 =
         participants = listOf(e2e_user1),
         comments = listOf(e2e_comment1))
 
-val defaultUserCredentials =
+val defaultUserCredentials1 =
     mapOf(
         "email" to e2e_user1_email,
         "password" to e2e_user1_password,
         "first name" to e2e_user1.name,
         "full name" to "${e2e_user1.name} ${e2e_user1.surname}")
+val defaultUserCredentials2 =
+    mapOf(
+        "email" to e2e_user2_email,
+        "password" to e2e_user2_password,
+        "first name" to e2e_user2.name,
+        "full name" to "${e2e_user2.name} ${e2e_user2.surname}")
+
 
 val e2e_Users = listOf(e2e_user1, e2e_user2)
 val e2e_Activities = listOf(e2e_activity1, e2e_activity2)

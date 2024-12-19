@@ -11,13 +11,14 @@ import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
-import com.android.sample.resources.dummydata.defaultUserCredentials
+import com.android.sample.resources.dummydata.defaultUserCredentials1
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.lang.Thread.sleep
 
 @HiltAndroidTest
 class ActivityFlowTest {
@@ -80,19 +81,44 @@ class ActivityFlowTest {
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
     hlp.see(Overview.ACTIVITY_CARD)
 
+
     // Filter for specific criteria
-    // TODO: Implement this feature
+
+    hlp.see("filterDialog")
+    hlp.click("filterDialog")
+    hlp.see("FilterDialog")
+    hlp.scroll(
+        parentTag = "FilterDialog",
+        nodeTag = "onlyPROCheckboxRow")
+    hlp.see("onlyPROCheckbox")
+    hlp.click("onlyPROCheckbox")
+    hlp.scroll(
+        parentTag = "FilterDialog",
+        nodeTag = "filterButton")
+    hlp.click("filterButton")
+
+    hlp.notSee(Overview.ACTIVITY_CARD) // After filtering by PRO and SPORT, no activity is displayed
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.SKILLS)) // Switch to SKILLS
+    hlp.see(Overview.ACTIVITY_CARD)
+
+    //Search bar
+    hlp.click("searchBar")
+    hlp.write("searchBar","DANCE",)
+    hlp.notSee(Overview.ACTIVITY_CARD)
+    hlp.click("searchBar")
+    hlp.write("searchBar","Sample", replace = true)
+    hlp.see(Overview.ACTIVITY_CARD)
 
     // Open the activity details
     hlp.click(Overview.ACTIVITY_CARD)
 
-    // Activity details screen
-    /*hlp.assertIsDisplayed("activityDetailsScreen")
+    //Activity details screen
+    hlp.see("activityDetailsScreen")
     listOf(
       "topAppBar", "goBackButton", "image", "title", "titleText", "descriptionText",
       "price", "priceText", "location", "locationText", "schedule", "scheduleText"
-    ).forEach { hlp.assertIsDisplayed(it) }*/
-    // TODO: Implement this feature
+    ).forEach { hlp.see(it) }
+
 
     // Check that the user is not logged in and can't enroll
     hlp.scroll(
@@ -103,6 +129,36 @@ class ActivityFlowTest {
     hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
     hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
     hlp.see(Overview.SCREEN)
+
+    //Check that the user do not have a profile
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+    hlp.see(Profile.NotLoggedIn.PROMPT)
+    hlp.see(Profile.NotLoggedIn.SIGN_IN_BUTTON)
+
+    // Check that the user is not logged in and has no liked activities
+    hlp.click(BottomNavigation.Liked, bottomNavItem = true)
+    hlp.notSee("activityCard")
+    hlp.see("notConnectedPrompt")
+    hlp.see("signInButton")
+
+
+    // Go To signIn
+
+    hlp.click("signInButton")
+    hlp.see(Auth.SignUp.SCREEN)
+    hlp.scroll(
+      Auth.SignUp.SIGN_UP_COLUMN,
+      Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
+    hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
+
+    // Auth screen > Sign in
+    hlp.see(Auth.SignIn.SCREEN)
+    hlp.scroll(
+      Auth.SignIn.SIGN_IN_COLUMN,
+      Auth.SignIn.GUEST_BUTTON)
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
+
+
   }
 
   @Test
@@ -167,9 +223,9 @@ class ActivityFlowTest {
   fun aUserSignsInAndLooksAtTheirProfile() {
     // use of !! is allowed because this is a test environment and we know the
     // key exists. if it doesn't, it is up to the developer to fix the test
-    val email = defaultUserCredentials["email"]!!
-    val password = defaultUserCredentials["password"]!!
-    val name = defaultUserCredentials["first name"]!! // @TODO: Should this change to full name?
+    val email = defaultUserCredentials1["email"]!!
+    val password = defaultUserCredentials1["password"]!!
+    val name = defaultUserCredentials1["first name"]!! // @TODO: Should this change to full name?
 
     // Auth screen > Sign in screen
     hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
