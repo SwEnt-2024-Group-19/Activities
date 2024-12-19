@@ -109,6 +109,9 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
               shortName = name)
         } ?: Location(0.0, 0.0, "No Location", "No Location")
 
+    val likes = data["likes"] as? Map<String, Boolean?> ?: emptyMap()
+    val filteredLikes = likes.filterValues { it != null } as Map<String, Boolean>
+
     return Activity(
         uid = documentId,
         title = data["title"] as? String ?: "No Title",
@@ -126,7 +129,7 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
         type = activityType,
         participants = participants,
         comments = comments,
-        likes = data["likes"] as? Map<String, Boolean?> ?: emptyMap(),
+        likes = filteredLikes,
         category = Category.valueOf(data["category"] as? String ?: "SPORT"),
         subcategory = data["subcategory"] as? String ?: "None")
   }
