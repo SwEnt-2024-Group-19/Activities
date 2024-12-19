@@ -56,7 +56,8 @@ import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
-import com.android.sample.ui.components.LoadingScreen
+import com.android.sample.ui.camera.getImageResourceIdForCategory
+import com.android.sample.ui.components.WaitingScreen
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -146,7 +147,7 @@ fun MapScreen(
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
-          LoadingScreen(message = stringResource(R.string.no_internet_connection))
+          WaitingScreen(message = stringResource(R.string.no_internet_connection))
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
@@ -283,19 +284,22 @@ fun MapScreen(
 @Composable
 fun DisplayActivity(activity: Activity) {
   Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("activityDetails")) {
-    if (activity.images.isNotEmpty()) {
-      AsyncImage(
-          model = activity.images.first(),
-          contentDescription = "Activity image",
-          modifier =
-              Modifier.fillMaxWidth()
-                  .height(LARGE_IMAGE_SIZE.dp)
-                  .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
-                  .testTag("activityImage"),
-          contentScale = ContentScale.Crop)
-      Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
-    }
-
+    val vignette =
+        if (activity.images.isNotEmpty()) {
+          activity.images.first()
+        } else {
+          getImageResourceIdForCategory(activity.category)
+        }
+    AsyncImage(
+        model = vignette,
+        contentDescription = "Activity image",
+        modifier =
+            Modifier.fillMaxWidth()
+                .height(LARGE_IMAGE_SIZE.dp)
+                .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
+                .testTag("activityImage"),
+        contentScale = ContentScale.Crop)
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
     Text(
         text = activity.title,
         style = MaterialTheme.typography.bodyLarge,

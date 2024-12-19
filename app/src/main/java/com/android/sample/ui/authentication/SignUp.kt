@@ -8,10 +8,7 @@ import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,11 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -57,6 +51,7 @@ import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.DefaultImageCarousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.EmailTextField
@@ -66,6 +61,7 @@ import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.android.sample.ui.profile.ManageInterests
+import com.android.sample.ui.profile.ModifyPictureButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -98,6 +94,7 @@ fun SignUpScreen(
   var showDialogImage by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
   var isCamOpen by remember { mutableStateOf(false) }
+  var isDefaultImageOpen by remember { mutableStateOf(false) }
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
   if (showDialogImage) {
@@ -110,23 +107,20 @@ fun SignUpScreen(
         onCameraClick = {
           showDialogImage = false
           isCamOpen = true
-        })
+        },
+        onSelectDefault = {
+          showDialogImage = false
+          isDefaultImageOpen = true
+        },
+        default = true)
   }
   if (isGalleryOpen) {
     GalleryScreen(
         isGalleryOpen = { isGalleryOpen = false },
-        addImage = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
-        },
+        addImage = { bitmap -> selectedBitmap = bitmap },
         context = context)
   }
+
   if (isCamOpen) {
     CameraScreen(
         paddingValues = PaddingValues(SMALL_PADDING.dp),
@@ -138,18 +132,7 @@ fun SignUpScreen(
             },
         context = context,
         isCamOpen = { isCamOpen = false },
-        addElem = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e(
-                    "SignUpAndProfileCreationScreen",
-                    "Failed to upload profile picture: ${error.message}")
-              })
-        })
+        addElem = { bitmap -> selectedBitmap = bitmap })
   } else {
     LazyColumn(
         modifier =
@@ -163,18 +146,19 @@ fun SignUpScreen(
             ProfileImage(
                 userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
                 modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
-                imageViewModel)
-            Box(
-                modifier =
-                    Modifier.testTag("uploadPicture")
-                        .clickable { showDialogImage = true } // Handle click action
-                        .padding(MEDIUM_PADDING.dp)
-                        .background(Color.Transparent)) {
-                  Icon(
-                      imageVector = Icons.Default.AddAPhoto,
-                      contentDescription = "Add a photo",
-                      tint = Color.Black)
-                }
+                imageViewModel,
+                bitmap = selectedBitmap,
+                editing = true)
+            if (isDefaultImageOpen) {
+              DefaultImageCarousel(
+                  onImageSelected = { bitmap ->
+                    selectedBitmap = bitmap
+                    isDefaultImageOpen = false
+                  },
+                  context = context,
+                  onDismiss = { isDefaultImageOpen = false })
+            }
+            ModifyPictureButton(showDialogImage = { showDialogImage = true })
           }
 
           // Email Field

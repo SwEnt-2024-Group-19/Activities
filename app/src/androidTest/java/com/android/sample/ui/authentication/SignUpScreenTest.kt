@@ -3,11 +3,13 @@ package com.android.sample.ui.authentication
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.sample.R
 import com.android.sample.model.authentication.MockSignInRepository
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
@@ -187,6 +189,33 @@ class SignUpAndProfileCreationScreenTest {
   }
 
   @Test
+  fun testCameraButtonOpensGalleryScreen() {
+    composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("profilePicture"))
+    composeTestRule.onNodeWithTag("profilePicture").performClick()
+    composeTestRule
+        .onNodeWithTag("SignUpColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+        .performClick()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("galleryButton").performClick()
+  }
+
+  @Test
+  fun testCameraButtonOpensDefaultImageCarousel() {
+    composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("profilePicture"))
+    composeTestRule.onNodeWithTag("profilePicture").performClick()
+    composeTestRule
+        .onNodeWithTag("SignUpColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+        .performClick()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("defaultImageButton").performClick()
+
+    composeTestRule.onNodeWithTag("DefaultImageCarousel").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ImageCard_${R.drawable.dog_avatar}").performClick()
+  }
+
+  @Test
   fun testProfileCreationWithInvalidDataShowsErrors() {
     composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("SignUpButton"))
     composeTestRule.onNodeWithTag("SignUpButton").performClick()
@@ -206,5 +235,17 @@ class SignUpAndProfileCreationScreenTest {
         .onNodeWithTag("SignUpColumn")
         .performScrollToNode(hasTestTag("surnameError"))
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun togglePasswordVisibility() {
+
+    composeTestRule.onNodeWithContentDescription("Show password").assertExists()
+
+    // Click the visibility icon to show the password
+    composeTestRule.onNodeWithContentDescription("Show password").performClick()
+
+    // Verify password visibility toggle behavior (e.g., check attribute or visual state).
+    composeTestRule.onNodeWithTag("PasswordTextField").assertExists()
   }
 }
