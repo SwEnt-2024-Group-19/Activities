@@ -27,13 +27,15 @@ fun MyDatePicker(
     initialDate: LocalDate?,
     onCloseRequest: (MaterialDialogState) -> Unit
 ) {
+    val dialogState = rememberMaterialDialogState(isOpen)
   MaterialDialog(
       onCloseRequest = onCloseRequest,
-      dialogState = rememberMaterialDialogState(isOpen),
-      properties = DialogProperties(dismissOnClickOutside = true, dismissOnBackPress = true),
+      dialogState = dialogState,
       buttons = {
         positiveButton("Ok")
-        negativeButton("Cancel")
+        negativeButton("Cancel"){
+            onCloseRequest(dialogState)
+        }
       }) {
         datepicker(
             initialDate = initialDate ?: LocalDate.now(),
