@@ -1,14 +1,18 @@
 package com.android.sample.ui.endtoend
 
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 
 /**
@@ -18,49 +22,68 @@ import androidx.compose.ui.test.performTextInput
  */
 class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
 
-  /** Clicks on a node with the given tag. */
+  /**
+   * Clicks on a node with the given tag.
+   *
+   * @param tag The tag of the node to click.
+   */
   fun click(tag: String) {
-    composeTestRule.onNodeWithTag(tag).assertHasClickAction()
-    composeTestRule.onNodeWithTag(tag).performClick()
+    val node = getNode(tag)
+    see(tag)
+    node.assertHasClickAction()
+    node.performClick()
     composeTestRule.waitForIdle()
   }
 
   /** Click on bottom navigation item and check that the screen changes. */
   fun clickBottomNavigationItem(tag: String) {
-    assertIsDisplayed(BottomNavigation.MENU)
-    assertIsDisplayed(tag)
+    see(BottomNavigation.MENU)
+    see(tag)
     click(tag)
     // assertIsSelected(tag) TODO: Uncomment this line when the bug is fixed
   }
 
-  /** Asserts that a node with the given tag is selected. */
-  fun assertIsSelected(tag: String) {
-    assertIsDisplayed(tag)
-    composeTestRule.onNodeWithTag(tag).assertIsSelected()
+  /**
+   * Asserts that a node with the given tag is displayed and optionally selected.
+   *
+   * @param tag The tag of the node to assert. If [] is true, this is the text to search for.
+   * @param selected Whether the node should be selected. default is false.
+   * @param text Whether to search for text instead of tag. default is false.
+   * @param any Whether to accept multiple nodes to match the tag, and to select any (i.e. the
+   *   first) of these nodes. default is false.
+   */
+  fun see(tag: String, selected: Boolean = false, text: Boolean = false, any: Boolean = false) {
+    val node = getNode(tag, text, any)
+    node.assertIsDisplayed()
+    if (selected) node.assertIsSelected()
   }
 
-  /** Asserts that a node with the given tag is displayed. */
-  fun assertIsDisplayed(tag: String) = composeTestRule.onNodeWithTag(tag).assertIsDisplayed()
+  private fun getNode(
+      tag: String,
+      text: Boolean = false,
+      any: Boolean = false
+  ): SemanticsNodeInteraction {
+    return if (any) {
+      if (text) composeTestRule.onAllNodesWithText(tag)[0]
+      else composeTestRule.onAllNodesWithTag(tag)[0]
+    } else {
+      if (text) composeTestRule.onNodeWithText(tag) else composeTestRule.onNodeWithTag(tag)
+    }
+  }
 
-  /** Asserts that there is at least one node with the given tag displayed. */
-  fun assertAnyIsDisplayed(tag: String) =
-      composeTestRule.onAllNodesWithTag(tag)[0].assertIsDisplayed()
+  /** Scrolls to a node with the given tag. */
+  fun scroll(parentTag: String, nodeTag: String) =
+      composeTestRule.onNodeWithTag(parentTag).performScrollToNode(hasTestTag(nodeTag))
 
   /** Asserts that a node with the given tag is not displayed. */
-  fun assertIsNotDisplayed(tag: String) = composeTestRule.onNodeWithTag(tag).assertIsNotDisplayed()
-
-  /** Asserts that a node with the given tag exists. */
-  fun assertExists(tag: String) = composeTestRule.onNodeWithTag(tag).assertExists()
-
-  /** Asserts that a node with the given tag does not exist. */
-  fun assertDoesNotExist(tag: String) = composeTestRule.onNodeWithTag(tag).assertDoesNotExist()
-
-  /** Asserts that a node with the given tag does not exist. */
-  fun assertTextIsDisplayed(text: String) = composeTestRule.onNodeWithText(text).assertIsDisplayed()
+  fun notSee(tag: String, text: Boolean = false) {
+    val node = if (text) composeTestRule.onNodeWithText(tag) else composeTestRule.onNodeWithTag(tag)
+    node.assertIsNotDisplayed()
+  }
 
   /** Writes text in a node with the given tag. */
-  fun write(tag: String, text: String) {
-    composeTestRule.onNodeWithTag(tag).performTextInput(text)
+  fun write(tag: String, input: String) {
+    composeTestRule.onNodeWithTag(tag).performTextInput(input)
     composeTestRule.waitForIdle()
   }
 }

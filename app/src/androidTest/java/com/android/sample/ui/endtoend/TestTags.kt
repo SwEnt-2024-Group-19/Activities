@@ -23,12 +23,13 @@ object BottomNavigation {
 object Auth {
   object SignUp {
     const val SCREEN = "SignUpColumn"
+    const val SIGN_UP_COLUMN = "SignUpColumn"
     const val GO_TO_SIGN_IN_BUTTON = "GoToSignInButton"
   }
 
   object SignIn {
     const val SCREEN = "SignInScreen"
-    const val SignInScreenColumn = "SignInScreenColumn"
+    const val SIGN_IN_COLUMN = "SignInScreenColumn"
     const val GO_TO_SIGN_UP_BUTTON = "GoToSignUpButton"
     const val SIGN_IN_BUTTON = "SignInButton"
     const val GUEST_BUTTON = "ContinueAsGuestButton"

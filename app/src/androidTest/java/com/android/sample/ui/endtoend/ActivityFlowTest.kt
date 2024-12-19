@@ -55,27 +55,30 @@ class ActivityFlowTest {
   fun setUp() {
     hiltRule.inject()
     hlp = ComposeTestHelper(composeTestRule)
+    composeTestRule.waitForIdle()
   }
 
   @Test
   fun guestCanSeeCorrectOverviewAndNavigateToActivityDetails() {
-
     // Auth screen > Sign in screen
+    hlp.scroll(
+        parentTag = Auth.SignIn.SIGN_IN_COLUMN,
+        nodeTag = Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
     hlp.click(Auth.SignIn.GUEST_BUTTON)
 
     // Overview screen
-    hlp.assertIsDisplayed(Overview.SCREEN)
-    hlp.assertIsSelected(BottomNavigation.OVERVIEW)
-    hlp.assertAnyIsDisplayed(Overview.ACTIVITY_CARD)
+    hlp.see(Overview.SCREEN)
+    hlp.see(BottomNavigation.OVERVIEW, selected = true)
+    hlp.see(Overview.ACTIVITY_CARD, any = true)
 
     // Filter for specific activity types
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.CULTURE))
-    hlp.assertIsDisplayed(Overview.EMPTY_ACTIVITY)
+    hlp.see(Overview.EMPTY_ACTIVITY)
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.CULTURE))
     // assert is unselected
 
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
-    hlp.assertIsDisplayed(Overview.ACTIVITY_CARD)
+    hlp.see(Overview.ACTIVITY_CARD)
 
     // Filter for specific criteria
     // TODO: Implement this feature
@@ -92,35 +95,48 @@ class ActivityFlowTest {
     // TODO: Implement this feature
 
     // Check that the user is not logged in and can't enroll
-    hlp.assertExists(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
-    hlp.assertDoesNotExist(Overview.ActivityDetails.ENROLL_BUTTON)
+    hlp.scroll(
+        Overview.ActivityDetails.SCREEN,
+        Overview.ActivityDetails
+            .NOT_LOGGED_IN_TEXT) // @TODO: The need for a scroll here is debatable
+    hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
+    hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
     hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
-    hlp.assertIsDisplayed(Overview.SCREEN)
+    hlp.see(Overview.SCREEN)
   }
 
   @Test
   fun guestShouldSignUpForOtherFunctionalities() {
     // Auth screen > Sign in screen
+    hlp.scroll(
+        Auth.SignIn.SIGN_IN_COLUMN,
+        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
     hlp.click(Auth.SignIn.GUEST_BUTTON)
 
     // Overview screen
-    hlp.assertIsDisplayed(Overview.SCREEN)
+    hlp.see(Overview.SCREEN)
     hlp.clickBottomNavigationItem(BottomNavigation.PROFILE)
 
     // Profile screen
-    hlp.assertIsDisplayed(Profile.NotLoggedIn.PROMPT)
+    hlp.see(Profile.NotLoggedIn.PROMPT)
     hlp.click(Profile.NotLoggedIn.SIGN_IN_BUTTON)
 
     // Auth screen > Sign up screen
-    hlp.assertIsDisplayed(Auth.SignUp.SCREEN)
+    hlp.see(Auth.SignUp.SCREEN)
+    hlp.scroll(
+        Auth.SignUp.SIGN_UP_COLUMN,
+        Auth.SignUp.GO_TO_SIGN_IN_BUTTON) // @TODO: This should not need scrolling
     hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
 
     // Auth screen > Sign in
-    hlp.assertIsDisplayed(Auth.SignIn.SCREEN)
+    hlp.see(Auth.SignIn.SCREEN)
+    hlp.scroll(
+        Auth.SignIn.SIGN_IN_COLUMN,
+        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
     hlp.click(Auth.SignIn.GUEST_BUTTON)
 
     // Tries to create a new activity and is prompted to sign in
-    hlp.assertIsDisplayed(Overview.SCREEN)
+    hlp.see(Overview.SCREEN)
     hlp.clickBottomNavigationItem(BottomNavigation.CREATE_ACTIVITY)
 
     // Add activity screen
@@ -156,9 +172,9 @@ class ActivityFlowTest {
     val name = defaultUserCredentials["first name"]!! // @TODO: Should this change to full name?
 
     // Auth screen > Sign in screen
-    hlp.click(Auth.SignIn.SIGN_IN_BUTTON) // try to sign in without credentials
-    hlp.assertIsNotDisplayed(Overview.SCREEN)
-    hlp.assertTextIsDisplayed(Auth.SignIn.TEXT_INVALID_EMAIL)
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+    hlp.notSee(Overview.SCREEN)
+    hlp.see(Auth.SignIn.TEXT_INVALID_EMAIL, text = true)
 
     //  Enters credentials then connects
     hlp.write(Auth.SignIn.EMAIL_INPUT, email)
@@ -166,13 +182,13 @@ class ActivityFlowTest {
     hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
 
     // Overview screen
-    hlp.assertIsDisplayed(Overview.SCREEN)
-    hlp.assertIsSelected(BottomNavigation.OVERVIEW)
+    hlp.see(Overview.SCREEN)
+    hlp.see(BottomNavigation.OVERVIEW)
     hlp.clickBottomNavigationItem(BottomNavigation.PROFILE)
 
     // Profile screen
-    hlp.assertIsDisplayed(Profile.SCREEN)
-    hlp.assertTextIsDisplayed(name)
+    hlp.see(Profile.SCREEN)
+    hlp.see(name, text = true)
   }
 
   /*
