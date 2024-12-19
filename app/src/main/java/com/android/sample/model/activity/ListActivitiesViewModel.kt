@@ -228,7 +228,8 @@ constructor(
    * @param review The review to be added.
    */
   fun reviewActivity(activity: Activity, userId: String, review: Boolean?) {
-    val newLikes = activity.likes.plus(userId to review)
+    val newLikes =
+        if (review == null) activity.likes - userId else activity.likes + (userId to review)
     val newActivity = activity.copy(likes = newLikes)
     updateActivity(newActivity)
   }
