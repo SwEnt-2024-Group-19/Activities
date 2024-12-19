@@ -423,7 +423,6 @@ fun ActivityForm(
                 "${dueDate.toDate().year + 1900}  (click to change)")
     else Text("Select Date for the activity")
   }
-  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
   // Button to display the start time picker
   TextButton(
       onClick = onClickStartingTime,
@@ -437,8 +436,6 @@ fun ActivityForm(
     if (startTimeIsSet) Text("Start time: $startTime (click to change)")
     else Text("Select start time")
   }
-
-  Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
   // Button to display the duration time picker
   TextButton(
       onClick = onClickDurationTime,

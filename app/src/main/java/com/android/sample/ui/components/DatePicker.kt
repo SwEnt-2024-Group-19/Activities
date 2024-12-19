@@ -3,7 +3,6 @@ package com.android.sample.ui.components
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.DialogProperties
 import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
@@ -27,13 +26,13 @@ fun MyDatePicker(
     initialDate: LocalDate?,
     onCloseRequest: (MaterialDialogState) -> Unit
 ) {
+  val dialogState = rememberMaterialDialogState(isOpen)
   MaterialDialog(
       onCloseRequest = onCloseRequest,
-      dialogState = rememberMaterialDialogState(isOpen),
-      properties = DialogProperties(dismissOnClickOutside = true, dismissOnBackPress = true),
+      dialogState = dialogState,
       buttons = {
         positiveButton("Ok")
-        negativeButton("Cancel")
+        negativeButton("Cancel") { onCloseRequest(dialogState) }
       }) {
         datepicker(
             initialDate = initialDate ?: LocalDate.now(),
