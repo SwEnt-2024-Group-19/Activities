@@ -3,6 +3,7 @@ package com.android.sample.resources.dummydata
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.Interest
@@ -12,12 +13,12 @@ import com.google.firebase.Timestamp
 /* Please do not modify the following dummy data for general testing, as it is designed for e2e tests */
 
 private val e2e_interests =
-    listOf(Interest("Indoor Activity", "reading"), Interest("Outdoor Activity", "hiking"))
+    listOf(Interest("Football", Category.SPORT), Interest("Movies", Category.ENTERTAINMENT))
 
 private val e2e_locations =
     mapOf(
-        "EPFL" to Location(46.519962, 6.633597, "EPFL"),
-        "Lausanne" to Location(46.5, 6.6, "Lausanne"))
+        "EPFL" to Location(46.519962, 6.633597, "EPFL", "EPFL"),
+        "Lausanne" to Location(46.5, 6.6, "Lausanne", "EPFL"))
 
 private val e2e_user1 =
     User(
@@ -73,7 +74,9 @@ private val e2e_activity1 =
         description = "Sample Description 1",
         date = Timestamp.now(),
         startTime = "10:00",
-        duration = "2 hours",
+        duration = "02:00",
+        category = Category.SPORT,
+        subcategory = "Football",
         price = 0.0,
         location = e2e_locations["EPFL"],
         creator = e2e_user1.id,
@@ -92,7 +95,9 @@ private val e2e_activity2 =
         description = "Sample Description 1",
         date = Timestamp.now(),
         startTime = "10:00",
-        duration = "2 hours",
+        duration = "03:00",
+        category = Category.SKILLS,
+        subcategory = "Programming",
         price = 15.0,
         location = e2e_locations["Lausanne"],
         creator = e2e_user2.id,
@@ -108,6 +113,7 @@ val defaultUserCredentials =
     mapOf(
         "email" to e2e_user1_email,
         "password" to e2e_user1_password,
+        "first name" to e2e_user1.name,
         "full name" to "${e2e_user1.name} ${e2e_user1.surname}")
 
 val e2e_Users = listOf(e2e_user1, e2e_user2)
