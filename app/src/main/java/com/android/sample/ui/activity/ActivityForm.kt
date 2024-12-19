@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.HourglassTop
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -30,6 +32,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,6 +49,8 @@ import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TOP_TITLE_SIZE
@@ -365,28 +370,40 @@ fun ActivityForm(
 
   Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
 
-  Card(
-      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
-  ) {
-    TextButton(
-        onClick = onOpenUserDialog,
-        modifier =
-            Modifier.width(BUTTON_WIDTH.dp)
-                .height(BUTTON_HEIGHT_SM.dp)
-                .testTag("addAttendeeButton")) {
-          Row(
-              horizontalArrangement =
-                  Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
-              verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Icon(
-                Icons.Filled.Add,
-                contentDescription = "add a new attendee",
-            )
-            Text("Add Attendee")
-          }
+  Box(
+      modifier = Modifier.fillMaxWidth().padding(horizontal = STANDARD_PADDING.dp),
+      contentAlignment = Alignment.Center // Center the content horizontally and vertically
+      ) {
+        Card(
+            elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+        ) {
+          TextButton(
+              onClick = onOpenUserDialog,
+              modifier =
+                  Modifier.width((BUTTON_WIDTH / 1.5).dp)
+                      .height(BUTTON_HEIGHT_SM.dp)
+                      .testTag("addAttendeeButton"),
+              shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT),
+              colors =
+                  ButtonColors(
+                      containerColor = Color(MAIN_COLOR_DARK),
+                      contentColor = Color.White,
+                      disabledContentColor = Color.Gray,
+                      disabledContainerColor = Color.Gray)) {
+                Row(
+                    horizontalArrangement =
+                        Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                  Icon(
+                      Icons.Filled.Add,
+                      contentDescription = "add a new attendee",
+                  )
+                  Text("Add Attendee")
+                }
+              }
         }
-  }
+      }
   if (attendees.isNotEmpty()) {
     LazyRow(
         modifier = Modifier.fillMaxHeight().padding(STANDARD_PADDING.dp),
@@ -412,48 +429,60 @@ fun ActivityForm(
   TextButton(
       onClick = onClickDate,
       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputDateCreate"),
-  ) {
-    Icon(
-        Icons.Filled.CalendarMonth,
-        contentDescription = "select date",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
-    if (dateIsSet)
-        Text(
-            "Selected date: ${dueDate.toDate().toString().take(11)}," +
-                "${dueDate.toDate().year + 1900}  (click to change)")
-    else Text("Select Date for the activity")
-  }
-  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+      colors =
+          ButtonColors(
+              containerColor = Color.Transparent,
+              contentColor = Color(MAIN_COLOR_DARK),
+              disabledContentColor = Color.Gray,
+              disabledContainerColor = Color.Gray)) {
+        Icon(
+            Icons.Filled.CalendarMonth,
+            contentDescription = "select date",
+            modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("iconDateCreate"))
+        if (dateIsSet)
+            Text(
+                "Selected date: ${dueDate.toDate().toString().take(11)}," +
+                    "${dueDate.toDate().year + 1900}  (click to change)")
+        else Text("Select Date for the activity")
+      }
   // Button to display the start time picker
   TextButton(
       onClick = onClickStartingTime,
-      modifier =
-          Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputStartTimeCreate"),
-  ) {
-    Icon(
-        Icons.Filled.AccessTime,
-        contentDescription = "select start time",
-        modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconStartTimeCreate"))
-    if (startTimeIsSet) Text("Start time: $startTime (click to change)")
-    else Text("Select start time")
-  }
+      modifier = Modifier.fillMaxWidth().testTag("inputStartTimeCreate"),
+      colors =
+          ButtonColors(
+              containerColor = Color.Transparent,
+              contentColor = Color(MAIN_COLOR_DARK),
+              disabledContentColor = Color.Gray,
+              disabledContainerColor = Color.Gray)) {
+        Icon(
+            Icons.Filled.AccessTime,
+            contentDescription = "select start time",
+            modifier = Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconStartTimeCreate"))
+        if (startTimeIsSet) Text("Start time: $startTime (click to change)")
+        else Text("Select start time")
+      }
 
-  Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
   // Button to display the duration time picker
   TextButton(
       onClick = onClickDurationTime,
-      modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),
-  ) {
-    Icon(
-        Icons.Filled.HourglassTop,
-        contentDescription = "select duration",
-        modifier =
-            Modifier.padding(end = STANDARD_PADDING.dp)
-                .align(Alignment.CenterVertically)
-                .testTag("iconEndTimeCreate"))
-    if (durationIsSet) Text("Duration Time: $duration (click to change)")
-    else Text("Select Duration")
-  }
+      modifier = Modifier.fillMaxWidth().testTag("inputEndTimeCreate"),
+      colors =
+          ButtonColors(
+              containerColor = Color.Transparent,
+              contentColor = Color(MAIN_COLOR_DARK),
+              disabledContentColor = Color.Gray,
+              disabledContainerColor = Color.Gray)) {
+        Icon(
+            Icons.Filled.HourglassTop,
+            contentDescription = "select duration",
+            modifier =
+                Modifier.padding(end = STANDARD_PADDING.dp)
+                    .align(Alignment.CenterVertically)
+                    .testTag("iconEndTimeCreate"))
+        if (durationIsSet) Text("Duration Time: $duration (click to change)")
+        else Text("Select Duration")
+      }
 }
 
 /**
