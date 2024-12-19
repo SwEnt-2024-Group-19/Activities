@@ -67,6 +67,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+// helper to check if the email is in the right format
 fun isValidEmail(email: String): Boolean {
   return Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
@@ -78,6 +79,7 @@ fun SignUpScreen(
     imageViewModel: ImageViewModel
 ) {
   val context = LocalContext.current
+  // Mutable states for user inputs, errors, and UI visibility
   val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
   val emailErrorState = remember { mutableStateOf<String?>(null) }
@@ -92,13 +94,14 @@ fun SignUpScreen(
   var photo by remember { mutableStateOf("") }
   var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
   var errorMessage by remember { mutableStateOf<String?>(null) }
+  // States to manage the visibility of dialogs and actions for image selection
   var showDialogImage by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
   var isCamOpen by remember { mutableStateOf(false) }
   var isDefaultImageOpen by remember { mutableStateOf(false) }
-  val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
   if (showDialogImage) {
+    // Dialog to let the user choose an image source (Gallery, Camera, or Default)
     AddImageDialog(
         onDismiss = { showDialogImage = false },
         onGalleryClick = {
@@ -292,7 +295,16 @@ fun SignUpScreen(
     }
   }
 }
-
+/**
+ * Creates a new user account using email and password with Firebase Authentication.
+ *
+ * This function interacts with Firebase's Authentication API to create a new user account.
+ *
+ * @param email The email address of the user to create the account for.
+ * @param password The password for the new account.
+ * @param context The Android `Context` used to display `Toast` messages.
+ * @param onSuccess Callback invoked when the account is successfully created.
+ */
 fun createUserWithEmailAndPassword(
     email: String,
     password: String,
