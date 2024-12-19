@@ -9,8 +9,6 @@ import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
-import com.android.sample.resources.dummydata.activity
-import com.android.sample.resources.dummydata.activityBiking
 import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.listActivities.LikedActivitiesScreen
 import com.android.sample.ui.navigation.NavigationActions
@@ -84,12 +82,4 @@ class LikedActivitiesTest {
     // Verify empty liked activity message is displayed
     composeTestRule.onNodeWithText("There is no liked activity yet.").assertIsDisplayed()
   }
-
-
-
-
-
-
-
-
 }

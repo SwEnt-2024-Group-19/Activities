@@ -33,7 +33,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
@@ -291,9 +290,10 @@ fun ActivityCard(
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
-    val isLiked = remember(activity.uid, profile?.likedActivities) {
+  val isLiked =
+      remember(activity.uid, profile?.likedActivities) {
         mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
-    }
+      }
 
   Card(
       modifier =
@@ -383,7 +383,8 @@ fun ActivityCard(
                                               Color(PRIMARY_COLOR),
                                               shape =
                                                   RoundedCornerShape(
-                                                      TEXT_FONTSIZE.dp)) // Purple background with rounded
+                                                      TEXT_FONTSIZE
+                                                          .dp)) // Purple background with rounded
                                           // corners
                                           .padding(
                                               horizontal = STANDARD_PADDING.dp,
@@ -423,48 +424,47 @@ fun ActivityCard(
                     modifier = Modifier.weight(1f).testTag("dateText") // Takes up remaining space
                     )
 
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp),
-                  modifier = Modifier.wrapContentWidth()// Ajuste sa largeur au contenu
-              ) {
-                  // Prix
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                      DisplayIcon(Icons.Outlined.AttachMoney, "price")
-                      Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-                      Text(
-                          text = if (activity.price == 0.0) "Free" else "${activity.price}CHF",
-                          style = MaterialTheme.typography.bodySmall.copy(
-                              color = Color.Gray,
-                              fontStyle = FontStyle.Italic
-                          ),
-                          modifier=Modifier.testTag("priceText")
-                      )
-                  }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp),
+                    modifier = Modifier.wrapContentWidth() // Ajuste sa largeur au contenu
+                    ) {
+                      // Prix
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        DisplayIcon(Icons.Outlined.AttachMoney, "price")
+                        Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+                        Text(
+                            text = if (activity.price == 0.0) "Free" else "${activity.price}CHF",
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    color = Color.Gray, fontStyle = FontStyle.Italic),
+                            modifier = Modifier.testTag("priceText"))
+                      }
 
-                  // Bouton "Like"
-                  if (profile != null) {
-                      IconButton(
-                          onClick = {
+                      // Bouton "Like"
+                      if (profile != null) {
+                        IconButton(
+                            onClick = {
                               val newLikeState = !isLiked.value
                               isLiked.value = newLikeState
 
                               if (newLikeState) {
-                                  profileViewModel.addLikedActivity(profile.id, activity.uid)
+                                profileViewModel.addLikedActivity(profile.id, activity.uid)
                               } else {
-                                  profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                                profileViewModel.removeLikedActivity(profile.id, activity.uid)
                               }
-                          },
-                          modifier = Modifier.testTag("likeButton${isLiked.value}")
-                      ) {
-                          Icon(
-                              imageVector = if (isLiked.value) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                              contentDescription = if (isLiked.value) "Liked" else "Not Liked",
-                              tint = Color(PRIMARY_COLOR)
-                          )
+                            },
+                            modifier = Modifier.testTag("likeButton${isLiked.value}")) {
+                              Icon(
+                                  imageVector =
+                                      if (isLiked.value) Icons.Filled.Favorite
+                                      else Icons.Outlined.FavoriteBorder,
+                                  contentDescription = if (isLiked.value) "Liked" else "Not Liked",
+                                  tint = Color(PRIMARY_COLOR))
+                            }
                       }
-                  }
-              }}
+                    }
+              }
 
           Row(
               modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
@@ -502,7 +502,9 @@ fun ActivityCard(
                             color = Color.Gray,
                             fontSize = MEDIUM_PADDING.sp),
                     modifier =
-                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp).testTag("participantsText"))
+                        Modifier.align(Alignment.CenterVertically)
+                            .padding(end = MEDIUM_PADDING.dp)
+                            .testTag("participantsText"))
               }
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
@@ -514,7 +516,8 @@ fun ActivityCard(
                   MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
               maxLines = 3,
               overflow = TextOverflow.Ellipsis, // add "..." when description is too long
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("descriptionText"))
+              modifier =
+                  Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("descriptionText"))
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
         }
       }
@@ -524,7 +527,7 @@ fun ActivityCard(
 fun DisplayInterests(activity: Activity) {
 
   if (activity.subcategory.contains("Other") || activity.subcategory == "None") {
-      Spacer(modifier = Modifier.padding(horizontal= MEDIUM_PADDING.dp))
+    Spacer(modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
     return
   }
 
@@ -558,14 +561,14 @@ fun DisplayIcon(imageVector: ImageVector, contentDescription: String) {
 }
 
 @Composable
-fun DarkGradient(){
-    Box(
-        modifier =
-        Modifier.fillMaxWidth()
-            .height(LARGE_IMAGE_SIZE.dp)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = GRADIENT_MAX)),
-                    startY =  START_Y,
-                    endY = END_Y)))
+fun DarkGradient() {
+  Box(
+      modifier =
+          Modifier.fillMaxWidth()
+              .height(LARGE_IMAGE_SIZE.dp)
+              .background(
+                  Brush.verticalGradient(
+                      colors = listOf(Color.Transparent, Color.Black.copy(alpha = GRADIENT_MAX)),
+                      startY = START_Y,
+                      endY = END_Y)))
 }

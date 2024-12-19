@@ -37,11 +37,11 @@ object C {
     const val ROW_WIDTH = 408
 
     const val HALF_SCREEN_TEXT_FIELD_PADDING = 120
-    const val START_Y=0f
-    const val END_Y=500f
+    const val START_Y = 0f
+    const val END_Y = 500f
 
     const val DEFAULT_MAX_PRICE = 300f
-    const val GRADIENT_MAX= 0.6f
+    const val GRADIENT_MAX = 0.6f
 
     const val BUTTON_WIDTH = 300
 
