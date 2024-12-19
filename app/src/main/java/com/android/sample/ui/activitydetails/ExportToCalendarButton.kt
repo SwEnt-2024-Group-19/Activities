@@ -10,49 +10,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.android.sample.R
 import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import java.util.*
 
 @Composable
-fun ExportActivityToCalendarButton(activity: Activity, context: Context = LocalContext.current) {
+fun ExportActivityToCalendarButton(
+    viewModel: ListActivitiesViewModel,
+    activity: Activity,
+    context: Context = LocalContext.current
+) {
   Button(
       onClick = {
-        val calendar = Calendar.getInstance()
-        // Assuming the activity's start time is a proper timestamp
-        calendar.time = activity.date.toDate()
+        val calendarEvent = viewModel.prepareCalendarEvent(activity)
 
-        val startMillis = calendar.timeInMillis
-
-        // For the end time, we assume the `duration` field is in the format HH:mm (e.g., "02:00").
-        val durationParts = activity.duration.split(":")
-        val hours = durationParts[0].toInt()
-        val minutes = durationParts[1].toInt()
-
-        calendar.add(Calendar.HOUR, hours)
-        calendar.add(Calendar.MINUTE, minutes)
-        val endMillis = calendar.timeInMillis
-
-        exportToCalendar(
-            context = context,
-            activityTitle = activity.title,
-            description = activity.description,
-            location = activity.location?.name ?: "Unknown Location",
-            startMillis = startMillis,
-            endMillis = endMillis)
+        if (calendarEvent != null) {
+          exportToCalendar(context = context, calendarEvent = calendarEvent)
+        }
       },
-      modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        Text("Export to Calendar")
+      modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
+        Text(context.getString(R.string.export_to_calendar))
       }
 }
 
-fun exportToCalendar(
-    context: Context,
-    activityTitle: String,
-    description: String,
-    location: String,
-    startMillis: Long,
-    endMillis: Long
-) {
+fun exportToCalendar(context: Context, calendarEvent: ListActivitiesViewModel.CalendarEvent) {
+  val activityTitle = calendarEvent.title
+  val location = calendarEvent.location
+  val description = calendarEvent.description
+  val startMillis = calendarEvent.startMillis
+  val endMillis = calendarEvent.endMillis
+
   if (activityTitle.isNotEmpty() && location.isNotEmpty() && description.isNotEmpty()) {
     val intent =
         Intent(Intent.ACTION_INSERT).apply {
@@ -63,23 +52,18 @@ fun exportToCalendar(
           putExtra(CalendarContract.Events.ALL_DAY, false)
           putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis)
           putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMillis)
-          putExtra(
-              CalendarContract.Events.EVENT_TIMEZONE,
-              "Europe/Zurich") // timezone is fixed, should be dynamic
         }
 
     // Check if an app exists to handle the intent
     if (intent.resolveActivity(context.packageManager) != null) {
       context.startActivity(intent)
     } else {
-      Toast.makeText(context, "No apps available to handle calendar events", Toast.LENGTH_SHORT)
+      Toast.makeText(context, context.getString(R.string.no_calendar_app), Toast.LENGTH_SHORT)
           .show()
     }
   } else {
     Toast.makeText(
-            context,
-            "This activity is missing data. Unable to export to calendar.",
-            Toast.LENGTH_SHORT)
+            context, context.getString(R.string.missing_data_export_calendar), Toast.LENGTH_SHORT)
         .show()
   }
 }

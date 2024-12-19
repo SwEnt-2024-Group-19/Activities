@@ -500,7 +500,8 @@ fun ActivityDetailsScreen(
 
               // Export to calendar button
               if (activity != null) {
-                ExportActivityToCalendarButton(activity)
+                ExportActivityToCalendarButton(
+                    activity = activity, viewModel = listActivityViewModel, context = context)
               }
 
               CommentSection(
