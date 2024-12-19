@@ -9,6 +9,7 @@ import com.android.sample.model.map.Location
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.User
 import com.google.firebase.Timestamp
+import java.util.Calendar
 
 /* Please do not modify the following dummy data for general testing, as it is designed for e2e tests */
 
@@ -50,6 +51,8 @@ private val e2e_user2_email =
     "${e2e_user2.name.lowercase()}.${e2e_user2.surname.lowercase()}@example.com"
 private val e2e_user2_password = e2e_user2.hashCode().toString()
 
+private val TOMORROW = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 1) }.time
+
 private val e2e_reply1 =
     Comment(
         uid = "reply1",
@@ -72,7 +75,7 @@ private val e2e_activity1 =
         uid = "e2e_activity1",
         title = "Sample Title 1",
         description = "Sample Description 1",
-        date = Timestamp.now(),
+        date = Timestamp(TOMORROW),
         startTime = "10:00",
         duration = "02:00",
         category = Category.SPORT,
@@ -93,7 +96,7 @@ private val e2e_activity2 =
         uid = "activity2",
         title = "Sample Title 1",
         description = "Sample Description 1",
-        date = Timestamp.now(),
+        date = Timestamp(TOMORROW),
         startTime = "10:00",
         duration = "03:00",
         category = Category.SKILLS,

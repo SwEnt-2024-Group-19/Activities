@@ -267,7 +267,6 @@ fun ListActivitiesScreen(
             val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
             Text(text = "Error: ${error.message}", modifier = Modifier.padding(STANDARD_PADDING.dp))
           }
-          else -> {}
         }
       }
     }
