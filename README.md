@@ -1,6 +1,5 @@
 # Aptivity
 
-## App Description
 
 ### Pitch
 
@@ -12,54 +11,68 @@ We target the following user groups:
 - Young adults and couples
 - Elderly
 
+You got it, we have something for everyone!
+
 ---
+
+### How it works
+
+- Explore activities happening near you on the map or search specific activities through the search bar.
+- Register for activities you are interested in.
+- Save your favorite activities for later to keep track of them.
+- Create your own activities and manage them as an organizer.
+- Ask any questions on the event page.
+- Rate and review activities you have attended.
+- Get notified about upcoming activities and changes in the events you are participating in.
+
 
 ### Split-App Model
 
-We plan to use **Firebase** as our primary cloud service for user authentication, real-time database, and notifications:
+We use **Firebase** as our primary cloud service for user authentication, real-time database, and notifications:
 
-- **Firebase Authentication** will manage user accounts and sign-ins.
-- **Firebase Firestore** will store activity data, user profiles, and reviews.
-- **Firebase Storage** will be used for media storage (event images, videos).
-- **Firebase Cloud Functions** will handle reminders and push notifications for upcoming activities, enhancing engagement and user experience.
+- **Firebase Authentication** manages user accounts and sign-ins.
+- **Firebase Firestore** stores activity data and user profiles data.
+- **Firebase Storage** is used for media storage (event images).
+- **Local caching** (DAO) is used to support offline mode.
 
 ---
 
 ### Multi-User Support
 
-Our app will support multiple users through **Firebase Authentication**, allowing users to register using their email or Google accounts. 
+Our app supports multiple users through **Firebase Authentication**, allowing users to register using their email or Google accounts. 
 
 #### Key Features:
-- Each user will have their own profile, storing preferences and past activity history.
-- Organizers will have additional tools for creating and managing events.
-- We will implement **role-based permissions**, distinguishing between:
+- Each user has their own profile, storing preferences and past activity history.
+- Any user can be an organizer or a participant
+- Organizers have additional tools for creating and managing events. 
+- We implement **role-based permissions**, distinguishing between:
   - Regular users
   - Organizers
 
-These roles will have different access levels to manage their respective tasks.
+These roles have different access levels to manage their respective tasks.
 
 ---
 
 ### Sensor Use
 
-The app will make use of the following sensors:
+Our app makes use of the following sensors:
 
 - **GPS Location Services**: To help users discover activities near their current location.
 - **Camera**: 
   - Organizers can showcase their activities.
-  - Users can share pictures of their participation in events.
+  - Users can upload their profile pictures.
 
 ---
 
 ### Offline Mode
 
-The app will feature an **Offline Mode** for better usability without network access. While offline, users will:
+Our app features an **Offline Mode** for better usability without network access. While offline, users are:
 
-- Be able to **browse activities** they have previously viewed.
-- Access **events they have signed up for**, including key details like time and location.
+- Able to **browse activities** they have previously viewed.
+- Able to access **events they have signed up for**, including key details like time and location.
 
-An offline toast message will inform users when they are in offline mode.
+An offline toast message informs users when they are in offline mode.
 
-**Note**: Event registration and browsing new activities will require the user to be online.
+**Note**: Event registration and browsing new activities requires the user to be online.
 
 ---
