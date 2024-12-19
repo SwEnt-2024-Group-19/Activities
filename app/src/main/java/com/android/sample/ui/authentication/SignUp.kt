@@ -246,7 +246,7 @@ fun SignUpScreen(
                             imageViewModel.uploadProfilePicture(
                                 FirebaseAuth.getInstance().currentUser?.uid ?: "",
                                 bitmap,
-                                onSuccess = { url -> photo = url },
+                                onSuccess = {}, // the photo field of user is not used anymore
                                 onFailure = { error -> errorMessage = error.message })
                           }
                           val userProfile =

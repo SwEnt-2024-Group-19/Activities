@@ -1,5 +1,6 @@
 package com.android.sample.ui.components
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -23,10 +24,13 @@ class AttendantPreviewTest {
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var mockImageViewModel: ImageViewModel
 
+  private lateinit var sharedPreferences: SharedPreferences
+
   @Before
   fun setUp() {
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
   }
 
   @Test

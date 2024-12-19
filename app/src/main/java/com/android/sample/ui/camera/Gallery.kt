@@ -4,12 +4,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +41,7 @@ import com.android.sample.model.image.uriToBitmap
 import com.android.sample.resources.C.Tag.CARD_IAMGES_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import kotlinx.coroutines.delay
 
 @Composable
 fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context: Context) {
@@ -132,27 +133,25 @@ fun ProfileImage(
     editing: Boolean = false,
     bitmap: Bitmap? = null
 ) {
-  var imageUrl by remember { mutableStateOf<String?>(null) }
-  var isImageRemoved by remember { mutableStateOf(false) }
+  val minDelay = 1500L // determined empirically, the smallest delay before the image can be fetched
+  val sharedPreferences = LocalContext.current.getSharedPreferences(userId, Context.MODE_PRIVATE)
+  var imageUrl by remember { mutableStateOf(sharedPreferences.getString(userId, null)) }
   val context = LocalContext.current
   // Fetch the profile image URL from Firebase Storage
+
   LaunchedEffect(userId) {
+    delay(minDelay)
     imageViewModel.fetchProfileImageUrl(
-        userId = userId, onSuccess = { url -> imageUrl = url }, onFailure = { _ -> })
+        userId = userId,
+        onSuccess = { url ->
+          imageUrl = url
+          sharedPreferences.edit().putString(userId, url).apply()
+        },
+        onFailure = { error ->
+          Log.e("ProfileImage", "Failed to fetch image URL: ${error.message}")
+        })
   }
 
-  LaunchedEffect(bitmap) {
-    if (bitmap != null && editing) {
-      isImageRemoved = false
-    } else if (bitmap == null && imageUrl == null && editing) {
-      isImageRemoved = true
-    }
-  }
-  LaunchedEffect(imageUrl) {
-    if (imageUrl != null && editing) {
-      isImageRemoved = false
-    }
-  }
   // Determine which painter to use
   val painter =
       when {
@@ -173,13 +172,11 @@ fun ProfileImage(
         }
       }
 
-  Box {
-    Image(
-        painter = painter,
-        contentDescription = "Profile Image",
-        modifier = modifier,
-        contentScale = ContentScale.Crop)
-  }
+  Image(
+      painter = painter,
+      contentDescription = "Profile Image",
+      modifier = modifier,
+      contentScale = ContentScale.Crop)
 }
 
 fun getImageResourceIdForCategory(category: Category): Int {

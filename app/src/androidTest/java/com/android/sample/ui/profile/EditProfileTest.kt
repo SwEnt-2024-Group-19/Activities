@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -39,6 +40,9 @@ class EditProfileScreenTest {
 
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
+
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -51,7 +55,9 @@ class EditProfileScreenTest {
     `when`(navigationActions.currentRoute()).thenReturn(PROFILE)
     `when`(profileViewModel.userState).thenReturn(userStateFlow)
     mockImageRepository = Mockito.mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = Mockito.mock(SharedPreferences::class.java)
+    mockEditor = Mockito.mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
   }
 
   @Test

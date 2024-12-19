@@ -208,9 +208,7 @@ fun ProfileCreationScreen(
                           imageViewModel.uploadProfilePicture(
                               uid,
                               bitmap,
-                              onSuccess = { url ->
-                                photo = url // Update photo URL in profile
-                              },
+                              onSuccess = {}, // the photo field is not used anymore
                               onFailure = { error -> errorMessage = error.message })
                         }
                         val userProfile =

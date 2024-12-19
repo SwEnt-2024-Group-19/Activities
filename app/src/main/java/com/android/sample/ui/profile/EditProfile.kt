@@ -1,6 +1,7 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
@@ -108,7 +109,6 @@ fun EditProfileScreen(
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-  var isPictureRemoved by remember { mutableStateOf(false) }
   Scaffold(
       modifier = Modifier.testTag("editProfileScreen"),
       topBar = {
@@ -245,22 +245,16 @@ fun EditProfileScreen(
                         surnameErrorState.value =
                             if (surname.isBlank()) "Surname cannot be empty" else null
                         if (nameErrorState.value == null && surnameErrorState.value == null) {
-                          if (isPictureRemoved) {
-                            imageViewModel.deleteProfilePicture(
-                                profile.id,
-                                onSuccess = {
-                                  photo = null // Clear photo reference
-                                },
-                                onFailure = { _ -> })
-                          }
                           selectedImage?.let { bitmap ->
                             imageViewModel.uploadProfilePicture(
                                 profile.id,
                                 bitmap,
-                                onSuccess = { url ->
-                                  photo = url // Update photo URL in profile
-                                },
-                                onFailure = { _ -> })
+                                onSuccess = {}, // the photo field is not used anymore
+                                onFailure = { error ->
+                                  Log.e(
+                                      "EditProfileScreen",
+                                      "Failed to upload profile picture: ${error.message}")
+                                })
                           }
                           try {
                             profileViewModel.updateProfile(
@@ -282,10 +276,12 @@ fun EditProfileScreen(
                                   imageViewModel.uploadProfilePicture(
                                       profile.id,
                                       bitmap,
-                                      onSuccess = { url ->
-                                        photo = url // Update photo URL in profile
-                                      },
-                                      onFailure = { _ -> })
+                                      onSuccess = {}, // the photo field is not used anymore
+                                      onFailure = { error ->
+                                        Log.e(
+                                            "EditProfileScreen",
+                                            "Failed to upload profile picture: ${error.message}")
+                                      })
                                 }
                               })
                         }

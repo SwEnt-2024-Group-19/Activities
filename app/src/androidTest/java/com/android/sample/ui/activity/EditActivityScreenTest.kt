@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -48,6 +49,9 @@ class EditActivityScreenTest {
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var profileViewModel: ProfileViewModel
 
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -69,7 +73,9 @@ class EditActivityScreenTest {
       onSuccess(locationList)
     }
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
   }
 
   @Test
