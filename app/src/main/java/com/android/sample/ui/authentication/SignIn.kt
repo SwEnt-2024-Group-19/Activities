@@ -59,16 +59,16 @@ import kotlinx.coroutines.launch
 fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewModel) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
-  val emailState = remember { mutableStateOf("") }
+    // Mutable states for user inputs, errors, and UI visibility
+    val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
-  val token = stringResource(R.string.default_web_client_id)
+    val emailErrorState = remember { mutableStateOf<String?>(null) }
+
+    val token = stringResource(R.string.default_web_client_id)
   val isPasswordVisible = remember { mutableStateOf(false) }
-  val emailErrorState = remember { mutableStateOf<String?>(null) }
   val onProfileExists = { navigationActions.navigateTo(Screen.OVERVIEW) }
-
   val onProfileMissing = { navigationActions.navigateTo(Screen.CREATE_PROFILE) }
-
   val onSignInFailure = { errorMessage: String ->
     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
   }
@@ -94,7 +94,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             Image(
                 painter = painterResource(id = R.drawable.aptivity_logo_with_text),
                 contentDescription = "App Logo",
-                modifier = Modifier.size((3 * IMAGE_SIZE).dp).testTag("AppLogo"))
+                modifier = Modifier.size((2 * IMAGE_SIZE).dp).testTag("AppLogo"))
             Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
           }
 
@@ -113,6 +113,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           }
 
           item {
+              // Password input
             PasswordTextField(
                 password = passwordState.value,
                 onPasswordChange = {
@@ -126,6 +127,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           }
 
           item {
+              // Sign-in Button
             Card(
                 modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignInCard"),
                 colors =
@@ -235,7 +237,20 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
         }
       })
 }
-
+/**
+ * Creates a `ManagedActivityResultLauncher` to handle Google Sign-In intents.
+ *
+ * This composable function returns a `ManagedActivityResultLauncher` that allows launching a Google
+ * Sign-In activity and processes its result. The function integrates with a `SignInViewModel` to
+ * manage authentication results and navigate users based on their profile status.
+ *
+ * @param viewModel The `SignInViewModel` responsible for handling the Google Sign-In result.
+ * @param onProfileExists Callback invoked when the user's profile already exists in the system.
+ * @param onProfileMissing Callback invoked when the user's profile is missing and needs creation.
+ * @param onFailure Callback invoked when the Google Sign-In process fails with an error message.
+ * @return A `ManagedActivityResultLauncher` instance to be used for launching the Google Sign-In
+ *   intent.
+ */
 @Composable
 fun rememberGoogleSignInLauncher(
     viewModel: SignInViewModel,
@@ -262,7 +277,15 @@ fun rememberGoogleSignInLauncher(
     }
   }
 }
-
+/**
+ * Creates an `Intent` for initiating Google Sign-In.
+ *
+ * It configures the Google Sign-In options to request the ID token and email address.
+ *
+ * @param context The `Context` used to create the Google Sign-In client.
+ * @param token The client ID token required for authentication.
+ * @return An `Intent` to launch the Google Sign-In activity.
+ */
 fun rememberGoogleSignInIntent(context: Context, token: String): Intent {
   val gso =
       GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -271,7 +294,7 @@ fun rememberGoogleSignInIntent(context: Context, token: String): Intent {
           .build()
   return GoogleSignIn.getClient(context, gso).signInIntent
 }
-
+// UI part of the Google button
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   val context = LocalContext.current
