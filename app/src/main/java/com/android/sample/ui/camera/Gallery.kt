@@ -176,7 +176,6 @@ fun ProfileImage(
       contentDescription = "Profile Image",
       modifier = modifier,
       contentScale = ContentScale.Crop)
-
 }
 
 fun getImageResourceIdForCategory(category: Category): Int {
