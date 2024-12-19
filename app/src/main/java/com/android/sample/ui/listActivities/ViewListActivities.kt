@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -421,27 +423,46 @@ fun ActivityCard(
                     modifier = Modifier.weight(1f) // Takes up remaining space
                     )
 
-                if (profile != null) {
-                  IconButton(
-                      onClick = {
-                        isLiked = !isLiked
-                        if (isLiked) {
-                          profileViewModel.addLikedActivity(profile.id, activity.uid)
-                        } else {
-                          profileViewModel.removeLikedActivity(profile.id, activity.uid)
-                        }
-                      },
-                      modifier = Modifier.testTag("likeButton$isLiked"),
-                  ) {
-                    Icon(
-                        imageVector =
-                            if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color(PRIMARY_COLOR) else Color.Gray,
-                    )
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp),
+                  modifier = Modifier.wrapContentWidth()// Ajuste sa largeur au contenu
+              ) {
+                  // Prix
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                      DisplayIcon(Icons.Outlined.AttachMoney, "price")
+                      Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+                      Text(
+                          text = if (activity.price == 0.0) "Free" else "${activity.price}CHF",
+                          style = MaterialTheme.typography.bodySmall.copy(
+                              color = Color.Gray,
+                              fontStyle = FontStyle.Italic
+                          )
+                      )
                   }
-                }
-              }
+
+                  // Bouton "Like"
+                  if (profile != null) {
+                      IconButton(
+                          onClick = {
+                              isLiked = !isLiked
+                              if (isLiked) {
+                                  profileViewModel.addLikedActivity(profile.id, activity.uid)
+                              } else {
+                                  profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                              }
+                          },
+                          modifier = Modifier.testTag("likeButton$isLiked"),
+                      ) {
+                          Icon(
+                              imageVector =
+                              if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                              contentDescription = if (isLiked) "Liked" else "Not Liked",
+                              tint = if (isLiked) Color(PRIMARY_COLOR) else Color.Gray
+                          )
+                      }
+                  }
+              }}
 
           Row(
               modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
