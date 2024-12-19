@@ -2,7 +2,6 @@ package com.android.sample.model.map
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -25,7 +24,6 @@ fun HandleLocationPermissionsAndTracking(
             if (isGranted) {
               locationViewModel.startTrackingLocation()
             } else {
-              Log.d("LocationPermissionHandler", "Location permission denied by the user.")
               onPermissionDenied()
             }
           })

@@ -113,6 +113,7 @@ fun EditActivityScreen(
   val maxDescriptionLength = 500
   val maxTitleLength = 50
   val locationQuery by locationViewModel.query.collectAsState()
+  locationViewModel.setQuery(selectedLocation.name)
   var showDropdown by remember { mutableStateOf(false) }
   val locationSuggestions by
       locationViewModel.locationSuggestions.collectAsState(initial = emptyList<Location?>())
@@ -189,7 +190,8 @@ fun EditActivityScreen(
                   onCameraClick = {
                     showDialogImage = false
                     isCamOpen = true
-                  })
+                  },
+                  onSelectDefault = { showDialogImage = false })
             }
             ActivityForm(
                 context = context,
@@ -361,10 +363,7 @@ fun EditActivityScreen(
                             activity?.uid ?: "",
                             selectedImages.toList(),
                             { urls -> items = urls },
-                            { error ->
-                              Log.e(
-                                  "EditActivityScreen", "Failed to upload images: ${error.message}")
-                            })
+                            { _ -> })
                         val updatedActivity =
                             Activity(
                                 uid = activity?.uid ?: "",
@@ -418,12 +417,7 @@ fun EditActivityScreen(
                     ),
                 onClick = {
                   listActivityViewModel.deleteActivityById(activity?.uid ?: "")
-                  imageViewModel.removeAllActivityImages(
-                      activity?.uid ?: "",
-                      { Log.d("EditActivityScreen", "Images removed") },
-                      { error ->
-                        Log.e("EditActivityScreen", "Failed to remove images: ${error.message}")
-                      })
+                  imageViewModel.removeAllActivityImages(activity?.uid ?: "", {}, { _ -> })
 
                   navigationActions.navigateTo(Screen.PROFILE)
                 },

@@ -56,7 +56,8 @@ import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
-import com.android.sample.ui.components.LoadingScreen
+import com.android.sample.ui.camera.getImageResourceIdForCategory
+import com.android.sample.ui.components.WaitingScreen
 import com.android.sample.ui.dialogs.FilterDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -68,6 +69,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.firebase.Timestamp
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -93,7 +95,7 @@ fun MapScreen(
   var showBottomSheet by remember { mutableStateOf(false) }
   val previousScreen = navigationActions.getPreviousRoute()
   var showFilterDialog by remember { mutableStateOf(false) }
-  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
+  val hourDateViewModel = HourDateViewModel()
   HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
 
   val firstLocation =
@@ -115,38 +117,41 @@ fun MapScreen(
 
   Scaffold(
       floatingActionButton = {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
-            horizontalArrangement = Arrangement.SpaceBetween) {
-              FloatingActionButton(
-                  modifier =
-                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("centerOnCurrentLocation"),
-                  onClick = {
-                    coroutineScope.launch {
-                      currentLocation?.let {
-                        val locationLatLng = LatLng(it.latitude, it.longitude)
-                        cameraPositionState.animate(
-                            update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
-                            durationMs = 800)
+        if (networkManager.isNetworkAvailable()) {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("centerOnCurrentLocation"),
+                    onClick = {
+                      coroutineScope.launch {
+                        currentLocation?.let {
+                          val locationLatLng = LatLng(it.latitude, it.longitude)
+                          cameraPositionState.animate(
+                              update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                              durationMs = 800)
+                        }
                       }
+                    }) {
+                      Icon(
+                          Icons.Default.MyLocation,
+                          contentDescription = "Center on current location")
                     }
-                  }) {
-                    Icon(
-                        Icons.Default.MyLocation, contentDescription = "Center on current location")
-                  }
-              FloatingActionButton(
-                  modifier =
-                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("filterDialogButton"),
-                  onClick = { showFilterDialog = true }) {
-                    Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
-                  }
-            }
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("filterDialogButton"),
+                    onClick = { showFilterDialog = true }) {
+                      Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
+                    }
+              }
+        }
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
-          LoadingScreen(message = stringResource(R.string.no_internet_connection))
+          WaitingScreen(message = stringResource(R.string.no_internet_connection))
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
@@ -159,7 +164,7 @@ fun MapScreen(
                   (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
                       .activities
                       .filter {
-                        if (it.price > listActivitiesViewModel.maxPrice) false
+                        (if (it.price > listActivitiesViewModel.maxPrice) false
                         else if (listActivitiesViewModel.availablePlaces != null &&
                             (it.maxPlaces - it.placesLeft) <=
                                 listActivitiesViewModel.availablePlaces!!)
@@ -185,7 +190,9 @@ fun MapScreen(
                             false
                         else if (listActivitiesViewModel.onlyPRO && it.type != ActivityType.PRO)
                             false
-                        else it.location != null
+                        else it.location != null) &&
+                            hourDateViewModel.combineDateAndTime(it.date, it.duration) >
+                                Timestamp.now()
                       }
                       .forEach { item ->
                         Marker(
@@ -283,19 +290,22 @@ fun MapScreen(
 @Composable
 fun DisplayActivity(activity: Activity) {
   Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("activityDetails")) {
-    if (activity.images.isNotEmpty()) {
-      AsyncImage(
-          model = activity.images.first(),
-          contentDescription = "Activity image",
-          modifier =
-              Modifier.fillMaxWidth()
-                  .height(LARGE_IMAGE_SIZE.dp)
-                  .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
-                  .testTag("activityImage"),
-          contentScale = ContentScale.Crop)
-      Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
-    }
-
+    val vignette =
+        if (activity.images.isNotEmpty()) {
+          activity.images.first()
+        } else {
+          getImageResourceIdForCategory(activity.category)
+        }
+    AsyncImage(
+        model = vignette,
+        contentDescription = "Activity image",
+        modifier =
+            Modifier.fillMaxWidth()
+                .height(LARGE_IMAGE_SIZE.dp)
+                .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
+                .testTag("activityImage"),
+        contentScale = ContentScale.Crop)
+    Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
     Text(
         text = activity.title,
         style = MaterialTheme.typography.bodyLarge,

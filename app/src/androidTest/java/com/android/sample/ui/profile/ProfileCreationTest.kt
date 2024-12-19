@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.hasTestTag
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import com.android.sample.R
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -37,6 +39,9 @@ class ProfileCreationTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
 
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
+
   // Mock or create a fake ProfilesRepository
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -52,7 +57,7 @@ class ProfileCreationTest {
     `when`(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
     `when`(mockFirebaseUser.uid).thenReturn(testUserId)
 
-    profileViewModel = ProfileViewModel(repository = mockProfilesRepository, mock())
+    profileViewModel = ProfileViewModel(repository = mockProfilesRepository, mock(), mock())
 
     `when`(mockProfilesRepository.getUser(any(), any(), any())).thenAnswer { invocation ->
       val onSuccess = invocation.getArgument<(User?) -> Unit>(1)
@@ -60,7 +65,9 @@ class ProfileCreationTest {
       null
     }
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
     composeTestRule.setContent {
       ProfileCreationScreen(
           viewModel = profileViewModel, navigationActions = navigationActions, mockImageViewModel)
@@ -77,6 +84,7 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("defaultImageButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cameraButton").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("cameraScreen").assertIsDisplayed()
@@ -97,8 +105,26 @@ class ProfileCreationTest {
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("defaultImageButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").performClick()
+  }
+
+  @Test
+  fun testProfileCreationWithDialogWithDefaultImage() {
+    composeTestRule
+        .onNodeWithTag("profileCreationScrollColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("defaultImageButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("defaultImageButton").performClick()
+    composeTestRule.onNodeWithTag("DefaultImageCarousel").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ImageCard_${R.drawable.dog_avatar}").performClick()
   }
 
   @Test

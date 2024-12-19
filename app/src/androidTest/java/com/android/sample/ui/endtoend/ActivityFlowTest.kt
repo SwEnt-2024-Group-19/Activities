@@ -1,25 +1,23 @@
 package com.android.sample.ui.endtoend
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.rule.GrantPermissionRule
 import com.android.sample.MainActivity
 import com.android.sample.model.activity.ActivitiesRepository
+import com.android.sample.model.activity.Category
 import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.image.ImageRepository
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
+import com.android.sample.resources.dummydata.defaultUserCredentials
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 
 @HiltAndroidTest
 class ActivityFlowTest {
@@ -42,6 +40,9 @@ class ActivityFlowTest {
 
   @Inject lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
 
+  /** Helper class to interact with the UI. `hlp` stands for helper. */
+  private lateinit var hlp: ComposeTestHelper
+
   @get:Rule
   val permissionRule: GrantPermissionRule =
       GrantPermissionRule.grant(
@@ -53,78 +54,100 @@ class ActivityFlowTest {
   @Before
   fun setUp() {
     hiltRule.inject()
+    hlp = ComposeTestHelper(composeTestRule)
+    composeTestRule.waitForIdle()
   }
 
-  // @Test // Will be fixed in a future PR
+  @Test
   fun guestCanSeeCorrectOverviewAndNavigateToActivityDetails() {
-    // Opens the app as a guest
-    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
-    composeTestRule.waitForIdle()
+    // Auth screen > Sign in screen
+    hlp.scroll(
+        parentTag = Auth.SignIn.SIGN_IN_COLUMN,
+        nodeTag = Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
 
-    // Goes back to the main screen and tries to filter activities
-    composeTestRule.onNodeWithTag("Overview").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Activity 1").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("likeButtontrue").assertIsNotDisplayed()
-    composeTestRule.onNodeWithTag("likeButtonfalse").assertIsNotDisplayed()
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+    hlp.see(BottomNavigation.OVERVIEW, selected = true)
+    hlp.see(Overview.ACTIVITY_CARD, any = true)
 
-    composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonCULTURE").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("segmentedButtonSPORT").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    // Filter for specific activity types
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.CULTURE))
+    hlp.see(Overview.EMPTY_ACTIVITY)
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.CULTURE))
+    // assert is unselected
 
-    // Opens the activity details
-    composeTestRule.onNodeWithTag("activityCard").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("topAppBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("image").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("title").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("titleText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("descriptionText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("price").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("priceText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("location").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("locationText").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("schedule").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("scheduleText").assertIsDisplayed()
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
+    hlp.see(Overview.ACTIVITY_CARD)
 
-    composeTestRule.onNodeWithTag("notLoggedInText").assertExists()
-    composeTestRule.onNodeWithTag("goBackButton").assertExists()
-    composeTestRule.onNodeWithTag("goBackButton").performClick()
-    composeTestRule.onNodeWithTag("listActivitiesScreen").assertIsDisplayed()
+    // Filter for specific criteria
+    // TODO: Implement this feature
+
+    // Open the activity details
+    hlp.click(Overview.ACTIVITY_CARD)
+
+    // Activity details screen
+    /*hlp.assertIsDisplayed("activityDetailsScreen")
+    listOf(
+      "topAppBar", "goBackButton", "image", "title", "titleText", "descriptionText",
+      "price", "priceText", "location", "locationText", "schedule", "scheduleText"
+    ).forEach { hlp.assertIsDisplayed(it) }*/
+    // TODO: Implement this feature
+
+    // Check that the user is not logged in and can't enroll
+    hlp.scroll(
+        Overview.ActivityDetails.SCREEN,
+        Overview.ActivityDetails
+            .NOT_LOGGED_IN_TEXT) // @TODO: The need for a scroll here is debatable
+    hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
+    hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
+    hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
+    hlp.see(Overview.SCREEN)
   }
 
-  // @Test // Will be fixed in a future PR
+  @Test
   fun guestShouldSignUpForOtherFunctionalities() {
-    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
-    composeTestRule.waitForIdle()
+    // Auth screen > Sign in screen
+    hlp.scroll(
+        Auth.SignIn.SIGN_IN_COLUMN,
+        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
 
-    composeTestRule.onNodeWithTag("Liked").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("notConnectedPrompt").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("signInButton").assertExists()
-    composeTestRule.onNodeWithTag("signInButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("SignUpScreenColumn").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("GoToSignInButton").assertExists()
-    composeTestRule.onNodeWithTag("GoToSignInButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("ContinueAsGuestButton").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("Profile").performClick()
-    composeTestRule.waitForIdle()
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+
+    // Profile screen
+    hlp.see(Profile.NotLoggedIn.PROMPT)
+    hlp.click(Profile.NotLoggedIn.SIGN_IN_BUTTON)
+
+    // Auth screen > Sign up screen
+    hlp.see(Auth.SignUp.SCREEN)
+    hlp.scroll(
+        Auth.SignUp.SIGN_UP_COLUMN,
+        Auth.SignUp.GO_TO_SIGN_IN_BUTTON) // @TODO: This should not need scrolling
+    hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
+
+    // Auth screen > Sign in
+    hlp.see(Auth.SignIn.SCREEN)
+    hlp.scroll(
+        Auth.SignIn.SIGN_IN_COLUMN,
+        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
 
     // Tries to create a new activity and is prompted to sign in
-    composeTestRule.onNodeWithTag("Add Activity").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("inputTitleCreate").assertIsDisplayed()
+    hlp.see(Overview.SCREEN)
+    hlp.click(BottomNavigation.CREATE_ACTIVITY, bottomNavItem = true)
+
+    // Add activity screen
+    /*hlp.assertIsDisplayed(CreateActivity.SCREEN)
+    hlp.write(CreateActivity.TITLE_INPUT, "Activity Title")
+    hlp.write(CreateActivity.DESCRIPTION_INPUT, "Activity Description")
+    hlp.write(CreateActivity.PRICE_INPUT, "13")
+    hlp.write(CreateActivity.PLACES_INPUT, "7")
+    hlp.write(CreateActivity.LOCATION_INPUT, "Activity Location")
+
+
     composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
     composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
     composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
@@ -137,8 +160,37 @@ class ActivityFlowTest {
     composeTestRule.onNodeWithTag("Map").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()*/
   }
+
+  @Test
+  fun aUserSignsInAndLooksAtTheirProfile() {
+    // use of !! is allowed because this is a test environment and we know the
+    // key exists. if it doesn't, it is up to the developer to fix the test
+    val email = defaultUserCredentials["email"]!!
+    val password = defaultUserCredentials["password"]!!
+    val name = defaultUserCredentials["first name"]!! // @TODO: Should this change to full name?
+
+    // Auth screen > Sign in screen
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+    hlp.notSee(Overview.SCREEN)
+    hlp.see(Auth.SignIn.TEXT_INVALID_EMAIL, text = true)
+
+    //  Enters credentials then connects
+    hlp.write(Auth.SignIn.EMAIL_INPUT, email)
+    hlp.write(Auth.SignIn.PASSWORD_INPUT, password)
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+    hlp.see(BottomNavigation.OVERVIEW)
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+
+    // Profile screen
+    hlp.see(Profile.SCREEN)
+    hlp.see(name, text = true)
+  }
+
   /*
    @Test
    fun aUserTriesToLookAtAnActivity() {

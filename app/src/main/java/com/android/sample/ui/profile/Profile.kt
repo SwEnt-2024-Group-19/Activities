@@ -3,7 +3,6 @@ package com.android.sample.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,9 +17,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.HourglassFull
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,10 +55,12 @@ import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.LIGHT_PURPLE_COLOR
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MAXIMUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.NORMAL_PADDING
 import com.android.sample.resources.C.Tag.PAST_ACTIVITIES
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.ROW_WIDTH
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -112,7 +111,7 @@ fun ProfileScreen(
         }
 
     when (user) {
-      null -> LoadingScreen(navigationActions)
+      null -> LoadingScreen(navigationActions, selectedRoute = Route.PROFILE)
       else -> {
         UserProfile(
             user,
@@ -147,28 +146,39 @@ fun ProfileScreen(
 }
 
 @Composable
-fun LoadingScreen(navigationActions: NavigationActions) {
+fun LoadingScreen(navigationActions: NavigationActions, selectedRoute: String) {
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("loadingScreen"),
+      modifier = Modifier.testTag("loadingScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { route -> navigationActions.navigateTo(route) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = navigationActions.currentRoute())
-      }) { innerPadding ->
-        Column(
-            Modifier.fillMaxSize().padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(
-                  text = LocalContext.current.getString(R.string.no_profile),
-                  modifier = Modifier.testTag("loadingText"),
-                  color = Color.Black)
-              Button(
-                  onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                  modifier = Modifier.testTag("signInButton")) {
-                    Text(LocalContext.current.getString(R.string.go_to_sign_in_page))
-                  }
-            }
+            selectedItem = selectedRoute)
+      }) { paddingValues ->
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+          Column(
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center,
+              modifier = Modifier.align(Alignment.Center).fillMaxWidth(WIDTH_FRACTION_MD)) {
+                Text(
+                    text = "You are not logged in. Login or Register to see your liked activities.",
+                    modifier = Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("loadingText"),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center)
+                Card(
+                    shape = RoundedCornerShape(MEDIUM_PADDING.dp),
+                    modifier =
+                        Modifier.padding(MEDIUM_PADDING.dp).testTag("DefaultImageCarousel")) {
+                      Button(
+                          onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                          modifier = Modifier.testTag("signInButton"),
+                          shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                            Text("Go to Sign Up Page", style = MaterialTheme.typography.labelLarge)
+                          }
+                    }
+              }
+        }
       }
 }
 
@@ -196,9 +206,7 @@ fun ActivityRow(
         var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
 
         imageViewModel.fetchActivityImagesAsBitmaps(
-            activity.uid,
-            onSuccess = { urls -> bitmaps = urls },
-            onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+            activity.uid, onSuccess = { urls -> bitmaps = urls }, onFailure = {})
 
         // Display image
         if (activity.images.isNotEmpty() && bitmaps.isNotEmpty()) {
@@ -387,6 +395,9 @@ fun UserProfile(
               selectedItem = Route.PROFILE)
         }
       },
+      modifier =
+          Modifier.fillMaxSize()
+              .testTag(if (uid.isEmpty()) "profileScreen" else "participantProfileScreen"),
       topBar = {
         TopAppBar(
             modifier = Modifier.testTag("profileTopBar"),
@@ -454,35 +465,70 @@ fun UserProfile(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.Top,
                   modifier = Modifier.fillMaxWidth().testTag("activityTypeRow")) {
-                    IconButton(
-                        onClick = { activityType = CREATED_ACTIVITIES },
+                    Text(
+                        "Created",
                         modifier =
-                            if (activityType == CREATED_ACTIVITIES)
-                                Modifier.background(Color.LightGray, shape = CircleShape)
-                                    .testTag("createdActivities")
-                            else Modifier.testTag("createdActivities")) {
-                          Icon(Icons.Outlined.Edit, contentDescription = "Created")
-                        }
+                            Modifier.testTag("createdActivities").clickable {
+                              activityType = CREATED_ACTIVITIES
+                            },
+                        style =
+                            if (activityType == CREATED_ACTIVITIES) {
+                              TextStyle(
+                                  textDecoration =
+                                      TextDecoration.Underline // Applique le soulignement
+                                  )
+                            } else TextStyle(),
+                        color =
+                            if (activityType == CREATED_ACTIVITIES) Color(MAIN_COLOR_DARK)
+                            else Color.Gray,
+                        fontWeight =
+                            if (activityType == CREATED_ACTIVITIES) FontWeight.Bold
+                            else FontWeight.Normal,
+                    )
 
-                    IconButton(
-                        onClick = { activityType = ENROLLED_ACTIVITIES },
+                    Text(
+                        "Enrolled",
                         modifier =
-                            if (activityType == ENROLLED_ACTIVITIES)
-                                Modifier.background(Color.LightGray, shape = CircleShape)
-                                    .testTag("enrolledActivities")
-                            else Modifier.testTag("enrolledActivities")) {
-                          Icon(Icons.Outlined.Groups, contentDescription = "Enrolled")
-                        }
-                    IconButton(
-                        onClick = { activityType = PAST_ACTIVITIES },
+                            Modifier.testTag("enrolledActivities").clickable {
+                              activityType = ENROLLED_ACTIVITIES
+                            },
+                        style =
+                            if (activityType == ENROLLED_ACTIVITIES) {
+                              TextStyle(
+                                  textDecoration =
+                                      TextDecoration.Underline // Applique le soulignement
+                                  )
+                            } else TextStyle(),
+                        color =
+                            if (activityType == ENROLLED_ACTIVITIES) Color(MAIN_COLOR_DARK)
+                            else Color.Gray,
+                        fontWeight =
+                            if (activityType == ENROLLED_ACTIVITIES) FontWeight.Bold
+                            else FontWeight.Normal,
+                    )
+
+                    Text(
+                        "Passed",
                         modifier =
-                            if (activityType == PAST_ACTIVITIES)
-                                Modifier.background(Color.LightGray, shape = CircleShape)
-                                    .testTag("passedActivities")
-                            else Modifier.testTag("passedActivities")) {
-                          Icon(Icons.Outlined.HourglassFull, contentDescription = "Passed")
-                        }
+                            Modifier.testTag("passedActivities").clickable {
+                              activityType = PAST_ACTIVITIES
+                            },
+                        style =
+                            if (activityType == PAST_ACTIVITIES) {
+                              TextStyle(
+                                  textDecoration =
+                                      TextDecoration.Underline // Applique le soulignement
+                                  )
+                            } else TextStyle(),
+                        color =
+                            if (activityType == PAST_ACTIVITIES) Color(MAIN_COLOR_DARK)
+                            else Color.Gray,
+                        fontWeight =
+                            if (activityType == PAST_ACTIVITIES) FontWeight.Bold
+                            else FontWeight.Normal,
+                    )
                   }
+
               Column(
                   verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.Top),
                   horizontalAlignment = Alignment.Start,
@@ -520,9 +566,7 @@ fun DisplayActivitiesList(
     PAST_ACTIVITIES -> {
       listToShow =
           userActivities.filter {
-            hourDateViewModel.combineDateAndTime(
-                it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) <=
-                Timestamp.now()
+            hourDateViewModel.combineDateAndTime(it.date, it.startTime) <= Timestamp.now()
           }
     }
     CREATED_ACTIVITIES -> {

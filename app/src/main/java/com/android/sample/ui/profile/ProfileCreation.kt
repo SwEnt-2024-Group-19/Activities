@@ -1,13 +1,10 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,12 +18,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,6 +52,7 @@ import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.CameraScreen
+import com.android.sample.ui.camera.DefaultImageCarousel
 import com.android.sample.ui.camera.GalleryScreen
 import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.TextFieldWithErrorState
@@ -82,6 +77,7 @@ fun ProfileCreationScreen(
   var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
   var isCamOpen by remember { mutableStateOf(false) }
   var isGalleryOpen by remember { mutableStateOf(false) }
+  var isDefaultImageOpen by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
   val context = LocalContext.current
   val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -97,22 +93,18 @@ fun ProfileCreationScreen(
         onCameraClick = {
           showDialogImage = false
           isCamOpen = true
-        })
+        },
+        onSelectDefault = {
+          showDialogImage = false
+          isDefaultImageOpen = true
+        },
+        default = true)
   }
 
   if (isGalleryOpen) {
     GalleryScreen(
         isGalleryOpen = { isGalleryOpen = false },
-        addImage = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
-        },
+        addImage = { bitmap -> selectedBitmap = bitmap },
         context = context)
   }
   if (isCamOpen) {
@@ -126,16 +118,7 @@ fun ProfileCreationScreen(
             },
         context = context,
         isCamOpen = { isCamOpen = false },
-        addElem = { bitmap ->
-          selectedBitmap = bitmap
-          imageViewModel.uploadProfilePicture(
-              uid,
-              bitmap,
-              onSuccess = { url -> photo = url },
-              onFailure = { error ->
-                Log.e("ProfileCreationScreen", "Failed to upload profile picture: ${error.message}")
-              })
-        })
+        addElem = { bitmap -> selectedBitmap = bitmap })
   } else {
     Column(
         modifier =
@@ -157,20 +140,19 @@ fun ProfileCreationScreen(
               userId = uid,
               modifier =
                   Modifier.size((1.5 * IMAGE_SIZE).dp).clip(CircleShape).testTag("profilePicture"),
-              imageViewModel)
-
-          Box(
-              modifier =
-                  Modifier.testTag("uploadPicture")
-                      .clickable { showDialogImage = true } // Handle click action
-                      .padding(MEDIUM_PADDING.dp)
-                      .background(Color.Transparent)) {
-                Icon(
-                    imageVector = Icons.Default.AddAPhoto,
-                    contentDescription = "Add a photo",
-                    tint = Color.Black)
-              }
-
+              imageViewModel,
+              bitmap = selectedBitmap,
+              editing = true)
+          if (isDefaultImageOpen) {
+            DefaultImageCarousel(
+                onImageSelected = { bitmap ->
+                  selectedBitmap = bitmap
+                  isDefaultImageOpen = false
+                },
+                context = context,
+                onDismiss = { isDefaultImageOpen = false })
+          }
+          ModifyPictureButton(showDialogImage = { showDialogImage = true })
           Spacer(modifier = Modifier.padding((2 * LARGE_PADDING).dp))
 
           Row(
@@ -226,9 +208,7 @@ fun ProfileCreationScreen(
                           imageViewModel.uploadProfilePicture(
                               uid,
                               bitmap,
-                              onSuccess = { url ->
-                                photo = url // Update photo URL in profile
-                              },
+                              onSuccess = {}, // the photo field is not used anymore
                               onFailure = { error -> errorMessage = error.message })
                         }
                         val userProfile =
@@ -244,7 +224,6 @@ fun ProfileCreationScreen(
                         viewModel.createUserProfile(
                             userProfile = userProfile,
                             onSuccess = {
-                              Log.d("ProfileCreation", "Profile created successfully")
                               viewModel.fetchUserData(uid)
                               navigationActions.navigateTo(Screen.OVERVIEW)
                             },

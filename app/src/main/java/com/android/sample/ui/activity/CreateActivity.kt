@@ -62,7 +62,7 @@ import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
-import com.android.sample.ui.components.LoadingScreen
+import com.android.sample.ui.components.WaitingScreen
 import com.android.sample.ui.dialogs.AddImageDialog
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -123,6 +123,7 @@ fun CreateActivityScreen(
   val maxTitleLength = 50
   val maxDescriptionLength = 500
   val locationQuery by locationViewModel.query.collectAsState()
+  locationViewModel.setQuery("")
   var showDropdown by remember { mutableStateOf(false) }
   //  val locationSuggestions by locationViewModel.locationSuggestions.collectAsState()
   val locationSuggestions by
@@ -131,7 +132,7 @@ fun CreateActivityScreen(
   var selectedLocation by remember { mutableStateOf<Location?>(null) }
   // Add scroll
   val scrollState = rememberScrollState()
-
+  var isDefaultPictureOpen by remember { mutableStateOf(false) }
   // Attendees
   val attendees_: List<User> = listOf<User>()
   var attendees: List<User> by remember { mutableStateOf(attendees_) }
@@ -154,7 +155,7 @@ fun CreateActivityScreen(
       },
       content = { paddingValues ->
         if (!networkManager.isNetworkAvailable()) {
-          LoadingScreen(stringResource(id = R.string.no_internet_connection))
+          WaitingScreen(stringResource(id = R.string.no_internet_connection))
         } else {
           if (isCamOpen) {
             CameraScreen(
@@ -192,7 +193,8 @@ fun CreateActivityScreen(
                     onCameraClick = {
                       showDialogImage = false
                       isCamOpen = true
-                    })
+                    },
+                    onSelectDefault = { showDialogImage = false })
               }
               ActivityForm(
                   context = context,

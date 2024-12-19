@@ -662,6 +662,44 @@ fun ActivityDetailsScreen(
                 }
                 ACTIVITY_COMMENTS -> {
 
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              // Export to calendar button
+              if (activity != null) {
+                ExportActivityToCalendarButton(
+                    activity = activity, viewModel = listActivityViewModel, context = context)
+              }
+
+              CommentSection(
+                  profileId = profile?.id ?: "anonymous",
+                  comments = comments,
+                  onAddComment = { content ->
+                    val newComment =
+                        Comment(
+                            uid = UUID.randomUUID().toString(),
+                            userId = profile?.id ?: "anonymous",
+                            userName = profile?.name ?: "anonymous",
+                            content = content,
+                            timestamp = Timestamp.now())
+                    // listActivityViewModel.addCommentToActivity(activity!!.uid, newComment)
+                    comments += newComment
+                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                  },
+                  onReplyComment = { replyContent, comment ->
+                    val reply =
+                        Comment(
+                            uid = UUID.randomUUID().toString(),
+                            userId = profile?.id ?: "anonymous",
+                            userName = profile?.name ?: "anonymous",
+                            content = replyContent,
+                            timestamp = Timestamp.now())
+                    // listActivityViewModel.addReplyToComment(activity!!.uid, comment.uid, reply)
+                    comment.replies += reply
+                    comments = comments.map { if (it.uid == comment.uid) comment else it }
+                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                  },
+                  onDeleteComment = deleteComment,
+                  creatorId = activity?.creator ?: "anonymous")
                   // Comment section
                   CommentSection(
                       profileId = profile?.id ?: "anonymous",

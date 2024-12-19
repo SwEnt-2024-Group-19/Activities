@@ -60,5 +60,9 @@
     <string name="price_neg">Price must not be negative</string>
     <string name="places_neg">Places must not be negative</string>
     <string name="activity_past">The activity is archived.</string>
+    <string name="export_to_calendar">Export to Calendar</string>
+    <string name="unknown_location">Unknown Location</string>
+    <string name="no_calendar_app">No apps available to handle calendar events.</string>
+    <string name="missing_data_export_calendar">This activity is missing data. Unable to export to calendar.</string>
 
 </resources>

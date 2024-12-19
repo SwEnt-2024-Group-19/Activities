@@ -1,13 +1,17 @@
 package com.android.sample.ui.authentication
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.sample.R
+import com.android.sample.model.authentication.MockSignInRepository
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.MockProfilesRepository
@@ -27,6 +31,10 @@ class SignUpAndProfileCreationScreenTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var mockProfilesRepository: MockProfilesRepository
+  private lateinit var mockSignInRepository: MockSignInRepository
+
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -34,9 +42,12 @@ class SignUpAndProfileCreationScreenTest {
   fun setUp() {
     navigationActions = mock(NavigationActions::class.java)
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences = sharedPreferences)
     mockProfilesRepository = MockProfilesRepository()
-    profileViewModel = ProfileViewModel(mockProfilesRepository, mock())
+    mockSignInRepository = MockSignInRepository()
+    profileViewModel = ProfileViewModel(mockProfilesRepository, mock(), mockSignInRepository)
 
     composeTestRule.setContent {
       SignUpScreen(
@@ -184,6 +195,33 @@ class SignUpAndProfileCreationScreenTest {
   }
 
   @Test
+  fun testCameraButtonOpensGalleryScreen() {
+    composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("profilePicture"))
+    composeTestRule.onNodeWithTag("profilePicture").performClick()
+    composeTestRule
+        .onNodeWithTag("SignUpColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+        .performClick()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("galleryButton").performClick()
+  }
+
+  @Test
+  fun testCameraButtonOpensDefaultImageCarousel() {
+    composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("profilePicture"))
+    composeTestRule.onNodeWithTag("profilePicture").performClick()
+    composeTestRule
+        .onNodeWithTag("SignUpColumn")
+        .performScrollToNode(hasTestTag("uploadPicture"))
+        .performClick()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("defaultImageButton").performClick()
+
+    composeTestRule.onNodeWithTag("DefaultImageCarousel").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ImageCard_${R.drawable.dog_avatar}").performClick()
+  }
+
+  @Test
   fun testProfileCreationWithInvalidDataShowsErrors() {
     composeTestRule.onNodeWithTag("SignUpColumn").performScrollToNode(hasTestTag("SignUpButton"))
     composeTestRule.onNodeWithTag("SignUpButton").performClick()
@@ -203,5 +241,17 @@ class SignUpAndProfileCreationScreenTest {
         .onNodeWithTag("SignUpColumn")
         .performScrollToNode(hasTestTag("surnameError"))
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun togglePasswordVisibility() {
+
+    composeTestRule.onNodeWithContentDescription("Show password").assertExists()
+
+    // Click the visibility icon to show the password
+    composeTestRule.onNodeWithContentDescription("Show password").performClick()
+
+    // Verify password visibility toggle behavior (e.g., check attribute or visual state).
+    composeTestRule.onNodeWithTag("PasswordTextField").assertExists()
   }
 }

@@ -2,7 +2,6 @@ package com.android.sample.model.activity
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -134,16 +134,12 @@ constructor(
                                 activity = activity, isCreator = activity.creator == currentUser.id)
                       }
                     },
-                    onFailure = { e ->
-                      Log.e("ListActivitiesViewModel", "Failed to schedule notification", e)
-                    })
+                    onFailure = { _ -> })
               }
-            } catch (e: Exception) {
-              Log.e("ListActivitiesViewModel", "Error scheduling notification", e)
-            }
+            } catch (_: Exception) {}
           }
         },
-        { error -> Log.e("ListActivitiesViewModel", "Failed to add activity", error) })
+        { _ -> })
   }
 
   /**
@@ -167,9 +163,7 @@ constructor(
                             activity = activity, isCreator = activity.creator == currentUser.id)
                   }
                 },
-                onFailure = { e ->
-                  Log.e("ListActivitiesViewModel", "Failed to schedule notification for update", e)
-                })
+                onFailure = {})
           }
         },
         {})
@@ -545,6 +539,35 @@ constructor(
       println("There is an error")
     }
   }
+
+  fun prepareCalendarEvent(activity: Activity): CalendarEvent? {
+    val calendar = Calendar.getInstance()
+    calendar.time = activity.date.toDate() // Assuming `toDate` is a valid method
+    val startMillis = calendar.timeInMillis
+
+    val durationParts = activity.duration.split(":")
+    val hours = durationParts[0].toIntOrNull() ?: return null
+    val minutes = durationParts[1].toIntOrNull() ?: return null
+
+    calendar.add(Calendar.HOUR, hours)
+    calendar.add(Calendar.MINUTE, minutes)
+    val endMillis = calendar.timeInMillis
+
+    return CalendarEvent(
+        title = activity.title,
+        description = activity.description,
+        location = activity.location?.name.orEmpty(),
+        startMillis = startMillis,
+        endMillis = endMillis)
+  }
+
+  data class CalendarEvent(
+      val title: String,
+      val description: String,
+      val location: String,
+      val startMillis: Long,
+      val endMillis: Long
+  )
 
   sealed class ActivitiesUiState {
     data class Success(val activities: List<Activity>) : ActivitiesUiState()

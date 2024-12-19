@@ -1,6 +1,5 @@
 package com.android.sample.model.activity
 
-import android.util.Log
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.User
@@ -28,7 +27,6 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
 
     db.collection(activitiesCollectionPath).addSnapshotListener { snapshot, e ->
       if (e != null) {
-        Log.e(TAG, "Error getting documents", e)
         onFailure(e)
         return@addSnapshotListener
       }
@@ -37,7 +35,6 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
         val activities =
             snapshot.documents
                 .map { document ->
-                  Log.d(TAG, "${document.id} => ${document.data}")
                   val data = document.data ?: return@map null // Handle null data gracefully
                   documentToActivity(data, document.id)
                 }
@@ -174,10 +171,7 @@ open class ActivitiesRepositoryFirestore @Inject constructor(private val db: Fir
       if (result.isSuccessful) {
         onSuccess()
       } else {
-        result.exception?.let { e ->
-          Log.e("ActivitiesRepositoryFirestore", "Error performing Firestore operation", e)
-          onFailure(e)
-        }
+        result.exception?.let { e -> onFailure(e) }
       }
     }
   }

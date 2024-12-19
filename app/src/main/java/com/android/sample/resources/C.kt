@@ -29,6 +29,7 @@ object C {
     const val ENROLLED_ACTIVITIES = 1
     const val PAST_ACTIVITIES = 2
 
+    const val CARD_IAMGES_SIZE = 120
     const val ACTIVITY_DETAILS = 0
     const val ATTENDANT_DETAILS = 1
     const val ACTIVITY_COMMENTS = 2
@@ -85,6 +86,7 @@ object C {
     const val LIGHT_PURPLE_COLOR = 0xFF8B6EA2
     const val DARK_BLUE_COLOR = 0xFF4A148C
     const val DARK_YELLOW = 0xFFCEB107
+    const val PRIMARY_COLOR = 0xFF005697
 
     const val BLACK_COLOR = 0xFF000000
     const val PURPLE_COLOR = 0xFF6200EE
@@ -108,6 +110,7 @@ object C {
     const val TOP_TITLE_SIZE = 30
 
     const val TEXT_FONTSIZE = 12
+    const val SMALL_TEXT_FONTSIZE = 9
 
     const val WIDTH_FRACTION_MD = 0.8f
 

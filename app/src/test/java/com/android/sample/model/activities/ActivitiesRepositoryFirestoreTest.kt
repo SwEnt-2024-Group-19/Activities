@@ -3,6 +3,7 @@ package com.android.sample.model.activities
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
+import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.Category
@@ -14,11 +15,12 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.QuerySnapshot
 import junit.framework.TestCase.fail
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -31,6 +33,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 
@@ -40,7 +43,6 @@ class ActivitiesRepositoryFirestoreTest {
   @Mock private lateinit var mockFirestore: FirebaseFirestore
   @Mock private lateinit var mockDocumentReference: DocumentReference
   @Mock private lateinit var mockCollectionReference: CollectionReference
-  @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
   @Mock private lateinit var mockActivityQuerySnapshot: QuerySnapshot
 
   private lateinit var activitiesRepositoryFirestore: ActivitiesRepositoryFirestore
@@ -389,5 +391,21 @@ class ActivitiesRepositoryFirestoreTest {
     assertEquals(0, activity?.likes?.size)
     assertEquals(Category.SPORT, activity?.category)
     assertEquals("None", activity?.subcategory)
+  }
+
+  // Setup Mock Behavior
+
+  @Test
+  fun `getActivities handles null snapshot`() {
+    whenever(mockCollectionReference.addSnapshotListener(any())).thenAnswer { x ->
+      val listener = x.getArgument<EventListener<QuerySnapshot>>(0)
+      listener.onEvent(null, null)
+      null
+    }
+
+    val onFailure: (Exception) -> Unit = { e -> assertEquals("Error getting documents", e.message) }
+    val onSuccess: (List<Activity>) -> Unit = { Assert.fail("Should not reach onSuccess") }
+
+    activitiesRepositoryFirestore.getActivities(onSuccess, onFailure)
   }
 }

@@ -24,12 +24,13 @@ fun MyTimePicker(
     onCloseRequest: (MaterialDialogState) -> Unit,
     isAmPm: Boolean = true
 ) {
+  val dialogState = rememberMaterialDialogState(isOpen)
   MaterialDialog(
       onCloseRequest = onCloseRequest,
-      dialogState = rememberMaterialDialogState(isOpen),
+      dialogState = dialogState,
       buttons = {
         positiveButton(text = "Ok")
-        negativeButton(text = "Cancel")
+        negativeButton(text = "Cancel") { onCloseRequest(dialogState) }
       }) {
         timepicker(
             initialTime = LocalTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES),

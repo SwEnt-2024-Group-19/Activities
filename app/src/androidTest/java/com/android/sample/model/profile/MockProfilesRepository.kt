@@ -1,30 +1,13 @@
 package com.android.sample.model.profile
 
-import com.android.sample.model.activity.Category
+import com.android.sample.mockDatabase.MockUsersDatabase
 
-class MockProfilesRepository : ProfilesRepository {
-
-  private val userProfiles =
-      mutableMapOf<String, User>(
-          "u1" to
-              User(
-                  id = "u1",
-                  name = "Alice",
-                  surname = "Smith",
-                  interests =
-                      listOf(
-                          Interest("Football", Category.SPORT),
-                          Interest("Movies", Category.ENTERTAINMENT)),
-                  activities = listOf("a1", "a2"),
-                  photo = null,
-                  likedActivities = listOf("a1")))
-  private val activitiesList =
-      mutableMapOf<String, MutableList<String>>("u1" to mutableListOf("a1", "a2"))
+class MockProfilesRepository(private val database: MockUsersDatabase = MockUsersDatabase()) :
+    ProfilesRepository {
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     try {
-      // Retrieve the user profile by userId
-      val user = userProfiles[userId]
+      val user = database.getUser(userId)
       onSuccess(user)
     } catch (e: Exception) {
       onFailure(e)
@@ -38,13 +21,8 @@ class MockProfilesRepository : ProfilesRepository {
       onFailure: (Exception) -> Unit
   ) {
     try {
-      // Add activity to user's activity list
-      if (userProfiles.containsKey(userId)) {
-        activitiesList.computeIfAbsent(userId) { mutableListOf() }.add(activityId)
-        onSuccess()
-      } else {
-        throw Exception("User not found")
-      }
+      val user = database.getUser(userId)
+      database.updateUser(user.copy(activities = user.activities?.plus(activityId)))
     } catch (e: Exception) {
       onFailure(e)
     }
@@ -56,7 +34,7 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    TODO("Not yet implemented")
+    throw NotImplementedError("Not implemented: addLikedActivity")
   }
 
   override fun removeLikedActivity(
@@ -65,7 +43,7 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    TODO("Not yet implemented")
+    throw NotImplementedError("Not implemented: removeLikedActivity")
   }
 
   override fun removeJoinedActivity(
@@ -74,22 +52,11 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    if (userProfiles.containsKey(userId)) {
-      activitiesList[userId]?.remove(activityId)
-      onSuccess()
-    } else {
-      onFailure(Exception("User not found"))
-    }
+    throw NotImplementedError("Not implemented: removeJoinedActivity")
   }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    try {
-      // Update the user profile in the in-memory map
-      userProfiles[user.id] = user
-      onSuccess()
-    } catch (e: Exception) {
-      onFailure(e)
-    }
+    throw NotImplementedError("Not implemented: updateProfile")
   }
 
   override fun addProfileToDatabase(
@@ -97,12 +64,6 @@ class MockProfilesRepository : ProfilesRepository {
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    try {
-      // Simulate adding a user profile to the database
-      userProfiles[userProfile.id] = userProfile
-      onSuccess()
-    } catch (e: Exception) {
-      onFailure(e)
-    }
+    throw NotImplementedError("Not implemented: addProfileToDatabase")
   }
 }

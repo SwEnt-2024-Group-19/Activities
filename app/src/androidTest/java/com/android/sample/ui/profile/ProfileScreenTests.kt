@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -51,6 +52,8 @@ class ProfileScreenTest {
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var mockHourDateViewModel: HourDateViewModel
 
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -83,7 +86,9 @@ class ProfileScreenTest {
 
     `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
     mockHourDateViewModel = mock(HourDateViewModel::class.java)
   }
 
@@ -99,7 +104,9 @@ class ProfileScreenTest {
           listActivitiesViewModel = listActivitiesViewModel,
           imageViewModel = mockImageViewModel)
     }
-    composeTestRule.onNodeWithTag("loadingText").assertTextEquals("You do not have a profile")
+    composeTestRule
+        .onNodeWithTag("loadingText")
+        .assertTextEquals("You are not logged in. Login or Register to see your liked activities.")
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
   }
 
@@ -364,7 +371,7 @@ class ProfileScreenTest {
 
   @Test
   fun loadingScreen() {
-    composeTestRule.setContent { LoadingScreen(navigationActions) }
+    composeTestRule.setContent { LoadingScreen(navigationActions, "") }
     composeTestRule.onNodeWithTag("loadingScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("loadingText").assertIsDisplayed()
     composeTestRule.onNodeWithTag("signInButton").assertIsDisplayed()

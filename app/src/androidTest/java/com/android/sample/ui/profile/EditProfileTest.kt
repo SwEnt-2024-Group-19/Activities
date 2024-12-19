@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -11,7 +12,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.sample.R
 import com.android.sample.model.activity.categories
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
@@ -36,6 +40,9 @@ class EditProfileScreenTest {
 
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
+
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -48,7 +55,9 @@ class EditProfileScreenTest {
     `when`(navigationActions.currentRoute()).thenReturn(PROFILE)
     `when`(profileViewModel.userState).thenReturn(userStateFlow)
     mockImageRepository = Mockito.mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = Mockito.mock(SharedPreferences::class.java)
+    mockEditor = Mockito.mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
   }
 
   @Test
@@ -79,6 +88,7 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("defaultImageButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cameraButton").performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("cameraScreen").assertIsDisplayed()
@@ -102,8 +112,25 @@ class EditProfileScreenTest {
     composeTestRule.onNodeWithTag("uploadPicture").performClick()
     composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("defaultImageButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("galleryButton").performClick()
+  }
+
+  @Test
+  fun testProfileEditionWithDialogWithDefaultImage() {
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
+    composeTestRule.onNodeWithTag("uploadPicture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("uploadPicture").performClick()
+    composeTestRule.onNodeWithTag("addImageDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cameraButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("defaultImageButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("galleryButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("defaultImageButton").performClick()
+    composeTestRule.onNodeWithTag("DefaultImageCarousel").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ImageCard_${R.drawable.dog_avatar}").performClick()
   }
 
   @Test
@@ -175,5 +202,39 @@ class EditProfileScreenTest {
 
     // Verify the "Remove Image" action was performed
     composeTestRule.onNodeWithTag("profilePicture").assertExists()
+  }
+
+  @Test
+  fun testErrorClearedAfterValidInput() {
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
+
+    // Input invalid data and trigger error
+    composeTestRule.onNodeWithTag("inputProfileName").performTextReplacement("")
+    composeTestRule.onNodeWithTag("inputProfileSurname").performTextReplacement("")
+
+    composeTestRule.onNodeWithTag("profileSaveButton").performClick()
+    composeTestRule.onNodeWithTag("nameError").assertTextEquals("Name cannot be empty")
+
+    // Correct the error
+    composeTestRule.onNodeWithTag("inputProfileName").performTextInput("John")
+    composeTestRule.onNodeWithTag("profileSaveButton").performClick()
+
+    // Check that the error message is cleared
+    composeTestRule.onNodeWithTag("nameError").assertDoesNotExist()
+  }
+
+  @Test
+  fun testNavigateBackWithUnmodifiedFields() {
+    composeTestRule.setContent {
+      EditProfileScreen(profileViewModel, navigationActions, mockImageViewModel)
+    }
+
+    // Click the Go Back button without making changes
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
+
+    // Verify navigation action
+    verify(navigationActions).goBack()
   }
 }

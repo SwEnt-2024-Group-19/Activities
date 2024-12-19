@@ -16,7 +16,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.resources.C.BOTTOM_ICON_OFFSET
@@ -46,8 +45,9 @@ fun BottomNavigationMenu(
           val isSelected = tab.route == selectedItem
 
           // Animate scale and offset when selected
-          val scale by animateFloatAsState(if (isSelected) BOTTOM_ICON_SCALE else 1f)
-          val offsetY by animateFloatAsState(if (isSelected) -BOTTOM_ICON_OFFSET else 0f)
+          val scale by animateFloatAsState(if (isSelected) BOTTOM_ICON_SCALE else 1f, label = "")
+          val offsetY by
+              animateFloatAsState(if (isSelected) -BOTTOM_ICON_OFFSET else 0f, label = "")
 
           BottomNavigationItem(
               icon = {
@@ -69,7 +69,8 @@ fun BottomNavigationMenu(
               onClick = { onTabSelect(tab) },
               alwaysShowLabel = false,
               selectedContentColor = Color(MAIN_COLOR_LIGHT),
-              unselectedContentColor = Color.Gray)
+              unselectedContentColor = Color.Gray,
+              modifier = Modifier.testTag(tab.textId))
         }
       }
 }
@@ -106,13 +107,4 @@ fun RegularButton(tab: TopLevelDestination, isSelected: Boolean) {
                 .clip(RoundedCornerShape(90))
                 .background(Color(MAIN_COLOR_DARK)))
   }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BottomNavigationPreview() {
-  BottomNavigationMenu(
-      onTabSelect = {},
-      tabList = LIST_TOP_LEVEL_DESTINATION,
-      selectedItem = TopLevelDestinations.ADD_ACTIVITY.route)
 }
