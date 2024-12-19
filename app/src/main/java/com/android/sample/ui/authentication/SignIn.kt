@@ -2,7 +2,6 @@ package com.android.sample.ui.authentication
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -28,14 +27,20 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.network.NetworkManager
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT
-import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
+import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
+import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
+import com.android.sample.resources.C.Tag.IMAGE_IN_BUTTON_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.LINE_STROKE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
+import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
-import com.android.sample.resources.C.Tag.WIDTH_FRACTION
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
 import com.android.sample.ui.components.EmailTextField
 import com.android.sample.ui.components.PasswordTextField
 import com.android.sample.ui.components.performOfflineAwareAction
@@ -79,10 +84,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           item {
             // App Logo
             Image(
-                painter = painterResource(id = R.drawable.aptivity_logo),
+                painter = painterResource(id = R.drawable.aptivity_logo_with_text),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(IMAGE_SIZE.dp).testTag("AppLogo"))
-            Spacer(modifier = Modifier.height((2 * LARGE_PADDING).dp))
+                modifier = Modifier.size((3 * IMAGE_SIZE).dp).testTag("AppLogo"))
+            Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
           }
 
           item {
@@ -102,49 +107,70 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           item {
             PasswordTextField(
                 password = passwordState.value,
-                onPasswordChange = { passwordState.value = it },
+                onPasswordChange = {
+                  passwordState.value = it
+                  passwordErrorState.value = if (it.isEmpty()) "Password cannot be empty" else null
+                },
                 isPasswordVisible = isPasswordVisible.value,
                 onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
                 passwordError = passwordErrorState.value)
-            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+            Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
           }
 
           item {
-            // Sign-In Button
-            Button(
-                onClick = {
-                  performOfflineAwareAction(
-                      context = context,
-                      networkManager = networkManager,
-                      onPerform = {
-                        when {
-                          !isValidEmail(emailState.value) -> {
-                            emailErrorState.value = "Please enter a valid address: example@mail.xx"
-                          }
-                          passwordState.value.isEmpty() -> {
-                            passwordErrorState.value =
-                                "Password cannot be empty" // Set external error
-                          }
-                          else -> {
-                            passwordErrorState.value =
-                                null // Clear external error if password is valid
-                            viewModel.signInWithEmailAndPassword(
-                                emailState.value,
-                                passwordState.value,
-                                onProfileExists,
-                                onProfileMissing,
-                                onSignInFailure)
-                          }
-                        }
-                        Log.d("SignInScreen", "Sign in with email/password")
-                      })
-                },
-                modifier =
-                    Modifier.fillMaxWidth(WIDTH_FRACTION)
-                        .height(BUTTON_HEIGHT.dp)
-                        .testTag("SignInButton")) {
-                  Text("Sign in with Email", fontSize = SUBTITLE_FONTSIZE.sp)
+            Card(
+                modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignInCard"),
+                colors =
+                    CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+                elevation =
+                    CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                  Button(
+                      onClick = {
+                        performOfflineAwareAction(
+                            context = context,
+                            networkManager = networkManager,
+                            onPerform = {
+                              when {
+                                !isValidEmail(emailState.value) -> {
+                                  emailErrorState.value =
+                                      "Please enter a valid address: example@mail.xx"
+                                }
+                                passwordState.value.isEmpty() -> {
+                                  passwordErrorState.value =
+                                      "Password cannot be empty" // Set external error
+                                }
+                                else -> {
+                                  passwordErrorState.value =
+                                      null // Clear external error if password is valid
+                                  viewModel.signInWithEmailAndPassword(
+                                      emailState.value,
+                                      passwordState.value,
+                                      onProfileExists,
+                                      onProfileMissing,
+                                      onSignInFailure)
+                                }
+                              }
+                            })
+                      },
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .height(AUTH_BUTTON_HEIGHT.dp)
+                              .testTag("SignInButton"),
+                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                      colors =
+                          ButtonDefaults.buttonColors(
+                              containerColor = MaterialTheme.colorScheme.primary,
+                              contentColor = Color.White)) {
+                        Text("SIGN IN", fontSize = SUBTITLE_FONTSIZE.sp)
+                      }
                 }
+            Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
+          }
+
+          // text that separates the buttons "OR"
+          item {
+            Text("OR", fontSize = SUBTITLE_FONTSIZE.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
           }
 
@@ -163,23 +189,6 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           }
 
           item {
-            // If user already has an account, navigate to the sign-in screen
-            TextButton(
-                onClick = {
-                  performOfflineAwareAction(
-                      context = context,
-                      networkManager = networkManager,
-                      onPerform = { navigationActions.navigateTo(Screen.SIGN_UP) })
-                },
-                modifier =
-                    Modifier.fillMaxWidth(WIDTH_FRACTION)
-                        .height(BUTTON_HEIGHT.dp)
-                        .testTag("GoToSignUpButton")) {
-                  Text("No account yet?", fontSize = SUBTITLE_FONTSIZE.sp)
-                }
-          }
-
-          item {
             // Continue as guest
             TextButton(
                 onClick = {
@@ -189,8 +198,28 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                       onPerform = { navigationActions.navigateTo(Screen.OVERVIEW) })
                 },
                 modifier = Modifier.testTag("ContinueAsGuestButton")) {
-                  Text("Continue as Guest")
+                  Text("Continue as a guest", fontSize = SUBTITLE_FONTSIZE.sp)
                 }
+            Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
+          }
+          item {
+            // If user already has an account, navigate to the sign-in screen
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text("Don't have an account? ", fontSize = SUBTITLE_FONTSIZE.sp)
+              Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+              TextButton(
+                  onClick = {
+                    performOfflineAwareAction(
+                        context = context,
+                        networkManager = networkManager,
+                        onPerform = { navigationActions.navigateTo(Screen.SIGN_UP) })
+                  },
+                  modifier = Modifier.testTag("GoToSignUpButton")) {
+                    Text("Sign Up", fontSize = SUBTITLE_FONTSIZE.sp)
+                  }
+            }
           }
         }
       })
@@ -236,31 +265,30 @@ fun rememberGoogleSignInIntent(context: Context, token: String): Intent {
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
-  Button(
-      onClick = {
-        performOfflineAwareAction(
-            context = context, networkManager = networkManager, onPerform = onSignInClick)
-      },
-      colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-      shape = RoundedCornerShape(50),
-      border = BorderStroke(1.dp, Color.LightGray),
-      modifier =
-          Modifier.padding(STANDARD_PADDING.dp)
-              .height(BUTTON_HEIGHT.dp)
-              .testTag("GoogleSignInButton")) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.width(BUTTON_WIDTH.dp)) {
-              Image(
-                  painter = painterResource(id = R.drawable.google_logo),
-                  contentDescription = "Google Logo",
-                  modifier = Modifier.size(IMAGE_SIZE.dp).padding(end = STANDARD_PADDING.dp))
-              Text(
-                  text = "Sign in with Google",
-                  color = Color.Gray,
-                  fontSize = MEDIUM_PADDING.sp,
-                  fontWeight = FontWeight.Medium)
-            }
-      }
+  Card(
+      modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("GoogleCard"),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
+      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+  ) {
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
+      OutlinedButton(
+          onClick = {
+            performOfflineAwareAction(
+                context = context, networkManager = networkManager, onPerform = onSignInClick)
+          },
+          shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+          modifier =
+              Modifier.height(BUTTON_HEIGHT_SM.dp).fillMaxWidth().testTag("GoogleSignInButton"),
+          border = BorderStroke(LINE_STROKE.dp, Color.Transparent) // Transparent indicator
+          ) {
+            Image(
+                painter = painterResource(id = R.drawable.google_logo),
+                contentDescription = "Google Sign-In",
+                modifier = Modifier.size(IMAGE_IN_BUTTON_DEFAULT.dp))
+            Spacer(Modifier.width(STANDARD_PADDING.dp))
+            Text("Login with Google", fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
+          }
+    }
+  }
 }

@@ -1,6 +1,7 @@
 package com.android.sample.di.module
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ActivitiesRepositoryFirestore
 import com.android.sample.model.auth.SignInRepository
@@ -84,5 +85,11 @@ object RepositoryModule {
   @Singleton
   fun provideImageRepository(firestoreImageRepository: ImageRepositoryFirestore): ImageRepository {
     return firestoreImageRepository
+  }
+
+  @Provides
+  @Singleton
+  fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+    return context.getSharedPreferences("shared_preferences", Context.MODE_PRIVATE)
   }
 }

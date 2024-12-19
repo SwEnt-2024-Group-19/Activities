@@ -23,19 +23,11 @@ interface ImageRepository {
       onFailure: (Exception) -> Unit
   )
 
-  fun fetchActivityImageUrls(
-      activityId: String,
-      onSuccess: (List<String>) -> Unit,
-      onFailure: (Exception) -> Unit
-  )
-
   fun fetchActivityImagesAsBitmaps(
       activityId: String,
       onSuccess: (List<Bitmap>) -> Unit,
       onFailure: (Exception) -> Unit
   )
-
-  fun deleteProfilePicture(userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
 
   fun removeAllActivityImages(
       activityId: String,

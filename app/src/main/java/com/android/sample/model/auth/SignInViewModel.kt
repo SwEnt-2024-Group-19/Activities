@@ -1,7 +1,6 @@
 // SignInViewModel.kt
 package com.android.sample.model.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -35,7 +34,6 @@ constructor(
         val authResult = signInRepository.signInWithEmail(email, password)
         checkUserProfile(authResult.user?.uid, onProfileExists, onProfileMissing, onFailure)
       } catch (e: Exception) {
-        Log.e("SignInViewModel", "Error signing in with email", e)
         onFailure(e.message ?: "Unknown error")
       }
     }
@@ -57,7 +55,6 @@ constructor(
         val authResult = signInRepository.signInWithGoogle(idToken)
         checkUserProfile(authResult.user?.uid, onProfileExists, onProfileMissing, onFailure)
       } catch (e: Exception) {
-        Log.e("SignInViewModel", "Error signing in with Google", e)
         onFailure(e.message ?: "Unknown error")
       }
     }
@@ -83,10 +80,7 @@ constructor(
               onProfileMissing()
             }
           },
-          {
-            Log.e("SignInViewModel", "Error checking user profile", it)
-            onFailure("Error checking user profile")
-          })
+          { onFailure("Error checking user profile") })
     } ?: onFailure("UID is null")
   }
 

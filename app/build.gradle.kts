@@ -168,6 +168,8 @@ fun DependencyHandlerScope.globalTestImplementation(dep: Any) {
 dependencies {
 
     implementation ("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+    implementation(libs.androidx.games.activity)
+    implementation(libs.core)
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:1.1.6")
 
     implementation(libs.firebase.storage.ktx)
@@ -199,7 +201,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.material)
 
-    //----
+
 
     // JUnit for unit testing
     testImplementation("junit:junit:4.13.2")
@@ -207,6 +209,7 @@ dependencies {
 
     // Or replace with Mockito if preferred:
     // testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("org.mockito:mockito-core:5.3.1")
 
 
 
@@ -215,6 +218,7 @@ dependencies {
 
 
     //----
+
 
 
     // Navigation
@@ -267,13 +271,11 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation("org.mockito:mockito-android:5.7.0")
 
-    testImplementation(libs.robolectric)
     androidTestImplementation(libs.kaspresso)
     androidTestImplementation(libs.kaspresso.allure.support)
     androidTestImplementation(libs.kaspresso.compose.support)
 
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.robolectric)
 
     implementation(libs.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -285,6 +287,9 @@ dependencies {
     testImplementation(libs.junit)
     globalTestImplementation(libs.androidx.junit)
     globalTestImplementation(libs.androidx.espresso.core)
+
+    //notifications
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 
 
     // ------------- Jetpack Compose ------------------
@@ -308,7 +313,13 @@ dependencies {
     implementation(libs.coil.kt.coil.compose)
     implementation(libs.coil.network.okhttp)
     // ----------       Robolectric     ------------
-    testImplementation(libs.robolectric)
+    testImplementation("org.robolectric:robolectric:4.11.1") {
+        exclude(group = "com.google.auto.service", module = "auto-service")
+    }
+    testImplementation("androidx.test:core:1.5.0")
+    testImplementation("androidx.test:runner:1.5.2")
+    testImplementation("androidx.test.ext:junit:1.1.5")
+    testImplementation("org.bouncycastle:bcprov-jdk15on:1.68")
 
     // ----------       Hilt     ------------
     implementation(libs.hilt.android)

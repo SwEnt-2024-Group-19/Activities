@@ -3,6 +3,7 @@ package com.android.sample.resources.dummydata
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.Comment
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.Interest
@@ -13,11 +14,11 @@ import java.util.GregorianCalendar
 import java.util.UUID
 
 val timestamp = Timestamp.now()
-val location = Location(46.519962, 6.633597, "EPFL")
-val location2 = Location(46.5, 6.6, "Lausanne")
+val location = Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne")
+val location2 = Location(46.5, 6.6, "Lausanne", "Lausanne, Vaud")
 val locationList = listOf(location, location2)
-val interest1 = Interest("Sport", "Cycling")
-val interest2 = Interest("Indoor Activity", "Reading")
+val interest1 = Interest("Reading", Category.ENTERTAINMENT)
+val interest2 = Interest("Hiking", Category.SPORT)
 val interest3 = listOf(interest1, interest2)
 val activity =
     Activity(
@@ -74,7 +75,8 @@ val activityWithParticipants =
         maxPlaces = 10,
         creator = "Creator",
         status = ActivityStatus.ACTIVE,
-        location = Location(46.519962, 6.633597, "EPFL"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         images = listOf("1"),
         participants =
             listOf(
@@ -125,7 +127,8 @@ val activityBiking =
         title = "Mountain Biking",
         description = "Exciting mountain biking experience.",
         date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
-        location = Location(46.519962, 6.633597, "EPFL"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         creator = "Chris",
         images = listOf(),
         price = 10.0,
@@ -163,7 +166,7 @@ val activity1 =
         title = "Fun Farm",
         description = "Come discover the new farm and enjoy with your family!",
         date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
-        location = Location(46.5, 6.6, "Lausanne"),
+        location = Location(46.5, 6.6, "Lausanne", "Lausanne, Vaud"),
         creator = "Rola",
         price = 1.0,
         images = listOf(),
@@ -181,7 +184,8 @@ val activity2 =
         title = "Cooking",
         description = "Great cooking class",
         date = Timestamp(GregorianCalendar(2050, Calendar.JANUARY, 1).time),
-        location = Location(46.519962, 6.633597, "EPFL"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         creator = "123",
         price = 1.0,
         images = listOf(),
@@ -199,7 +203,8 @@ val pastActivity =
         title = "Watch World Cup 2022",
         description = "Exciting mountain biking experience.",
         date = Timestamp(GregorianCalendar(2020, Calendar.JANUARY, 1).time),
-        location = Location(46.519962, 6.633597, "EPFL"),
+        location =
+            Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
         creator = "Chris",
         images = listOf(),
         price = 10.0,
@@ -248,7 +253,7 @@ val userWithActivities =
         surname = "A",
         photo = "",
         interests = interest3,
-        activities = listOf(),
+        activities = listOf("activity1", "activity2", "activity3"),
         likedActivities = listOf(activityBiking.uid))
 
 const val email = "test@example.com"

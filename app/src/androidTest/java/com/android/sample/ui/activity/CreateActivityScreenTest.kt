@@ -1,6 +1,7 @@
 package com.android.sample.ui.activity
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextEquals
@@ -50,8 +51,12 @@ class CreateActivityScreenTest {
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var profileViewModel: ProfileViewModel
 
-  private val location = Location(46.519962, 6.633597, "EPFL")
-  private val location2 = Location(46.5, 6.6, "Lausanne")
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
+
+  private val location =
+      Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne")
+  private val location2 = Location(46.5, 6.6, "Lausanne", "Lausanne, Vaud")
   private val locationList = listOf(location, location2)
   private val locationListFlow = MutableStateFlow(listOf(location, location2))
 
@@ -76,7 +81,9 @@ class CreateActivityScreenTest {
     `when`(profileViewModel.userState).thenReturn(MutableStateFlow(testUser))
 
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
   }
 
   @Test

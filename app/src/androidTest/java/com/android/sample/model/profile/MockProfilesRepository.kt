@@ -1,5 +1,7 @@
 package com.android.sample.model.profile
 
+import com.android.sample.model.activity.Category
+
 class MockProfilesRepository : ProfilesRepository {
 
   private val userProfiles =
@@ -9,7 +11,10 @@ class MockProfilesRepository : ProfilesRepository {
                   id = "u1",
                   name = "Alice",
                   surname = "Smith",
-                  interests = listOf(Interest("Sport", "Hiking"), Interest("Sport", "Cycling")),
+                  interests =
+                      listOf(
+                          Interest("Football", Category.SPORT),
+                          Interest("Movies", Category.ENTERTAINMENT)),
                   activities = listOf("a1", "a2"),
                   photo = null,
                   likedActivities = listOf("a1")))
