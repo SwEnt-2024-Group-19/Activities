@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,6 +44,8 @@ import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.MIN_PASSWORD_LENGTH
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
@@ -134,161 +136,160 @@ fun SignUpScreen(
   } else {
     LazyColumn(
         modifier =
-            Modifier.fillMaxSize().padding(horizontal = MEDIUM_PADDING.dp).testTag("SignUpColumn"),
+            Modifier.fillMaxSize()
+                .padding(horizontal = MEDIUM_PADDING.dp)
+                .background(Color(MAIN_BACKGROUND))
+                .testTag("SignUpColumn"),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
+        verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp),
+    ) {
 
-          // Profile Picture
-          item {
-            Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
-            ProfileImage(
-                userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
-                modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
-                imageViewModel,
-                bitmap = selectedBitmap,
-                editing = true)
-            if (isDefaultImageOpen) {
-              DefaultImageCarousel(
-                  onImageSelected = { bitmap ->
-                    selectedBitmap = bitmap
-                    isDefaultImageOpen = false
-                  },
-                  context = context,
-                  onDismiss = { isDefaultImageOpen = false })
-            }
-            ModifyPictureButton(showDialogImage = { showDialogImage = true })
-          }
-
-          // Email Field
-          item {
-            EmailTextField(
-                email = emailState.value,
-                onEmailChange = {
-                  emailState.value = it
-                  emailErrorState.value = if (it.isBlank()) "Email cannot be empty" else null
-                },
-                emailError = emailErrorState.value)
-          }
-
-          // Password Field
-          item {
-            PasswordTextField(
-                password = passwordState.value,
-                onPasswordChange = { passwordState.value = it },
-                isPasswordVisible = isPasswordVisible.value,
-                onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
-                passwordError = passwordErrorState.value)
-          }
-
-          // Name and Surname Fields
-          item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
-                  TextFieldWithErrorState(
-                      value = name,
-                      onValueChange = { name = it },
-                      label = "Name",
-                      validation = { input ->
-                        if (input.isBlank()) "Name cannot be empty" else null
-                      },
-                      externalError = nameErrorState.value,
-                      errorTestTag = "nameError",
-                      testTag = "nameTextField",
-                      modifier = Modifier.weight(1f))
-                  TextFieldWithErrorState(
-                      value = surname,
-                      onValueChange = { surname = it },
-                      label = "Surname",
-                      validation = { input ->
-                        if (input.isBlank()) "Surname cannot be empty" else null
-                      },
-                      externalError = surnameErrorState.value,
-                      errorTestTag = "surnameError",
-                      testTag = "surnameTextField",
-                      modifier = Modifier.weight(1f))
-                }
-          }
-
-          // Interests Section
-          item {
-            ManageInterests(initialInterests = interests, onUpdateInterests = { interests = it })
-          }
-
-          // Sign Up Button
-          item {
-            Button(
-                onClick = {
-                  // Validate email, password, name, and surname
-                  emailErrorState.value =
-                      if (!isValidEmail(emailState.value)) "Please enter a valid email address"
-                      else null
-                  passwordErrorState.value =
-                      if (passwordState.value.isBlank()) "Password cannot be empty"
-                      else if (passwordState.value.length < MIN_PASSWORD_LENGTH)
-                          "Password must be at least $MIN_PASSWORD_LENGTH characters long"
-                      else null
-                  nameErrorState.value = if (name.isBlank()) "Name cannot be empty" else null
-                  surnameErrorState.value =
-                      if (surname.isBlank()) "Surname cannot be empty" else null
-
-                  // Proceed if no errors
-                  if (emailErrorState.value == null &&
-                      passwordErrorState.value == null &&
-                      nameErrorState.value == null &&
-                      surnameErrorState.value == null) {
-                    createUserWithEmailAndPassword(
-                        emailState.value,
-                        passwordState.value,
-                        context,
-                        onSuccess = {
-                          selectedBitmap?.let { bitmap ->
-                            imageViewModel.uploadProfilePicture(
-                                FirebaseAuth.getInstance().currentUser?.uid ?: "",
-                                bitmap,
-                                onSuccess = {}, // the photo field of user is not used anymore
-                                onFailure = { error -> errorMessage = error.message })
-                          }
-                          val userProfile =
-                              User(
-                                  id = FirebaseAuth.getInstance().currentUser?.uid ?: "",
-                                  name = name,
-                                  surname = surname,
-                                  interests = interests,
-                                  activities = emptyList(),
-                                  photo = photo,
-                                  likedActivities = emptyList())
-                          profileViewModel.createUserProfile(
-                              userProfile = userProfile,
-                              onSuccess = {
-                                profileViewModel.fetchUserData(userProfile.id)
-                                navigationActions.navigateTo(Screen.OVERVIEW)
-                              },
-                              onError = { error -> errorMessage = error.message })
-                        })
-                  }
-                },
-                modifier =
-                    Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignUpButton"),
-                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
-                border = BorderStroke(BORDER_STROKE_SM.dp, Color.Transparent),
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White)) {
-                  Text("SIGN UP", fontSize = SUBTITLE_FONTSIZE.sp)
-                }
-          }
-
-          // Already Have an Account Button
-          item {
-            TextButton(
-                onClick = { navigationActions.navigateTo(Screen.AUTH) },
-                modifier = Modifier.testTag("GoToSignInButton")) {
-                  Text("Already an account? Sign-in")
-                }
-          }
+      // Profile Picture
+      item {
+        Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
+        ProfileImage(
+            userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+            modifier = Modifier.size(150.dp).clip(CircleShape).testTag("profilePicture"),
+            imageViewModel,
+            bitmap = selectedBitmap,
+            editing = true)
+        if (isDefaultImageOpen) {
+          DefaultImageCarousel(
+              onImageSelected = { bitmap ->
+                selectedBitmap = bitmap
+                isDefaultImageOpen = false
+              },
+              context = context,
+              onDismiss = { isDefaultImageOpen = false })
         }
+        ModifyPictureButton(showDialogImage = { showDialogImage = true })
+      }
+
+      // Email Field
+      item {
+        EmailTextField(
+            email = emailState.value,
+            onEmailChange = {
+              emailState.value = it
+              emailErrorState.value = if (it.isBlank()) "Email cannot be empty" else null
+            },
+            emailError = emailErrorState.value)
+      }
+
+      // Password Field
+      item {
+        PasswordTextField(
+            password = passwordState.value,
+            onPasswordChange = { passwordState.value = it },
+            isPasswordVisible = isPasswordVisible.value,
+            onPasswordVisibilityChange = { isPasswordVisible.value = !isPasswordVisible.value },
+            passwordError = passwordErrorState.value)
+      }
+
+      // Name and Surname Fields
+      item {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
+              TextFieldWithErrorState(
+                  value = name,
+                  onValueChange = { name = it },
+                  label = "Name",
+                  validation = { input -> if (input.isBlank()) "Name cannot be empty" else null },
+                  externalError = nameErrorState.value,
+                  errorTestTag = "nameError",
+                  testTag = "nameTextField",
+                  modifier = Modifier.weight(1f))
+              TextFieldWithErrorState(
+                  value = surname,
+                  onValueChange = { surname = it },
+                  label = "Surname",
+                  validation = { input ->
+                    if (input.isBlank()) "Surname cannot be empty" else null
+                  },
+                  externalError = surnameErrorState.value,
+                  errorTestTag = "surnameError",
+                  testTag = "surnameTextField",
+                  modifier = Modifier.weight(1f))
+            }
+      }
+
+      // Interests Section
+      item { ManageInterests(initialInterests = interests, onUpdateInterests = { interests = it }) }
+
+      // Sign Up Button
+      item {
+        Button(
+            onClick = {
+              // Validate email, password, name, and surname
+              emailErrorState.value =
+                  if (!isValidEmail(emailState.value)) "Please enter a valid email address"
+                  else null
+              passwordErrorState.value =
+                  if (passwordState.value.isBlank()) "Password cannot be empty"
+                  else if (passwordState.value.length < MIN_PASSWORD_LENGTH)
+                      "Password must be at least $MIN_PASSWORD_LENGTH characters long"
+                  else null
+              nameErrorState.value = if (name.isBlank()) "Name cannot be empty" else null
+              surnameErrorState.value = if (surname.isBlank()) "Surname cannot be empty" else null
+
+              // Proceed if no errors
+              if (emailErrorState.value == null &&
+                  passwordErrorState.value == null &&
+                  nameErrorState.value == null &&
+                  surnameErrorState.value == null) {
+                createUserWithEmailAndPassword(
+                    emailState.value,
+                    passwordState.value,
+                    context,
+                    onSuccess = {
+                      selectedBitmap?.let { bitmap ->
+                        imageViewModel.uploadProfilePicture(
+                            FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                            bitmap,
+                            onSuccess = {}, // the photo field of user is not used anymore
+                            onFailure = { error -> errorMessage = error.message })
+                      }
+                      val userProfile =
+                          User(
+                              id = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                              name = name,
+                              surname = surname,
+                              interests = interests,
+                              activities = emptyList(),
+                              photo = photo,
+                              likedActivities = emptyList())
+                      profileViewModel.createUserProfile(
+                          userProfile = userProfile,
+                          onSuccess = {
+                            profileViewModel.fetchUserData(userProfile.id)
+                            navigationActions.navigateTo(Screen.OVERVIEW)
+                          },
+                          onError = { error -> errorMessage = error.message })
+                    })
+              }
+            },
+            modifier =
+                Modifier.fillMaxWidth().height(AUTH_BUTTON_HEIGHT.dp).testTag("SignUpButton"),
+            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+            border = BorderStroke(BORDER_STROKE_SM.dp, Color.Transparent),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color(MAIN_COLOR_DARK), contentColor = Color.White)) {
+              Text("SIGN UP", fontSize = SUBTITLE_FONTSIZE.sp)
+            }
+      }
+
+      // Already Have an Account Button
+      item {
+        TextButton(
+            onClick = { navigationActions.navigateTo(Screen.AUTH) },
+            modifier = Modifier.testTag("GoToSignInButton"),
+            colors = ButtonDefaults.textButtonColors(contentColor = Color(MAIN_COLOR_DARK))) {
+              Text("Already an account? Sign-in")
+            }
+      }
+    }
   }
 }
 

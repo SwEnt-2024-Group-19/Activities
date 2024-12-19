@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.DensityMedium
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -53,7 +55,10 @@ import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
+import com.android.sample.resources.C.Tag.MAIN_COLOR_LIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.camera.getImageResourceIdForCategory
@@ -132,16 +137,23 @@ fun MapScreen(
                             durationMs = 800)
                       }
                     }
-                  }) {
+                  },
+                  containerColor = Color(MAIN_COLOR_DARK)) {
                     Icon(
-                        Icons.Default.MyLocation, contentDescription = "Center on current location")
+                        Icons.Default.MyLocation,
+                        contentDescription = "Center on current location",
+                        tint = Color(MAIN_COLOR_LIGHT))
                   }
               FloatingActionButton(
                   modifier =
                       Modifier.padding(horizontal = MEDIUM_PADDING.dp)
                           .testTag("filterDialogButton"),
-                  onClick = { showFilterDialog = true }) {
-                    Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
+                  onClick = { showFilterDialog = true },
+                  containerColor = Color(MAIN_COLOR_DARK)) {
+                    Icon(
+                        Icons.Default.DensityMedium,
+                        contentDescription = "Open filter dialog",
+                        tint = Color(MAIN_COLOR_LIGHT))
                   }
             }
       },
@@ -363,7 +375,13 @@ fun SeeMoreDetailsButton(navigationActions: NavigationActions) {
   Button(
       modifier = Modifier.testTag("seeMoreDetailsButton"),
       onClick = { navigationActions.navigateTo(Screen.ACTIVITY_DETAILS) },
-  ) {
-    Text(text = "See more details")
-  }
+      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+      colors =
+          ButtonColors(
+              contentColor = Color.White,
+              containerColor = Color(MAIN_COLOR_DARK),
+              disabledContentColor = Color(MAIN_COLOR_DARK),
+              disabledContainerColor = Color(MAIN_COLOR_DARK))) {
+        Text(text = "See more details")
+      }
 }

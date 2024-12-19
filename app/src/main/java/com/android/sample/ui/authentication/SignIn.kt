@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +36,9 @@ import com.android.sample.resources.C.Tag.IMAGE_IN_BUTTON_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.LINE_STROKE
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -77,7 +81,11 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
       content = { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("SignInScreenColumn"),
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(padding)
+                    .background(Color(MAIN_BACKGROUND))
+                    .testTag("SignInScreenColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -160,7 +168,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                       shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
                       colors =
                           ButtonDefaults.buttonColors(
-                              containerColor = MaterialTheme.colorScheme.primary,
+                              containerColor = Color(MAIN_COLOR_DARK),
                               contentColor = Color.White)) {
                         Text("SIGN IN", fontSize = SUBTITLE_FONTSIZE.sp)
                       }
@@ -198,7 +206,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                       onPerform = { navigationActions.navigateTo(Screen.OVERVIEW) })
                 },
                 modifier = Modifier.testTag("ContinueAsGuestButton")) {
-                  Text("Continue as a guest", fontSize = SUBTITLE_FONTSIZE.sp)
+                  Text(
+                      "Continue as a guest",
+                      fontSize = SUBTITLE_FONTSIZE.sp,
+                      color = Color(MAIN_COLOR_DARK))
                 }
             Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
           }
@@ -217,7 +228,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                         onPerform = { navigationActions.navigateTo(Screen.SIGN_UP) })
                   },
                   modifier = Modifier.testTag("GoToSignUpButton")) {
-                    Text("Sign Up", fontSize = SUBTITLE_FONTSIZE.sp)
+                    Text("Sign Up", fontSize = SUBTITLE_FONTSIZE.sp, color = Color(MAIN_COLOR_DARK))
                   }
             }
           }
@@ -280,14 +291,22 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
           shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
           modifier =
               Modifier.height(BUTTON_HEIGHT_SM.dp).fillMaxWidth().testTag("GoogleSignInButton"),
-          border = BorderStroke(LINE_STROKE.dp, Color.Transparent) // Transparent indicator
-          ) {
+          border = BorderStroke(LINE_STROKE.dp, Color.Transparent), // Transparent indicator
+          colors =
+              ButtonColors(
+                  containerColor = Color(MAIN_BACKGROUND_BUTTON),
+                  contentColor = Color.White,
+                  disabledContentColor = Color.Gray,
+                  disabledContainerColor = Color.Gray)) {
             Image(
                 painter = painterResource(id = R.drawable.google_logo),
                 contentDescription = "Google Sign-In",
                 modifier = Modifier.size(IMAGE_IN_BUTTON_DEFAULT.dp))
             Spacer(Modifier.width(STANDARD_PADDING.dp))
-            Text("Login with Google", fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
+            Text(
+                "Login with Google",
+                fontSize = SUBTITLE_FONTSIZE.sp,
+                color = Color(MAIN_COLOR_DARK))
           }
     }
   }

@@ -20,11 +20,13 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,8 +58,11 @@ import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.DARK_BLUE_COLOR
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PRIMARY
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
@@ -151,7 +156,13 @@ fun CreateActivityScreen(
                   color = Color.White,
               )
             },
-        )
+            colors =
+                TopAppBarColors(
+                    containerColor = Color(MAIN_COLOR_DARK),
+                    titleContentColor = Color.Black,
+                    scrolledContainerColor = Color(MAIN_BACKGROUND),
+                    navigationIconContentColor = Color(MAIN_COLOR_DARK),
+                    actionIconContentColor = Color(MAIN_COLOR_DARK)))
       },
       content = { paddingValues ->
         if (!networkManager.isNetworkAvailable()) {
@@ -175,6 +186,7 @@ fun CreateActivityScreen(
                     Modifier.padding(paddingValues)
                         .fillMaxSize()
                         .verticalScroll(scrollState)
+                        .background(Color(MAIN_BACKGROUND))
                         .testTag("activityCreateScreen"),
             ) {
               if (isGalleryOpen) {
@@ -352,10 +364,18 @@ fun CreateActivityScreen(
                   },
                   modifier =
                       Modifier.width(BUTTON_WIDTH.dp)
-                          .background(Color(PRIMARY))
+                          .background(Color.Transparent)
                           .height(BUTTON_HEIGHT_SM.dp)
                           .testTag("createButton")
                           .align(Alignment.CenterHorizontally),
+                  shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                  colors =
+                      ButtonColors(
+                          containerColor = Color(MAIN_COLOR_DARK),
+                          contentColor = Color.White,
+                          disabledContentColor = Color.Gray,
+                          disabledContainerColor = Color.LightGray,
+                      ),
               ) {
                 Icon(
                     Icons.Filled.Add,
