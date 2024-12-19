@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.DialogProperties
 import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MAIN_COLOR_LIGHT
@@ -32,17 +31,19 @@ fun MyTimePicker(
     onCloseRequest: (MaterialDialogState) -> Unit,
     isAmPm: Boolean = true
 ) {
+  val dialogState = rememberMaterialDialogState(isOpen)
   MaterialDialog(
       onCloseRequest = onCloseRequest,
-      dialogState = rememberMaterialDialogState(isOpen),
-      properties = DialogProperties(dismissOnClickOutside = true, dismissOnBackPress = true),
+      dialogState = dialogState,
       buttons = {
         positiveButton(
             text = "Ok",
             textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold))
-        positiveButton(
+          negativeButton(
             text = "Cancel",
-            textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold))
+            textStyle = TextStyle(color = Color(MAIN_COLOR_DARK), fontWeight = FontWeight.Bold)){
+              onCloseRequest(dialogState)
+          }
       },
   ) {
     timepicker(

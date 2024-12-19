@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.MockActivitiesRepository
 import com.android.sample.model.auth.SignInRepository
+import com.android.sample.model.authentication.MockSignInRepository
 import com.android.sample.model.image.ImageRepository
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
@@ -32,7 +33,7 @@ object TestRepositoryModule {
   @Provides
   @Singleton
   fun provideSignInRepository(): SignInRepository {
-    return mock(SignInRepository::class.java)
+    return MockSignInRepository()
   }
 
   @Provides

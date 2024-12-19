@@ -312,6 +312,28 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("iconparticipants", useUnmergedTree = true).assertIsDisplayed()
     composeTestRule.onNodeWithTag("iconlocation", useUnmergedTree = true).assertIsDisplayed()
     composeTestRule.onNodeWithTag("iconcalendar", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("iconprice", useUnmergedTree = true).assertIsDisplayed()
+  }
+
+  @Test
+  fun infoAreDisplayed() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity)
+    }
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("participantsText", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag("dateText", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("priceText", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("descriptionText", useUnmergedTree = true).assertIsDisplayed()
   }
 
   @Test
@@ -383,7 +405,7 @@ class OverviewScreenTest {
           distance = 0.5503f)
     }
     composeTestRule
-        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
         .assertTextContains("550m", substring = true)
   }
 
@@ -400,7 +422,7 @@ class OverviewScreenTest {
           distance = 12.354f)
     }
     composeTestRule
-        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
         .assertTextContains("12.4km", substring = true)
   }
 
@@ -417,13 +439,13 @@ class OverviewScreenTest {
           distance = null)
     }
     composeTestRule
-        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
         .assertTextEquals("EPFL") // there is only the location, not the distance
   }
 
   @Test
   fun changeIconWhenActivityIsOnclick() {
-    userProfileViewModel = ProfileViewModel(profilesRepository, mock())
+    userProfileViewModel = ProfileViewModel(profilesRepository, mock(), mock())
 
     composeTestRule.setContent {
       ActivityCard(
