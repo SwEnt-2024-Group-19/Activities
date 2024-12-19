@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.sample.model.authentication.MockSignInRepository
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.MockProfilesRepository
@@ -27,6 +28,7 @@ class SignUpAndProfileCreationScreenTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var mockProfilesRepository: MockProfilesRepository
+  private lateinit var mockSignInRepository: MockSignInRepository
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -36,7 +38,8 @@ class SignUpAndProfileCreationScreenTest {
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
     mockImageViewModel = ImageViewModel(mockImageRepository)
     mockProfilesRepository = MockProfilesRepository()
-    profileViewModel = ProfileViewModel(mockProfilesRepository, mock())
+    mockSignInRepository = MockSignInRepository()
+    profileViewModel = ProfileViewModel(mockProfilesRepository, mock(), mockSignInRepository)
 
     composeTestRule.setContent {
       SignUpScreen(

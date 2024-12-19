@@ -46,8 +46,9 @@ fun BottomNavigationMenu(
           val isSelected = tab.route == selectedItem
 
           // Animate scale and offset when selected
-          val scale by animateFloatAsState(if (isSelected) BOTTOM_ICON_SCALE else 1f)
-          val offsetY by animateFloatAsState(if (isSelected) -BOTTOM_ICON_OFFSET else 0f)
+          val scale by animateFloatAsState(if (isSelected) BOTTOM_ICON_SCALE else 1f, label = "")
+          val offsetY by
+              animateFloatAsState(if (isSelected) -BOTTOM_ICON_OFFSET else 0f, label = "")
 
           BottomNavigationItem(
               icon = {
@@ -69,7 +70,8 @@ fun BottomNavigationMenu(
               onClick = { onTabSelect(tab) },
               alwaysShowLabel = false,
               selectedContentColor = Color(MAIN_COLOR_LIGHT),
-              unselectedContentColor = Color.Gray)
+              unselectedContentColor = Color.Gray,
+              modifier = Modifier.testTag(tab.textId))
         }
       }
 }

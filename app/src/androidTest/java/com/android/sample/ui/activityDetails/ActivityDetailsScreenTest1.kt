@@ -28,8 +28,8 @@ import com.android.sample.model.profile.MockProfilesRepository
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
-import com.android.sample.resources.dummydata.activityListWithPastActivity
 import com.android.sample.model.profile.database.UserDao
+import com.android.sample.resources.dummydata.activityListWithPastActivity
 import com.android.sample.resources.dummydata.activityWithParticipants
 import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
