@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -85,7 +86,7 @@ fun EditActivityScreen(
     imageViewModel: ImageViewModel,
     profileViewModel: ProfileViewModel
 ) {
-  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
+  val hourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
@@ -102,7 +103,6 @@ fun EditActivityScreen(
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration ?: "00:01") }
-  var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
   var expandedType by remember { mutableStateOf(false) }
   var expandedCategory by remember { mutableStateOf(false) }
@@ -121,12 +121,14 @@ fun EditActivityScreen(
   var isGalleryOpen by remember { mutableStateOf(false) }
   var selectedImages by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
   var items by remember { mutableStateOf(activity?.images ?: listOf()) }
-  imageViewModel.fetchActivityImagesAsBitmaps(
-      activity?.uid ?: "",
-      { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
-      onFailure = { error ->
-        Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
-      })
+  LaunchedEffect(activity!!.uid) {
+    imageViewModel.fetchActivityImagesAsBitmaps(
+        activity.uid,
+        { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
+        onFailure = { error ->
+          Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
+        })
+  }
   // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember { mutableStateOf(activity?.date ?: Timestamp.now()) }
   var dateIsOpen by remember { mutableStateOf(false) }

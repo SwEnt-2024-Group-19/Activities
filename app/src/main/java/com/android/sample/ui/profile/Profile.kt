@@ -205,8 +205,10 @@ fun ActivityRow(
       verticalAlignment = Alignment.Top) {
         var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
 
-        imageViewModel.fetchActivityImagesAsBitmaps(
-            activity.uid, onSuccess = { urls -> bitmaps = urls }, onFailure = {})
+        LaunchedEffect(user) {
+          imageViewModel.fetchActivityImagesAsBitmaps(
+              activity.uid, onSuccess = { urls -> bitmaps = urls }, onFailure = {})
+        }
 
         // Display image
         if (activity.images.isNotEmpty() && bitmaps.isNotEmpty()) {
