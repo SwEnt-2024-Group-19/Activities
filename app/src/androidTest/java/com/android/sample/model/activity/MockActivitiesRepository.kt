@@ -28,14 +28,12 @@ class MockActivitiesRepository(
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    throw NotImplementedError("Not needed for mock repository")
-    /*try {
-      // Simulate adding an activity
-      database.getActivities().add(activity)
+    try {
+      database.addActivity(activity)
       onSuccess()
     } catch (e: Exception) {
       onFailure(e)
-    }*/
+    }
   }
 
   override fun updateActivity(

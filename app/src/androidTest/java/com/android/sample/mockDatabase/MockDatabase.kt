@@ -13,8 +13,10 @@ import com.android.sample.resources.dummydata.e2e_Users
  */
 data class MockUsersDatabase(private val users: List<User> = e2e_Users) {
   fun getUser(userId: String): User {
-    return users.find { it.id == userId } ?: throw IllegalArgumentException("User with id $userId does not exist")
+    return users.find { it.id == userId }
+        ?: throw IllegalArgumentException("User with id $userId does not exist")
   }
+
   fun updateUser(user: User) {
     val index = users.indexOfFirst { it.id == user.id }
     if (index == -1) {
