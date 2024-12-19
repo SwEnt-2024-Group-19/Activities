@@ -2,7 +2,6 @@ package com.android.sample.model.activity
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -131,16 +130,12 @@ constructor(
                                 activity = activity, isCreator = activity.creator == currentUser.id)
                       }
                     },
-                    onFailure = { e ->
-                      Log.e("ListActivitiesViewModel", "Failed to schedule notification", e)
-                    })
+                    onFailure = { _ -> })
               }
-            } catch (e: Exception) {
-              Log.e("ListActivitiesViewModel", "Error scheduling notification", e)
-            }
+            } catch (_: Exception) {}
           }
         },
-        { error -> Log.e("ListActivitiesViewModel", "Failed to add activity", error) })
+        { _ -> })
   }
 
   /**
@@ -164,9 +159,7 @@ constructor(
                             activity = activity, isCreator = activity.creator == currentUser.id)
                   }
                 },
-                onFailure = { e ->
-                  Log.e("ListActivitiesViewModel", "Failed to schedule notification for update", e)
-                })
+                onFailure = {})
           }
         },
         {})

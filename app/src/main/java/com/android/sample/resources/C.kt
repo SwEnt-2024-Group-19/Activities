@@ -76,6 +76,7 @@ object C {
     const val WHITE_COLOR = 0xFFFFFFFF
     const val LIGHT_PURPLE_COLOR = 0xFF8B6EA2
     const val DARK_BLUE_COLOR = 0xFF4A148C
+    const val PRIMARY_COLOR = 0xFF005697
 
     const val BLACK_COLOR = 0xFF000000
     const val PURPLE_COLOR = 0xFF6200EE
@@ -98,6 +99,7 @@ object C {
     const val TOP_TITLE_SIZE = 30
 
     const val TEXT_FONTSIZE = 12
+    const val SMALL_TEXT_FONTSIZE = 9
 
     const val WIDTH_FRACTION_MD = 0.8f
 

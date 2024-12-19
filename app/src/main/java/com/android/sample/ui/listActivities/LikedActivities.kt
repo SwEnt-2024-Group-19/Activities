@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -52,9 +56,12 @@ import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.PRIMARY_COLOR
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.navigation.BottomNavigationMenu
 import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -101,7 +108,7 @@ fun LikedActivitiesScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.Center)) {
+                    modifier = Modifier.align(Alignment.Center).fillMaxWidth(WIDTH_FRACTION_MD)) {
                       Text(
                           text =
                               "You are not logged in. Login or Register to see your liked activities.",
@@ -111,12 +118,19 @@ fun LikedActivitiesScreen(
                           color = MaterialTheme.colorScheme.onSurface,
                           style = MaterialTheme.typography.bodyMedium,
                           textAlign = TextAlign.Center)
-                      Button(
-                          onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
-                          modifier = Modifier.testTag("signInButton"),
-                      ) {
-                        Text("Go to Sign In Page", style = MaterialTheme.typography.labelLarge)
-                      }
+                      Card(
+                          shape = RoundedCornerShape(MEDIUM_PADDING.dp),
+                          modifier =
+                              Modifier.padding(MEDIUM_PADDING.dp).testTag("DefaultImageCarousel")) {
+                            Button(
+                                onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
+                                modifier = Modifier.testTag("signInButton"),
+                                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                                  Text(
+                                      "Go to Sign Up Page",
+                                      style = MaterialTheme.typography.labelLarge)
+                                }
+                          }
                     }
               }
               if (likedActivitiesList != null) {
@@ -221,6 +235,10 @@ fun ActivityCard2(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
+                Icon(
+                    imageVector = Icons.Filled.CalendarMonth,
+                    contentDescription = "Calendar",
+                    tint = Color(PRIMARY_COLOR))
                 Text(
                     text = formattedDate,
                     style =
@@ -246,7 +264,7 @@ fun ActivityCard2(
                         imageVector =
                             if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color.Black else Color.Gray)
+                        tint = if (isLiked) Color(PRIMARY_COLOR) else Color.Gray)
                   }
                 }
               }
@@ -256,6 +274,10 @@ fun ActivityCard2(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = "location",
+                    tint = Color(PRIMARY_COLOR))
                 Text(
                     text = activity.location?.shortName ?: "No location",
                     style =
@@ -263,6 +285,11 @@ fun ActivityCard2(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
                     modifier = Modifier.weight(1f) // Takes up remaining space
                     )
+                Icon(
+                    imageVector = Icons.Filled.Groups,
+                    contentDescription = "Participants",
+                    tint = Color(PRIMARY_COLOR))
+                Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
 
                 Text(
                     text = "${activity.placesLeft}/${activity.maxPlaces}",

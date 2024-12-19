@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -171,11 +170,13 @@ fun ProfileImage(
               model = ImageRequest.Builder(context).data(R.drawable.default_profile_image).build())
         }
       }
+
   Image(
       painter = painter,
       contentDescription = "Profile Image",
       modifier = modifier,
       contentScale = ContentScale.Crop)
+
 }
 
 fun getImageResourceIdForCategory(category: Category): Int {

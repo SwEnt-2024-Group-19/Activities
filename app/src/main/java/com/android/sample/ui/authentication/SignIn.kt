@@ -2,7 +2,6 @@ package com.android.sample.ui.authentication
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -152,7 +151,6 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                                       onSignInFailure)
                                 }
                               }
-                              Log.d("SignInScreen", "Sign in with email/password")
                             })
                       },
                       modifier =

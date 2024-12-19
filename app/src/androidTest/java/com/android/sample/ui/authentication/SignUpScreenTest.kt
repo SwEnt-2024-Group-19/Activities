@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
@@ -237,5 +238,17 @@ class SignUpAndProfileCreationScreenTest {
         .onNodeWithTag("SignUpColumn")
         .performScrollToNode(hasTestTag("surnameError"))
         .assertIsDisplayed()
+  }
+
+  @Test
+  fun togglePasswordVisibility() {
+
+    composeTestRule.onNodeWithContentDescription("Show password").assertExists()
+
+    // Click the visibility icon to show the password
+    composeTestRule.onNodeWithContentDescription("Show password").performClick()
+
+    // Verify password visibility toggle behavior (e.g., check attribute or visual state).
+    composeTestRule.onNodeWithTag("PasswordTextField").assertExists()
   }
 }

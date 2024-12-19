@@ -1,7 +1,6 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
@@ -252,11 +251,7 @@ fun EditProfileScreen(
                                 onSuccess = {
                                   photo = null // Clear photo reference
                                 },
-                                onFailure = { error ->
-                                  Log.e(
-                                      "EditProfileScreen",
-                                      "Failed to remove profile picture: ${error.message}")
-                                })
+                                onFailure = { _ -> })
                           }
                           selectedImage?.let { bitmap ->
                             imageViewModel.uploadProfilePicture(
@@ -289,6 +284,7 @@ fun EditProfileScreen(
                                   imageViewModel.uploadProfilePicture(
                                       profile.id,
                                       bitmap,
+
                                       onSuccess = {}, // the photo field is not used anymore
                                       onFailure = { error ->
                                         Log.e(
