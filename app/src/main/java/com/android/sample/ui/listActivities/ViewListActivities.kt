@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.outlined.AttachMoney
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -66,12 +68,15 @@ import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
+import com.android.sample.resources.C.Tag.END_Y
+import com.android.sample.resources.C.Tag.GRADIENT_MAX
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PRIMARY_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.SMALL_TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.START_Y
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.SearchBar
@@ -285,9 +290,10 @@ fun ActivityCard(
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
-  var isLiked by remember {
-    mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
-  }
+  val isLiked =
+      remember(activity.uid, profile?.likedActivities) {
+        mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
+      }
 
   Card(
       modifier =
@@ -310,15 +316,7 @@ fun ActivityCard(
                 modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
             // Apply a dark gradient overlay at the bottom to improve contrast
-            Box(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .height(LARGE_IMAGE_SIZE.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
-                                startY = 0f,
-                                endY = 500f)))
+            DarkGradient()
 
             // Display the activity name on top of the image
             Text(
@@ -346,6 +344,7 @@ fun ActivityCard(
                     if (profile.activities?.contains(activity.uid) == true) {
 
                       Row(
+                          horizontalArrangement = Arrangement.End,
                           verticalAlignment = Alignment.CenterVertically,
                           modifier = Modifier.testTag("activityStatus")) {
                             if (profile.id == activity.creator) {
@@ -384,7 +383,8 @@ fun ActivityCard(
                                               Color(PRIMARY_COLOR),
                                               shape =
                                                   RoundedCornerShape(
-                                                      12.dp)) // Purple background with rounded
+                                                      TEXT_FONTSIZE
+                                                          .dp)) // Purple background with rounded
                                           // corners
                                           .padding(
                                               horizontal = STANDARD_PADDING.dp,
@@ -421,29 +421,49 @@ fun ActivityCard(
                         MaterialTheme.typography.bodySmall.copy(
                             color = Color.Gray, // Light gray color for the date
                             fontStyle = FontStyle.Italic),
-                    modifier = Modifier.weight(1f) // Takes up remaining space
+                    modifier = Modifier.weight(1f).testTag("dateText") // Takes up remaining space
                     )
 
-                if (profile != null) {
-                  IconButton(
-                      onClick = {
-                        isLiked = !isLiked
-                        if (isLiked) {
-                          profileViewModel.addLikedActivity(profile.id, activity.uid)
-                        } else {
-                          profileViewModel.removeLikedActivity(profile.id, activity.uid)
-                        }
-                      },
-                      modifier = Modifier.testTag("likeButton$isLiked"),
-                  ) {
-                    Icon(
-                        imageVector =
-                            if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = if (isLiked) "Liked" else "Not Liked",
-                        tint = if (isLiked) Color(PRIMARY_COLOR) else Color.Gray,
-                    )
-                  }
-                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp),
+                    modifier = Modifier.wrapContentWidth() // Ajuste sa largeur au contenu
+                    ) {
+                      // Prix
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        DisplayIcon(Icons.Outlined.AttachMoney, "price")
+                        Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+                        Text(
+                            text = if (activity.price == 0.0) "Free" else "${activity.price}CHF",
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    color = Color.Gray, fontStyle = FontStyle.Italic),
+                            modifier = Modifier.testTag("priceText"))
+                      }
+
+                      // Bouton "Like"
+                      if (profile != null) {
+                        IconButton(
+                            onClick = {
+                              val newLikeState = !isLiked.value
+                              isLiked.value = newLikeState
+
+                              if (newLikeState) {
+                                profileViewModel.addLikedActivity(profile.id, activity.uid)
+                              } else {
+                                profileViewModel.removeLikedActivity(profile.id, activity.uid)
+                              }
+                            },
+                            modifier = Modifier.testTag("likeButton${isLiked.value}")) {
+                              Icon(
+                                  imageVector =
+                                      if (isLiked.value) Icons.Filled.Favorite
+                                      else Icons.Outlined.FavoriteBorder,
+                                  contentDescription = if (isLiked.value) "Liked" else "Not Liked",
+                                  tint = Color(PRIMARY_COLOR))
+                            }
+                      }
+                    }
               }
 
           Row(
@@ -468,7 +488,7 @@ fun ActivityCard(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
                     modifier =
                         Modifier.weight(1f)
-                            .testTag("locationAndDistance") // Takes up remaining space
+                            .testTag("locationAndDistanceText") // Takes up remaining space
                     )
                 DisplayIcon(Icons.Filled.Groups, "participants")
 
@@ -482,7 +502,9 @@ fun ActivityCard(
                             color = Color.Gray,
                             fontSize = MEDIUM_PADDING.sp),
                     modifier =
-                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
+                        Modifier.align(Alignment.CenterVertically)
+                            .padding(end = MEDIUM_PADDING.dp)
+                            .testTag("participantsText"))
               }
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
@@ -494,7 +516,8 @@ fun ActivityCard(
                   MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
               maxLines = 3,
               overflow = TextOverflow.Ellipsis, // add "..." when description is too long
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
+              modifier =
+                  Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("descriptionText"))
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
         }
       }
@@ -504,6 +527,7 @@ fun ActivityCard(
 fun DisplayInterests(activity: Activity) {
 
   if (activity.subcategory.contains("Other") || activity.subcategory == "None") {
+    Spacer(modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
     return
   }
 
@@ -534,4 +558,17 @@ fun DisplayIcon(imageVector: ImageVector, contentDescription: String) {
       contentDescription = contentDescription,
       tint = Color(PRIMARY_COLOR),
       modifier = Modifier.testTag("icon$contentDescription"))
+}
+
+@Composable
+fun DarkGradient() {
+  Box(
+      modifier =
+          Modifier.fillMaxWidth()
+              .height(LARGE_IMAGE_SIZE.dp)
+              .background(
+                  Brush.verticalGradient(
+                      colors = listOf(Color.Transparent, Color.Black.copy(alpha = GRADIENT_MAX)),
+                      startY = START_Y,
+                      endY = END_Y)))
 }
