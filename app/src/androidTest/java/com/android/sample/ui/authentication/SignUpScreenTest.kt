@@ -11,7 +11,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.R
 import com.android.sample.model.authentication.MockSignInRepository
-import com.android.sample.R
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.MockProfilesRepository
