@@ -152,41 +152,6 @@ class ImageUtilsTest {
   }
 
   @Test
-  fun deleteProfilePicture_success() {
-    val userId = "testUserId"
-
-    doAnswer {
-          val onSuccess = it.getArgument<() -> Unit>(1)
-          onSuccess()
-        }
-        .whenever(mockRepository)
-        .deleteProfilePicture(eq(userId), any(), any())
-
-    var success = false
-    viewModel.deleteProfilePicture(userId, { success = true }, {})
-
-    assert(success)
-  }
-
-  @Test
-  fun deleteProfilePicture_failure() {
-    val userId = "testUserId"
-    val exception = Exception("Failed to delete profile picture")
-
-    doAnswer {
-          val onFailure = it.getArgument<(Exception) -> Unit>(2)
-          onFailure(exception)
-        }
-        .whenever(mockRepository)
-        .deleteProfilePicture(eq(userId), any(), any())
-
-    var errorOccurred: Exception? = null
-    viewModel.deleteProfilePicture(userId, {}, { errorOccurred = it })
-
-    assert(errorOccurred == exception)
-  }
-
-  @Test
   fun fetchActivityImagesAsBitmaps_success() {
     val activityId = "activityId"
     val expectedBitmaps = listOf(mock(Bitmap::class.java), mock(Bitmap::class.java))

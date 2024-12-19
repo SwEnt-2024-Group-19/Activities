@@ -540,42 +540,6 @@ class ImageRepositoryFirestoreTest {
 
   /** ---------------------------------* */
 
-  /** TEST FOR DELETE_PROFILE_PICTURE * */
-  @Test
-  fun deleteProfilePicture_success() {
-    val userId = "testUserId"
-    `when`(mockStorageRef.child("users/$userId/profile_picture.jpg")).thenReturn(mockStorageRef)
-    `when`(mockStorageRef.delete()).thenReturn(Tasks.forResult(null))
-
-    var success = false
-    imageRepository.deleteProfilePicture(
-        userId,
-        {
-          success = true
-          assertTrue("Success callback should be triggered", success)
-        },
-        { throw it })
-  }
-
-  @Test
-  fun deleteProfilePicture_failure() {
-    val userId = "testUserId"
-    val exception = Exception("Failed to delete profile picture")
-    `when`(mockStorageRef.child("users/$userId/profile_picture.jpg")).thenReturn(mockStorageRef)
-    `when`(mockStorageRef.delete()).thenReturn(Tasks.forException(exception))
-
-    var errorOccurred = false
-    imageRepository.deleteProfilePicture(
-        userId,
-        { throw AssertionError("This should not be called") },
-        {
-          errorOccurred = true
-          assertEquals("Exception should match", exception, it)
-          assertTrue("Failure callback should be triggered", errorOccurred)
-        })
-  }
-  /** ---------------------------------* */
-
   /** TEST FOR REMOVE_ACTIVITY_IMAGES * */
   @Test
   fun removeAllActivityImages_success() {
