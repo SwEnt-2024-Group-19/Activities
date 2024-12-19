@@ -117,47 +117,37 @@ fun MapScreen(
 
   Scaffold(
       floatingActionButton = {
-          if(networkManager.isNetworkAvailable()) {
-              Row(
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(horizontal = MEDIUM_PADDING.dp),
-                  horizontalArrangement = Arrangement.SpaceBetween
-              ) {
-                  FloatingActionButton(
-                      modifier =
-                      Modifier
-                          .padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("centerOnCurrentLocation"),
-                      onClick = {
-                          coroutineScope.launch {
-                              currentLocation?.let {
-                                  val locationLatLng = LatLng(it.latitude, it.longitude)
-                                  cameraPositionState.animate(
-                                      update = CameraUpdateFactory.newLatLngZoom(
-                                          locationLatLng,
-                                          15f
-                                      ),
-                                      durationMs = 800
-                                  )
-                              }
-                          }
-                      }) {
+        if (networkManager.isNetworkAvailable()) {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("centerOnCurrentLocation"),
+                    onClick = {
+                      coroutineScope.launch {
+                        currentLocation?.let {
+                          val locationLatLng = LatLng(it.latitude, it.longitude)
+                          cameraPositionState.animate(
+                              update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                              durationMs = 800)
+                        }
+                      }
+                    }) {
                       Icon(
                           Icons.Default.MyLocation,
-                          contentDescription = "Center on current location"
-                      )
-                  }
-                  FloatingActionButton(
-                      modifier =
-                      Modifier
-                          .padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("filterDialogButton"),
-                      onClick = { showFilterDialog = true }) {
+                          contentDescription = "Center on current location")
+                    }
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("filterDialogButton"),
+                    onClick = { showFilterDialog = true }) {
                       Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
-                  }
+                    }
               }
-          }
+        }
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
@@ -165,10 +155,7 @@ fun MapScreen(
         } else {
           Box(modifier = Modifier.fillMaxSize()) {
             GoogleMap(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .testTag("mapScreen"),
+                modifier = Modifier.fillMaxSize().padding(padding).testTag("mapScreen"),
                 cameraPositionState = cameraPositionState,
                 properties =
                     MapProperties(
@@ -203,8 +190,9 @@ fun MapScreen(
                             false
                         else if (listActivitiesViewModel.onlyPRO && it.type != ActivityType.PRO)
                             false
-                        else it.location != null) && hourDateViewModel
-                            .combineDateAndTime(it.date, it.duration) > Timestamp.now()
+                        else it.location != null) &&
+                            hourDateViewModel.combineDateAndTime(it.date, it.duration) >
+                                Timestamp.now()
                       }
                       .forEach { item ->
                         Marker(
@@ -277,13 +265,9 @@ fun MapScreen(
     ModalBottomSheet(
         onDismissRequest = { showBottomSheet = false },
     ) {
-      Column(modifier = Modifier
-          .fillMaxWidth()
-          .padding(MEDIUM_PADDING.dp)) {
+      Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(STANDARD_PADDING.dp),
+            modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
               SeeMoreDetailsButton(navigationActions)
@@ -305,10 +289,7 @@ fun MapScreen(
 
 @Composable
 fun DisplayActivity(activity: Activity) {
-  Column(modifier = Modifier
-      .fillMaxWidth()
-      .padding(MEDIUM_PADDING.dp)
-      .testTag("activityDetails")) {
+  Column(modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp).testTag("activityDetails")) {
     val vignette =
         if (activity.images.isNotEmpty()) {
           activity.images.first()
@@ -319,35 +300,28 @@ fun DisplayActivity(activity: Activity) {
         model = vignette,
         contentDescription = "Activity image",
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .height(LARGE_IMAGE_SIZE.dp)
-            .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
-            .testTag("activityImage"),
+            Modifier.fillMaxWidth()
+                .height(LARGE_IMAGE_SIZE.dp)
+                .clip(RoundedCornerShape(TEXT_FONTSIZE.dp))
+                .testTag("activityImage"),
         contentScale = ContentScale.Crop)
     Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
     Text(
         text = activity.title,
         style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier
-            .padding(bottom = STANDARD_PADDING.dp)
-            .testTag("activityTitle"),
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityTitle"),
     )
     Text(
         text = activity.description,
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier
-            .padding(bottom = STANDARD_PADDING.dp)
-            .testTag("activityDescription"),
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityDescription"),
     )
     Spacer(modifier = Modifier.height(TEXT_FONTSIZE.dp))
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(bottom = STANDARD_PADDING.dp)
-            .testTag("activityDate")) {
+        modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityDate")) {
           Icon(
               imageVector = Icons.Default.CalendarToday,
               contentDescription = "Date",
@@ -360,9 +334,7 @@ fun DisplayActivity(activity: Activity) {
     if (activity.location != null) {
       Row(
           verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier
-              .padding(bottom = STANDARD_PADDING.dp)
-              .testTag("activityLocation")) {
+          modifier = Modifier.padding(bottom = STANDARD_PADDING.dp).testTag("activityLocation")) {
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = "Location",
@@ -378,9 +350,7 @@ fun DisplayActivity(activity: Activity) {
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag("activityPrice")) {
+        modifier = Modifier.fillMaxWidth().testTag("activityPrice")) {
           Text(
               text = "Price: ${activity.price} CHF",
               style = MaterialTheme.typography.bodyMedium,
