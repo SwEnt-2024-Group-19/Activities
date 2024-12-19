@@ -395,6 +395,9 @@ fun UserProfile(
               selectedItem = Route.PROFILE)
         }
       },
+      modifier =
+          Modifier.fillMaxSize()
+              .testTag(if (uid.isEmpty()) "profileScreen" else "participantProfileScreen"),
       topBar = {
         TopAppBar(
             modifier = Modifier.testTag("profileTopBar"),
