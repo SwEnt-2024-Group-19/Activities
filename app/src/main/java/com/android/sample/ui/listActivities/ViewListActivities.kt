@@ -618,7 +618,3 @@ fun DarkGradient() {
                       startY = START_Y,
                       endY = END_Y)))
 }
-
-fun Bitmap.resizeToFixedSize(width: Int, height: Int): Bitmap {
-  return Bitmap.createScaledBitmap(this, width, height, true)
-}
