@@ -1,7 +1,6 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
@@ -209,9 +208,7 @@ fun ProfileCreationScreen(
                           imageViewModel.uploadProfilePicture(
                               uid,
                               bitmap,
-                              onSuccess = { url ->
-                                photo = url // Update photo URL in profile
-                              },
+                              onSuccess = {}, // the photo field is not used anymore
                               onFailure = { error -> errorMessage = error.message })
                         }
                         val userProfile =
@@ -227,7 +224,6 @@ fun ProfileCreationScreen(
                         viewModel.createUserProfile(
                             userProfile = userProfile,
                             onSuccess = {
-                              Log.d("ProfileCreation", "Profile created successfully")
                               viewModel.fetchUserData(uid)
                               navigationActions.navigateTo(Screen.OVERVIEW)
                             },

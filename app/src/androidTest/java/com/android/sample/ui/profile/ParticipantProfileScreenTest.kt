@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -39,6 +40,9 @@ class ParticipantProfileScreenTest {
 
   private lateinit var mockHourDateViewModel: HourDateViewModel
 
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
@@ -71,7 +75,9 @@ class ParticipantProfileScreenTest {
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PARTICIPANT_PROFILE)
 
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
     mockHourDateViewModel = mock(HourDateViewModel::class.java)
   }
 

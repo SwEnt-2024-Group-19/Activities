@@ -1,5 +1,6 @@
 package com.android.sample.ui.authentication
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -32,13 +33,18 @@ class SignUpAndProfileCreationScreenTest {
   private lateinit var mockProfilesRepository: MockProfilesRepository
   private lateinit var mockSignInRepository: MockSignInRepository
 
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
+
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
     navigationActions = mock(NavigationActions::class.java)
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences = sharedPreferences)
     mockProfilesRepository = MockProfilesRepository()
     mockSignInRepository = MockSignInRepository()
     profileViewModel = ProfileViewModel(mockProfilesRepository, mock(), mockSignInRepository)

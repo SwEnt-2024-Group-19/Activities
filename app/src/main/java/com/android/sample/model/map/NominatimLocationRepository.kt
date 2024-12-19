@@ -37,9 +37,6 @@ constructor(
           val location = locationResult.lastLocation
           if (location != null) {
             // Update the ViewModel or any listener with the new location
-            Log.d(
-                "NominatimLocationRepository",
-                "Updated location: ${location.latitude}, ${location.longitude}")
             // You could notify the ViewModel here, for example:
             onLocationUpdate?.invoke(
                 Location(location.latitude, location.longitude, "Current", "Current Location"))

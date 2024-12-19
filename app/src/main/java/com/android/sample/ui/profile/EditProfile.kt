@@ -109,7 +109,6 @@ fun EditProfileScreen(
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-  var isPictureRemoved by remember { mutableStateOf(false) }
   Scaffold(
       modifier = Modifier.testTag("editProfileScreen"),
       topBar = {
@@ -246,25 +245,11 @@ fun EditProfileScreen(
                         surnameErrorState.value =
                             if (surname.isBlank()) "Surname cannot be empty" else null
                         if (nameErrorState.value == null && surnameErrorState.value == null) {
-                          if (isPictureRemoved) {
-                            imageViewModel.deleteProfilePicture(
-                                profile.id,
-                                onSuccess = {
-                                  photo = null // Clear photo reference
-                                },
-                                onFailure = { error ->
-                                  Log.e(
-                                      "EditProfileScreen",
-                                      "Failed to remove profile picture: ${error.message}")
-                                })
-                          }
                           selectedImage?.let { bitmap ->
                             imageViewModel.uploadProfilePicture(
                                 profile.id,
                                 bitmap,
-                                onSuccess = { url ->
-                                  photo = url // Update photo URL in profile
-                                },
+                                onSuccess = {}, // the photo field is not used anymore
                                 onFailure = { error ->
                                   Log.e(
                                       "EditProfileScreen",
@@ -291,9 +276,7 @@ fun EditProfileScreen(
                                   imageViewModel.uploadProfilePicture(
                                       profile.id,
                                       bitmap,
-                                      onSuccess = { url ->
-                                        photo = url // Update photo URL in profile
-                                      },
+                                      onSuccess = {}, // the photo field is not used anymore
                                       onFailure = { error ->
                                         Log.e(
                                             "EditProfileScreen",

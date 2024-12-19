@@ -1,6 +1,5 @@
 package com.android.sample.model.profile
 
-import android.util.Log
 import com.android.sample.model.activity.categories
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -21,10 +20,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           onSuccess(null) // No document found, return null
         }
       } else {
-        task.exception?.let { e ->
-          Log.e("UserProfileRepository", "Error getting user document", e)
-          onFailure(e)
-        }
+        task.exception?.let { e -> onFailure(e) }
       }
     }
   }
@@ -54,7 +50,6 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
               (document.get("likedActivities") as? List<*>)?.filterIsInstance<String>()
                   ?: return null)
     } catch (e: Exception) {
-      Log.e("ProfilesRepositoryFirestore", "Error converting document to User", e)
       null
     }
   }
@@ -72,10 +67,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           if (task.isSuccessful) {
             onSuccess()
           } else {
-            task.exception?.let { e ->
-              Log.e("ProfilesRepository", "Error adding activity to profile", e)
-              onFailure(e)
-            }
+            task.exception?.let { e -> onFailure(e) }
           }
         }
   }
@@ -93,10 +85,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           if (task.isSuccessful) {
             onSuccess()
           } else {
-            task.exception?.let { e ->
-              Log.e("ProfilesRepository", "Error adding activity to profile", e)
-              onFailure(e)
-            }
+            task.exception?.let { e -> onFailure(e) }
           }
         }
   }
@@ -114,10 +103,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           if (task.isSuccessful) {
             onSuccess()
           } else {
-            task.exception?.let { e ->
-              Log.e("ProfilesRepository", "Error adding activity to profile", e)
-              onFailure(e)
-            }
+            task.exception?.let { e -> onFailure(e) }
           }
         }
   }
@@ -135,10 +121,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
           if (task.isSuccessful) {
             onSuccess()
           } else {
-            task.exception?.let { e ->
-              Log.e("ProfilesRepository", "Error adding activity to profile", e)
-              onFailure(e)
-            }
+            task.exception?.let { e -> onFailure(e) }
           }
         }
   }
@@ -152,10 +135,7 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
         .document(userProfile.id)
         .set(userProfile)
         .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { exception ->
-          Log.e("ProfilesRepository", "Error adding user profile")
-          onFailure(exception)
-        }
+        .addOnFailureListener { exception -> onFailure(exception) }
   }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
@@ -163,9 +143,6 @@ open class ProfilesRepositoryFirestore @Inject constructor(private val db: Fireb
         .document(user.id)
         .set(user)
         .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { exception ->
-          Log.e("ProfilesRepository", "Error updating user profile", exception)
-          onFailure(exception)
-        }
+        .addOnFailureListener { exception -> onFailure(exception) }
   }
 }

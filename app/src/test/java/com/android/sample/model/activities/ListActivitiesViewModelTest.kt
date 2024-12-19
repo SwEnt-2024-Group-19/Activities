@@ -1,9 +1,12 @@
 package com.android.sample.model.activities
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
+import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -12,14 +15,18 @@ import com.android.sample.resources.dummydata.simpleUser
 import com.android.sample.resources.dummydata.userWithActivities
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -33,6 +40,8 @@ class ListActivitiesViewModelTest {
   private lateinit var activitiesRepository: ActivitiesRepository
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var profilesRepository: ProfilesRepository
+  private val mockContext: Context = getApplicationContext()
+  private val hourDateViewModel: HourDateViewModel = mock()
 
   private val location =
       Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne")
@@ -729,5 +738,103 @@ class ListActivitiesViewModelTest {
             dueDate)
 
     assertThat(isEnabled, `is`(false))
+  }
+
+  @Test
+  fun `should fail when activityDateTime is less than one hour from now`() {
+    val result =
+        listActivitiesViewModel.validateActivityCreation(
+            context = mockContext,
+            activityDateTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(30),
+            attendees = emptyList(),
+            placesMax = "10",
+            creator = "test_creator",
+            hourDateViewModel = hourDateViewModel,
+            startTime = "10:00",
+            duration = "1:00",
+            price = "10.0",
+            selectedLocation = activity.location,
+            selectedOptionCategory = null,
+            selectedOptionInterest = null)
+    assertFalse(result)
+  }
+
+  @Test
+  fun `should fail when attendees exceed placesMax`() {
+    val attendees = List(11) { simpleUser }
+    val result =
+        listActivitiesViewModel.validateActivityCreation(
+            context = mockContext,
+            activityDateTime = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(2),
+            attendees = attendees,
+            placesMax = "5",
+            creator = "test_creator",
+            hourDateViewModel = hourDateViewModel,
+            startTime = "10:00",
+            duration = "1:00",
+            price = "10.0",
+            selectedLocation = activity.location,
+            selectedOptionCategory = null,
+            selectedOptionInterest = null)
+    assertFalse(result)
+  }
+
+  @Test
+  fun `should fail when creator is empty`() {
+    val result =
+        listActivitiesViewModel.validateActivityCreation(
+            context = mockContext,
+            activityDateTime = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(2),
+            attendees = emptyList(),
+            placesMax = "10",
+            creator = "",
+            hourDateViewModel = hourDateViewModel,
+            startTime = "10:00",
+            duration = "1:00",
+            price = "10.0",
+            selectedLocation = activity.location,
+            selectedOptionCategory = null,
+            selectedOptionInterest = null)
+    assertFalse(result)
+  }
+
+  @Test
+  fun `should fail when price format is invalid`() {
+    val result =
+        listActivitiesViewModel.validateActivityCreation(
+            context = mockContext,
+            activityDateTime = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(2),
+            attendees = emptyList(),
+            placesMax = "10",
+            creator = "test_creator",
+            hourDateViewModel = hourDateViewModel,
+            startTime = "10:00",
+            duration = "1:00",
+            price = "invalid",
+            selectedLocation = activity.location,
+            selectedOptionCategory = null,
+            selectedOptionInterest = null)
+    assertFalse(result)
+  }
+
+  @Test
+  fun `should pass when all conditions are valid`() {
+    Mockito.`when`(hourDateViewModel.isBeginGreaterThanEnd(any(), any())).thenReturn(true)
+
+    val result =
+        listActivitiesViewModel.validateActivityCreation(
+            context = mockContext,
+            activityDateTime = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(2),
+            attendees = emptyList(),
+            placesMax = "10",
+            creator = "test_creator",
+            hourDateViewModel = hourDateViewModel,
+            startTime = "10:00",
+            duration = "1:00",
+            price = "10.0",
+            selectedLocation = activity.location,
+            selectedOptionCategory = Category.SPORT,
+            selectedOptionInterest = "Football")
+    assertTrue(result)
   }
 }

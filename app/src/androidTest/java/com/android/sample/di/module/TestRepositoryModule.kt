@@ -1,5 +1,6 @@
 package com.android.sample.di.module
 
+import android.content.SharedPreferences
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.MockActivitiesRepository
 import com.android.sample.model.auth.SignInRepository
@@ -69,5 +70,11 @@ object TestRepositoryModule {
   @Singleton
   fun provideImageRepositoryFirestore(): ImageRepositoryFirestore {
     return mock(ImageRepositoryFirestore::class.java)
+  }
+
+  @Provides
+  @Singleton
+  fun provideSharedPreferences(): SharedPreferences {
+    return mock(SharedPreferences::class.java)
   }
 }

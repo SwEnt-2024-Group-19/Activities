@@ -3,16 +3,13 @@ package com.android.sample.model.profile
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.database.AppDatabase
 import com.android.sample.model.auth.SignInRepository
-import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Firebase
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -125,17 +122,6 @@ constructor(
   // Written by: @mohamedtahaguelzim
   fun loadCachedProfile(): User? {
     return runBlocking { localDatabase.userDao().getUser(Firebase.auth.currentUser?.uid ?: "") }
-  }
-  /** Check if the activity should be displayed based on the category and the user's role in the */
-  fun shouldShowActivity(activity: Activity, user: User, category: String): Boolean {
-    val hourDateViewModel = HourDateViewModel()
-    val activityTimestamp = hourDateViewModel.combineDateAndTime(activity.date, activity.startTime)
-    return when (category) {
-      "created" -> activity.creator == user.id && activityTimestamp > Timestamp.now()
-      "enrolled" -> activity.creator != user.id && activityTimestamp > Timestamp.now()
-      "past" -> activityTimestamp < Timestamp.now()
-      else -> false
-    }
   }
   /** Navigate to the appropriate screen based on the category */
   fun navigateToActivity(navigationActions: NavigationActions, context: Context) {

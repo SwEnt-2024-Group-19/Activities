@@ -1,6 +1,7 @@
 package com.android.sample.ui.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.window.DialogProperties
 import com.google.firebase.Timestamp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
@@ -27,6 +28,7 @@ fun MyTimePicker(
   MaterialDialog(
       onCloseRequest = onCloseRequest,
       dialogState = rememberMaterialDialogState(isOpen),
+      properties = DialogProperties(dismissOnClickOutside = true, dismissOnBackPress = true),
       buttons = {
         positiveButton(text = "Ok")
         negativeButton(text = "Cancel")

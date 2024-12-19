@@ -1,6 +1,7 @@
 package com.android.sample.ui.camera
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -25,13 +26,18 @@ class GalleryTest {
 
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
+
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
   private val context = ApplicationProvider.getApplicationContext<Context>()
 
   @Before
   fun setUp() {
     mockAddImage = mock()
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
   }
 
   @Test

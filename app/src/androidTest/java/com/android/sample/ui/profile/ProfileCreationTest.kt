@@ -1,5 +1,6 @@
 package com.android.sample.ui.profile
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.hasTestTag
@@ -38,6 +39,9 @@ class ProfileCreationTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
 
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var mockEditor: SharedPreferences.Editor
+
   // Mock or create a fake ProfilesRepository
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -61,7 +65,9 @@ class ProfileCreationTest {
       null
     }
     mockImageRepository = mock(ImageRepositoryFirestore::class.java)
-    mockImageViewModel = ImageViewModel(mockImageRepository)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    mockEditor = mock(SharedPreferences.Editor::class.java)
+    mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences)
     composeTestRule.setContent {
       ProfileCreationScreen(
           viewModel = profileViewModel, navigationActions = navigationActions, mockImageViewModel)
