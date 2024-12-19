@@ -436,7 +436,7 @@ fun ActivityForm(
     if (startTimeIsSet) Text("Start time: $startTime (click to change)")
     else Text("Select start time")
   }
-    // Button to display the duration time picker
+  // Button to display the duration time picker
   TextButton(
       onClick = onClickDurationTime,
       modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("inputEndTimeCreate"),
