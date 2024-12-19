@@ -224,7 +224,7 @@ constructor(private val firestore: FirebaseFirestore, private val storage: Fireb
         .addOnFailureListener { onFailure(it) }
   }
 
-  private fun sortUrlsByTimestamp(urls: List<String>): List<String> {
+  fun sortUrlsByTimestamp(urls: List<String>): List<String> {
     return urls.sortedBy { url ->
       // Extract the timestamp part from the URL
       url.substringAfterLast("image_").substringBefore('.').toLongOrNull() ?: 0L

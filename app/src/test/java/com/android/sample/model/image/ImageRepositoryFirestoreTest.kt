@@ -467,6 +467,25 @@ class ImageRepositoryFirestoreTest {
   }
 
   @Test
+  fun testSortUrlsByTimestamp() {
+    // Given: A list of URLs with embedded timestamps
+    val urls =
+        listOf(
+            "https://example.com/o/image_1734567209436.jpg?alt=media",
+            "https://example.com/o/image_1734567209401.jpg?alt=media",
+            "https://example.com/o/image_1734567209411.jpg?alt=media")
+    // When: Sorting the URLs by timestamp
+    val sortedUrls = imageRepository.sortUrlsByTimestamp(urls)
+    // Then: The URLs should be sorted by their timestamps in ascending order
+    val expected =
+        listOf(
+            "https://example.com/o/image_1734567209401.jpg?alt=media",
+            "https://example.com/o/image_1734567209411.jpg?alt=media",
+            "https://example.com/o/image_1734567209436.jpg?alt=media")
+    assertEquals(expected, sortedUrls)
+  }
+
+  @Test
   fun fetchActivityImagesAsBitmaps_success() {
     val activityId = "activityId"
     val expectedUrls = listOf("https://example.com/image1.jpg", "https://example.com/image2.jpg")
