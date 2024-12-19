@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -88,7 +89,10 @@ fun DefaultImageCarousel(
   Dialog(onDismissRequest = onDismiss) {
     Card(
         shape = RoundedCornerShape(MEDIUM_PADDING.dp),
-        modifier = Modifier.padding(MEDIUM_PADDING.dp).testTag("DefaultImageCarousel")) {
+        modifier =
+            Modifier.width((2 * CARD_IAMGES_SIZE).dp)
+                .padding(MEDIUM_PADDING.dp)
+                .testTag("DefaultImageCarousel")) {
           Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = "Select an Image",
