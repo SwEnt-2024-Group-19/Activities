@@ -1,7 +1,6 @@
 package com.android.sample.ui.profile
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.background
@@ -227,7 +226,6 @@ fun ProfileCreationScreen(
                         viewModel.createUserProfile(
                             userProfile = userProfile,
                             onSuccess = {
-                              Log.d("ProfileCreation", "Profile created successfully")
                               viewModel.fetchUserData(uid)
                               navigationActions.navigateTo(Screen.OVERVIEW)
                             },

@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -139,11 +138,7 @@ fun ProfileImage(
   // Fetch the profile image URL from Firebase Storage
   LaunchedEffect(userId) {
     imageViewModel.fetchProfileImageUrl(
-        userId = userId,
-        onSuccess = { url -> imageUrl = url },
-        onFailure = { error ->
-          Log.e("ProfileImage", "Failed to fetch image URL: ${error.message}")
-        })
+        userId = userId, onSuccess = { url -> imageUrl = url }, onFailure = { _ -> })
   }
 
   LaunchedEffect(bitmap) {
@@ -178,7 +173,7 @@ fun ProfileImage(
         }
       }
 
-  Box() {
+  Box {
     Image(
         painter = painter,
         contentDescription = "Profile Image",

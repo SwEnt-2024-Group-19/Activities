@@ -16,7 +16,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.resources.C.BOTTOM_ICON_OFFSET
@@ -106,13 +105,4 @@ fun RegularButton(tab: TopLevelDestination, isSelected: Boolean) {
                 .clip(RoundedCornerShape(90))
                 .background(Color(MAIN_COLOR_DARK)))
   }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BottomNavigationPreview() {
-  BottomNavigationMenu(
-      onTabSelect = {},
-      tabList = LIST_TOP_LEVEL_DESTINATION,
-      selectedItem = TopLevelDestinations.ADD_ACTIVITY.route)
 }
