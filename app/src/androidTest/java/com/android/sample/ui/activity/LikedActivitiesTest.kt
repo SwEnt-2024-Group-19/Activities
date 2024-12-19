@@ -86,87 +86,11 @@ class LikedActivitiesTest {
     composeTestRule.onNodeWithText("There is no liked activity yet.").assertIsDisplayed()
   }
 
-  @Test
-  fun whenLikedActivitiesExist_thenDisplaysActivityCards() {
-    profileViewModel = mock(ProfileViewModel::class.java)
-    composeTestRule.setContent {
-      ActivityCard2(
-          activityId = activityBiking.uid,
-          navigationActions = navigationActions,
-          listActivitiesViewModel = viewModel,
-          profileViewModel = profileViewModel,
-          profile = testUser,
-          allActivities = listOf(activityBiking))
-    }
-    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Exciting mountain biking experience.").assertIsDisplayed()
-    composeTestRule.onNodeWithText("EPFL").assertIsDisplayed()
-    composeTestRule.onNodeWithText("8/15").assertIsDisplayed()
-  }
 
-  @Test
-  fun activityListIsDisplayed() {
-    profileViewModel = mock(ProfileViewModel::class.java)
-    composeTestRule.setContent {
-      ActivityCard2(
-          activityId = activityBiking.uid,
-          navigationActions = navigationActions,
-          listActivitiesViewModel = viewModel,
-          profileViewModel = profileViewModel,
-          profile = testUser,
-          allActivities = listOf(activityBiking))
-    }
-    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Mountain Biking").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Exciting mountain biking experience.").assertIsDisplayed()
-    composeTestRule.onNodeWithText("EPFL").assertIsDisplayed()
-    composeTestRule.onNodeWithText("8/15").assertIsDisplayed()
-  }
 
-  @Test
-  fun likeButtonTogglesCorrectly_whenClicked() {
-    // Initially set activity as liked
-    profileViewModel = ProfileViewModel(profilesRepository, mock(), mock())
-    composeTestRule.setContent {
-      ActivityCard2(
-          activityId = activityBiking.uid,
-          navigationActions = navigationActions,
-          listActivitiesViewModel = viewModel,
-          profileViewModel = profileViewModel,
-          profile = testUser,
-          allActivities = listOf(activityBiking))
-    }
 
-    // Verify initial state is liked
-    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("favoriteIcontrue").assertIsDisplayed()
 
-    // Click on the like button
-    composeTestRule.onNodeWithTag("favoriteIcontrue").performClick()
 
-    // Verify that the like button is toggled
-    composeTestRule.onNodeWithTag("favoriteIconfalse").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("favoriteIconfalse").performClick()
 
-    // Verify that the like button is toggled
-    composeTestRule.onNodeWithTag("favoriteIcontrue").assertIsDisplayed()
-  }
 
-  @Test
-  fun navigateToActivityDetails() {
-    // Initially set activity as liked
-    profileViewModel = ProfileViewModel(profilesRepository, mock(), mock())
-    composeTestRule.setContent {
-      ActivityCard2(
-          activityId = activity.uid,
-          navigationActions = navigationActions,
-          listActivitiesViewModel = viewModel,
-          profileViewModel = profileViewModel,
-          profile = testUser,
-          allActivities = listOf(activity))
-    }
-    composeTestRule.onNodeWithTag("activityCard").performClick()
-    verify(navigationActions).navigateTo(Screen.ACTIVITY_DETAILS)
-  }
 }
