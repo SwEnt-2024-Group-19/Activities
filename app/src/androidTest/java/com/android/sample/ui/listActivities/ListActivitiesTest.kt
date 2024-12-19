@@ -405,7 +405,7 @@ class OverviewScreenTest {
           distance = 0.5503f)
     }
     composeTestRule
-        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
         .assertTextContains("550m", substring = true)
   }
 
@@ -422,7 +422,7 @@ class OverviewScreenTest {
           distance = 12.354f)
     }
     composeTestRule
-        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
         .assertTextContains("12.4km", substring = true)
   }
 
@@ -439,7 +439,7 @@ class OverviewScreenTest {
           distance = null)
     }
     composeTestRule
-        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
         .assertTextEquals("EPFL") // there is only the location, not the distance
   }
 
