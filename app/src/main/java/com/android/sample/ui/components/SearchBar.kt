@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.sharp.FilterList
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -21,7 +20,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
-import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PRIMARY_COLOR
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -32,7 +30,6 @@ import com.android.sample.resources.C.Tag.STANDARD_PADDING
  * @param onValueChange The callback to handle the value change in the search bar.
  * @param value The value of the search bar.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(onValueChange: (String) -> Unit, value: String, onClickFilter: () -> Unit) {
 
@@ -51,7 +48,7 @@ fun SearchBar(onValueChange: (String) -> Unit, value: String, onClickFilter: () 
       },
       modifier =
           Modifier.testTag("searchBar")
-              .clip(shape = RoundedCornerShape(MEDIUM_PADDING.dp))
+              .clip(shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
               .fillMaxWidth()
               .padding(STANDARD_PADDING.dp)
               .background(Color(MAIN_BACKGROUND_BUTTON)),
