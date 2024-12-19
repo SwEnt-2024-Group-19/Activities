@@ -38,4 +38,16 @@ data class MockActivitiesDatabase(private val activities: List<Activity> = e2e_A
   fun addActivity(activity: Activity) {
     activities.toMutableList().add(activity)
   }
+
+  /**
+   * Update an activity
+   *
+   * @throws IllegalArgumentException if the activity does not exist
+   */
+  fun updateActivity(activity: Activity) {
+    val index = activities.indexOfFirst { it.uid == activity.uid }
+    if (index == -1) {
+      throw IllegalArgumentException("Activity with id ${activity.uid} does not exist")
+    }
+  }
 }

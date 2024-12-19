@@ -43,17 +43,12 @@ class MockActivitiesRepository(
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    throw NotImplementedError("Not needed for mock repository")
-    /*try {
-      // Simulate updating an activity
-      if (index != -1) {
-        onSuccess()
-      } else {
-        throw Exception("Activity not found")
-      }
+    try {
+      database.updateActivity(activity)
+      onSuccess()
     } catch (e: Exception) {
       onFailure(e)
-    }*/
+    }
   }
 
   override fun deleteActivityById(
