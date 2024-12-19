@@ -122,13 +122,9 @@ fun EditActivityScreen(
   var selectedImages by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
   var items by remember { mutableStateOf(activity?.images ?: listOf()) }
   LaunchedEffect(activity!!.uid) {
-    Log.d("EditActivityScreen", "Fetching images for activity: ${activity.uid}")
     imageViewModel.fetchActivityImagesAsBitmaps(
         activity.uid,
-        { bitmaps ->
-          selectedImages = bitmaps.toMutableStateList()
-          Log.d("EditActivityScreen", "Fetched images successfully for activity: ${activity.uid}")
-        },
+        { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
         onFailure = { error ->
           Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
         })

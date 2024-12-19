@@ -201,15 +201,9 @@ fun ActivityDetailsScreen(
                     .testTag("activityDetailsScreen")) {
               // Image section
               LaunchedEffect(activity!!.uid) {
-                Log.d("ActivityDetailsScreen", "Fetching images for activity ${activity.uid}")
                 imageViewModel.fetchActivityImagesAsBitmaps(
                     activity.uid,
-                    onSuccess = { urls ->
-                      bitmaps = urls
-                      Log.d(
-                          "ActivityDetailsScreen",
-                          "Fetched images successfully for activity ${activity.uid}")
-                    },
+                    onSuccess = { urls -> bitmaps = urls },
                     onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
               }
               Box(
