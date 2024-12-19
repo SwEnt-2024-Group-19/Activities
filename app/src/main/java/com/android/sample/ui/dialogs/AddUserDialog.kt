@@ -67,7 +67,7 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
               modifier = Modifier.testTag("addUserDialogTitle"),
           )
           TextFieldWithErrorState(
-              modifier = Modifier.testTag("nameTextFieldUser").fillMaxWidth(WIDTH_FRACTION_SM),
+              modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM),
               value = name,
               onValueChange = { name = it },
               label = "Name",
@@ -78,15 +78,17 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
                   null
                 }
               },
+              testTag = "nameTextFieldUser",
               errorTestTag = "nameErrorUser")
 
           Spacer(modifier = Modifier.padding(SMALL_PADDING.dp))
           TextFieldWithErrorState(
-              modifier = Modifier.testTag("surnameTextFieldUser").fillMaxWidth(WIDTH_FRACTION_SM),
+              modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM),
               value = surname,
               onValueChange = { surname = it },
               label = "Surname",
               validation = { null },
+              testTag = "surnameTextFieldUser",
               errorTestTag = "surnameErrorUser")
           TextButton(
               modifier =
