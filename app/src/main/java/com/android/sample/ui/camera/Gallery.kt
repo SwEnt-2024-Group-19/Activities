@@ -48,20 +48,22 @@ fun GalleryScreen(isGalleryOpen: () -> Unit, addImage: (Bitmap) -> Unit, context
   val launcher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri?
         ->
-        uri?.let {
-          val bitmap = uriToBitmap(it, context)
-          bitmap?.let { bmp ->
-            addImage(bmp)
-            isGalleryOpen()
+        if (uri != null) {
+          val bitmap = uriToBitmap(uri, context)
+          if (bitmap != null) {
+            addImage(bitmap)
+            isGalleryOpen() // Close the gallery view
           }
+        } else {
+          isGalleryOpen() // Close the gallery view if no image is selected
         }
       }
 
-  LaunchedEffect(key1 = true) { launcher.launch("image/*") }
+  // Relaunch the image picker whenever GalleryScreen is recomposed
+  // which should typically be controlled by the state in the parent view
   DisposableEffect(Unit) {
-    onDispose {
-      isGalleryOpen() // Ensure the screen closes even if no image is selected
-    }
+    launcher.launch("image/*")
+    onDispose {}
   }
 }
 
