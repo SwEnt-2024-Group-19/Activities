@@ -40,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -67,7 +68,7 @@ import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
-import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
 import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
@@ -117,6 +118,11 @@ fun EditProfileScreen(
       topBar = {
         TopAppBar(
             title = { Text("Edit Profile", modifier = Modifier.testTag("editProfileTitle")) },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(MAIN_COLOR_DARK),
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White),
             navigationIcon = {
               IconButton(
                   modifier = Modifier.testTag("goBackButton"),
@@ -171,18 +177,20 @@ fun EditProfileScreen(
                   Modifier.fillMaxSize()
                       .padding(paddingValues)
                       .padding(MEDIUM_PADDING.dp)
+                      .background(Color(MAIN_BACKGROUND))
                       .testTag("editProfileContent")
                       .verticalScroll(scrollState),
               verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
               horizontalAlignment = Alignment.CenterHorizontally, // Ensures horizontal centering
           ) {
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             ProfileImage(
                 userId = profile.id,
                 modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
                 imageViewModel,
                 editing = true,
                 bitmap = selectedImage)
-            Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
+            Spacer(modifier = Modifier.padding(SMALL_PADDING.dp))
             if (isDefaultImageSelected) {
               DefaultImageCarousel(
                   onImageSelected = { bitmap ->
@@ -293,7 +301,9 @@ fun EditProfileScreen(
                           Modifier.fillMaxWidth()
                               .height(AUTH_BUTTON_HEIGHT.dp)
                               .testTag("profileSaveButton"),
-                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                      colors =
+                          ButtonDefaults.buttonColors(containerColor = Color(MAIN_COLOR_DARK))) {
                         Text("Save", fontSize = SUBTITLE_FONTSIZE.sp)
                       }
                 }
