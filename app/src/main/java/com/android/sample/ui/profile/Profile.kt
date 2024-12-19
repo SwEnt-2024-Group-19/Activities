@@ -573,18 +573,14 @@ fun DisplayActivitiesList(
       listToShow =
           userActivities.filter {
             it.creator == user.id &&
-                hourDateViewModel.combineDateAndTime(
-                    it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
-                    Timestamp.now()
+                hourDateViewModel.combineDateAndTime(it.date, it.startTime) > Timestamp.now()
           }
     }
     ENROLLED_ACTIVITIES -> {
       listToShow =
           userActivities.filter {
             (it.creator != user.id || it.participants.map { it.id }.contains(user.id)) &&
-                hourDateViewModel.combineDateAndTime(
-                    it.date, hourDateViewModel.addDurationToTime(it.startTime, it.duration)) >
-                    Timestamp.now()
+                hourDateViewModel.combineDateAndTime(it.date, it.startTime) > Timestamp.now()
           }
     }
   }
