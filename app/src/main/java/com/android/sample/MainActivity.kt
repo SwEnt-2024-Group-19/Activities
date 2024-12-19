@@ -174,6 +174,10 @@ fun NavGraph(
       composable(Screen.MAP) {
         MapScreen(navigationActions, locationViewModel, listActivitiesViewModel)
       }
+      composable(Screen.OVERVIEW) {
+        ListActivitiesScreen(
+            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+      }
     }
 
     navigation(startDestination = Screen.ADD_ACTIVITY, route = Route.ADD_ACTIVITY) {
