@@ -331,7 +331,7 @@ fun DisplayActivity(activity: Activity) {
           Icon(
               imageVector = Icons.Default.CalendarToday,
               contentDescription = "Date",
-              tint = MaterialTheme.colorScheme.primary,
+              tint = Color(MAIN_COLOR_DARK),
               modifier = Modifier.testTag("calendarIcon"))
           Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
           Text(
@@ -344,7 +344,7 @@ fun DisplayActivity(activity: Activity) {
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = "Location",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = Color(MAIN_COLOR_DARK),
                 modifier = Modifier.testTag("locationIcon"))
             Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
             Text(

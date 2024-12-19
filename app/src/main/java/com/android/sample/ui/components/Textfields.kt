@@ -82,7 +82,8 @@ fun PasswordTextField(
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             errorIndicatorColor = Color.Transparent,
-                            errorContainerColor = Color.Transparent))
+                            errorContainerColor = Color.Transparent),
+                    singleLine = true)
               }
         }
     passwordError?.let {
@@ -135,7 +136,8 @@ fun EmailTextField(
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             errorIndicatorColor = Color.Transparent,
-                            errorContainerColor = Color.Transparent))
+                            errorContainerColor = Color.Transparent),
+                    singleLine = true)
               }
         }
     emailError?.let {
