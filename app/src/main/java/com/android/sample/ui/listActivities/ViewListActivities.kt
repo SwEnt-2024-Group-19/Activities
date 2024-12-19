@@ -342,6 +342,7 @@ fun ActivityCard(
                     if (profile.activities?.contains(activity.uid) == true) {
 
                       Row(
+                          horizontalArrangement = Arrangement.End,
                           verticalAlignment = Alignment.CenterVertically,
                           modifier = Modifier.testTag("activityStatus")) {
                             if (profile.id == activity.creator) {
@@ -380,7 +381,7 @@ fun ActivityCard(
                                               Color(PRIMARY_COLOR),
                                               shape =
                                                   RoundedCornerShape(
-                                                      12.dp)) // Purple background with rounded
+                                                      TEXT_FONTSIZE.dp)) // Purple background with rounded
                                           // corners
                                           .padding(
                                               horizontal = STANDARD_PADDING.dp,
@@ -500,6 +501,7 @@ fun ActivityCard(
 fun DisplayInterests(activity: Activity) {
 
   if (activity.subcategory.contains("Other") || activity.subcategory == "None") {
+      Spacer(modifier = Modifier.padding(horizontal= MEDIUM_PADDING.dp))
     return
   }
 

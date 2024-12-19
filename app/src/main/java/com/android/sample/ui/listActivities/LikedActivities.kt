@@ -78,7 +78,8 @@ fun LikedActivitiesScreen(
     viewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+
 ) {
   val uiState by viewModel.uiState.collectAsState()
   val profile = profileViewModel.userState.collectAsState().value
@@ -94,7 +95,9 @@ fun LikedActivitiesScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.LIKED_ACTIVITIES)
       }) { paddingValues ->
-        Box(modifier = modifier.fillMaxSize().padding(paddingValues)) {
+        Box(modifier = modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
           val likedActivitiesList =
               if (networkManager.isNetworkAvailable()) {
                 profile?.likedActivities
@@ -109,20 +112,25 @@ fun LikedActivitiesScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.align(Alignment.Center).fillMaxWidth(WIDTH_FRACTION_MD)) {
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth(WIDTH_FRACTION_MD)) {
                       Text(
                           text =
                               "You are not logged in. Login or Register to see your liked activities.",
                           modifier =
-                              Modifier.padding(bottom = MEDIUM_PADDING.dp)
-                                  .testTag("notConnectedPrompt"),
+                          Modifier
+                              .padding(bottom = MEDIUM_PADDING.dp)
+                              .testTag("notConnectedPrompt"),
                           color = MaterialTheme.colorScheme.onSurface,
                           style = MaterialTheme.typography.bodyMedium,
                           textAlign = TextAlign.Center)
                       Card(
                           shape = RoundedCornerShape(MEDIUM_PADDING.dp),
                           modifier =
-                              Modifier.padding(MEDIUM_PADDING.dp).testTag("DefaultImageCarousel")) {
+                          Modifier
+                              .padding(MEDIUM_PADDING.dp)
+                              .testTag("DefaultImageCarousel")) {
                             Button(
                                 onClick = { navigationActions.navigateTo(Screen.SIGN_UP) },
                                 modifier = Modifier.testTag("signInButton"),
@@ -135,32 +143,38 @@ fun LikedActivitiesScreen(
                     }
               }
               if (likedActivitiesList != null) {
-                if (likedActivitiesList!!.isEmpty()) {
+                if (likedActivitiesList.isEmpty()) {
                   Text(
                       text = "There is no liked activity yet.",
                       modifier =
-                          Modifier.padding(STANDARD_PADDING.dp)
-                              .align(Alignment.Center)
-                              .testTag("emptyLikedActivityPrompt"),
+                      Modifier
+                          .padding(STANDARD_PADDING.dp)
+                          .align(Alignment.Center)
+                          .testTag("emptyLikedActivityPrompt"),
                       color = MaterialTheme.colorScheme.onSurface)
                 } else {
 
                   LazyColumn(
                       modifier =
-                          Modifier.padding(paddingValues)
-                              .fillMaxSize()
-                              .padding(MEDIUM_PADDING.dp)
-                              .padding(horizontal = SMALL_PADDING.dp),
+                      Modifier
+                          .padding(paddingValues)
+                          .fillMaxSize()
+                          .padding(MEDIUM_PADDING.dp)
+                          .padding(horizontal = SMALL_PADDING.dp),
                       verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
-                        items(likedActivitiesList!!) { activityId ->
-                          ActivityCard2(
-                              activityId = activityId,
+                        items(likedActivitiesList) { activityId ->
+                            val activity = allActivities.find { act -> act.uid == activityId }
+                            if (activity == null) {
+                                profileViewModel.removeLikedActivity(profile!!.id, activityId)
+                                return@items
+                            }
+                          ActivityCard(
+                              activity = activity,
                               navigationActions,
                               viewModel,
                               profileViewModel,
                               profile,
-                              allActivities)
-                        }
+                        null)}
                       }
                 }
               }
@@ -201,22 +215,27 @@ fun ActivityCard2(
 
   Card(
       modifier =
-          Modifier.fillMaxWidth()
-              .testTag("activityCard")
-              .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
-              .clickable {
-                listActivitiesViewModel.selectActivity(activity)
-                navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
-              },
+      Modifier
+          .fillMaxWidth()
+          .testTag("activityCard")
+          .clip(RoundedCornerShape(MEDIUM_PADDING.dp))
+          .clickable {
+              listActivitiesViewModel.selectActivity(activity)
+              navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
+          },
       elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)) {
         Column {
           // Box for overlaying the title on the image
-          Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
+          Box(modifier = Modifier
+              .fillMaxWidth()
+              .height(LARGE_IMAGE_SIZE.dp)) {
             // Display the activity image
             Image(
                 painter = painterResource(getImageResourceIdForCategory(activity.category)),
                 contentDescription = activity.title,
-                modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
               DarkGradient()
 
@@ -228,12 +247,16 @@ fun ActivityCard2(
                         fontWeight = FontWeight.Bold,
                         color = Color.White // Title color set to black
                         ),
-                modifier = Modifier.align(Alignment.BottomStart).padding(MEDIUM_PADDING.dp))
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(MEDIUM_PADDING.dp))
           }
 
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
           Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(horizontal = MEDIUM_PADDING.dp)
+                  .fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Display the date
@@ -272,7 +295,9 @@ fun ActivityCard2(
               }
 
           Row(
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).fillMaxWidth(),
+              modifier = Modifier
+                  .padding(horizontal = MEDIUM_PADDING.dp)
+                  .fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically) {
                 // Location on the left
@@ -301,7 +326,9 @@ fun ActivityCard2(
                             color = Color.Gray,
                             fontSize = MEDIUM_PADDING.sp),
                     modifier =
-                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
+                    Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = MEDIUM_PADDING.dp))
               }
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
