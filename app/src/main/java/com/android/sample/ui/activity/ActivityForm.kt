@@ -2,6 +2,7 @@ package com.android.sample.ui.activity
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -49,6 +50,7 @@ import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -547,7 +549,8 @@ fun MyDropDownMenu(
                   "interest" -> "interestTextField"
                   else -> ""
                 },
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            modifier =
+                Modifier.menuAnchor().fillMaxWidth().background(Color(MAIN_BACKGROUND_BUTTON)),
         )
         ExposedDropdownMenu(
             expanded = expanded,
