@@ -49,6 +49,7 @@
     <string name="max_places_exceed">The number of participants is bigger or equal to the max number of places</string>
     <string name="title_empty">Title must not be empty</string>
     <string name="title_too_long">Title exceed max size</string>
+    <string name="comment_empty">Comment must not be empty</string>
     <string name="description_empty">Description must not be empty</string>
     <string name="description_too_long">Description exceed max size</string>
     <string name="price_empty">Price must not be empty</string>

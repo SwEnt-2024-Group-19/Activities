@@ -3,9 +3,7 @@ package com.android.sample.ui.activitydetails
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,12 +30,19 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material.icons.filled.StarOutline
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.ModeComment
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,7 +51,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,11 +64,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.sample.R
@@ -76,26 +81,39 @@ import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
-import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
-import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
-import com.android.sample.resources.C.Tag.LARGE_FONTSIZE
-import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.ACTIVITY_COMMENTS
+import com.android.sample.resources.C.Tag.ACTIVITY_DETAILS
+import com.android.sample.resources.C.Tag.ATTENDANT_DETAILS
+import com.android.sample.resources.C.Tag.BUTTON_ELEVATION_DEFAULT
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_LG
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_MD
+import com.android.sample.resources.C.Tag.DARK_GRAY
+import com.android.sample.resources.C.Tag.DARK_YELLOW
+import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
+import com.android.sample.resources.C.Tag.ICON_BUTTON_SIZE
+import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
+import com.android.sample.resources.C.Tag.LIGHT_BLUE
 import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
+import com.android.sample.resources.C.Tag.MEDIUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.NORMAL_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_L
+import com.android.sample.resources.C.Tag.SMALL_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.SMALL_BUTTON_WIDTH
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
+import com.android.sample.resources.C.Tag.TEXT_WEIGHT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
 import com.android.sample.ui.camera.CarouselNoModif
 import com.android.sample.ui.camera.ProfileImage
+import com.android.sample.ui.components.TextFieldWithErrorState
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import java.util.Calendar
-import java.util.GregorianCalendar
 import java.util.UUID
 import kotlin.math.min
-import kotlin.math.round
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,6 +124,7 @@ fun ActivityDetailsScreen(
     locationViewModel: LocationViewModel,
     imageViewModel: ImageViewModel
 ) {
+  var detailsType = listActivityViewModel.selectedDetailsType.collectAsState().value
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
   // Check if the user is already enrolled in the activity
@@ -115,20 +134,7 @@ fun ActivityDetailsScreen(
   val description by remember { mutableStateOf(activity?.description) }
   val location by remember { mutableStateOf(activity?.location) }
   val price by remember { mutableStateOf(activity?.price) }
-  val dueDate by remember {
-    mutableStateOf(
-        activity?.date.let {
-          val calendar = GregorianCalendar()
-          if (activity != null) {
-            calendar.time = activity.date.toDate()
-          }
-          return@let "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${
-                    calendar.get(
-                        Calendar.YEAR
-                    )
-                }"
-        })
-  }
+  val dueDate by remember { mutableStateOf(activity?.date) }
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
   val distance = locationViewModel.getDistanceFromCurrentLocation(location)
@@ -174,7 +180,7 @@ fun ActivityDetailsScreen(
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
-            title = { Text("Activity Details", color = Color.White) },
+            title = {},
             modifier = Modifier.testTag("topAppBar"),
             navigationIcon = {
               IconButton(
@@ -184,218 +190,23 @@ fun ActivityDetailsScreen(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back")
                   }
-            },
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF6200EA), // Background color
-                    titleContentColor = Color.White // Title text color
-                    ))
-      }) { padding ->
-        Column(
+            })
+      },
+      bottomBar = {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier =
-                Modifier.fillMaxSize()
-                    .padding(padding)
-                    .padding(MEDIUM_PADDING.dp)
-                    .verticalScroll(rememberScrollState())
-                    .testTag("activityDetailsScreen")) {
-              // Image section
-              Box(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .aspectRatio(MEDIUM_PADDING / 9f)
-                          .padding(MEDIUM_PADDING.dp)
-                          .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
-                          .testTag("image")) {
-                    imageViewModel.fetchActivityImagesAsBitmaps(
-                        activity?.uid ?: "",
-                        onSuccess = { urls -> bitmaps = urls },
-                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
-                    if (activity !=
-                        null) { // to avoid setting a default category in the case where activity is
-                      // null which should never be the case
-                      CarouselNoModif(itemsList = bitmaps, category = activity.category)
-                    }
-                    LikeButton(profile, activity, profileViewModel)
-                  }
+                Modifier.wrapContentHeight()
+                    .padding(horizontal = MEDIUM_PADDING.dp)
+                    .testTag("bottomBar")) {
+              LikeButton(profile, activity, profileViewModel)
+              Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+              Icon(
+                  Icons.Default.DateRange,
+                  contentDescription = "Schedule",
+                  tint = Color(LIGHT_BLUE))
 
-              // Title
-              Box(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(vertical = STANDARD_PADDING.dp)
-                          .testTag("title"),
-                  contentAlignment = Alignment.Center) {
-                    Text(
-                        text = activityTitle ?: "title not specified",
-                        modifier = Modifier.testTag("titleText"),
-                        style = MaterialTheme.typography.headlineMedium)
-                  }
-
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-              // Description
-              Column(
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .height(150.dp)
-                          .padding(STANDARD_PADDING.dp)
-                          .border(1.dp, Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
-                          .verticalScroll(rememberScrollState())
-                          .testTag("description")) {
-                    Text(
-                        text = "Description:",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier =
-                            Modifier.padding(
-                                horizontal = STANDARD_PADDING.dp, vertical = SMALL_PADDING.dp))
-                    Text(
-                        text = description ?: "description not specified",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier =
-                            Modifier.padding(horizontal = STANDARD_PADDING.dp)
-                                .testTag("descriptionText"))
-                  }
-
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-              // price
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("price").fillMaxWidth()) {
-                    Icon(Icons.Filled.AttachMoney, contentDescription = "Price")
-                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-                    Text(
-                        text = if (price != null) "${price.toString()} CHF" else "not defined yet",
-                        modifier = Modifier.testTag("priceText"))
-                    Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
-                    PaymentInfoScreen(price ?: 0.0)
-                  }
-
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-              // location
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("location")) {
-                    Icon(Icons.Default.LocationOn, contentDescription = "Location")
-                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-                    Column {
-                      Text(
-                          text = location?.shortName ?: "No location",
-                          modifier = Modifier.testTag("locationText"))
-                      if (distance != null) {
-                        val distanceString =
-                            "Distance : " +
-                                if (distance < 1) {
-                                  "${round(distance * 1000).toInt()}m"
-                                } else {
-                                  "${round(distance * 10) / 10}km"
-                                }
-                        Text(text = distanceString, modifier = Modifier.testTag("distanceText"))
-                        Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                        // text field button to navigate to the activity's location on the map
-                        // screen
-                        Text(
-                            text = stringResource(id = R.string.button_to_map),
-                            modifier =
-                                Modifier.testTag("activityToMapText")
-                                    .clickable(
-                                        onClick = { navigationActions.navigateTo(Screen.MAP) }),
-                            style = TextStyle(textDecoration = TextDecoration.Underline))
-                      }
-                    }
-                  }
-
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
-              // schedule
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("schedule")) {
-                    Icon(Icons.Default.DateRange, contentDescription = "Schedule")
-                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-                    Text(
-                        text = if (startTime != null) "$dueDate at $startTime" else dueDate,
-                        modifier = Modifier.testTag("scheduleText"))
-                  }
-
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-              // duration
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.testTag("duration")) {
-                    Icon(Icons.Default.Timelapse, contentDescription = "duration")
-                    Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-                    Text(
-                        text = "Event length: ${duration ?: "not defined yet"}",
-                        modifier = Modifier.testTag("durationText"))
-                  }
-              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
-
-              CreatorRow(creator, nbActivitiesCreated)
-              // Participants section
-              Text(
-                  text = "Participants: (${activity?.participants?.size}/${maxPlaces ?: 0})",
-                  style = MaterialTheme.typography.bodyLarge,
-                  modifier = Modifier.padding(bottom = STANDARD_PADDING.dp))
-
-              Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
-
-              // List of participants
-              Column(modifier = Modifier.testTag("participants")) {
-                activity?.participants?.forEach { participant ->
-                  Row(
-                      verticalAlignment = Alignment.CenterVertically,
-                      modifier =
-                          Modifier.padding(vertical = SMALL_PADDING.dp)
-                              .testTag(participant.name)
-                              .clickable {
-                                if (participant.id == profile?.id) {
-                                  navigationActions.navigateTo(Screen.PROFILE)
-                                } else {
-                                  listActivityViewModel.selectUser(participant)
-                                  navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
-                                }
-                              }) {
-                        // Placeholder for participant picture
-                        if (participant.photo == null) {
-                          Box(
-                              modifier =
-                                  Modifier.size(BUTTON_HEIGHT_SM.dp)
-                                      .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                                      .padding(STANDARD_PADDING.dp)) {
-                                Image(
-                                    painter =
-                                        painterResource(id = R.drawable.default_profile_image),
-                                    contentDescription = "Participant Image",
-                                    modifier =
-                                        Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)))
-                              }
-                        } else {
-                          // Profile Picture
-                          ProfileImage(
-                              userId = participant.id,
-                              modifier = Modifier.size(BUTTON_HEIGHT_SM.dp).clip(CircleShape),
-                              imageViewModel = imageViewModel)
-                        }
-                        Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-
-                        // Participant name
-                        Text(
-                            text = participant.name, // Display the participant's name
-                            style = MaterialTheme.typography.bodyMedium)
-                        Spacer(modifier = Modifier.width(LARGE_PADDING.dp))
-                        Text(
-                            text = "Rating : ",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "Blank/10", style = MaterialTheme.typography.bodyMedium)
-                      }
-                }
-              }
-
-              Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
-
+              Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
               // Enroll button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
 
@@ -405,7 +216,7 @@ fun ActivityDetailsScreen(
                       text = stringResource(R.string.activity_past),
                       modifier = Modifier.testTag("archivedActivity"))
                 } else if (activity.creator != profile.id) {
-                  Button(
+                  ElevatedButton(
                       onClick = {
                         performOfflineAwareAction(
                             context = context,
@@ -458,26 +269,40 @@ fun ActivityDetailsScreen(
                               }
                             })
                       },
-                      modifier =
-                          Modifier.fillMaxWidth()
-                              .padding(horizontal = LARGE_PADDING.dp)
-                              .testTag("enrollButton")) {
-                        if (isUserEnrolled) Text(text = "Leave") else Text(text = "Enroll")
+                      colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
+                      elevation =
+                          ButtonDefaults.elevatedButtonElevation(
+                              defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
+                      modifier = Modifier.testTag("enrollButton")) {
+                        if (isUserEnrolled)
+                            Text(
+                                text = "Leave",
+                                color = Color.Black,
+                            )
+                        else
+                            Text(
+                                text = "Enroll",
+                                color = Color.Black,
+                            )
                       }
                 } else {
                   // Creator of the activity
-                  Button(
+                  ElevatedButton(
                       onClick = {
                         performOfflineAwareAction(
                             context = context,
                             networkManager = networkManager,
                             onPerform = { navigationActions.navigateTo(Screen.EDIT_ACTIVITY) })
                       },
-                      modifier =
-                          Modifier.fillMaxWidth()
-                              .padding(horizontal = LARGE_PADDING.dp)
-                              .testTag("editButton")) {
-                        Text(text = "Edit")
+                      colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
+                      elevation =
+                          ButtonDefaults.elevatedButtonElevation(
+                              defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
+                      modifier = Modifier.testTag("editButton")) {
+                        Text(
+                            text = "Edit",
+                            color = Color.Black,
+                        )
                       }
                 }
               } else if (activity?.status == ActivityStatus.FINISHED) {
@@ -486,46 +311,392 @@ fun ActivityDetailsScreen(
                 Text(
                     text = "You need to be logged in to enroll",
                     modifier = Modifier.testTag("notLoggedInText"))
-                Button(
+                ElevatedButton(
                     onClick = { navigationActions.navigateTo(Screen.AUTH) },
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(horizontal = LARGE_PADDING.dp)
-                            .testTag("loginButton")) {
-                      Text(text = "Login/Register")
+                    colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
+                    elevation =
+                        ButtonDefaults.elevatedButtonElevation(
+                            defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
+                    modifier = Modifier.testTag("loginButton")) {
+                      Text(
+                          text = "Login/Register",
+                          color = Color.Black,
+                      )
                     }
               }
+            }
+      }) { padding ->
+        Column(
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .testTag("activityDetailsScreen")) {
+              // Image section
+              Box(
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .aspectRatio(16f / 9f)
+                          .size(300.dp, 200.dp)
+                          .padding(vertical = 60.dp)
+                          .testTag("image")) {
+                    imageViewModel.fetchActivityImagesAsBitmaps(
+                        activity?.uid ?: "",
+                        onSuccess = { urls -> bitmaps = urls },
+                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+                    if (activity !=
+                        null) { // to avoid setting a default category in the case where activity is
+                      // null which should never be the case
+                      CarouselNoModif(itemsList = bitmaps, category = activity.category)
+                    }
+                  }
 
-              CommentSection(
-                  profileId = profile?.id ?: "anonymous",
-                  comments = comments,
-                  onAddComment = { content ->
-                    val newComment =
-                        Comment(
-                            uid = UUID.randomUUID().toString(),
-                            userId = profile?.id ?: "anonymous",
-                            userName = profile?.name ?: "anonymous",
-                            content = content,
-                            timestamp = Timestamp.now())
-                    // listActivityViewModel.addCommentToActivity(activity!!.uid, newComment)
-                    comments += newComment
-                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
-                  },
-                  onReplyComment = { replyContent, comment ->
-                    val reply =
-                        Comment(
-                            uid = UUID.randomUUID().toString(),
-                            userId = profile?.id ?: "anonymous",
-                            userName = profile?.name ?: "anonymous",
-                            content = replyContent,
-                            timestamp = Timestamp.now())
-                    // listActivityViewModel.addReplyToComment(activity!!.uid, comment.uid, reply)
-                    comment.replies += reply
-                    comments = comments.map { if (it.uid == comment.uid) comment else it }
-                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
-                  },
-                  onDeleteComment = deleteComment,
-                  creatorId = activity?.creator ?: "anonymous")
+              // Title
+              Column(
+                  modifier = Modifier.padding(horizontal = EXTRA_LARGE_PADDING.dp).testTag("title"),
+                  horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = activityTitle ?: "title not specified",
+                        modifier =
+                            Modifier.align(Alignment.CenterHorizontally).testTag("titleText"),
+                        style = MaterialTheme.typography.headlineMedium)
+                  }
+
+              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+              Row(
+                  horizontalArrangement = Arrangement.SpaceEvenly,
+                  verticalAlignment = Alignment.Top,
+                  modifier = Modifier.fillMaxWidth().testTag("")) {
+                    IconButton(
+                        onClick = { listActivityViewModel.updateDetailsType(ACTIVITY_DETAILS) },
+                        modifier =
+                            Modifier.width(ICON_BUTTON_SIZE.dp) // Increase width horizontally
+                                .let {
+                                  if (detailsType == ACTIVITY_DETAILS) {
+                                    it.background(Color.LightGray, shape = CircleShape)
+                                  } else {
+                                    it
+                                  }
+                                }
+                                .testTag("")) {
+                          Icon(Icons.Outlined.Search, contentDescription = "")
+                        }
+
+                    IconButton(
+                        onClick = { listActivityViewModel.updateDetailsType(ATTENDANT_DETAILS) },
+                        modifier =
+                            Modifier.width(ICON_BUTTON_SIZE.dp)
+                                .let {
+                                  if (detailsType == ATTENDANT_DETAILS)
+                                      it.background(Color.LightGray, shape = CircleShape)
+                                  else it
+                                }
+                                .testTag("")) {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Outlined.Groups, contentDescription = "")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "${activity?.participants?.size}/${maxPlaces ?: 0}",
+                                style = MaterialTheme.typography.bodyMedium)
+                          }
+                        }
+                    IconButton(
+                        onClick = { listActivityViewModel.updateDetailsType(ACTIVITY_COMMENTS) },
+                        modifier =
+                            Modifier.width(ICON_BUTTON_SIZE.dp)
+                                .let {
+                                  if (detailsType == ACTIVITY_COMMENTS) {
+                                    it.background(Color.LightGray, shape = CircleShape)
+                                  } else {
+                                    it
+                                  }
+                                }
+                                .testTag("")) {
+                          Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Outlined.ModeComment, contentDescription = "")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "${activity?.comments?.size ?: 0}",
+                                style = MaterialTheme.typography.bodyMedium)
+                          }
+                        }
+                  }
+              when (detailsType) {
+                ACTIVITY_DETAILS -> {
+                  // Description
+                  Column(
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .padding(STANDARD_PADDING.dp)
+                              .wrapContentHeight()
+                              .testTag("description")) {
+                        Text(
+                            text = description ?: "description not specified",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier =
+                                Modifier.padding(horizontal = STANDARD_PADDING.dp)
+                                    .testTag("descriptionText"))
+                      }
+                  // Horizontal line
+                  Divider(
+                      color = Color.LightGray, // Set divider color
+                      thickness = 3.dp, // Set thickness of the line
+                      modifier = Modifier.fillMaxWidth(0.8f).align(Alignment.CenterHorizontally))
+
+                  // price
+
+                  PaymentInfoScreen(price ?: 0.0)
+
+                  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+                  // Due Time
+                  Row(
+                      verticalAlignment = Alignment.CenterVertically,
+                      modifier =
+                          Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("schedule")) {
+                        Icon(
+                            Icons.Default.DateRange,
+                            contentDescription = "Schedule",
+                            tint = Color(LIGHT_BLUE))
+                        Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+                        Text(
+                            text =
+                                " ${
+                              dueDate?.toDate().toString().take(11)
+                          }th" +
+                                    "${(dueDate?.toDate()?.year)?.plus(1900)}, " +
+                                    "$startTime to ${
+                                      hourDateViewModel.addDurationToTime(
+                                          startTime.toString(),
+                                          duration.toString()
+                                      )
+                                  }",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.testTag("scheduleText"))
+                      }
+
+                  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+                  // location
+                  Row(
+                      verticalAlignment = Alignment.CenterVertically,
+                      modifier =
+                          Modifier.wrapContentHeight()
+                              .padding(horizontal = MEDIUM_PADDING.dp)
+                              .testTag("location")) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = "Location",
+                            tint = Color(LIGHT_BLUE))
+                        Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+                        Text(
+                            text = location?.name ?: "No location",
+                            modifier =
+                                Modifier.weight(
+                                        TEXT_WEIGHT) // Dynamically takes remaining space while
+                                                     // respecting constraints
+                                    .padding(
+                                        end =
+                                            SMALL_PADDING
+                                                .dp) // Add space between the text and button
+                                    .testTag("locationText"))
+                        Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
+                        // Info Icon with Click
+                        ElevatedButton(
+                            modifier = Modifier.testTag("activityToMapText"),
+                            onClick = { navigationActions.navigateTo(Screen.MAP) },
+                            colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
+                            elevation =
+                                ButtonDefaults.elevatedButtonElevation(
+                                    defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
+                            content = {
+                              Text(
+                                  text = "See on map",
+                                  style = MaterialTheme.typography.bodyMedium,
+                                  color = Color.Black,
+                                  modifier = Modifier.padding(end = SMALL_PADDING.dp))
+                            })
+                      }
+
+                  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+
+                  Divider(
+                      color = Color.LightGray, // Set divider color
+                      thickness = 3.dp, // Set thickness of the line
+                      modifier = Modifier.fillMaxWidth(0.8f).align(Alignment.CenterHorizontally))
+
+                  CreatorRow(creator, nbActivitiesCreated, imageViewModel, navigationActions)
+                }
+                ATTENDANT_DETAILS -> {
+                  // Participants section
+                  Text(
+                      text = "Participants",
+                      style =
+                          TextStyle(
+                              fontSize = SUBTITLE_FONTSIZE.sp,
+                              fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                              color = Color(DARK_GRAY),
+                              textAlign = TextAlign.Center,
+                          ),
+                      modifier =
+                          Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("participantsTitle"))
+
+                  // List of participants
+                  Column(modifier = Modifier.testTag("participants")) {
+                    activity?.participants?.forEach { participant ->
+                      Row(
+                          verticalAlignment = Alignment.CenterVertically,
+                          modifier = Modifier.padding(vertical = SMALL_PADDING.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier =
+                                    Modifier.padding(vertical = SMALL_PADDING.dp)
+                                        .testTag("${participant.name} ${participant.surname} row")
+                                        .clickable {
+                                          if (participant.id == "") {
+                                            Toast.makeText(
+                                                    context,
+                                                    "This user is not registered",
+                                                    Toast.LENGTH_SHORT)
+                                                .show()
+                                          } else {
+                                            if (participant.id == profile?.id) {
+                                              navigationActions.navigateTo(Screen.PROFILE)
+                                            } else {
+                                              listActivityViewModel.selectUser(participant)
+                                              navigationActions.navigateTo(
+                                                  Screen.PARTICIPANT_PROFILE)
+                                            }
+                                          }
+                                        }) {
+
+                                  // Profile Picture
+                                  ProfileImage(
+                                      userId = participant.id,
+                                      modifier =
+                                          Modifier.size(BUTTON_HEIGHT_MD.dp).clip(CircleShape),
+                                      imageViewModel = imageViewModel)
+
+                                  Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
+
+                                  // Participant name
+                                  Column(
+                                      modifier = Modifier.testTag("participantColumn"),
+                                      verticalArrangement = Arrangement.Center) {
+                                        Text(
+                                            text =
+                                                "${participant.name} ${participant.surname}", // Display the participant's name
+                                            style = MaterialTheme.typography.bodyMedium)
+                                        Text(
+                                            text =
+                                                participant.activities?.let { activities ->
+                                                  "joined ${activities.size} Activities"
+                                                } ?: "joined 0 Activities",
+                                            style =
+                                                TextStyle(
+                                                    fontSize = MEDIUM_PADDING.sp,
+                                                    fontWeight = FontWeight(MEDIUM_FONT_WEIGHT),
+                                                    color = Color(DARK_GRAY),
+                                                    textAlign = TextAlign.Center,
+                                                ),
+                                            modifier = Modifier.testTag("activityCount"))
+                                      }
+                                }
+                            Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier =
+                                    Modifier.fillMaxWidth()
+                                        .padding(
+                                            vertical = SMALL_PADDING.dp,
+                                            horizontal = MEDIUM_PADDING.dp)
+                                        .testTag("participantsRating")) {
+                                  Icon(
+                                      imageVector = Icons.Filled.Star,
+                                      contentDescription = "Star1",
+                                      tint = Color(LIGHT_BLUE),
+                                      modifier =
+                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar1"))
+                                  Icon(
+                                      imageVector = Icons.Filled.Star,
+                                      contentDescription = "Star2",
+                                      tint = Color(LIGHT_BLUE),
+                                      modifier =
+                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar2"))
+                                  Icon(
+                                      imageVector = Icons.Filled.Star,
+                                      contentDescription = "Star3",
+                                      tint = Color(LIGHT_BLUE),
+                                      modifier =
+                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar3"))
+                                  Icon(
+                                      imageVector = Icons.Filled.Star,
+                                      contentDescription = "Star4",
+                                      tint = Color(LIGHT_BLUE),
+                                      modifier =
+                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar4"))
+                                  Icon(
+                                      imageVector = Icons.Filled.StarOutline,
+                                      contentDescription = "Star5",
+                                      tint = Color.Black,
+                                      modifier =
+                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar5"))
+                                }
+                          }
+                    }
+                    if ((activity?.participants?.size ?: 0) < maxPlaces!!) {
+                      Text(
+                          text = "${maxPlaces!! - (activity?.participants?.size ?: 0)} places left",
+                          style =
+                              TextStyle(
+                                  fontSize = MEDIUM_PADDING.sp,
+                                  fontWeight = FontWeight(MEDIUM_FONT_WEIGHT),
+                                  color = Color(DARK_GRAY),
+                                  textAlign = TextAlign.Center,
+                              ),
+                          modifier =
+                              Modifier.align(Alignment.CenterHorizontally).testTag("placesLeft"))
+                    }
+                  }
+                }
+                ACTIVITY_COMMENTS -> {
+
+                  // Comment section
+                  CommentSection(
+                      profileId = profile?.id ?: "anonymous",
+                      comments = comments,
+                      onAddComment = { content ->
+                        val newComment =
+                            Comment(
+                                uid = UUID.randomUUID().toString(),
+                                userId = profile?.id ?: "anonymous",
+                                userName = profile?.name ?: "anonymous",
+                                content = content,
+                                timestamp = Timestamp.now())
+                        // listActivityViewModel.addCommentToActivity(activity!!.uid, newComment)
+                        comments += newComment
+                        listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                      },
+                      onReplyComment = { replyContent, comment ->
+                        val reply =
+                            Comment(
+                                uid = UUID.randomUUID().toString(),
+                                userId = profile?.id ?: "anonymous",
+                                userName = profile?.name ?: "anonymous",
+                                content = replyContent,
+                                timestamp = Timestamp.now())
+                        // listActivityViewModel.addReplyToComment(activity!!.uid, comment.uid,
+                        // reply)
+                        comment.replies += reply
+                        comments = comments.map { if (it.uid == comment.uid) comment else it }
+                        listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                      },
+                      onDeleteComment = deleteComment,
+                      creatorId = activity?.creator ?: "anonymous",
+                      imageViewModel = imageViewModel)
+                }
+              }
             }
       }
 }
@@ -537,7 +708,8 @@ fun CommentSection(
     onAddComment: (String) -> Unit,
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
-    creatorId: String
+    creatorId: String,
+    imageViewModel: ImageViewModel
 ) {
   val newCommentText = remember { mutableStateOf("") }
   val context = LocalContext.current
@@ -553,7 +725,7 @@ fun CommentSection(
           onReplyComment,
           onDeleteComment,
           allowReplies = true,
-      ) // Set allowReplies to true for top-level comments
+          imageViewModel) // Set allowReplies to true for top-level comments
     }
 
     Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
@@ -565,13 +737,22 @@ fun CommentSection(
           modifier = Modifier.padding(SMALL_PADDING.dp).testTag("notLoggedInMessage"))
     } else {
       // Input field for new comments if the user is logged in
-      OutlinedTextField(
-          value = newCommentText.value,
-          onValueChange = { newCommentText.value = it },
-          label = { Text("Add a comment") },
-          modifier = Modifier.fillMaxWidth().testTag("CommentInputField"))
+        TextFieldWithErrorState(
+            value = newCommentText.value,
+            onValueChange = { newCommentText.value = it },
+            label = "Add Comment",
+            modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
+            validation = { comment ->
+                when {
+                    comment.isEmpty() -> context.getString(R.string.comment_empty)
+                    else -> null
+                }
+            },
+            testTag = "inputComment",
+            errorTestTag = "commentErrorText")
 
-      Button(
+
+      ElevatedButton(
           onClick = {
             performOfflineAwareAction(
                 context = context,
@@ -581,8 +762,12 @@ fun CommentSection(
                   newCommentText.value = ""
                 })
           },
+          colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
+          elevation =
+              ButtonDefaults.elevatedButtonElevation(
+                  defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
           modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("PostCommentButton")) {
-            Text("Post Comment")
+            Text("Post Comment", color = Color.Black)
           }
     }
   }
@@ -595,7 +780,8 @@ fun CommentItem(
     creatorId: String, // Pass the creator ID as a parameter
     onReplyComment: (String, Comment) -> Unit,
     onDeleteComment: (Comment) -> Unit,
-    allowReplies: Boolean = true
+    allowReplies: Boolean = true,
+    imageViewModel: ImageViewModel
 ) {
   var showReplyField by remember { mutableStateOf(false) }
   var replyText by remember { mutableStateOf("") }
@@ -606,42 +792,68 @@ fun CommentItem(
     Row(
         verticalAlignment = Alignment.CenterVertically, // Align items vertically
         modifier = Modifier.padding(bottom = SMALL_PADDING.dp)) {
-          // If the user is the creator, display a badge
-          if (comment.userId == creatorId) {
+        // Profile Picture
+        ProfileImage(
+            userId = profileId,
+            modifier = Modifier.size(BUTTON_HEIGHT_MD.dp).clip(CircleShape),
+            imageViewModel = imageViewModel
+        )
+        // If the user is the creator, display a badge
+        if (comment.userId == creatorId) {
             Box(
                 modifier =
-                    Modifier.padding(end = SMALL_PADDING.dp)
-                        .background(color = Color.Gray, shape = RoundedCornerShape(4.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)) {
-                  Text(
-                      text = "Creator",
-                      style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
-                      modifier = Modifier.testTag("creatorBadge_${comment.uid}"))
-                }
-          }
-          // Display the user's name
-          Text(
-              text = "${comment.userName}:",
-              style = MaterialTheme.typography.bodyMedium,
-              modifier = Modifier.testTag("commentUserName_${comment.uid}"))
+                Modifier.padding(end = SMALL_PADDING.dp)
+                    .background(color = Color.Gray, shape = RoundedCornerShape(4.dp))
+                    .padding(horizontal = STANDARD_PADDING.dp, vertical = SMALL_PADDING.dp)
+            ) {
+                Text(
+                    text = "Creator",
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
+                    modifier = Modifier.testTag("creatorBadge_${comment.uid}")
+                )
+            }
         }
+        Column(modifier= Modifier.padding(SMALL_PADDING.dp)) {
+            // Display the user's name
+            Text(
+                text = "${comment.userName}",
+                style =
+                    TextStyle(
+                        fontSize = SUBTITLE_FONTSIZE.sp,
+                        fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                        color = Color(DARK_GRAY),
+                        textAlign = TextAlign.Center,
+                    ),
+                modifier = Modifier.testTag("commentUserName_${comment.uid}")
+            )
 
-    // Display the comment content
-    Text(
-        text = comment.content,
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.testTag("commentContent_${comment.uid}"))
 
-    // Display the timestamp
-    Text(
-        text = comment.timestamp.toDate().toString(),
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
+            // Display the comment content
+            Text(
+                text = comment.content,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.testTag("commentContent_${comment.uid}")
+            )
+
+            // Display the timestamp
+            Text(
+                text = comment.timestamp.toDate().toString(),
+                style =
+                TextStyle(
+                    fontSize = NORMAL_PADDING.sp,
+                    fontWeight = FontWeight(MEDIUM_FONT_WEIGHT),
+                    color = Color(DARK_GRAY),
+
+                ),
+                modifier = Modifier.testTag("commentTimestamp_${comment.uid}")
+            )
+        }
+    }
 
     if (profileId != "anonymous") {
       Column {
         if (comment.userId == profileId) {
-          Button(
+          TextButton(
               onClick = {
                 performOfflineAwareAction(
                     context = context,
@@ -651,19 +863,19 @@ fun CommentItem(
               modifier =
                   Modifier.padding(top = SMALL_PADDING.dp, end = STANDARD_PADDING.dp)
                       .testTag("DeleteButton_${comment.uid}")) {
-                Text("Delete")
+                Text("Delete", color= Color(DARK_GRAY))
               }
         }
 
         if (allowReplies) {
           // Toggle button to show/hide the reply input field
-          Button(
+          TextButton(
               onClick = { showReplyField = !showReplyField },
               modifier =
                   Modifier.padding(top = SMALL_PADDING.dp)
                       .testTag(
                           "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
-                Text(if (showReplyField) "Cancel" else "Reply")
+                Text(if (showReplyField) "Cancel" else "Reply", color= Color(DARK_GRAY))
               }
         }
 
@@ -699,7 +911,13 @@ fun CommentItem(
         Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
           // Pass `allowReplies = false` for replies to prevent nesting
           CommentItem(
-              profileId, reply, creatorId, onReplyComment, onDeleteComment, allowReplies = false)
+              profileId,
+              reply,
+              creatorId,
+              onReplyComment,
+              onDeleteComment,
+              allowReplies = false,
+              imageViewModel)
         }
       }
     }
@@ -714,50 +932,63 @@ fun PaymentInfoScreen(price: Double) {
   Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start,
-      modifier = Modifier.testTag("paymentSection")) {
+      modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("PriceAndInfo")) {
         // Payment Text
-        Text(
-            text = "Payment info",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo"))
 
+        Icon(Icons.Filled.AttachMoney, contentDescription = "Price", tint = Color(LIGHT_BLUE))
+        Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+        Text(
+            text = if (price != null) "${price.toString()} CHF" else "not defined yet",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.testTag("priceText"))
+
+        Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
         // Info Icon with Click
-        IconButton(modifier = Modifier.testTag("infoIconButton"), onClick = { showDialog = true }) {
-          Icon(
-              painter = painterResource(id = android.R.drawable.ic_dialog_info),
-              contentDescription = "Info",
-              tint = Color.Gray)
+        ElevatedButton(
+            modifier = Modifier.testTag("PaymentInfoButton"),
+            onClick = { showDialog = true },
+            colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
+            elevation =
+                ButtonDefaults.elevatedButtonElevation(
+                    defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
+            content = {
+              Text(
+                  text = "Payment info",
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = Color.Black,
+                  modifier = Modifier.padding(end = SMALL_PADDING.dp).testTag("paymentInfo"))
+            })
+
+        // Info Dialog
+        if (showDialog) {
+          AlertDialog(
+              modifier = Modifier.testTag("paymentInfoDialog"),
+              onDismissRequest = { showDialog = false },
+              confirmButton = {
+                TextButton(
+                    modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
+                      Text(text = stringResource(id = R.string.ok))
+                    }
+              },
+              title = {
+                Text(
+                    modifier = Modifier.testTag("paymentInfoTitle"),
+                    text = stringResource(id = R.string.payment_info))
+              },
+              text = {
+                if (price != 0.0) {
+                  Text(
+                      modifier = Modifier.testTag("paymentInfoText"),
+                      text = stringResource(id = R.string.payment_explanation))
+                } else {
+                  Text(
+                      modifier = Modifier.testTag("freeInfoText"),
+                      text = stringResource(id = R.string.free_activity))
+                }
+              },
+          )
         }
       }
-
-  // Info Dialog
-  if (showDialog) {
-    AlertDialog(
-        modifier = Modifier.testTag("paymentInfoDialog"),
-        onDismissRequest = { showDialog = false },
-        confirmButton = {
-          TextButton(modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
-            Text(text = stringResource(id = R.string.ok))
-          }
-        },
-        title = {
-          Text(
-              modifier = Modifier.testTag("paymentInfoTitle"),
-              text = stringResource(id = R.string.payment_info))
-        },
-        text = {
-          if (price != 0.0) {
-            Text(
-                modifier = Modifier.testTag("paymentInfoText"),
-                text = stringResource(id = R.string.payment_explanation))
-          } else {
-            Text(
-                modifier = Modifier.testTag("freeInfoText"),
-                text = stringResource(id = R.string.free_activity))
-          }
-        },
-    )
-  }
 }
 
 @Composable
@@ -792,52 +1023,82 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
       Icon(
           imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
           contentDescription = if (isLiked) "Liked" else "Not Liked",
-          tint = if (isLiked) Color.Black else Color.LightGray)
+          tint = if (isLiked) Color(LIGHT_BLUE) else Color(LIGHT_BLUE))
     }
   }
 }
 
 @Composable
-fun CreatorRow(creator: User, nbActivitiesCreated: Int) {
-  Card(
-      modifier =
-          Modifier.fillMaxWidth()
-              .padding(horizontal = LARGE_PADDING.dp, vertical = MEDIUM_PADDING.dp)
-              .testTag("creatorRow"),
-      elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
-      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)) {
+fun CreatorRow(
+    creator: User,
+    nbActivitiesCreated: Int,
+    imageViewModel: ImageViewModel,
+    navigationActions: NavigationActions
+) {
+
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.padding(SMALL_PADDING.dp).testTag("creatorRow")) {
+        ProfileImage(
+            userId = creator.id,
+            modifier = Modifier.size(BUTTON_HEIGHT_LG.dp).clip(CircleShape),
+            imageViewModel = imageViewModel)
+
         Column(
-            modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.testTag("creatorColumn"),
             verticalArrangement = Arrangement.Center) {
+              ElevatedButton(
+                  modifier = Modifier.height(SMALL_BUTTON_HEIGHT.dp).width(SMALL_BUTTON_WIDTH.dp),
+                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
+                  colors = buttonColors(containerColor = Color(DARK_YELLOW)),
+                  elevation =
+                      ButtonDefaults.elevatedButtonElevation(
+                          defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
+                  content = {
+                    Text(
+                        text = "Creator",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Black,
+                        modifier = Modifier.padding(end = SMALL_PADDING.dp))
+                  })
               Text(
                   text = "${creator.name} ${creator.surname}",
-                  style = MaterialTheme.typography.titleLarge,
+                  style =
+                      TextStyle(
+                          fontSize = SUBTITLE_FONTSIZE.sp,
+                          fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                          color = Color(DARK_GRAY),
+                          textAlign = TextAlign.Center,
+                      ),
                   color = MaterialTheme.colorScheme.onSurface,
-                  fontSize = LARGE_FONTSIZE.sp,
                   modifier = Modifier.testTag("creatorName"))
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
-                  modifier = Modifier.padding(all = SMALL_PADDING.dp)) {
-                    Text(
-                        text = "Blank",
-                        modifier =
-                            Modifier.align(Alignment.CenterVertically).testTag("creatorRating"),
-                        color = Color.Black,
-                        fontSize = MEDIUM_FONTSIZE.sp)
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = "Full Star",
-                        tint = Color.Black,
-                        modifier = Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar"))
-                    Spacer(modifier = Modifier.padding(STANDARD_PADDING.dp))
-                    Text(
-                        text = "$nbActivitiesCreated Activities Created",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontSize = MEDIUM_FONTSIZE.sp,
-                        modifier = Modifier.testTag("activityCount"))
-                  }
+              Text(
+                  text = "Created $nbActivitiesCreated Activities",
+                  style =
+                      TextStyle(
+                          fontSize = MEDIUM_PADDING.sp,
+                          fontWeight = FontWeight(MEDIUM_FONT_WEIGHT),
+                          color = Color(DARK_GRAY),
+                          textAlign = TextAlign.Center,
+                      ),
+                  modifier = Modifier.testTag("activityCount"))
             }
+        Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
+        Row(
+            horizontalArrangement =
+                Arrangement.spacedBy(SMALL_PADDING.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+              modifier = Modifier.testTag("ratingText"),
+              text = "4.7",
+              style =
+                  TextStyle(
+                      fontSize = MEDIUM_PADDING.sp,
+                      fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                      color = Color(DARK_GRAY),
+                      textAlign = TextAlign.Center,
+                  ))
+        }
       }
 }
