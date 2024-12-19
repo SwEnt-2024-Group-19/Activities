@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.sample.R
+import com.android.sample.model.authentication.MockSignInRepository
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.MockProfilesRepository
@@ -30,6 +31,7 @@ class SignUpAndProfileCreationScreenTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var mockProfilesRepository: MockProfilesRepository
+  private lateinit var mockSignInRepository: MockSignInRepository
 
   private lateinit var sharedPreferences: SharedPreferences
   private lateinit var mockEditor: SharedPreferences.Editor
@@ -44,7 +46,8 @@ class SignUpAndProfileCreationScreenTest {
     mockEditor = mock(SharedPreferences.Editor::class.java)
     mockImageViewModel = ImageViewModel(mockImageRepository, sharedPreferences = sharedPreferences)
     mockProfilesRepository = MockProfilesRepository()
-    profileViewModel = ProfileViewModel(mockProfilesRepository, mock())
+    mockSignInRepository = MockSignInRepository()
+    profileViewModel = ProfileViewModel(mockProfilesRepository, mock(), mockSignInRepository)
 
     composeTestRule.setContent {
       SignUpScreen(
