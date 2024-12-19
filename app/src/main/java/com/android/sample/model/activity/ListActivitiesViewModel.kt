@@ -370,15 +370,13 @@ constructor(
     val participationScore = calculateParticipationScore(user.activities, activity.creator)
     val completionScore = calculateCompletionScore(activity.participants.size, activity.maxPlaces)
     val priceScore = calculatePriceScore(activity.price)
-
     val score =
-        (distanceScore * weights["distance"]!! +
-            dateScore * weights["date"]!! +
-            interestScore * weights["interest"]!! +
-            participationScore * weights["participation"]!! +
-            completionScore * weights["completion"]!! +
-            priceScore * weights["price"]!!) / totalWeights
-
+        (distanceScore * (weights["distance"] ?: 0.2) +
+            dateScore * (weights["date"] ?: 0.15) +
+            interestScore * (weights["interest"] ?: 0.25) +
+            participationScore * (weights["participation"] ?: 0.15) +
+            completionScore * (weights["completion"] ?: 0.1) +
+            priceScore * (weights["price"] ?: 0.15)) / totalWeights
     cachedScores_[activity.uid] = score
     return score
   }
