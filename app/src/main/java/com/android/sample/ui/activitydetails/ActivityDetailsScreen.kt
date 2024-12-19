@@ -1,5 +1,6 @@
 package com.android.sample.ui.activitydetails
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.Toast
@@ -90,6 +91,7 @@ import com.android.sample.ui.camera.ProfileImage
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.utils.ReviewActivityButtons
 import com.google.firebase.Timestamp
 import java.util.Calendar
 import java.util.GregorianCalendar
@@ -97,6 +99,7 @@ import java.util.UUID
 import kotlin.math.min
 import kotlin.math.round
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(
@@ -385,11 +388,28 @@ fun ActivityDetailsScreen(
                             text = participant.name, // Display the participant's name
                             style = MaterialTheme.typography.bodyMedium)
                         Spacer(modifier = Modifier.width(LARGE_PADDING.dp))
-                        Text(
-                            text = "Rating : ",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodyMedium)
-                        Text(text = "Blank/10", style = MaterialTheme.typography.bodyMedium)
+                        val isPassed =
+                            hourDateViewModel.combineDateAndTime(
+                                activity.date, activity.startTime) <= Timestamp.now()
+                        val isCreator = profile?.id == activity.creator
+                        if (isPassed && isCreator && participant.id != activity.creator) {
+                          ReviewActivityButtons(currentReview = participant.likes[activity.uid]) {
+                            profileViewModel.addReview(participant.id, activity.uid, it)
+                          }
+                        } else {
+
+                          if (participant.getUserRatingAsAParticipant() >= 0) {
+                            Text(
+                                text = "Rating : ",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                text =
+                                    String.format(
+                                        "%.1f", participant.getUserRatingAsAParticipant() * 5),
+                                style = MaterialTheme.typography.bodyMedium)
+                          }
+                        }
                       }
                 }
               }
