@@ -15,6 +15,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 
 /**
  * Helper class to interact with the UI.
@@ -91,9 +92,19 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
     node.assertIsNotDisplayed()
   }
 
-  /** Writes text in a node with the given tag. */
-  fun write(tag: String, input: String) {
-    composeTestRule.onNodeWithTag(tag).performTextInput(input)
+  /**
+   * Writes text to a node with the given tag.
+   *
+   * @param tag The tag of the node to write to.
+   * @param input The text to write.
+   * @param replace Whether to replace the text in the node. default is false.
+   */
+  fun write(tag: String, input: String, replace: Boolean = false) {
+    when(replace){
+      true -> composeTestRule.onNodeWithTag(tag).performTextReplacement(input)
+      false -> composeTestRule.onNodeWithTag(tag).performTextInput(input)
+    }
     composeTestRule.waitForIdle()
   }
+
 }
