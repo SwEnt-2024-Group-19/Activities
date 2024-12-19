@@ -1,6 +1,7 @@
 package com.android.sample.ui.listActivities
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -71,8 +72,13 @@ import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
 import com.android.sample.resources.C.Tag.END_Y
 import com.android.sample.resources.C.Tag.GRADIENT_MAX
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
+import com.android.sample.resources.C.Tag.MAIN_COLOR_LIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PRIMARY_COLOR
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.SMALL_TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
@@ -123,158 +129,182 @@ fun ListActivitiesScreen(
             selectedItem = Route.OVERVIEW)
       },
   ) { paddingValues ->
-    Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-      if (showFilterDialog) {
-        FilterDialog(
-            onDismiss = { showFilterDialog = false },
-            onFilter = {
-                price,
-                placesAvailable,
-                minDateTimestamp,
-                maxDateTimestamp,
-                startTime,
-                endTime,
-                distance,
-                seeOnlyPRO ->
-              viewModel.updateFilterState(
-                  price,
-                  placesAvailable,
-                  minDateTimestamp,
-                  maxDateTimestamp,
-                  startTime,
-                  endTime,
-                  distance,
-                  seeOnlyPRO)
-            })
-      }
-      Box(
-          modifier =
-              Modifier.height(BUTTON_HEIGHT_SM.dp)
-                  .testTag("segmentedButtonRow")
-                  .fillMaxWidth()
-                  .padding(horizontal = STANDARD_PADDING.dp)) {
-            MultiChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-              options.forEachIndexed { index, label ->
-                SegmentedButton(
-                    modifier =
-                        Modifier.testTag("segmentedButton$label")
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = Color(PRIMARY_COLOR),
-                                shape =
-                                    SegmentedButtonDefaults.itemShape(
-                                        index = index, count = options.size)),
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                    onCheckedChange = {
-                      if (index in checkedList) {
-                        checkedList.remove(index)
-                      } else {
-                        checkedList.add(index)
+    Column(
+        modifier =
+            Modifier.fillMaxSize().padding(paddingValues).background(Color(MAIN_BACKGROUND))) {
+          if (showFilterDialog) {
+            FilterDialog(
+                onDismiss = { showFilterDialog = false },
+                onFilter = {
+                    price,
+                    placesAvailable,
+                    minDateTimestamp,
+                    maxDateTimestamp,
+                    startTime,
+                    endTime,
+                    distance,
+                    seeOnlyPRO ->
+                  viewModel.updateFilterState(
+                      price,
+                      placesAvailable,
+                      minDateTimestamp,
+                      maxDateTimestamp,
+                      startTime,
+                      endTime,
+                      distance,
+                      seeOnlyPRO)
+                })
+          }
+          Box(
+              modifier =
+                  Modifier.height(BUTTON_HEIGHT_SM.dp)
+                      .testTag("segmentedButtonRow")
+                      .fillMaxWidth()
+                      .padding(horizontal = STANDARD_PADDING.dp)
+                      .background(Color.Transparent)) {
+                MultiChoiceSegmentedButtonRow(
+                    modifier = Modifier.fillMaxWidth().background(Color.Transparent)) {
+                      options.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            modifier =
+                                Modifier.testTag("segmentedButton$label")
+                                    .fillMaxWidth()
+                                    .padding(horizontal = (SMALL_PADDING / 2).dp)
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.Transparent,
+                                        shape =
+                                            SegmentedButtonDefaults.itemShape(
+                                                index = index, count = options.size)),
+                            colors =
+                                SegmentedButtonDefaults.colors(
+                                    activeContentColor = Color(MAIN_COLOR_DARK),
+                                    activeBorderColor = Color(MAIN_COLOR_DARK),
+                                    inactiveBorderColor = Color(MAIN_COLOR_DARK),
+                                    inactiveContainerColor = Color(MAIN_BACKGROUND_BUTTON),
+                                    activeContainerColor = Color(MAIN_COLOR_LIGHT)),
+                            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                            onCheckedChange = {
+                              if (index in checkedList) {
+                                checkedList.remove(index)
+                              } else {
+                                checkedList.add(index)
+                              }
+                            },
+                            checked = index in checkedList) {
+                              Text(
+                                  label,
+                                  fontSize = SMALL_TEXT_FONTSIZE.sp,
+                                  color = Color(PRIMARY_COLOR))
+                            }
                       }
-                    },
-                    checked = index in checkedList) {
-                      Text(label, fontSize = SMALL_TEXT_FONTSIZE.sp, color = Color(PRIMARY_COLOR))
                     }
               }
-            }
-          }
-      Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-      Box(modifier = modifier.fillMaxWidth()) {
-        when (uiState) {
-          is ListActivitiesViewModel.ActivitiesUiState.Success -> {
-            var activitiesList =
-                (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
-            if (checkedList.isNotEmpty()) {
-              activitiesList =
-                  activitiesList.filter { checkedList.contains(categories.indexOf(it.category)) }
-            }
-            activitiesList =
-                activitiesList.filter {
-                  val activityTimestamp =
-                      hourDateViewModel.combineDateAndTime(
-                          it.date, it.startTime) // Combine date and startTime
-                  activityTimestamp >= Timestamp.now() // Compare with current time
+          Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+          Box(modifier = modifier.fillMaxWidth()) {
+            when (uiState) {
+              is ListActivitiesViewModel.ActivitiesUiState.Success -> {
+                var activitiesList =
+                    (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
+                if (checkedList.isNotEmpty()) {
+                  activitiesList =
+                      activitiesList.filter {
+                        checkedList.contains(categories.indexOf(it.category))
+                      }
                 }
-            if (activitiesList.isEmpty()) {
-              if (checkedList.isEmpty()) {
-                Text(
-                    text = "There is no activity yet.",
-                    modifier =
-                        Modifier.padding(STANDARD_PADDING.dp)
-                            .align(Alignment.Center)
-                            .testTag("emptyActivityPrompt"),
-                    color = MaterialTheme.colorScheme.onSurface)
-              } else {
-                Text(
-                    text = "There is no activity of these categories yet.",
-                    modifier =
-                        Modifier.padding(STANDARD_PADDING.dp)
-                            .align(Alignment.Center)
-                            .testTag("emptyActivityPrompt"),
-                    color = MaterialTheme.colorScheme.onSurface)
-              }
-            } else {
-              val filteredActivities =
-                  activitiesList.filter {
-                    if (it.price > viewModel.maxPrice) false
-                    else if (viewModel.availablePlaces != null &&
-                        (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
-                        false
-                    else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
-                    else if (viewModel.maxDate != null && it.date > viewModel.maxDate!!) false
-                    else if (viewModel.startTime != null &&
-                        hourDateViewModel.isBeginGreaterThanEnd(
-                            it.startTime, viewModel.startTime!!))
-                        false
-                    else if (viewModel.endTime != null &&
-                        hourDateViewModel.isBeginGreaterThanEnd(
-                            viewModel.endTime!!,
-                            hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
-                        false
-                    else if (viewModel.distance != null &&
-                        viewModel.distance!! <
-                            (locationViewModel.getDistanceFromCurrentLocation(it.location) ?: 0f))
-                        false
-                    else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
-                    else {
-                      if (searchText.isEmpty() || searchText.isBlank()) true
-                      else {
-                        it.title.contains(searchText, ignoreCase = true) ||
-                            it.description.contains(searchText, ignoreCase = true) ||
-                            it.location?.shortName?.contains(searchText, ignoreCase = true) ?: false
-                      }
+                activitiesList =
+                    activitiesList.filter {
+                      // log the activity to see which one faisl in combine date and time
+                      Log.d("Overview", "${it.title}")
+                      val activityTimestamp =
+                          hourDateViewModel.combineDateAndTime(
+                              it.date, it.startTime) // Combine date and startTime
+                      activityTimestamp >= Timestamp.now() // Compare with current time
                     }
+                if (activitiesList.isEmpty()) {
+                  if (checkedList.isEmpty()) {
+                    Text(
+                        text = "There is no activity yet.",
+                        modifier =
+                            Modifier.padding(STANDARD_PADDING.dp)
+                                .align(Alignment.Center)
+                                .testTag("emptyActivityPrompt"),
+                        color = MaterialTheme.colorScheme.onSurface)
+                  } else {
+                    Text(
+                        text = "There is no activity of these categories yet.",
+                        modifier =
+                            Modifier.padding(STANDARD_PADDING.dp)
+                                .align(Alignment.Center)
+                                .testTag("emptyActivityPrompt"),
+                        color = MaterialTheme.colorScheme.onSurface)
                   }
-              LazyColumn(
-                  modifier =
-                      Modifier.fillMaxSize()
-                          .padding(horizontal = STANDARD_PADDING.dp)
-                          .testTag("lazyColumn"),
-                  verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
-                    // Use LazyColumn to efficiently display the list of activities
+                } else {
+                  val filteredActivities =
+                      activitiesList.filter {
+                        if (it.price > viewModel.maxPrice) false
+                        else if (viewModel.availablePlaces != null &&
+                            (it.maxPlaces - it.placesLeft) <= viewModel.availablePlaces!!)
+                            false
+                        else if (viewModel.minDate != null && it.date < viewModel.minDate!!) false
+                        else if (viewModel.maxDate != null && it.date > viewModel.maxDate!!) false
+                        else if (viewModel.startTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                it.startTime, viewModel.startTime!!))
+                            false
+                        else if (viewModel.endTime != null &&
+                            hourDateViewModel.isBeginGreaterThanEnd(
+                                viewModel.endTime!!,
+                                hourDateViewModel.addDurationToTime(it.startTime, it.duration)))
+                            false
+                        else if (viewModel.distance != null &&
+                            viewModel.distance!! <
+                                (locationViewModel.getDistanceFromCurrentLocation(it.location)
+                                    ?: 0f))
+                            false
+                        else if (viewModel.onlyPRO && it.type != ActivityType.PRO) false
+                        else {
+                          if (searchText.isEmpty() || searchText.isBlank()) true
+                          else {
+                            it.title.contains(searchText, ignoreCase = true) ||
+                                it.description.contains(searchText, ignoreCase = true) ||
+                                it.location?.shortName?.contains(searchText, ignoreCase = true)
+                                    ?: false
+                          }
+                        }
+                      }
+                  LazyColumn(
+                      modifier =
+                          Modifier.fillMaxSize()
+                              .padding(horizontal = STANDARD_PADDING.dp)
+                              .testTag("lazyColumn")
+                              .background(Color(MAIN_BACKGROUND)),
+                      verticalArrangement = Arrangement.spacedBy(MEDIUM_PADDING.dp)) {
+                        // Use LazyColumn to efficiently display the list of activities
 
-                    items(filteredActivities) { activity ->
-                      if (activity.participants.size < activity.maxPlaces) {
-                        ActivityCard(
-                            activity = activity,
-                            navigationActions,
-                            viewModel,
-                            profileViewModel,
-                            profile,
-                            locationViewModel.getDistanceFromCurrentLocation(activity.location))
+                        items(filteredActivities) { activity ->
+                          if (activity.participants.size < activity.maxPlaces) {
+                            ActivityCard(
+                                activity = activity,
+                                navigationActions,
+                                viewModel,
+                                profileViewModel,
+                                profile,
+                                locationViewModel.getDistanceFromCurrentLocation(activity.location))
+                          }
+                        }
                       }
-                    }
-                  }
+                }
+              }
+              is ListActivitiesViewModel.ActivitiesUiState.Error -> {
+                val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
+                Text(
+                    text = "Error: ${error.message}",
+                    modifier = Modifier.padding(STANDARD_PADDING.dp))
+              }
             }
-          }
-          is ListActivitiesViewModel.ActivitiesUiState.Error -> {
-            val error = (uiState as ListActivitiesViewModel.ActivitiesUiState.Error).exception
-            Text(text = "Error: ${error.message}", modifier = Modifier.padding(STANDARD_PADDING.dp))
           }
         }
-      }
-    }
   }
 }
 
@@ -305,7 +335,7 @@ fun ActivityCard(
                 navigationActions.navigateTo(Screen.ACTIVITY_DETAILS)
               },
       elevation = CardDefaults.cardElevation(STANDARD_PADDING.dp)) {
-        Column {
+        Column(modifier = Modifier.fillMaxWidth().background(Color(0xFFD5EAF3))) {
           // Box for overlaying the title on the image
           Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
 
@@ -419,7 +449,7 @@ fun ActivityCard(
                     text = formattedDate,
                     style =
                         MaterialTheme.typography.bodySmall.copy(
-                            color = Color.Gray, // Light gray color for the date
+                            color = Color.Black, // Light gray color for the date
                             fontStyle = FontStyle.Italic),
                     modifier = Modifier.weight(1f).testTag("dateText") // Takes up remaining space
                     )
@@ -485,7 +515,7 @@ fun ActivityCard(
                             } else "",
                     style =
                         MaterialTheme.typography.bodySmall.copy(
-                            fontStyle = FontStyle.Italic, color = Color.Gray),
+                            fontStyle = FontStyle.Italic, color = Color.Black),
                     modifier =
                         Modifier.weight(1f)
                             .testTag("locationAndDistanceText") // Takes up remaining space
@@ -499,7 +529,7 @@ fun ActivityCard(
                     style =
                         MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray,
+                            color = Color.Black,
                             fontSize = MEDIUM_PADDING.sp),
                     modifier =
                         Modifier.align(Alignment.CenterVertically)
@@ -537,18 +567,16 @@ fun DisplayInterests(activity: Activity) {
               .testTag("interestPresent")
               .background(
                   CategoryColorMap[activity.category] ?: Color.Gray,
-                  shape =
-                      RoundedCornerShape(
-                          TEXT_FONTSIZE.dp)) // Purple background with rounded corners
-              .padding(horizontal = SMALL_PADDING.dp, vertical = SMALL_PADDING.dp)) {
-        Text(
-            text = activity.subcategory,
-            style =
-                MaterialTheme.typography.bodySmall.copy(
-                    color = Color(PRIMARY_COLOR), fontWeight = FontWeight.SemiBold),
-            modifier =
-                Modifier.testTag("subcategoryText").padding(horizontal = STANDARD_PADDING.dp))
-      }
+                  shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
+              .padding(horizontal = SMALL_PADDING.dp, vertical = SMALL_PADDING.dp),
+  ) {
+    Text(
+        text = activity.subcategory,
+        style =
+            MaterialTheme.typography.bodySmall.copy(
+                color = Color(PRIMARY_COLOR), fontWeight = FontWeight.SemiBold),
+        modifier = Modifier.testTag("subcategoryText").padding(horizontal = STANDARD_PADDING.dp))
+  }
 }
 
 @Composable

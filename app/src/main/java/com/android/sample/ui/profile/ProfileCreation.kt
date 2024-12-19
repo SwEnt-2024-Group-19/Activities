@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,7 @@ import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -234,7 +236,10 @@ fun ProfileCreationScreen(
                         Modifier.testTag("createProfileButton")
                             .fillMaxWidth()
                             .height(AUTH_BUTTON_HEIGHT.dp),
-                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(MAIN_COLOR_DARK), contentColor = Color.White)) {
                       Text("Create Profile", fontSize = SUBTITLE_FONTSIZE.sp)
                     }
               }

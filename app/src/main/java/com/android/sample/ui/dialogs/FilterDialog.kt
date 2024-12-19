@@ -1,6 +1,7 @@
 package com.android.sample.ui.dialogs
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.HourglassTop
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -29,10 +32,15 @@ import com.android.sample.R
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.resources.C.Tag.DEFAULT_MAX_PRICE
 import com.android.sample.resources.C.Tag.DIALOG_PADDING
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
+import com.android.sample.resources.C.Tag.MAIN_COLOR_LIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
-import com.android.sample.resources.C.Tag.TEXT_PADDING
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
 import com.android.sample.ui.components.MyDatePicker
 import com.android.sample.ui.components.MyTimePicker
 import com.google.firebase.Timestamp
@@ -80,7 +88,8 @@ fun FilterDialog(
                 Modifier.fillMaxWidth()
                     .height(DIALOG_PADDING.dp)
                     .background(
-                        color = Color.White, shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
+                        color = Color(MAIN_BACKGROUND),
+                        shape = RoundedCornerShape(size = MEDIUM_PADDING.dp))
                     .verticalScroll(rememberScrollState())
                     .testTag("FilterDialog"),
             verticalArrangement = Arrangement.Center,
@@ -113,7 +122,13 @@ fun FilterDialog(
                     value = maxPrice,
                     onValueChange = { newMaxPrice -> maxPrice = newMaxPrice },
                     valueRange = 0f..DEFAULT_MAX_PRICE, // Total range of the slider
-                    modifier = Modifier.testTag("priceRangeSlider"))
+                    modifier = Modifier.testTag("priceRangeSlider"),
+                    colors =
+                        SliderDefaults.colors(
+                            thumbColor = Color(MAIN_COLOR_DARK),
+                            activeTrackColor = Color(MAIN_COLOR_DARK),
+                            inactiveTrackColor = Color(MAIN_COLOR_LIGHT)),
+                )
 
                 OutlinedTextField(
                     value = availablePlaces?.toString() ?: "",
@@ -121,7 +136,7 @@ fun FilterDialog(
                     label = { Text("Members Available") },
                     singleLine = true,
                     modifier = Modifier.testTag("membersAvailableTextField"),
-                    shape = RoundedCornerShape(TEXT_PADDING.dp))
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
 
                 Text(
                     text = "Date Range",
@@ -130,23 +145,28 @@ fun FilterDialog(
                 OutlinedButton(
                     onClick = { startDateIsOpen = true },
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier.fillMaxWidth(WIDTH_FRACTION_SM)
                             .padding(STANDARD_PADDING.dp)
                             .testTag("minDateTextField"),
-                ) {
-                  Icon(
-                      Icons.Filled.CalendarMonth,
-                      contentDescription = "select a date from which activities are shown",
-                      modifier =
-                          Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
-                  if (startDateIsSet)
-                      Text(
-                          "you selected activities after: ${
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(MAIN_BACKGROUND_BUTTON),
+                            contentColor = Color(MAIN_COLOR_DARK)),
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                    border = BorderStroke(2.dp, Color.Transparent)) {
+                      Icon(
+                          Icons.Filled.CalendarMonth,
+                          contentDescription = "select a date from which activities are shown",
+                          modifier =
+                              Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+                      if (startDateIsSet)
+                          Text(
+                              "you selected activities after: ${
                                     startDateTimestamp.toDate().toString().take(11)
                                 }," +
-                              "${(startDateTimestamp.toDate().year) + 1900}  (click to change)")
-                  else Text("select a date from which activities are shown")
-                }
+                                  "${(startDateTimestamp.toDate().year) + 1900}  (click to change)")
+                      else Text("From date")
+                    }
                 if (startDateIsOpen) {
                   MyDatePicker(
                       onCloseRequest = { startDateIsOpen = false },
@@ -163,27 +183,31 @@ fun FilterDialog(
                               .atZone(ZoneId.systemDefault())
                               .toLocalDate())
                 }
-                Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
                 OutlinedButton(
                     onClick = { endDateIsOpen = true },
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier.fillMaxWidth(WIDTH_FRACTION_SM)
                             .padding(STANDARD_PADDING.dp)
                             .testTag("maxDateTextField"),
-                ) {
-                  Icon(
-                      Icons.Filled.CalendarMonth,
-                      contentDescription = "select end date",
-                      modifier =
-                          Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
-                  if (endDateIsSet)
-                      Text(
-                          "you selected activities before: ${
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(MAIN_BACKGROUND_BUTTON),
+                            contentColor = Color(MAIN_COLOR_DARK)),
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                    border = BorderStroke(2.dp, Color.Transparent)) {
+                      Icon(
+                          Icons.Filled.CalendarMonth,
+                          contentDescription = "select end date",
+                          modifier =
+                              Modifier.padding(end = STANDARD_PADDING.dp).testTag("iconDateCreate"))
+                      if (endDateIsSet)
+                          Text(
+                              "you selected activities before: ${
                                 endDateTimestamp?.toDate().toString().take(11)
                             }," +
-                              "${(endDateTimestamp?.toDate()?.year)?.plus(1900)}  (click to change)")
-                  else Text("Select a Date from which activities are hidden")
-                }
+                                  "${(endDateTimestamp?.toDate()?.year)?.plus(1900)}  (click to change)")
+                      else Text("To date")
+                    }
                 if (endDateIsOpen) {
                   MyDatePicker(
                       onCloseRequest = { endDateIsOpen = false },
@@ -200,27 +224,31 @@ fun FilterDialog(
                               .atZone(ZoneId.systemDefault())
                               .toLocalDate())
                 }
-                Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
                 Text(
-                    text = "Date Range",
+                    text = "Time Range",
                     modifier =
                         Modifier.padding(top = STANDARD_PADDING.dp).testTag("dateRangeLabel"))
                 OutlinedButton(
                     onClick = { startTimeIsOpen = true },
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier.fillMaxWidth(WIDTH_FRACTION_SM)
                             .padding(STANDARD_PADDING.dp)
                             .testTag("startTimeTextField"),
-                ) {
-                  Icon(
-                      Icons.Filled.AccessTime,
-                      contentDescription = "select start time",
-                      modifier =
-                          Modifier.padding(end = STANDARD_PADDING.dp)
-                              .testTag("iconStartTimeCreate"))
-                  if (startTimeIsSet) Text("Start time: $startTime (click to change)")
-                  else Text("Select start time")
-                }
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(MAIN_BACKGROUND_BUTTON),
+                            contentColor = Color(MAIN_COLOR_DARK)),
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                    border = BorderStroke(2.dp, Color.Transparent)) {
+                      Icon(
+                          Icons.Filled.AccessTime,
+                          contentDescription = "select start time",
+                          modifier =
+                              Modifier.padding(end = STANDARD_PADDING.dp)
+                                  .testTag("iconStartTimeCreate"))
+                      if (startTimeIsSet) Text("Start time: $startTime (click to change)")
+                      else Text("Start time")
+                    }
                 if (startTimeIsOpen) {
                   MyTimePicker(
                       onTimeSelected = { time ->
@@ -233,23 +261,27 @@ fun FilterDialog(
                       onCloseRequest = { startTimeIsOpen = false })
                 }
 
-                Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
                 OutlinedButton(
                     onClick = { durationIsOpen = true },
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier.fillMaxWidth(WIDTH_FRACTION_SM)
                             .padding(STANDARD_PADDING.dp)
                             .testTag("endTimeTextField"),
-                ) {
-                  Icon(
-                      Icons.Filled.HourglassTop,
-                      contentDescription = "select duration",
-                      modifier =
-                          Modifier.padding(end = STANDARD_PADDING.dp)
-                              .align(Alignment.CenterVertically))
-                  if (durationIsSet) Text("Finishing Time: $endTime (click to change)")
-                  else Text("Select End Time")
-                }
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(MAIN_BACKGROUND_BUTTON),
+                            contentColor = Color(MAIN_COLOR_DARK)),
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                    border = BorderStroke(2.dp, Color.Transparent)) {
+                      Icon(
+                          Icons.Filled.HourglassTop,
+                          contentDescription = "select duration",
+                          modifier =
+                              Modifier.padding(end = STANDARD_PADDING.dp)
+                                  .align(Alignment.CenterVertically))
+                      if (durationIsSet) Text("End Time: $endTime (click to change)")
+                      else Text("End Time")
+                    }
                 if (durationIsOpen) {
                   MyTimePicker(
                       onTimeSelected = { time ->
@@ -268,7 +300,7 @@ fun FilterDialog(
                     modifier = Modifier.testTag("distanceTextField"),
                     placeholder = { Text(text = "exp: 10.5 km") },
                     singleLine = true,
-                    shape = RoundedCornerShape(TEXT_PADDING.dp))
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
                 Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth().testTag("onlyPROCheckboxRow"),
@@ -278,7 +310,7 @@ fun FilterDialog(
                       modifier = Modifier.testTag("onlyPROCheckbox"),
                       checked = onlyPRO ?: false,
                       onCheckedChange = { onlyPRO = it },
-                      colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary),
+                      colors = CheckboxDefaults.colors(checkedColor = Color(MAIN_COLOR_DARK)),
                   )
                   Text(
                       "Only see PRO activities",
@@ -329,6 +361,8 @@ fun FilterDialog(
                           }
                         }
                       },
+                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                      colors = ButtonDefaults.buttonColors(containerColor = Color(MAIN_COLOR_DARK)),
                       modifier = Modifier.testTag("filterButton")) {
                         Text("Filter")
                       }
@@ -364,7 +398,7 @@ fun PROinfo() {
         confirmButton = {
           androidx.compose.material3.TextButton(
               modifier = Modifier.testTag("okButton"), onClick = { showDialog = false }) {
-                Text(text = stringResource(id = R.string.ok))
+                Text(text = stringResource(id = R.string.ok), color = Color(MAIN_COLOR_DARK))
               }
         },
         title = {

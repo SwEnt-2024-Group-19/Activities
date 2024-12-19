@@ -1,6 +1,7 @@
 package com.android.sample.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
@@ -48,36 +50,41 @@ fun PasswordTextField(
               BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
             } else null) {
           // Box to remove padding discrepancies
-          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
-            OutlinedTextField(
-                value = password,
-                onValueChange = onPasswordChange,
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth().testTag("PasswordTextField"),
-                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
-                visualTransformation =
-                    if (isPasswordVisible) VisualTransformation.None
-                    else PasswordVisualTransformation(),
-                isError = passwordError != null,
-                trailingIcon = {
-                  IconButton(onClick = onPasswordVisibilityChange) {
-                    Icon(
-                        imageVector =
-                            if (isPasswordVisible) Icons.Filled.Visibility
-                            else Icons.Filled.VisibilityOff,
-                        contentDescription =
-                            if (isPasswordVisible) "Hide password" else "Show password")
-                  }
-                },
-                colors =
-                    TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent))
-          }
+          Box(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(horizontal = 0.dp, vertical = 0.dp)
+                      .background(Color(MAIN_BACKGROUND_BUTTON))) {
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = onPasswordChange,
+                    label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth().testTag("PasswordTextField"),
+                    shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                    visualTransformation =
+                        if (isPasswordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
+                    isError = passwordError != null,
+                    trailingIcon = {
+                      IconButton(onClick = onPasswordVisibilityChange) {
+                        Icon(
+                            imageVector =
+                                if (isPasswordVisible) Icons.Filled.Visibility
+                                else Icons.Filled.VisibilityOff,
+                            contentDescription =
+                                if (isPasswordVisible) "Hide password" else "Show password")
+                      }
+                    },
+                    colors =
+                        TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent),
+                    singleLine = true)
+              }
         }
     passwordError?.let {
       Text(
@@ -108,24 +115,30 @@ fun EmailTextField(
               BorderStroke(BORDER_STROKE_SM.dp, Color.Red) // Apply red border in case of error
             } else null) {
           // Box to ensure alignment and padding consistency
-          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
-            OutlinedTextField(
-                value = email,
-                onValueChange = onEmailChange,
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth().testTag("EmailTextField"),
-                shape =
-                    RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp), // Matches the Card shape
-                isError = emailError != null,
-                colors =
-                    TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent))
-          }
+          Box(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(horizontal = 0.dp, vertical = 0.dp)
+                      .background(Color(MAIN_BACKGROUND_BUTTON))) {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = onEmailChange,
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth().testTag("EmailTextField"),
+                    shape =
+                        RoundedCornerShape(
+                            ROUNDED_CORNER_SHAPE_DEFAULT.dp), // Matches the Card shape
+                    isError = emailError != null,
+                    colors =
+                        TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent),
+                    singleLine = true)
+              }
         }
     emailError?.let {
       Text(
@@ -162,27 +175,32 @@ fun TextFieldWithErrorState(
         elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
         shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
         border = if (error != null) BorderStroke(BORDER_STROKE_SM.dp, Color.Red) else null) {
-          Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 0.dp, vertical = 0.dp)) {
-            OutlinedTextField(
-                value = value,
-                onValueChange = { newValue ->
-                  onValueChange(newValue)
-                  internalError = validation(newValue)
-                },
-                label = { Text(label) },
-                isError = error != null,
-                modifier = Modifier.fillMaxWidth().testTag(testTag ?: "TextFieldWithErrorState"),
-                shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
-                colors =
-                    TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent),
-                singleLine = true)
-          }
+          Box(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .padding(horizontal = 0.dp, vertical = 0.dp)
+                      .background(Color(MAIN_BACKGROUND_BUTTON))) {
+                OutlinedTextField(
+                    value = value,
+                    onValueChange = { newValue ->
+                      onValueChange(newValue)
+                      internalError = validation(newValue)
+                    },
+                    label = { Text(label) },
+                    isError = error != null,
+                    modifier =
+                        Modifier.fillMaxWidth().testTag(testTag ?: "TextFieldWithErrorState"),
+                    shape = RoundedCornerShape(BORDER_STROKE_SM.dp),
+                    colors =
+                        TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent),
+                    singleLine = true)
+              }
         }
     error?.let {
       Text(
