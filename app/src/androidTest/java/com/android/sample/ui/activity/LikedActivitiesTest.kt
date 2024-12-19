@@ -12,7 +12,6 @@ import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.activity
 import com.android.sample.resources.dummydata.activityBiking
 import com.android.sample.resources.dummydata.testUser
-import com.android.sample.ui.listActivities.ActivityCard2
 import com.android.sample.ui.listActivities.LikedActivitiesScreen
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route

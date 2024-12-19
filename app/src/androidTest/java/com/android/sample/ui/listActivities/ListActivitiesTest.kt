@@ -44,6 +44,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import java.lang.Thread.sleep
 
 class OverviewScreenTest {
   private lateinit var activitiesRepository: ActivitiesRepository
@@ -312,7 +313,26 @@ class OverviewScreenTest {
     composeTestRule.onNodeWithTag("iconparticipants", useUnmergedTree = true).assertIsDisplayed()
     composeTestRule.onNodeWithTag("iconlocation", useUnmergedTree = true).assertIsDisplayed()
     composeTestRule.onNodeWithTag("iconcalendar", useUnmergedTree = true).assertIsDisplayed()
+      composeTestRule.onNodeWithTag("iconprice", useUnmergedTree = true).assertIsDisplayed()
   }
+    @Test
+    fun infoAreDisplayed(){
+        userProfileViewModel = mock(ProfileViewModel::class.java)
+        composeTestRule.setContent {
+            ActivityCard(
+                navigationActions = navigationActions,
+                listActivitiesViewModel = listActivitiesViewModel,
+                profileViewModel = userProfileViewModel,
+                profile = testUser,
+                activity = activity)
+        }
+        composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("participantsText", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("locationAndDistanceText", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("dateText", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("priceText", useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("descriptionText", useUnmergedTree = true).assertIsDisplayed()
+    }
 
   @Test
   fun interestsAreCorrectlyDisplayed() {

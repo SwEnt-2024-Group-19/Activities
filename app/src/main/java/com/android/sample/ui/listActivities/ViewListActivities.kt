@@ -420,7 +420,7 @@ fun ActivityCard(
                         MaterialTheme.typography.bodySmall.copy(
                             color = Color.Gray, // Light gray color for the date
                             fontStyle = FontStyle.Italic),
-                    modifier = Modifier.weight(1f) // Takes up remaining space
+                    modifier = Modifier.weight(1f).testTag("dateText") // Takes up remaining space
                     )
 
               Row(
@@ -437,7 +437,8 @@ fun ActivityCard(
                           style = MaterialTheme.typography.bodySmall.copy(
                               color = Color.Gray,
                               fontStyle = FontStyle.Italic
-                          )
+                          ),
+                          modifier=Modifier.testTag("priceText")
                       )
                   }
 
@@ -487,7 +488,7 @@ fun ActivityCard(
                             fontStyle = FontStyle.Italic, color = Color.Gray),
                     modifier =
                         Modifier.weight(1f)
-                            .testTag("locationAndDistance") // Takes up remaining space
+                            .testTag("locationAndDistanceText") // Takes up remaining space
                     )
                 DisplayIcon(Icons.Filled.Groups, "participants")
 
@@ -501,7 +502,7 @@ fun ActivityCard(
                             color = Color.Gray,
                             fontSize = MEDIUM_PADDING.sp),
                     modifier =
-                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp))
+                        Modifier.align(Alignment.CenterVertically).padding(end = MEDIUM_PADDING.dp).testTag("participantsText"))
               }
 
           Spacer(modifier = Modifier.height(SMALL_PADDING.dp))
@@ -513,7 +514,7 @@ fun ActivityCard(
                   MaterialTheme.typography.bodyMedium.copy(color = Color.Black, lineHeight = 20.sp),
               maxLines = 3,
               overflow = TextOverflow.Ellipsis, // add "..." when description is too long
-              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp))
+              modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("descriptionText"))
           Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
         }
       }
