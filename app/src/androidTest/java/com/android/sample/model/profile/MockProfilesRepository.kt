@@ -7,10 +7,7 @@ class MockProfilesRepository(private val database: MockUsersDatabase = MockUsers
 
   override fun getUser(userId: String, onSuccess: (User?) -> Unit, onFailure: (Exception) -> Unit) {
     try {
-      val user =
-          database.getUser(userId)
-              ?: throw Exception(
-                  "User not found: if you are expecting this to pass, make sure you have the user in the e2e_IdToUser map")
+      val user = database.getUser(userId)
       onSuccess(user)
     } catch (e: Exception) {
       onFailure(e)
@@ -23,7 +20,12 @@ class MockProfilesRepository(private val database: MockUsersDatabase = MockUsers
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    throw NotImplementedError("Not implemented: addActivity")
+    try {
+      val user = database.getUser(userId)
+      database.updateUser(user.copy(activities = user.activities?.plus(activityId)))
+    } catch (e: Exception) {
+      onFailure(e)
+    }
   }
 
   override fun addLikedActivity(
