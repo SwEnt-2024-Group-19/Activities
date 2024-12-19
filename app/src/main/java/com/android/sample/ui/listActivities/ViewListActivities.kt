@@ -31,6 +31,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
@@ -66,12 +67,15 @@ import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.User
 import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
+import com.android.sample.resources.C.Tag.END_Y
+import com.android.sample.resources.C.Tag.GRADIENT_MAX
 import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.PRIMARY_COLOR
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.SMALL_TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
+import com.android.sample.resources.C.Tag.START_Y
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.ui.camera.getImageResourceIdForCategory
 import com.android.sample.ui.components.SearchBar
@@ -310,15 +314,7 @@ fun ActivityCard(
                 modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
             // Apply a dark gradient overlay at the bottom to improve contrast
-            Box(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .height(LARGE_IMAGE_SIZE.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f)),
-                                startY = 0f,
-                                endY = 500f)))
+            DarkGradient()
 
             // Display the activity name on top of the image
             Text(
@@ -534,4 +530,17 @@ fun DisplayIcon(imageVector: ImageVector, contentDescription: String) {
       contentDescription = contentDescription,
       tint = Color(PRIMARY_COLOR),
       modifier = Modifier.testTag("icon$contentDescription"))
+}
+
+@Composable
+fun DarkGradient(){
+    Box(
+        modifier =
+        Modifier.fillMaxWidth()
+            .height(LARGE_IMAGE_SIZE.dp)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color.Transparent, Color.Black.copy(alpha = GRADIENT_MAX)),
+                    startY =  START_Y,
+                    endY = END_Y)))
 }

@@ -217,6 +217,7 @@ fun ActivityCard2(
                 contentDescription = activity.title,
                 modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
+              DarkGradient()
 
             // Display the activity name on top of the image
             Text(
