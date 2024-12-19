@@ -48,6 +48,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -202,6 +203,12 @@ fun ActivityDetailsScreen(
                     .verticalScroll(rememberScrollState())
                     .testTag("activityDetailsScreen")) {
               // Image section
+              LaunchedEffect(activity!!.uid) {
+                imageViewModel.fetchActivityImagesAsBitmaps(
+                    activity.uid,
+                    onSuccess = { urls -> bitmaps = urls },
+                    onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
+              }
               Box(
                   modifier =
                       Modifier.fillMaxWidth()
@@ -209,15 +216,7 @@ fun ActivityDetailsScreen(
                           .padding(MEDIUM_PADDING.dp)
                           .background(Color.Gray, shape = RoundedCornerShape(STANDARD_PADDING.dp))
                           .testTag("image")) {
-                    imageViewModel.fetchActivityImagesAsBitmaps(
-                        activity?.uid ?: "",
-                        onSuccess = { urls -> bitmaps = urls },
-                        onFailure = { Log.e("ActivityDetailsScreen", it.message.toString()) })
-                    if (activity !=
-                        null) { // to avoid setting a default category in the case where activity is
-                      // null which should never be the case
-                      CarouselNoModif(itemsList = bitmaps, category = activity.category)
-                    }
+                    CarouselNoModif(itemsList = bitmaps, category = activity.category)
                     LikeButton(profile, activity, profileViewModel)
                   }
 

@@ -1,7 +1,6 @@
 package com.android.sample.ui.dialogs
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,15 +21,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
+import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
-import com.android.sample.resources.C.Tag.TITLE_FONTSIZE
 
 /**
  * Composable function to display the dialog to add an image, either from the gallery or the camera.
@@ -57,54 +58,48 @@ fun AddImageDialog(
         Column(
             modifier =
                 Modifier.background(
-                        color = Color.White,
+                        color = Color(MAIN_BACKGROUND),
                         shape = RoundedCornerShape(size = ROUNDED_CORNER_SHAPE_DEFAULT.dp))
+                    .padding(STANDARD_PADDING.dp)
                     .testTag("addImageDialog"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Text(
               text = "Add an image",
-              style = TextStyle(color = Color.Black, fontSize = TITLE_FONTSIZE.sp),
-          )
+              style =
+                  TextStyle(
+                      color = Color.Black,
+                      fontSize = MEDIUM_FONTSIZE.sp,
+                      fontWeight = FontWeight.Bold))
           TextButton(
               onClick = onGalleryClick,
               modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(STANDARD_PADDING.dp)
-                      .testTag("galleryButton")
-                      .border(
-                          width = BORDER_STROKE_SM.dp,
-                          color = Color.Cyan,
-                          shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))) {
+                  Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("galleryButton")) {
                 Text(
                     text = "Choose from gallery",
-                    style = TextStyle(color = Color.Black, fontSize = SUBTITLE_FONTSIZE.sp))
+                    style =
+                        TextStyle(color = Color(MAIN_COLOR_DARK), fontSize = SUBTITLE_FONTSIZE.sp))
                 Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
                 Icon(
                     Icons.Filled.PhotoLibrary,
                     contentDescription = "Choose from gallery",
-                    tint = Color.Gray)
+                    tint = Color(MAIN_COLOR_DARK))
               }
 
           TextButton(
               onClick = onCameraClick,
               modifier =
-                  Modifier.fillMaxWidth()
-                      .padding(STANDARD_PADDING.dp)
-                      .testTag("cameraButton")
-                      .border(
-                          width = BORDER_STROKE_SM.dp,
-                          color = Color.Cyan,
-                          shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))) {
+                  Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("cameraButton")) {
                 Text(
                     text = "Take pictures with camera",
-                    style = TextStyle(color = Color.Black, fontSize = SUBTITLE_FONTSIZE.sp))
+                    style =
+                        TextStyle(color = Color(MAIN_COLOR_DARK), fontSize = SUBTITLE_FONTSIZE.sp))
                 Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
                 Icon(
                     Icons.Filled.PhotoCamera,
                     contentDescription = "Choose from gallery",
-                    tint = Color.Gray)
+                    tint = Color(MAIN_COLOR_DARK))
               }
 
           if (default) {
@@ -113,16 +108,17 @@ fun AddImageDialog(
                 modifier =
                     Modifier.fillMaxWidth()
                         .padding(STANDARD_PADDING.dp)
-                        .testTag("defaultImageButton")
-                        .border(
-                            width = BORDER_STROKE_SM.dp,
-                            color = Color.Cyan,
-                            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))) {
+                        .testTag("defaultImageButton")) {
                   Text(
                       text = "Select default picture",
-                      style = TextStyle(color = Color.Black, fontSize = SUBTITLE_FONTSIZE.sp))
+                      style =
+                          TextStyle(
+                              color = Color(MAIN_COLOR_DARK), fontSize = SUBTITLE_FONTSIZE.sp))
                   Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
-                  Icon(Icons.Filled.AddToPhotos, contentDescription = "Default", tint = Color.Gray)
+                  Icon(
+                      Icons.Filled.AddToPhotos,
+                      contentDescription = "Default",
+                      tint = Color(MAIN_COLOR_DARK))
                 }
           }
         }

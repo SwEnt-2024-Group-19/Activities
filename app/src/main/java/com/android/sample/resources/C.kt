@@ -23,13 +23,14 @@ object C {
     // App colors
     const val MAIN_COLOR_DARK = 0xFF00499E
     const val MAIN_COLOR_LIGHT = 0xFF5CE1E6
-    const val MAIN_BACKGROUND = 0xFFF1FDFD
+    const val MAIN_BACKGROUND = 0xFFFCFFFF
+    const val MAIN_BACKGROUND_BUTTON = 0xFFE7F2FD
 
     const val CREATED_ACTIVITIES = 0
     const val ENROLLED_ACTIVITIES = 1
     const val PAST_ACTIVITIES = 2
 
-    const val CARD_IAMGES_SIZE = 120
+    const val CARD_IAMGES_SIZE = 100
     const val STANDARD_PADDING = 8
 
     const val MEDIUM_FONTSIZE = 18

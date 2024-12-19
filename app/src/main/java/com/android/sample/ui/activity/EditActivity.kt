@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -28,7 +30,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +57,12 @@ import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.categoryOf
+import com.android.sample.resources.C.Tag.BUTTON_HEIGHT_SM
+import com.android.sample.resources.C.Tag.BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.ui.camera.CameraScreen
 import com.android.sample.ui.camera.GalleryScreen
@@ -85,7 +94,7 @@ fun EditActivityScreen(
     imageViewModel: ImageViewModel,
     profileViewModel: ProfileViewModel
 ) {
-  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
+  val hourDateViewModel = HourDateViewModel()
   val context = LocalContext.current
   var showDialog by remember { mutableStateOf(false) }
   var showDialogImage by remember { mutableStateOf(false) }
@@ -102,7 +111,6 @@ fun EditActivityScreen(
   var attendees by remember { mutableStateOf(activity?.participants!!) }
   var startTime by remember { mutableStateOf(activity?.startTime) }
   var duration by remember { mutableStateOf(activity?.duration ?: "00:01") }
-  var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf(activity?.type.toString()) }
   var expandedType by remember { mutableStateOf(false) }
   var expandedCategory by remember { mutableStateOf(false) }
@@ -121,12 +129,14 @@ fun EditActivityScreen(
   var isGalleryOpen by remember { mutableStateOf(false) }
   var selectedImages by remember { mutableStateOf<List<Bitmap>>(emptyList()) }
   var items by remember { mutableStateOf(activity?.images ?: listOf()) }
-  imageViewModel.fetchActivityImagesAsBitmaps(
-      activity?.uid ?: "",
-      { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
-      onFailure = { error ->
-        Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
-      })
+  LaunchedEffect(activity!!.uid) {
+    imageViewModel.fetchActivityImagesAsBitmaps(
+        activity.uid,
+        { bitmaps -> selectedImages = bitmaps.toMutableStateList() },
+        onFailure = { error ->
+          Log.e("EditActivityScreen", "Failed to fetch images: ${error.message}")
+        })
+  }
   // Handle the error, e.g., show a Toast or log the exception
   var dueDate by remember { mutableStateOf(activity?.date ?: Timestamp.now()) }
   var dateIsOpen by remember { mutableStateOf(false) }
@@ -136,7 +146,7 @@ fun EditActivityScreen(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
-            title = { Text("Edit the activity") },
+            title = { Text("Edit the activity", color = Color.White) },
             navigationIcon = {
               IconButton(
                   onClick = { navigationActions.goBack() },
@@ -145,7 +155,14 @@ fun EditActivityScreen(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "Back")
                   }
-            })
+            },
+            colors =
+                TopAppBarColors(
+                    containerColor = Color(MAIN_COLOR_DARK),
+                    titleContentColor = Color.Black,
+                    scrolledContainerColor = Color(MAIN_BACKGROUND),
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color(MAIN_COLOR_DARK)))
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -391,21 +408,32 @@ fun EditActivityScreen(
                   }
                 },
                 modifier =
-                    Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("editButton"),
-            ) {
-              Row(
-                  horizontalArrangement =
-                      Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
-                  verticalAlignment = Alignment.CenterVertically,
-              ) {
-                Icon(
-                    Icons.Default.Done,
-                    contentDescription = "add a new activity",
-                )
+                    Modifier.width(BUTTON_WIDTH.dp)
+                        .background(Color.Transparent)
+                        .height(BUTTON_HEIGHT_SM.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .testTag("editButton"),
+                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                colors =
+                    ButtonColors(
+                        containerColor = Color(MAIN_COLOR_DARK),
+                        contentColor = Color.White,
+                        disabledContentColor = Color.Gray,
+                        disabledContainerColor = Color.LightGray,
+                    )) {
+                  Row(
+                      horizontalArrangement =
+                          Arrangement.spacedBy(STANDARD_PADDING.dp, Alignment.CenterHorizontally),
+                      verticalAlignment = Alignment.CenterVertically,
+                  ) {
+                    Icon(
+                        Icons.Default.Done,
+                        contentDescription = "add a new activity",
+                    )
 
-                Text("Save", color = Color.White)
-              }
-            }
+                    Text("Save", color = Color.White)
+                  }
+                }
             Spacer(modifier = Modifier.height(MEDIUM_PADDING.dp))
             Button(
                 colors =
