@@ -291,9 +291,9 @@ fun ActivityCard(
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
 
-  var isLiked by remember {
-    mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
-  }
+    val isLiked = remember(activity.uid, profile?.likedActivities) {
+        mutableStateOf(profile?.likedActivities?.contains(activity.uid) ?: false)
+    }
 
   Card(
       modifier =
@@ -445,20 +445,21 @@ fun ActivityCard(
                   if (profile != null) {
                       IconButton(
                           onClick = {
-                              isLiked = !isLiked
-                              if (isLiked) {
+                              val newLikeState = !isLiked.value
+                              isLiked.value = newLikeState
+
+                              if (newLikeState) {
                                   profileViewModel.addLikedActivity(profile.id, activity.uid)
                               } else {
                                   profileViewModel.removeLikedActivity(profile.id, activity.uid)
                               }
                           },
-                          modifier = Modifier.testTag("likeButton$isLiked"),
+                          modifier = Modifier.testTag("likeButton${isLiked.value}")
                       ) {
                           Icon(
-                              imageVector =
-                              if (isLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                              contentDescription = if (isLiked) "Liked" else "Not Liked",
-                              tint = if (isLiked) Color(PRIMARY_COLOR) else Color.Gray
+                              imageVector = if (isLiked.value) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                              contentDescription = if (isLiked.value) "Liked" else "Not Liked",
+                              tint = Color(PRIMARY_COLOR)
                           )
                       }
                   }
