@@ -69,6 +69,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.firebase.Timestamp
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -94,7 +95,7 @@ fun MapScreen(
   var showBottomSheet by remember { mutableStateOf(false) }
   val previousScreen = navigationActions.getPreviousRoute()
   var showFilterDialog by remember { mutableStateOf(false) }
-  val hourDateViewModel: HourDateViewModel = HourDateViewModel()
+  val hourDateViewModel = HourDateViewModel()
   HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
 
   val firstLocation =
@@ -116,34 +117,37 @@ fun MapScreen(
 
   Scaffold(
       floatingActionButton = {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
-            horizontalArrangement = Arrangement.SpaceBetween) {
-              FloatingActionButton(
-                  modifier =
-                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("centerOnCurrentLocation"),
-                  onClick = {
-                    coroutineScope.launch {
-                      currentLocation?.let {
-                        val locationLatLng = LatLng(it.latitude, it.longitude)
-                        cameraPositionState.animate(
-                            update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
-                            durationMs = 800)
+        if (networkManager.isNetworkAvailable()) {
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = MEDIUM_PADDING.dp),
+              horizontalArrangement = Arrangement.SpaceBetween) {
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("centerOnCurrentLocation"),
+                    onClick = {
+                      coroutineScope.launch {
+                        currentLocation?.let {
+                          val locationLatLng = LatLng(it.latitude, it.longitude)
+                          cameraPositionState.animate(
+                              update = CameraUpdateFactory.newLatLngZoom(locationLatLng, 15f),
+                              durationMs = 800)
+                        }
                       }
+                    }) {
+                      Icon(
+                          Icons.Default.MyLocation,
+                          contentDescription = "Center on current location")
                     }
-                  }) {
-                    Icon(
-                        Icons.Default.MyLocation, contentDescription = "Center on current location")
-                  }
-              FloatingActionButton(
-                  modifier =
-                      Modifier.padding(horizontal = MEDIUM_PADDING.dp)
-                          .testTag("filterDialogButton"),
-                  onClick = { showFilterDialog = true }) {
-                    Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
-                  }
-            }
+                FloatingActionButton(
+                    modifier =
+                        Modifier.padding(horizontal = MEDIUM_PADDING.dp)
+                            .testTag("filterDialogButton"),
+                    onClick = { showFilterDialog = true }) {
+                      Icon(Icons.Default.DensityMedium, contentDescription = "Open filter dialog")
+                    }
+              }
+        }
       },
       content = { padding ->
         if (!networkManager.isNetworkAvailable()) {
@@ -160,7 +164,7 @@ fun MapScreen(
                   (activities as ListActivitiesViewModel.ActivitiesUiState.Success)
                       .activities
                       .filter {
-                        if (it.price > listActivitiesViewModel.maxPrice) false
+                        (if (it.price > listActivitiesViewModel.maxPrice) false
                         else if (listActivitiesViewModel.availablePlaces != null &&
                             (it.maxPlaces - it.placesLeft) <=
                                 listActivitiesViewModel.availablePlaces!!)
@@ -186,7 +190,9 @@ fun MapScreen(
                             false
                         else if (listActivitiesViewModel.onlyPRO && it.type != ActivityType.PRO)
                             false
-                        else it.location != null
+                        else it.location != null) &&
+                            hourDateViewModel.combineDateAndTime(it.date, it.duration) >
+                                Timestamp.now()
                       }
                       .forEach { item ->
                         Marker(
