@@ -115,7 +115,7 @@ class ActivityFlowTest {
 
     // Overview screen
     hlp.see(Overview.SCREEN)
-    hlp.clickBottomNavigationItem(BottomNavigation.PROFILE)
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
 
     // Profile screen
     hlp.see(Profile.NotLoggedIn.PROMPT)
@@ -137,7 +137,7 @@ class ActivityFlowTest {
 
     // Tries to create a new activity and is prompted to sign in
     hlp.see(Overview.SCREEN)
-    hlp.clickBottomNavigationItem(BottomNavigation.CREATE_ACTIVITY)
+    hlp.click(BottomNavigation.CREATE_ACTIVITY, bottomNavItem = true)
 
     // Add activity screen
     /*hlp.assertIsDisplayed(CreateActivity.SCREEN)
@@ -184,7 +184,7 @@ class ActivityFlowTest {
     // Overview screen
     hlp.see(Overview.SCREEN)
     hlp.see(BottomNavigation.OVERVIEW)
-    hlp.clickBottomNavigationItem(BottomNavigation.PROFILE)
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
 
     // Profile screen
     hlp.see(Profile.SCREEN)

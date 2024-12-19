@@ -4,6 +4,7 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -27,7 +28,11 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
    *
    * @param tag The tag of the node to click.
    */
-  fun click(tag: String) {
+  fun click(tag: String, bottomNavItem: Boolean = false) {
+    if (bottomNavItem) {
+      clickBottomNavigationItem(tag)
+      return
+    }
     val node = getNode(tag)
     see(tag)
     node.assertHasClickAction()
@@ -36,26 +41,31 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
   }
 
   /** Click on bottom navigation item and check that the screen changes. */
-  fun clickBottomNavigationItem(tag: String) {
+  private fun clickBottomNavigationItem(tag: String) {
     see(BottomNavigation.MENU)
     see(tag)
     click(tag)
-    // assertIsSelected(tag) TODO: Uncomment this line when the bug is fixed
+    // see(tag, selected = true) TODO: Uncomment this line when the bug is fixed
   }
 
   /**
    * Asserts that a node with the given tag is displayed and optionally selected.
    *
    * @param tag The tag of the node to assert. If [] is true, this is the text to search for.
-   * @param selected Whether the node should be selected. default is false.
+   * @param selected Assert whether the node should be selected. default is null, meaning no check
+   *   on selection.
    * @param text Whether to search for text instead of tag. default is false.
    * @param any Whether to accept multiple nodes to match the tag, and to select any (i.e. the
    *   first) of these nodes. default is false.
    */
-  fun see(tag: String, selected: Boolean = false, text: Boolean = false, any: Boolean = false) {
+  fun see(tag: String, selected: Boolean? = null, text: Boolean = false, any: Boolean = false) {
     val node = getNode(tag, text, any)
     node.assertIsDisplayed()
-    if (selected) node.assertIsSelected()
+    when (selected) {
+      true -> node.assertIsSelected()
+      false -> node.assertIsNotSelected()
+      null -> {}
+    }
   }
 
   private fun getNode(
