@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -297,6 +298,44 @@ class OverviewScreenTest {
   }
 
   @Test
+  fun iconsAreDisplayed() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity)
+    }
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("iconparticipants", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("iconlocation", useUnmergedTree = true).assertIsDisplayed()
+    composeTestRule.onNodeWithTag("iconcalendar", useUnmergedTree = true).assertIsDisplayed()
+  }
+
+  @Test
+  fun interestsAreCorrectlyDisplayed() {
+    userProfileViewModel = mock(ProfileViewModel::class.java)
+    val activity1 = activity.copy(subcategory = "Basketball")
+    composeTestRule.setContent {
+      ActivityCard(
+          navigationActions = navigationActions,
+          listActivitiesViewModel = listActivitiesViewModel,
+          profileViewModel = userProfileViewModel,
+          profile = testUser,
+          activity = activity1)
+    }
+
+    composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag("activityStatusAndInterests", useUnmergedTree = true)
+        .assertExists()
+    composeTestRule.onNodeWithTag("interestPresent", useUnmergedTree = true)
+    composeTestRule.onNodeWithText("Basketball", useUnmergedTree = true).assertIsDisplayed()
+  }
+
+  @Test
   fun changeIconWhenActivityNotLiked() {
     userProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
@@ -344,8 +383,8 @@ class OverviewScreenTest {
           distance = 0.5503f)
     }
     composeTestRule
-        .onNodeWithTag("distanceText", useUnmergedTree = true)
-        .assertTextContains("Distance : 550m")
+        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .assertTextContains("550m", substring = true)
   }
 
   @Test
@@ -361,8 +400,8 @@ class OverviewScreenTest {
           distance = 12.354f)
     }
     composeTestRule
-        .onNodeWithTag("distanceText", useUnmergedTree = true)
-        .assertTextContains("Distance : 12.4km")
+        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .assertTextContains("12.4km", substring = true)
   }
 
   @Test
@@ -377,7 +416,9 @@ class OverviewScreenTest {
           activity = activity,
           distance = null)
     }
-    composeTestRule.onNodeWithTag("distanceText", useUnmergedTree = true).assertIsNotDisplayed()
+    composeTestRule
+        .onNodeWithTag("locationAndDistance", useUnmergedTree = true)
+        .assertTextEquals("EPFL") // there is only the location, not the distance
   }
 
   @Test
@@ -597,6 +638,9 @@ class OverviewScreenTest {
 
     composeTestRule
         .onNodeWithTag("activityStatusEnrolledBox", useUnmergedTree = true)
+        .assertExists()
+    composeTestRule
+        .onNodeWithTag("activityStatusAndInterests", useUnmergedTree = true)
         .assertExists()
     composeTestRule.onNodeWithTag("activityStatus", useUnmergedTree = true).assertExists()
     composeTestRule.onNodeWithTag("enrolledText", useUnmergedTree = true).assertExists()

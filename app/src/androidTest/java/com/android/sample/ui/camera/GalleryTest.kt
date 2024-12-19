@@ -5,7 +5,11 @@ import android.graphics.Bitmap
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
+import com.android.sample.R
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
 import org.junit.Before
@@ -21,6 +25,7 @@ class GalleryTest {
 
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
+  private val context = ApplicationProvider.getApplicationContext<Context>()
 
   @Before
   fun setUp() {
@@ -33,8 +38,6 @@ class GalleryTest {
   fun profileImage_displaysCorrectlyWhenUrlIsPresent() {
     // Arrange
     val mockUserId = "testUserId"
-    val mockImageUrl = "https://test.com/image.jpg"
-    val context = ApplicationProvider.getApplicationContext<Context>()
 
     composeTestRule.setContent {
       ProfileImage(userId = mockUserId, modifier = androidx.compose.ui.Modifier, mockImageViewModel)
@@ -45,5 +48,19 @@ class GalleryTest {
 
     // Assert
     composeTestRule.onNodeWithContentDescription("Profile Image").assertIsDisplayed()
+  }
+
+  @Test
+  fun testDefaultImageCarousel() {
+    val mockOnImageSelected = mock<(Bitmap) -> Unit>()
+    val mockOnDismiss = mock<() -> Unit>()
+    composeTestRule.setContent {
+      DefaultImageCarousel(
+          onImageSelected = mockOnImageSelected, context = context, onDismiss = mockOnDismiss)
+    }
+
+    composeTestRule.onNodeWithTag("DefaultImageCarousel").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("ImageCard_${R.drawable.dog_avatar}").performClick()
+    composeTestRule.onNodeWithText("Select an Image").assertIsDisplayed()
   }
 }
