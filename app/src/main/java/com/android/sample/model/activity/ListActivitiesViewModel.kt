@@ -362,7 +362,7 @@ constructor(
     val weights = getWeights()
     val totalWeights = weights.values.sum()
 
-    if (cachedScores_.containsKey(activity.uid)) return cachedScores_[activity.uid]!!
+    if (cachedScores_.containsKey(activity.uid)) return cachedScores_[activity.uid] ?: 2.5
 
     val distanceScore = calculateDistanceScore(distanceTo(activity.location))
     val dateScore = calculateDateScore(activity.date)
