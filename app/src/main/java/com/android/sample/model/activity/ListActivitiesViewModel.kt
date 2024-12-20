@@ -13,6 +13,7 @@ import com.android.sample.R
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
+import com.android.sample.model.profile.Interest
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.model.profile.User
@@ -240,7 +241,7 @@ constructor(
    * @param user The user to sort the activities for.
    * @param distanceTo The function to calculate the distance to the activity.
    */
-  fun sortActivitiesByScore(user: User, distanceTo: (Location?) -> Float?) {
+  fun sortActivitiesByScore(user: User?, distanceTo: (Location?) -> Float?) {
     val activities =
         (_uiState.value as? ActivitiesUiState.Success)?.activities?.sortedByDescending {
           calculateActivityScore(it, user, distanceTo)
@@ -252,6 +253,7 @@ constructor(
   /** Give the weights for the different factors that influence the score. */
   open fun getWeights(): Map<String, Double> {
     return mapOf(
+        "creator" to 0.2,
         "distance" to 0.2,
         "date" to 0.15,
         "interest" to 0.25,
@@ -300,10 +302,12 @@ constructor(
   }
 
   /** Calculates the interest score. */
-  open fun calculateInterestScore(): Double {
-    // return user.interests.count { it == activity.category }.toDouble() /
-    // user.interests.size.coerceAtLeast(1) TODO in Sprint 7
-    return 0.0
+  open fun calculateInterestScore(
+      userInterests: List<Interest>,
+      activityInterest: Interest
+  ): Double {
+    return if (userInterests.any { it.name == activityInterest.name }) 1.0
+    else if (userInterests.any { it.category == activityInterest.category }) 0.35 else 0.0
   }
 
   /**
@@ -348,6 +352,23 @@ constructor(
     return 1 - (price / MAX_PRICE).coerceAtMost(1.0)
   }
 
+  /** Calculates the creator score. */
+  open fun calculateCreatorScore(creator: String): Double {
+    val creatorUser: MutableStateFlow<User?> = MutableStateFlow(null)
+    profilesRepository.getUser(creator, { creatorUser.value = it }, { creatorUser.value = null })
+
+    val activities =
+        uiState.value.let { (it as? ActivitiesUiState.Success)?.activities } ?: emptyList()
+    return creatorUser.value?.getUserRatingAsACreator(
+        activities
+            .filter {
+              HourDateViewModel().combineDateAndTime(it.date, it.startTime) <= Timestamp.now()
+            }
+            .map { it.getActivityWeightedRating() }
+            .filter { it >= 0 }
+            .map { it * 5 }) ?: 0.0
+  }
+
   /**
    * Calculates the score of an activity.
    *
@@ -357,28 +378,39 @@ constructor(
    */
   open fun calculateActivityScore(
       activity: Activity,
-      user: User,
+      user: User?,
       distanceTo: (Location?) -> Float?
   ): Double {
     val weights = getWeights()
     val totalWeights = weights.values.sum()
 
-    if (cachedScores_.containsKey(activity.uid)) return cachedScores_[activity.uid] ?: 2.5
+    if (cachedScores_.containsKey("last_updated") &&
+        Timestamp.now().seconds.toDouble() - cachedScores_["last_updated"]!! < 60 &&
+        cachedScores_.containsKey(activity.uid))
+        return cachedScores_[activity.uid] ?: 2.5
 
     val distanceScore = calculateDistanceScore(distanceTo(activity.location))
     val dateScore = calculateDateScore(activity.date)
-    val interestScore = calculateInterestScore()
-    val participationScore = calculateParticipationScore(user.activities, activity.creator)
+    val interestScore =
+        if (user == null) 0.0
+        else
+            calculateInterestScore(
+                user.interests ?: emptyList(), Interest(activity.subcategory, activity.category))
+    val participationScore =
+        if (user == null) 0.0 else calculateParticipationScore(user.activities, activity.creator)
     val completionScore = calculateCompletionScore(activity.participants.size, activity.maxPlaces)
     val priceScore = calculatePriceScore(activity.price)
+    val creatorScore = calculateCreatorScore(creator = activity.creator)
     val score =
         (distanceScore * (weights["distance"] ?: 0.2) +
             dateScore * (weights["date"] ?: 0.15) +
             interestScore * (weights["interest"] ?: 0.25) +
             participationScore * (weights["participation"] ?: 0.15) +
             completionScore * (weights["completion"] ?: 0.1) +
-            priceScore * (weights["price"] ?: 0.15)) / totalWeights
+            priceScore * (weights["price"] ?: 0.15) +
+            creatorScore * (weights["creator"] ?: 0.2)) / totalWeights
     cachedScores_[activity.uid] = score
+    cachedScores_["last_updated"] = Timestamp.now().seconds.toDouble()
     return score
   }
 
