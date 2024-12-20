@@ -36,11 +36,10 @@ import com.android.sample.model.activity.Category
 import com.android.sample.model.image.resize
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
-import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
-import com.android.sample.resources.C.Tag.MEDIUM_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR

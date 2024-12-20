@@ -140,7 +140,6 @@ fun ActivityDetailsScreen(
   val dueDate by remember { mutableStateOf(activity?.date) }
   val placesTaken by remember { mutableStateOf(activity?.placesLeft) }
   val maxPlaces by remember { mutableStateOf(activity?.maxPlaces) }
-  val distance = locationViewModel.getDistanceFromCurrentLocation(location)
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
   val startTime by remember { mutableStateOf(activity?.startTime) }
@@ -179,7 +178,20 @@ fun ActivityDetailsScreen(
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
   val hourDateViewModel = HourDateViewModel()
-  var participantsList by remember { mutableStateOf(activity?.participants ?: listOf()) }
+  var participantsList by remember { mutableStateOf(listOf<User>()) }
+  LaunchedEffect(activity?.uid) {
+    activity?.participants?.forEach { participant ->
+      if (participant.id.isEmpty()) participantsList = participantsList + participant
+      else {
+        profileViewModel.getUserData(
+            participant.id,
+            onResult = {
+              if (it != null && !participantsList.contains(it))
+                  participantsList = participantsList.plus(it)
+            })
+      }
+    }
+  }
 
   Scaffold(
       topBar = {
@@ -558,7 +570,7 @@ fun ActivityDetailsScreen(
 
                   // List of participants
                   Column(modifier = Modifier.fillMaxWidth().testTag("participants")) {
-                    participantsList.forEach { participant ->
+                    participantsList?.forEach { participant ->
                       Row(
                           verticalAlignment = Alignment.CenterVertically,
                           modifier = Modifier.padding(vertical = SMALL_PADDING.dp)) {
@@ -638,28 +650,38 @@ fun ActivityDetailsScreen(
                                             horizontal = MEDIUM_PADDING.dp)
                                         .testTag(
                                             "participantsRating ${participant.name} ${participant.surname}")) {
-                                  Text(
-                                      text = "4.7",
-                                      style =
-                                          TextStyle(
-                                              fontSize = MEDIUM_PADDING.sp,
-                                              fontWeight = FontWeight(MEDIUM_FONT_WEIGHT),
-                                              color = Color(DARK_GRAY),
-                                              textAlign = TextAlign.Center,
-                                          ),
-                                      modifier = Modifier.testTag("ratingText"))
-                                  Icon(
-                                      imageVector = Icons.Filled.Star,
-                                      contentDescription = "Star",
-                                      tint = Color.Black,
-                                      modifier = Modifier.size(MEDIUM_FONTSIZE.dp))
+                                  val isPassed =
+                                      hourDateViewModel.combineDateAndTime(
+                                          activity.date, activity.startTime) <= Timestamp.now()
+                                  val isCreator = profile?.id == activity.creator
+                                  if (isPassed && isCreator && participant.id != activity.creator) {
+                                    ReviewActivityButtons(
+                                        currentReview = participant.likes[activity.uid]) {
+                                          profileViewModel.addReview(
+                                              participant.id, activity.uid, it)
+                                        }
+                                  } else {
+
+                                    if (participant.getUserRatingAsAParticipant() >= 0) {
+                                      Text(
+                                          text = "Rating : ",
+                                          fontWeight = FontWeight.Bold,
+                                          style = MaterialTheme.typography.bodyMedium)
+                                      Text(
+                                          text =
+                                              String.format(
+                                                  "%.1f",
+                                                  participant.getUserRatingAsAParticipant() * 5),
+                                          style = MaterialTheme.typography.bodyMedium)
+                                    }
+                                  }
                                 }
                           }
                     }
                     Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-                    if ((activity?.participants?.size ?: 0) < maxPlaces!!) {
+                    if ((activity.participants.size) < maxPlaces!!) {
                       Text(
-                          text = "${maxPlaces!! - (activity?.participants?.size ?: 0)} places left",
+                          text = "${maxPlaces!! - (activity.participants.size )} places left",
                           style =
                               TextStyle(
                                   fontSize = MEDIUM_PADDING.sp,
@@ -690,7 +712,7 @@ fun ActivityDetailsScreen(
                                 timestamp = Timestamp.now())
                         // listActivityViewModel.addCommentToActivity(activity!!.uid, newComment)
                         comments += newComment
-                        listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
+                        listActivityViewModel.updateActivity(activity.copy(comments = comments))
                       },
                       onReplyComment = { replyContent, comment ->
                         val reply =
