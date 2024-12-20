@@ -73,10 +73,7 @@ object Overview {
 
   const val EMPTY_ACTIVITY = "emptyActivityPrompt"
 
-  object ActivityDetails {
-
-
-  }
+  object ActivityDetails {}
 }
 
 /** Profile tags */
@@ -134,13 +131,13 @@ object ActivityDetails {
 }
 
 object EditActivity {
-    const val SCREEN = "editActivityScreen"
-    const val TITLE_INPUT = "titleInput"
-    const val DESCRIPTION_INPUT = "descriptionInput"
-    const val PRICE_INPUT = "priceInput"
-    const val LOCATION_INPUT = "locationInput"
+  const val SCREEN = "editActivityScreen"
+  const val TITLE_INPUT = "titleInput"
+  const val DESCRIPTION_INPUT = "descriptionInput"
+  const val PRICE_INPUT = "priceInput"
+  const val LOCATION_INPUT = "locationInput"
   const val LOCATION_ITEM = "locationItem"
-    const val EDIT_BUTTON = "editButton"
+  const val EDIT_BUTTON = "editButton"
 }
 
 // Prompts

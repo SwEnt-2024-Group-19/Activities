@@ -579,8 +579,8 @@ fun CommentSection(
 ) {
   val newCommentText = remember { mutableStateOf("") }
   val context = LocalContext.current
-  Column(modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-    Text(text = "Comments", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.testTag("commentsTitle"))
+  Column(modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp).testTag("comments")) {
+    Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
 
     // Display all comments
     comments.forEach { comment ->
