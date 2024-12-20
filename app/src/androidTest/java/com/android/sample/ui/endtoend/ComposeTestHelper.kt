@@ -29,14 +29,20 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
    *
    * @param tag The tag of the node to click.
    */
-  fun click(tag: String, bottomNavItem: Boolean = false, text: Boolean = false, any: Boolean = false) {
+  fun click(
+      tag: String,
+      bottomNavItem: Boolean = false,
+      text: Boolean = false,
+      any: Boolean = false,
+      index: Int = 0
+  ) {
     if (bottomNavItem) {
       if (text || any) throw IllegalArgumentException("Bottom navigation items should use tags.")
       clickBottomNavigationItem(tag)
       return
     }
-    val node = getNode(tag, text, any)
-    see(tag)
+    val node = getNode(tag, text, any, index)
+    see(tag, text = text, any = any, index = index)
     node.assertHasClickAction()
     node.performClick()
     composeTestRule.waitForIdle()
@@ -60,8 +66,14 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
    * @param any Whether to accept multiple nodes to match the tag, and to select any (i.e. the
    *   first) of these nodes. default is false.
    */
-  fun see(tag: String, selected: Boolean? = null, text: Boolean = false, any: Boolean = false) {
-    val node = getNode(tag, text, any)
+  fun see(
+      tag: String,
+      selected: Boolean? = null,
+      text: Boolean = false,
+      any: Boolean = false,
+      index: Int = 0
+  ) {
+    val node = getNode(tag, text, any, index)
     node.assertIsDisplayed()
     when (selected) {
       true -> node.assertIsSelected()
@@ -73,25 +85,23 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
   private fun getNode(
       tag: String,
       text: Boolean = false,
-      any: Boolean = false
+      any: Boolean = false,
+      index: Int = 0
   ): SemanticsNodeInteraction {
     return if (any) {
-      if (text) composeTestRule.onAllNodesWithText(tag)[0]
-      else composeTestRule.onAllNodesWithTag(tag)[0]
+      if (text) composeTestRule.onAllNodesWithText(tag)[index]
+      else composeTestRule.onAllNodesWithTag(tag)[index]
     } else {
       if (text) composeTestRule.onNodeWithText(tag) else composeTestRule.onNodeWithTag(tag)
     }
   }
 
   /** Scrolls to a node with the given tag. */
-  fun scroll(parentTag: String, nodeTag: String) =
-      composeTestRule.onNodeWithTag(parentTag).performScrollToNode(hasTestTag(nodeTag))
+  fun scroll(parentTag: String, nodeTag: String, text: Boolean = false) =
+      getNode(nodeTag, text).performScrollToNode(hasTestTag(nodeTag))
 
   /** Asserts that a node with the given tag is not displayed. */
-  fun notSee(tag: String, text: Boolean = false) {
-    val node = if (text) composeTestRule.onNodeWithText(tag) else composeTestRule.onNodeWithTag(tag)
-    node.assertIsNotDisplayed()
-  }
+  fun notSee(tag: String, text: Boolean = false) = getNode(tag, text).assertIsNotDisplayed()
 
   /**
    * Writes text to a node with the given tag.
