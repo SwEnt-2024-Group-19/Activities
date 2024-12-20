@@ -13,7 +13,8 @@ import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.defaultUserCredentials1
 import com.android.sample.resources.dummydata.defaultUserCredentials2
-import com.android.sample.ui.endtoend.ActivityDetails.ENROLL_BUTTON
+import com.android.sample.ui.endtoend.BottomNavigation.Liked
+import com.android.sample.ui.endtoend.Overview.ActivityDetails.ENROLL_BUTTON
 import com.android.sample.ui.endtoend.Profile.ACTIVITY_ROW
 import com.android.sample.ui.endtoend.Profile.ENROLLED_BUTTON
 import com.android.sample.ui.endtoend.Profile.PLUS_BUTTON_TO_CREATE
@@ -132,9 +133,9 @@ class ActivityFlowTest {
 
     // Check that the user is not logged in and can't enroll
     // @TODO: The need for a scroll here is debatable
-    hlp.see(ActivityDetails.NOT_LOGGED_IN_TEXT)
-    hlp.notSee(ActivityDetails.ENROLL_BUTTON)
-    hlp.click(ActivityDetails.GO_BACK_BUTTON)
+    hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
+    hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
+    hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
     hlp.see(Overview.SCREEN)
 
     // Check that the user do not have a profile
@@ -307,7 +308,7 @@ class ActivityFlowTest {
     // Likes screen
     hlp.click(BottomNavigation.Liked, bottomNavItem = true)
     hlp.notSee(Overview.ACTIVITY_CARD)
-    hlp.see(Liked.NO_LIKED_ACTIVITIES)
+    hlp.see("emptyLikedActivityPrompt")
 
     // Overview screen
     hlp.click(BottomNavigation.OVERVIEW, bottomNavItem = true)
@@ -315,8 +316,8 @@ class ActivityFlowTest {
 
     // Activity details screen
     hlp.see(ActivityDetails.SCREEN)
-    hlp.click(ActivityDetails.LIKE_BUTTON + "false")
-    hlp.see(ActivityDetails.LIKE_BUTTON + "true")
+    hlp.click("likeButton" + "false")
+    hlp.see("likeButton" + "true")
     hlp.click(ActivityDetails.GoBackButton)
 
     // Overview screen
@@ -326,7 +327,7 @@ class ActivityFlowTest {
     hlp.click(BottomNavigation.Liked, bottomNavItem = true)
     composeTestRule.waitForIdle()
     hlp.see(Overview.ACTIVITY_CARD)
-    hlp.notSee(Liked.NO_LIKED_ACTIVITIES)
+    hlp.notSee("emptyLikedActivityPrompt")
     hlp.click(Overview.ACTIVITY_CARD)
 
     // Activity details screen

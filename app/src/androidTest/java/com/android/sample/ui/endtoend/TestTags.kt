@@ -45,12 +45,6 @@ object Auth {
   }
 }
 
-object Liked {
-  const val SCREEN = "likedActivitiesScreen"
-  const val ACTIVITY_CARD = "activityCard"
-  const val NO_LIKED_ACTIVITIES = "emptyLikedActivityPrompt"
-}
-
 /** Overview tags */
 object Overview {
   const val SCREEN = "listActivitiesScreen"
@@ -73,7 +67,23 @@ object Overview {
 
   const val EMPTY_ACTIVITY = "emptyActivityPrompt"
 
-  object ActivityDetails {}
+  object ActivityDetails {
+    const val SCREEN = "activityDetailsScreen"
+    const val TopAppBar = "topAppBar"
+    const val GO_BACK_BUTTON = "goBackButton"
+    const val Image = "image"
+    const val Title = "title"
+    const val TitleText = "titleText"
+    const val DescriptionText = "descriptionText"
+    const val Price = "price"
+    const val PriceText = "priceText"
+    const val Location = "location"
+    const val LocationText = "locationText"
+    const val Schedule = "schedule"
+    const val ScheduleText = "scheduleText"
+    const val NOT_LOGGED_IN_TEXT = "notLoggedInText"
+    const val ENROLL_BUTTON = "enrollButton"
+  }
 }
 
 /** Profile tags */
@@ -105,15 +115,6 @@ object NoConnection {
 /** Activity details tags */
 object ActivityDetails {
   const val SCREEN = "activityDetailsScreen"
-  const val GO_BACK_BUTTON = "goBackButton"
-  const val NOT_LOGGED_IN_TEXT = "notLoggedInText"
-  const val ENROLL_BUTTON = "enrollButton"
-  const val LIKE_BUTTON = "likeButton"
-  const val COMMENTS = "comments"
-  const val COMMENT_INPUT = "CommentInputField"
-  const val COMMENT_POST_BUTTON = "PostCommentButton"
-  const val COMMENT_ITEM = "commentItem"
-  const val EDIT_BUTTON = "editButton"
   const val TopAppBar = "topAppBar"
   const val Image = "image"
   const val Title = "title"
@@ -129,22 +130,42 @@ object ActivityDetails {
   const val Schedule = "schedule"
   const val ScheduleText = "scheduleText"
   const val GoBackButton = "goBackButton"
-  // Amine Dafer: I added this tag for you to uncomment it in the test
-  // const val COMMENT_SECTION = "commentSection"
 }
 
-object EditActivity {
-  const val SCREEN = "editActivityScreen"
-  const val TITLE_INPUT = "titleInput"
-  const val DESCRIPTION_INPUT = "descriptionInput"
-  const val PRICE_INPUT = "priceInput"
-  const val LOCATION_INPUT = "locationInput"
-  const val LOCATION_ITEM = "locationItem"
-  const val EDIT_BUTTON = "editButton"
+// Inputs
+object Inputs {
+  const val InputTitleCreate = "inputTitleCreate"
+  const val InputDescriptionCreate = "inputDescriptionCreate"
+  const val InputDateCreate = "inputDateCreate"
+  const val InputPriceCreate = "inputPriceCreate"
+  const val InputPlacesCreate = "inputPlacesCreate"
+  const val InputLocationCreate = "inputLocationCreate"
+  const val ChooseTypeMenu = "chooseTypeMenu"
+}
+
+// Filter & Lists
+object Filters {
+  const val SegmentedButtonRow = "segmentedButtonRow"
+  const val SegmentedButtonCulture = "segmentedButtonCULTURE"
+  const val SegmentedButtonSport = "segmentedButtonSPORT"
 }
 
 // Prompts
 object Prompts {
   const val NOT_CONNECTED = "notConnectedPrompt"
+  const val EmptyActivityPrompt = "emptyActivityPrompt"
   const val SignInButton = "signInButton"
+  const val GoToSignInButton = "GoToSignInButton"
+}
+
+// Map
+object Map {
+  const val Map = "Map"
+  const val CenterOnCurrentLocation = "centerOnCurrentLocation"
+}
+
+// Liked Activities
+object LikedActivities {
+  const val SCREEN = "likedActivitiesScreen"
+  const val ACTIVITY_CARD = "activityCard"
 }
