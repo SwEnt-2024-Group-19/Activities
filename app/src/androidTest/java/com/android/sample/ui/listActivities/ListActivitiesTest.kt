@@ -1,5 +1,6 @@
 package com.android.sample.ui.listActivities
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsOff
@@ -22,6 +23,8 @@ import com.android.sample.model.activity.ActivityStatus
 import com.android.sample.model.activity.ActivityType
 import com.android.sample.model.activity.Category
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.Location
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.LocationViewModel
@@ -52,6 +55,9 @@ class OverviewScreenTest {
   private lateinit var listActivitiesViewModel: ListActivitiesViewModel
   private lateinit var userProfileViewModel: ProfileViewModel
   private lateinit var locationViewModel: LocationViewModel
+  private lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var imageViewModel: ImageViewModel
   private lateinit var testUser: User
 
   private val activity =
@@ -105,7 +111,9 @@ class OverviewScreenTest {
     activitiesRepository = mock(ActivitiesRepository::class.java)
     navigationActions = mock(NavigationActions::class.java)
     listActivitiesViewModel = ListActivitiesViewModel(profilesRepository, activitiesRepository)
-
+    imageRepositoryFirestore = mock(ImageRepositoryFirestore::class.java)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    imageViewModel = ImageViewModel(imageRepositoryFirestore, sharedPreferences)
     testUser =
         User(
             id = "Rola",
@@ -134,7 +142,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     `when`(activitiesRepository.getActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf())
@@ -150,7 +162,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     // Mock the activities repository to return an activity
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -177,7 +193,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     // Ensure segmented buttons are displayed
     composeTestRule.onNodeWithTag("segmentedButtonRow").assertIsDisplayed()
@@ -197,7 +217,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     composeTestRule.onNodeWithText("CULTURE").performClick()
     composeTestRule
@@ -211,7 +235,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     val fullActivity = activity.copy(maxPlaces = 2, placesLeft = 2)
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -229,7 +257,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     // Ensure bottom navigation menu is displayed
     composeTestRule.onNodeWithTag("bottomNavigationMenu").assertIsDisplayed()
@@ -243,7 +275,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -265,7 +301,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     val activity1 = activity.copy(title = "Italian cooking", category = Category.CULTURE)
     val activity2 = activity.copy(title = "dance", category = Category.ENTERTAINMENT)
@@ -306,7 +346,8 @@ class OverviewScreenTest {
           listActivitiesViewModel = listActivitiesViewModel,
           profileViewModel = userProfileViewModel,
           profile = testUser,
-          activity = activity)
+          activity = activity,
+          imageViewModel = imageViewModel)
     }
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("iconparticipants", useUnmergedTree = true).assertIsDisplayed()
@@ -324,7 +365,8 @@ class OverviewScreenTest {
           listActivitiesViewModel = listActivitiesViewModel,
           profileViewModel = userProfileViewModel,
           profile = testUser,
-          activity = activity)
+          activity = activity,
+          imageViewModel = imageViewModel)
     }
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
     composeTestRule.onNodeWithTag("participantsText", useUnmergedTree = true).assertIsDisplayed()
@@ -346,7 +388,8 @@ class OverviewScreenTest {
           listActivitiesViewModel = listActivitiesViewModel,
           profileViewModel = userProfileViewModel,
           profile = testUser,
-          activity = activity1)
+          activity = activity1,
+          imageViewModel = imageViewModel)
     }
 
     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
@@ -363,7 +406,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     `when`(activitiesRepository.getActivities(any(), any())).then {
       it.getArgument<(List<Activity>) -> Unit>(0)(listOf(activity))
@@ -386,7 +433,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(newUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     composeTestRule.onNodeWithTag("likeButtontrue").assertIsDisplayed()
@@ -402,7 +453,8 @@ class OverviewScreenTest {
           profileViewModel = userProfileViewModel,
           profile = testUser,
           activity = activity,
-          distance = 0.5503f)
+          distance = 0.5503f,
+          imageViewModel = imageViewModel)
     }
     composeTestRule
         .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
@@ -419,7 +471,8 @@ class OverviewScreenTest {
           profileViewModel = userProfileViewModel,
           profile = testUser,
           activity = activity,
-          distance = 12.354f)
+          distance = 12.354f,
+          imageViewModel = imageViewModel)
     }
     composeTestRule
         .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
@@ -436,7 +489,8 @@ class OverviewScreenTest {
           profileViewModel = userProfileViewModel,
           profile = testUser,
           activity = activity,
-          distance = null)
+          distance = null,
+          imageViewModel = imageViewModel)
     }
     composeTestRule
         .onNodeWithTag("locationAndDistanceText", useUnmergedTree = true)
@@ -453,7 +507,8 @@ class OverviewScreenTest {
           listActivitiesViewModel = listActivitiesViewModel,
           profileViewModel = userProfileViewModel,
           profile = testUser,
-          activity = activity)
+          activity = activity,
+          imageViewModel = imageViewModel)
     }
 
     // Verify initial state is liked
@@ -477,7 +532,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
     val activity2 = activity.copy(title = "dance", type = ActivityType.PRO)
@@ -501,7 +560,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
     val activity1 = activity.copy(title = "cooking", type = ActivityType.INDIVIDUAL)
     val activity2 = activity.copy(title = "dance", type = ActivityType.PRO)
@@ -531,7 +594,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     val activity1 = activity.copy(title = "Few spots", maxPlaces = 5)
@@ -560,7 +627,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     val activity1 = activity.copy(title = "PRO activity", type = ActivityType.PRO)
@@ -588,7 +659,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     val activity1 =
@@ -618,7 +693,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(creatorProfile))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -649,7 +728,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -678,7 +761,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(user))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     `when`(activitiesRepository.getActivities(any(), any())).then {
@@ -711,7 +798,11 @@ class OverviewScreenTest {
     `when`(userProfileViewModel.userState).thenReturn(MutableStateFlow(creatorProfile))
     composeTestRule.setContent {
       ListActivitiesScreen(
-          listActivitiesViewModel, navigationActions, userProfileViewModel, locationViewModel)
+          listActivitiesViewModel,
+          navigationActions,
+          userProfileViewModel,
+          locationViewModel,
+          imageViewModel = imageViewModel)
     }
 
     `when`(activitiesRepository.getActivities(any(), any())).then {

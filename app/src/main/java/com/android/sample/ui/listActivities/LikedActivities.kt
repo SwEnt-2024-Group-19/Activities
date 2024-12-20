@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
@@ -48,6 +49,7 @@ fun LikedActivitiesScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
     modifier: Modifier = Modifier,
+    imageViewModel: ImageViewModel
 ) {
   val uiState by viewModel.uiState.collectAsState()
   val profile = profileViewModel.userState.collectAsState().value
@@ -133,7 +135,8 @@ fun LikedActivitiesScreen(
                               viewModel,
                               profileViewModel,
                               profile,
-                              null)
+                              null,
+                              imageViewModel = imageViewModel)
                         }
                       }
                 }

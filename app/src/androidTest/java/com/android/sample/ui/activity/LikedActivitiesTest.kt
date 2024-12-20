@@ -1,5 +1,6 @@
 package com.android.sample.ui.activity
 
+import android.content.SharedPreferences
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -7,6 +8,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.image.ImageRepositoryFirestore
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.profile.ProfileViewModel
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.testUser
@@ -30,6 +33,9 @@ class LikedActivitiesTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var viewModel: ListActivitiesViewModel
   private lateinit var profileViewModel: ProfileViewModel
+  private lateinit var imageRepositoryFirestore: ImageRepositoryFirestore
+  private lateinit var sharedPreferences: SharedPreferences
+  private lateinit var imageViewModel: ImageViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
@@ -41,14 +47,11 @@ class LikedActivitiesTest {
     navigationActions = mock(NavigationActions::class.java)
     viewModel = ListActivitiesViewModel(profilesRepository, activitiesRepository)
 
-    // val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)
-
-    // `when`(userProfileViewModel.userState).thenReturn(userStateFlow)
-
+    imageRepositoryFirestore = mock(ImageRepositoryFirestore::class.java)
+    sharedPreferences = mock(SharedPreferences::class.java)
+    imageViewModel = ImageViewModel(imageRepositoryFirestore, sharedPreferences)
     `when`(navigationActions.currentRoute()).thenReturn(Route.LIKED_ACTIVITIES)
-    // composeTestRule.setContent { ListActivitiesScreen(listActivitiesViewModel, navigationActions,
-    // userProfileViewModel) }
   }
 
   @Test
@@ -58,7 +61,8 @@ class LikedActivitiesTest {
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(null))
 
     composeTestRule.setContent {
-      LikedActivitiesScreen(viewModel, navigationActions, profileViewModel)
+      LikedActivitiesScreen(
+          viewModel, navigationActions, profileViewModel, imageViewModel = imageViewModel)
     }
 
     // Verify sign-in prompt is displayed
@@ -76,7 +80,8 @@ class LikedActivitiesTest {
     whenever(profileViewModel.userState).thenReturn(MutableStateFlow(emptyTestUser))
 
     composeTestRule.setContent {
-      LikedActivitiesScreen(viewModel, navigationActions, profileViewModel)
+      LikedActivitiesScreen(
+          viewModel, navigationActions, profileViewModel, imageViewModel = imageViewModel)
     }
 
     // Verify empty liked activity message is displayed

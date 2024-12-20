@@ -1,6 +1,7 @@
 package com.android.sample.ui.listActivities
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +38,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -48,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -63,6 +66,7 @@ import com.android.sample.model.activity.CategoryColorMap
 import com.android.sample.model.activity.ListActivitiesViewModel
 import com.android.sample.model.activity.categories
 import com.android.sample.model.hour_date.HourDateViewModel
+import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.map.HandleLocationPermissionsAndTracking
 import com.android.sample.model.map.LocationViewModel
 import com.android.sample.model.profile.ProfileViewModel
@@ -103,7 +107,8 @@ fun ListActivitiesScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileViewModel,
     locationViewModel: LocationViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    imageViewModel: ImageViewModel
 ) {
   val uiState by viewModel.uiState.collectAsState()
   val options = categories.map { it.name }
@@ -288,7 +293,8 @@ fun ListActivitiesScreen(
                                 viewModel,
                                 profileViewModel,
                                 profile,
-                                locationViewModel.getDistanceFromCurrentLocation(activity.location))
+                                locationViewModel.getDistanceFromCurrentLocation(activity.location),
+                                imageViewModel = imageViewModel)
                           }
                         }
                       }
@@ -313,7 +319,8 @@ fun ActivityCard(
     listActivitiesViewModel: ListActivitiesViewModel,
     profileViewModel: ProfileViewModel,
     profile: User?,
-    distance: Float? = null
+    distance: Float? = null,
+    imageViewModel: ImageViewModel
 ) {
   val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
   val formattedDate = dateFormat.format(activity.date.toDate())
@@ -336,13 +343,26 @@ fun ActivityCard(
         Column(modifier = Modifier.fillMaxWidth().background(Color(0xFFD5EAF3))) {
           // Box for overlaying the title on the image
           Box(modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp)) {
-
+            var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
+            LaunchedEffect(activity.uid) {
+              imageViewModel.fetchActivityImagesAsBitmaps(
+                  activity.uid, onSuccess = { urls -> bitmaps = urls }, onFailure = {})
+            }
             // Display the activity image
-            Image(
-                painter = painterResource(getImageResourceIdForCategory(activity.category)),
-                contentDescription = activity.title,
-                modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
-                contentScale = ContentScale.Crop)
+            if (activity.images.isNotEmpty() && bitmaps.isNotEmpty()) {
+              Image(
+                  bitmap = bitmaps[0].asImageBitmap(),
+                  contentDescription = activity.title,
+                  modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
+                  contentScale = ContentScale.FillWidth)
+            } else {
+              Image(
+                  painter = painterResource(getImageResourceIdForCategory(activity.category)),
+                  contentDescription = activity.title,
+                  modifier = Modifier.fillMaxWidth().height(LARGE_IMAGE_SIZE.dp),
+                  contentScale = ContentScale.Crop)
+            }
+
             // Apply a dark gradient overlay at the bottom to improve contrast
             DarkGradient()
 
