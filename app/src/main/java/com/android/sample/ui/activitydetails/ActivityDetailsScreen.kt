@@ -1064,7 +1064,7 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
       Icon(
           imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
           contentDescription = if (isLiked) "Liked" else "Not Liked",
-          tint = if (isLiked) Color(LIGHT_BLUE) else Color(LIGHT_BLUE))
+          tint = Color(LIGHT_BLUE))
     }
   }
 }
