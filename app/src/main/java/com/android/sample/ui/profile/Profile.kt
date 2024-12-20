@@ -3,6 +3,7 @@ package com.android.sample.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.auth.SignInRepository
+import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
@@ -90,7 +93,8 @@ fun ProfileScreen(
     userProfileViewModel: ProfileViewModel,
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+    signInViewModel: SignInViewModel
 ) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
@@ -119,7 +123,7 @@ fun ProfileScreen(
             imageViewModel,
             userProfileViewModel,
             listActivitiesViewModel,
-            uid)
+            uid, signInViewModel  )
       }
     }
   } else {
@@ -139,7 +143,8 @@ fun ProfileScreen(
             imageViewModel,
             userProfileViewModel,
             listActivitiesViewModel,
-            uid)
+            uid,
+            signInViewModel)
       }
     }
   }
@@ -364,7 +369,7 @@ fun InterestBox(interest: Interest) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun UserProfile(
     user: User,
@@ -372,7 +377,8 @@ fun UserProfile(
     imageViewModel: ImageViewModel,
     profileViewModel: ProfileViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
-    uid: String
+    uid: String,
+    signInViewModel: SignInViewModel
 ) {
   var activityType by remember { mutableIntStateOf(CREATED_ACTIVITIES) }
   val uiState by listActivitiesViewModel.uiState.collectAsState()
@@ -432,7 +438,8 @@ fun UserProfile(
                 DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                   DropdownMenuItem(
                       modifier = Modifier.testTag("logoutMenuItem"),
-                      text = { Text(LocalContext.current.getString(R.string.logout)) },
+                      text = {
+                          Text(LocalContext.current.getString(R.string.logout)) },
                       onClick = {
                         performOfflineAwareAction(
                             context = context,
@@ -440,15 +447,17 @@ fun UserProfile(
                             onPerform = {
                               showMenu = false
                               profileViewModel.clearUserData()
-                              Firebase.auth.signOut()
+                              signInViewModel.signOut() //sign out
                               navigationActions.navigateTo(Screen.AUTH)
+
                             })
                       },
-                      enabled = Firebase.auth.currentUser?.isAnonymous == false)
+                      enabled = profileViewModel.userState.value!=null)
                   DropdownMenuItem(
                       modifier = Modifier.testTag("editProfileMenuItem"),
                       text = { Text(LocalContext.current.getString(R.string.edit_profile)) },
-                      onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
+                      onClick = {
+                          navigationActions.navigateTo(Screen.EDIT_PROFILE) })
                 }
               }
             })
