@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,6 +36,7 @@ import com.android.sample.model.activity.Category
 import com.android.sample.model.image.resize
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
+import com.android.sample.resources.C.Tag.LARGE_IMAGE_SIZE
 import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
@@ -137,24 +139,24 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
  */
 @Composable
 fun CarouselNoModif(itemsList: List<Bitmap>, category: Category) {
-  Row(modifier = Modifier.padding(8.dp).height(120.dp)) {
+  Row(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
     LazyRow {
       if (itemsList.isNotEmpty()) {
         items(itemsList.size) { index ->
-          Card(modifier = Modifier.padding(4.dp)) {
+          Card(modifier = Modifier.padding(SMALL_PADDING.dp)) {
             Image(
-                bitmap = itemsList[index].resize(100).asImageBitmap(),
+                bitmap = itemsList[index].resize(LARGE_IMAGE_SIZE).asImageBitmap(),
                 contentDescription = "Selected Image",
-                modifier = Modifier.size(100.dp))
+                modifier = Modifier.size(LARGE_IMAGE_SIZE.dp).fillMaxSize())
           }
         }
       } else {
         item {
-          Card(modifier = Modifier.padding(4.dp)) {
+          Card(modifier = Modifier.padding(SMALL_PADDING.dp)) {
             Image(
                 painter = painterResource(id = getImageResourceIdForCategory(category)),
                 contentDescription = "Default Category Image",
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier.size(LARGE_IMAGE_SIZE.dp),
                 contentScale = ContentScale.Crop)
           }
         }

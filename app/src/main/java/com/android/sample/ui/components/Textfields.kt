@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
+import com.android.sample.resources.C.Tag.LIGHT_BLUE
 import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
@@ -198,7 +199,9 @@ fun TextFieldWithErrorState(
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             errorIndicatorColor = Color.Transparent,
-                            errorContainerColor = Color.Transparent),
+                            errorContainerColor = Color.Transparent,
+                            focusedLabelColor = Color(LIGHT_BLUE),
+                            cursorColor = Color.Black),
                     singleLine = true)
               }
         }
