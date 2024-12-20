@@ -13,6 +13,10 @@ import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.defaultUserCredentials1
 import com.android.sample.resources.dummydata.defaultUserCredentials2
+import com.android.sample.ui.endtoend.Overview.ActivityDetails.ENROLL_BUTTON
+import com.android.sample.ui.endtoend.Profile.ACTIVITY_ROW
+import com.android.sample.ui.endtoend.Profile.ENROLLED_BUTTON
+import com.android.sample.ui.endtoend.Profile.PLUS_BUTTON_TO_CREATE
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
@@ -158,64 +162,6 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun guestShouldSignUpForOtherFunctionalities() {
-    // Auth screen > Sign in screen
-    hlp.scroll(
-        Auth.SignIn.SIGN_IN_COLUMN,
-        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
-    hlp.click(Auth.SignIn.GUEST_BUTTON)
-
-    // Overview screen
-    hlp.see(Overview.SCREEN)
-    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
-
-    // Profile screen
-    hlp.see(Profile.NotLoggedIn.PROMPT)
-    hlp.click(Profile.NotLoggedIn.SIGN_IN_BUTTON)
-
-    // Auth screen > Sign up screen
-    hlp.see(Auth.SignUp.SCREEN)
-    hlp.scroll(
-        Auth.SignUp.SIGN_UP_COLUMN,
-        Auth.SignUp.GO_TO_SIGN_IN_BUTTON) // @TODO: This should not need scrolling
-    hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
-
-    // Auth screen > Sign in
-    hlp.see(Auth.SignIn.SCREEN)
-    hlp.scroll(
-        Auth.SignIn.SIGN_IN_COLUMN,
-        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
-    hlp.click(Auth.SignIn.GUEST_BUTTON)
-
-    // Tries to create a new activity and is prompted to sign in
-    hlp.see(Overview.SCREEN)
-    hlp.click(BottomNavigation.CREATE_ACTIVITY, bottomNavItem = true)
-
-    // Add activity screen
-    /*hlp.assertIsDisplayed(CreateActivity.SCREEN)
-    hlp.write(CreateActivity.TITLE_INPUT, "Activity Title")
-    hlp.write(CreateActivity.DESCRIPTION_INPUT, "Activity Description")
-    hlp.write(CreateActivity.PRICE_INPUT, "13")
-    hlp.write(CreateActivity.PLACES_INPUT, "7")
-    hlp.write(CreateActivity.LOCATION_INPUT, "Activity Location")
-
-
-    composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputPlacesCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
-    composeTestRule.onNodeWithTag("chooseTypeMenu").assertExists()
-    composeTestRule.onNodeWithTag("addAttendeeButton").assertExists()
-    composeTestRule.onNodeWithTag("createButton").assertExists()
-    composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("Map").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()*/
-  }
-
-  @Test
   fun aUserSwitchesProfile() {
     // use of !! is allowed because this is a test environment and we know the
     // key exists. if it doesn't, it is up to the developer to fix the test
@@ -267,56 +213,82 @@ class ActivityFlowTest {
     hlp.see(name2, text = true)
   }
 
-  /*
-   @Test
-   fun aUserTriesToLookAtAnActivity() {
-     // Signs in
-     composeTestRule.onNodeWithTag("SignInButton").performClick()
-     composeTestRule.waitForIdle()
+  @Test
+  fun EditProfileAndJoinActivity() {
+    //    val email = "anna1@gmail.com"
+    //    val password= "anna123"
+    //    val name = "anna" // @TODO: Should this change to full name?
+    //    val surname="ronnie"
 
-     // create an activity
-     composeTestRule.onNodeWithTag("Overview").performClick()
-     composeTestRule.waitForIdle()
-     composeTestRule.onNodeWithTag("Add Activity").performClick()
-     composeTestRule.waitForIdle()
-     composeTestRule.onNodeWithTag("inputTitleCreate").performTextInput("Activity Title")
-     composeTestRule.onNodeWithTag("Description").performTextInput("Activity Description")
-     composeTestRule.onNodeWithTag("inputDateCreate").performTextInput("12/12/2025")
-     composeTestRule.onNodeWithTag("inputStartTime").performTextInput("15:30")
-     composeTestRule.onNodeWithTag("inputDurationCreate").performTextInput("00:30")
-     composeTestRule.onNodeWithTag("inputPriceCreate").performTextInput("13")
-     composeTestRule.onNodeWithTag("inputPlacesCreate").performTextInput("7")
-     composeTestRule.onNodeWithTag("inputLocationCreate").performTextInput("Activity Location")
-     composeTestRule.onNodeWithTag("createButton").performClick()
-     composeTestRule.waitForIdle()
+    // Auth screen > Sign up screen
+    //    hlp.click(Auth.SignIn.GO_TO_SIGN_UP_BUTTON)
+    //    hlp.notSee(Overview.SCREEN)
+    //    hlp.see(Auth.SignUp.SCREEN)
+    //    hlp.write(Auth.SignUp.EMAIL_TEXT_FIELDS, email)
+    //    hlp.write(Auth.SignUp.PASSWORD_TEXT_FIELDS, password)
+    //    hlp.write(Auth.SignUp.NAME_TEXT_FIELDS, name)
+    //    hlp.write(Auth.SignUp.SURNAME_TEXT_FIELDS, surname)
+    //    hlp.click(Auth.SignUp.SIGN_UP_BUTTON)
+    //
+    //
+    val email1 = defaultUserCredentials2["email"]!!
+    val password1 = defaultUserCredentials2["password"]!!
+    val name1 = defaultUserCredentials2["first name"]!! // @TODO: Should this change to full name?
 
-     // check in profile that the activity was added
-     composeTestRule.onNodeWithTag("Profile").performClick()
-     composeTestRule.waitForIdle()
-     composeTestRule.onNodeWithTag("profileScreen").assertExists()
-     composeTestRule.onNodeWithTag("activityCreated").assertExists()
-     composeTestRule.onNodeWithTag("activityCreated").performClick()
-     composeTestRule.waitForIdle()
+    // Auth screen > Sign in screen
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+    hlp.notSee(Overview.SCREEN)
+    hlp.see(Auth.SignIn.TEXT_INVALID_EMAIL, text = true)
 
-     // Filters for specific activity types
-     composeTestRule.onNodeWithTag("segmentedButtonSOLO").performClick()
-     composeTestRule.waitForIdle()
-     composeTestRule.onNodeWithTag("emptyActivityPrompt").assertIsDisplayed()
+    //  Enters credentials then connects
+    hlp.write(Auth.SignIn.EMAIL_INPUT, email1)
+    hlp.write(Auth.SignIn.PASSWORD_INPUT, password1)
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
 
-     composeTestRule.onNodeWithTag("segmentedButtonPRO").performClick()
-     composeTestRule.waitForIdle()
-     composeTestRule.onNodeWithTag("activityCard").assertIsDisplayed()
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+    hlp.see(BottomNavigation.OVERVIEW)
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
 
-     // Opens the activity details
-     composeTestRule.onNodeWithTag("activityCard").performClick()
-     composeTestRule.waitForIdle()
-     composeTestRule.onNodeWithTag("activityDetailsScreen").assertIsDisplayed()
+    // Profile screen of user
+    hlp.see(Profile.SCREEN)
+    hlp.see(name1, text = true)
 
-     // Verifies user-specific options (enrollment, edit, or activity details)
-     composeTestRule.onNodeWithTag("enrollButton").assertExists()
-     composeTestRule.onNodeWithTag("activityDescription").assertIsDisplayed()
-   }
+    // proceed to edit profile
+    hlp.see(Profile.MORE_OPTIONS_BUTTON)
+    hlp.click(Profile.MORE_OPTIONS_BUTTON)
+    hlp.see(Profile.EDIT_PROFILE_BUTTON)
+    hlp.click(Profile.EDIT_PROFILE_BUTTON)
 
-  */
+    // changing The profile name
+    hlp.see(Profile.EditProfile.EDIT_PROFILE_SCREEN)
+    hlp.click(Profile.EditProfile.INPUT_NAME)
+    hlp.write(Profile.EditProfile.INPUT_NAME, "Mary", true)
+    hlp.scroll("editProfileContent", "ProfileCreationButtonCard")
+    hlp.click(Profile.EditProfile.SAVE_BUTTON)
+    hlp.see(Profile.SCREEN)
 
+    // make sure the name is really updated and displayed
+    hlp.see("Mary", text = true)
+
+    // make sure the user is not enrolled in any activity
+    hlp.click(ENROLLED_BUTTON)
+    hlp.notSee(ACTIVITY_ROW)
+    hlp.see(PLUS_BUTTON_TO_CREATE)
+
+    // enroll in a new activity
+    hlp.click(BottomNavigation.OVERVIEW, bottomNavItem = true)
+    hlp.see(Overview.SCREEN)
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
+    hlp.click(Overview.ACTIVITY_CARD)
+    hlp.see(ActivityDetails.SCREEN)
+    hlp.scroll("activityDetailsScreen", ENROLL_BUTTON)
+    hlp.click(ENROLL_BUTTON)
+
+    // make sure the user is now enrolled in an activity
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+    hlp.click(ENROLLED_BUTTON)
+    hlp.see(ACTIVITY_ROW)
+    hlp.notSee(PLUS_BUTTON_TO_CREATE)
+  }
 }

@@ -56,7 +56,13 @@ class MockProfilesRepository(private val database: MockUsersDatabase = MockUsers
   }
 
   override fun updateProfile(user: User, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    throw NotImplementedError("Not implemented: updateProfile")
+    try {
+      database.updateUser(user)
+
+      onSuccess()
+    } catch (e: Exception) {
+      onFailure(e)
+    }
   }
 
   override fun addProfileToDatabase(
