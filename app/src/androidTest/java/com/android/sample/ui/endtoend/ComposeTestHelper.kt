@@ -29,13 +29,13 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
    *
    * @param tag The tag of the node to click.
    */
-  fun click(tag: String, bottomNavItem: Boolean = false) {
+  fun click(tag: String, bottomNavItem: Boolean = false, any: Boolean = false, index: Int = 0) {
     if (bottomNavItem) {
       clickBottomNavigationItem(tag)
       return
     }
-    val node = getNode(tag)
-    see(tag)
+    val node = getNode(tag, any = any, index = index)
+    see(tag, any = any, index = index)
     node.assertHasClickAction()
     node.performClick()
     composeTestRule.waitForIdle()
@@ -59,8 +59,14 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
    * @param any Whether to accept multiple nodes to match the tag, and to select any (i.e. the
    *   first) of these nodes. default is false.
    */
-  fun see(tag: String, selected: Boolean? = null, text: Boolean = false, any: Boolean = false) {
-    val node = getNode(tag, text, any)
+  fun see(
+      tag: String,
+      selected: Boolean? = null,
+      text: Boolean = false,
+      any: Boolean = false,
+      index: Int = 0
+  ) {
+    val node = getNode(tag, text, any, index)
     node.assertIsDisplayed()
     when (selected) {
       true -> node.assertIsSelected()
@@ -72,11 +78,12 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
   private fun getNode(
       tag: String,
       text: Boolean = false,
-      any: Boolean = false
+      any: Boolean = false,
+      index: Int = 0
   ): SemanticsNodeInteraction {
     return if (any) {
-      if (text) composeTestRule.onAllNodesWithText(tag)[0]
-      else composeTestRule.onAllNodesWithTag(tag)[0]
+      if (text) composeTestRule.onAllNodesWithText(tag)[index]
+      else composeTestRule.onAllNodesWithTag(tag)[index]
     } else {
       if (text) composeTestRule.onNodeWithText(tag) else composeTestRule.onNodeWithTag(tag)
     }
