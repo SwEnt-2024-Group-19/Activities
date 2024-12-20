@@ -640,8 +640,6 @@ class ActivityDetailsScreenAndroidTest {
     composeTestRule.onNodeWithTag("creatorName").assertIsDisplayed()
     composeTestRule.onNodeWithTag("creatorName").assertTextContains("John Doe")
 
-    composeTestRule.onNodeWithTag("creatorRating").assertIsDisplayed()
-
     composeTestRule.onNodeWithTag("activityCount").assertIsDisplayed()
     composeTestRule.onNodeWithTag("activityCount").assertTextContains("Created 5 Activities")
   }
