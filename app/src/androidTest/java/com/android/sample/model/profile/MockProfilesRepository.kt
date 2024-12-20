@@ -34,7 +34,12 @@ class MockProfilesRepository(private val database: MockUsersDatabase = MockUsers
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    throw NotImplementedError("Not implemented: addLikedActivity")
+    try {
+      val user = database.getUser(userId)
+      database.updateUser(user.copy(likedActivities = user.likedActivities?.plus(activityId)))
+    } catch (e: Exception) {
+      onFailure(e)
+    }
   }
 
   override fun removeLikedActivity(
@@ -43,7 +48,12 @@ class MockProfilesRepository(private val database: MockUsersDatabase = MockUsers
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    throw NotImplementedError("Not implemented: removeLikedActivity")
+    try {
+      val user = database.getUser(userId)
+      database.updateUser(user.copy(likedActivities = user.likedActivities?.minus(activityId)))
+    } catch (e: Exception) {
+      onFailure(e)
+    }
   }
 
   override fun removeJoinedActivity(
