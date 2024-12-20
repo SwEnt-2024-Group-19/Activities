@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
@@ -80,8 +81,6 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import java.util.Calendar
 
 @Composable
@@ -90,7 +89,8 @@ fun ProfileScreen(
     userProfileViewModel: ProfileViewModel,
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+    signInViewModel: SignInViewModel
 ) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
@@ -119,7 +119,8 @@ fun ProfileScreen(
             imageViewModel,
             userProfileViewModel,
             listActivitiesViewModel,
-            uid)
+            uid,
+            signInViewModel)
       }
     }
   } else {
@@ -139,7 +140,8 @@ fun ProfileScreen(
             imageViewModel,
             userProfileViewModel,
             listActivitiesViewModel,
-            uid)
+            uid,
+            signInViewModel)
       }
     }
   }
@@ -366,7 +368,7 @@ fun InterestBox(interest: Interest) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun UserProfile(
     user: User,
@@ -374,7 +376,8 @@ fun UserProfile(
     imageViewModel: ImageViewModel,
     profileViewModel: ProfileViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
-    uid: String
+    uid: String,
+    signInViewModel: SignInViewModel
 ) {
   var activityType by remember { mutableIntStateOf(CREATED_ACTIVITIES) }
   val uiState by listActivitiesViewModel.uiState.collectAsState()
@@ -442,11 +445,11 @@ fun UserProfile(
                             onPerform = {
                               showMenu = false
                               profileViewModel.clearUserData()
-                              Firebase.auth.signOut()
+                              signInViewModel.signOut() // sign out
                               navigationActions.navigateTo(Screen.AUTH)
                             })
                       },
-                      enabled = Firebase.auth.currentUser?.isAnonymous == false)
+                      enabled = profileViewModel.userState.value != null)
                   DropdownMenuItem(
                       modifier = Modifier.testTag("editProfileMenuItem"),
                       text = { Text(LocalContext.current.getString(R.string.edit_profile)) },

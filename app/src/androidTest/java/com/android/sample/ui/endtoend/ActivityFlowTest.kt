@@ -11,7 +11,8 @@ import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
-import com.android.sample.resources.dummydata.defaultUserCredentials
+import com.android.sample.resources.dummydata.defaultUserCredentials1
+import com.android.sample.resources.dummydata.defaultUserCredentials2
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
@@ -81,28 +82,79 @@ class ActivityFlowTest {
     hlp.see(Overview.ACTIVITY_CARD)
 
     // Filter for specific criteria
-    // TODO: Implement this feature
+
+    hlp.see(Overview.FILTER_DIALOG_BUTTON)
+    hlp.click(Overview.FILTER_DIALOG_BUTTON)
+    hlp.see(Overview.FILTER_DIALOG)
+    hlp.scroll(parentTag = Overview.FILTER_DIALOG, nodeTag = Overview.Filters.ONLY_PRO_CHECKBOX_ROW)
+    hlp.see(Overview.Filters.ONLY_PRO_CHECKBOX_ROW)
+    hlp.click(Overview.Filters.ONLY_PRO_CHECKBOX)
+    hlp.scroll(parentTag = Overview.FILTER_DIALOG, nodeTag = Overview.Filters.FILTER_BUTTON)
+    hlp.click(Overview.Filters.FILTER_BUTTON)
+
+    hlp.notSee(Overview.ACTIVITY_CARD) // After filtering by PRO and SPORT, no activity is displayed
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.SKILLS)) // Switch to SKILLS
+    hlp.see(Overview.ACTIVITY_CARD)
+
+    // Search bar
+    hlp.click(Overview.SearchBar.SEARCH_BAR)
+    hlp.write(
+        Overview.SearchBar.SEARCH_BAR,
+        "DANCE",
+    )
+    hlp.notSee(Overview.ACTIVITY_CARD)
+    hlp.click(Overview.SearchBar.SEARCH_BAR)
+    hlp.write(Overview.SearchBar.SEARCH_BAR, "Sample", replace = true)
+    hlp.see(Overview.ACTIVITY_CARD)
 
     // Open the activity details
     hlp.click(Overview.ACTIVITY_CARD)
 
     // Activity details screen
-    /*hlp.assertIsDisplayed("activityDetailsScreen")
+    hlp.see(ActivityDetails.SCREEN)
     listOf(
-      "topAppBar", "goBackButton", "image", "title", "titleText", "descriptionText",
-      "price", "priceText", "location", "locationText", "schedule", "scheduleText"
-    ).forEach { hlp.assertIsDisplayed(it) }*/
-    // TODO: Implement this feature
+            ActivityDetails.TopAppBar,
+            ActivityDetails.GoBackButton,
+            ActivityDetails.Image,
+            ActivityDetails.Title,
+            ActivityDetails.TitleText,
+            ActivityDetails.DescriptionText,
+            ActivityDetails.Price,
+            ActivityDetails.PriceText,
+            ActivityDetails.Location,
+            ActivityDetails.LocationText,
+            ActivityDetails.Schedule,
+            ActivityDetails.ScheduleText)
+        .forEach { hlp.see(it) }
 
     // Check that the user is not logged in and can't enroll
-    hlp.scroll(
-        Overview.ActivityDetails.SCREEN,
-        Overview.ActivityDetails
-            .NOT_LOGGED_IN_TEXT) // @TODO: The need for a scroll here is debatable
+    hlp.scroll(Overview.ActivityDetails.SCREEN, Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
     hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
     hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
     hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
     hlp.see(Overview.SCREEN)
+
+    // Check that the user do not have a profile
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+    hlp.see(Profile.NotLoggedIn.PROMPT)
+    hlp.see(Profile.NotLoggedIn.SIGN_IN_BUTTON)
+
+    // Check that the user is not logged in and has no liked activities
+    hlp.click(BottomNavigation.Liked, bottomNavItem = true)
+    hlp.notSee(Overview.ACTIVITY_CARD)
+    hlp.see(Prompts.NOT_CONNECTED)
+    hlp.see(Prompts.SignInButton)
+
+    // Go To signIn
+    hlp.click(Prompts.SignInButton)
+    hlp.see(Auth.SignUp.SCREEN)
+    hlp.scroll(Auth.SignUp.SIGN_UP_COLUMN, Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
+    hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
+
+    // Auth screen > Sign in
+    hlp.see(Auth.SignIn.SCREEN)
+    hlp.scroll(Auth.SignIn.SIGN_IN_COLUMN, Auth.SignIn.GUEST_BUTTON)
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
   }
 
   @Test
@@ -164,12 +216,15 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun aUserSignsInAndLooksAtTheirProfile() {
+  fun aUserSwitchesProfile() {
     // use of !! is allowed because this is a test environment and we know the
     // key exists. if it doesn't, it is up to the developer to fix the test
-    val email = defaultUserCredentials["email"]!!
-    val password = defaultUserCredentials["password"]!!
-    val name = defaultUserCredentials["first name"]!! // @TODO: Should this change to full name?
+    val email1 = defaultUserCredentials1["email"]!!
+    val password1 = defaultUserCredentials1["password"]!!
+    val name1 = defaultUserCredentials1["first name"]!! // @TODO: Should this change to full name?
+    val email2 = defaultUserCredentials2["email"]!!
+    val password2 = defaultUserCredentials2["password"]!!
+    val name2 = defaultUserCredentials2["first name"]!!
 
     // Auth screen > Sign in screen
     hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
@@ -177,8 +232,8 @@ class ActivityFlowTest {
     hlp.see(Auth.SignIn.TEXT_INVALID_EMAIL, text = true)
 
     //  Enters credentials then connects
-    hlp.write(Auth.SignIn.EMAIL_INPUT, email)
-    hlp.write(Auth.SignIn.PASSWORD_INPUT, password)
+    hlp.write(Auth.SignIn.EMAIL_INPUT, email1)
+    hlp.write(Auth.SignIn.PASSWORD_INPUT, password1)
     hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
 
     // Overview screen
@@ -186,9 +241,30 @@ class ActivityFlowTest {
     hlp.see(BottomNavigation.OVERVIEW)
     hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
 
-    // Profile screen
+    // Profile screen of user 1
     hlp.see(Profile.SCREEN)
-    hlp.see(name, text = true)
+    hlp.see(name1, text = true)
+
+    // proceed to logout
+    hlp.see(Profile.MORE_OPTIONS_BUTTON)
+    hlp.click(Profile.MORE_OPTIONS_BUTTON)
+    hlp.see(Profile.LOGOUT_BUTTON)
+    hlp.click(Profile.LOGOUT_BUTTON)
+
+    // login with new credentials for user 2
+    hlp.see(Auth.SignIn.SCREEN)
+    hlp.write(Auth.SignIn.EMAIL_INPUT, email2)
+    hlp.write(Auth.SignIn.PASSWORD_INPUT, password2)
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+    hlp.see(BottomNavigation.OVERVIEW)
+
+    // Profile screen of user 2
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+    hlp.see(Profile.SCREEN)
+    hlp.see(name2, text = true)
   }
 
   /*
@@ -242,4 +318,5 @@ class ActivityFlowTest {
    }
 
   */
+
 }

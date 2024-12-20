@@ -45,6 +45,18 @@ object Overview {
   const val SCREEN = "listActivitiesScreen"
   const val ACTIVITY_CARD = "activityCard"
   const val SEGMENTED_BUTTON_ROW = "segmentedButtonRow"
+  const val FILTER_DIALOG_BUTTON = "filterDialog"
+  const val FILTER_DIALOG = "FilterDialog"
+
+  object Filters {
+    const val ONLY_PRO_CHECKBOX_ROW = "onlyPROCheckboxRow"
+    const val ONLY_PRO_CHECKBOX = "onlyPROCheckbox"
+    const val FILTER_BUTTON = "filterButton"
+  }
+
+  object SearchBar {
+    const val SEARCH_BAR = "searchBar"
+  }
 
   fun SEGMENTED_BUTTON_(type: Category) = "segmentedButton${type.name}"
 
@@ -72,6 +84,8 @@ object Overview {
 /** Profile tags */
 object Profile {
   const val SCREEN = "profileScreen"
+  const val MORE_OPTIONS_BUTTON = "moreOptionsButton"
+  const val LOGOUT_BUTTON = "logoutMenuItem"
 
   object NotLoggedIn {
     const val PROMPT = "loadingText"
@@ -85,6 +99,7 @@ object NoConnection {
 
 /** Activity details tags */
 object ActivityDetails {
+  const val SCREEN = "activityDetailsScreen"
   const val TopAppBar = "topAppBar"
   const val Image = "image"
   const val Title = "title"
@@ -96,6 +111,7 @@ object ActivityDetails {
   const val LocationText = "locationText"
   const val Schedule = "schedule"
   const val ScheduleText = "scheduleText"
+  const val GoBackButton = "goBackButton"
 }
 
 // Inputs
@@ -128,4 +144,10 @@ object Prompts {
 object Map {
   const val Map = "Map"
   const val CenterOnCurrentLocation = "centerOnCurrentLocation"
+}
+
+// Liked Activities
+object LikedActivities {
+  const val SCREEN = "likedActivitiesScreen"
+  const val ACTIVITY_CARD = "activityCard"
 }
