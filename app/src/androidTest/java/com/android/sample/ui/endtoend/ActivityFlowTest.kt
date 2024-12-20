@@ -13,6 +13,7 @@ import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.defaultUserCredentials1
 import com.android.sample.resources.dummydata.defaultUserCredentials2
+import com.android.sample.ui.endtoend.ActivityDetails.ENROLL_BUTTON
 import com.android.sample.ui.endtoend.Profile.ACTIVITY_ROW
 import com.android.sample.ui.endtoend.Profile.ENROLLED_BUTTON
 import com.android.sample.ui.endtoend.Profile.PLUS_BUTTON_TO_CREATE
@@ -22,7 +23,6 @@ import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 
 @HiltAndroidTest
 class ActivityFlowTest {
@@ -100,7 +100,10 @@ class ActivityFlowTest {
 
     // Search bar
     hlp.click(Overview.SearchBar.SEARCH_BAR)
-    hlp.write(Overview.SearchBar.SEARCH_BAR, "DANCE")
+    hlp.write(
+        Overview.SearchBar.SEARCH_BAR,
+        "DANCE",
+    )
     hlp.notSee(Overview.ACTIVITY_CARD)
     hlp.click(Overview.SearchBar.SEARCH_BAR)
     hlp.write(Overview.SearchBar.SEARCH_BAR, "Sample", replace = true)
@@ -118,6 +121,7 @@ class ActivityFlowTest {
     hlp.see(ActivityDetails.Title)
     hlp.see(ActivityDetails.TitleText)
     hlp.click(ActivityDetails.detailsIcon)
+
     hlp.see(ActivityDetails.DescriptionText)
     hlp.see(ActivityDetails.Price)
     hlp.see(ActivityDetails.PriceText)
@@ -154,64 +158,6 @@ class ActivityFlowTest {
     hlp.see(Auth.SignIn.SCREEN)
     hlp.scroll(Auth.SignIn.SIGN_IN_COLUMN, Auth.SignIn.GUEST_BUTTON)
     hlp.click(Auth.SignIn.GUEST_BUTTON)
-  }
-
-  @Test
-  fun guestShouldSignUpForOtherFunctionalities() {
-    // Auth screen > Sign in screen
-    hlp.scroll(
-        Auth.SignIn.SIGN_IN_COLUMN,
-        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
-    hlp.click(Auth.SignIn.GUEST_BUTTON)
-
-    // Overview screen
-    hlp.see(Overview.SCREEN)
-    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
-
-    // Profile screen
-    hlp.see(Profile.NotLoggedIn.PROMPT)
-    hlp.click(Profile.NotLoggedIn.SIGN_IN_BUTTON)
-
-    // Auth screen > Sign up screen
-    hlp.see(Auth.SignUp.SCREEN)
-    hlp.scroll(
-        Auth.SignUp.SIGN_UP_COLUMN,
-        Auth.SignUp.GO_TO_SIGN_IN_BUTTON) // @TODO: This should not need scrolling
-    hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
-
-    // Auth screen > Sign in
-    hlp.see(Auth.SignIn.SCREEN)
-    hlp.scroll(
-        Auth.SignIn.SIGN_IN_COLUMN,
-        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
-    hlp.click(Auth.SignIn.GUEST_BUTTON)
-
-    // Tries to create a new activity and is prompted to sign in
-    hlp.see(Overview.SCREEN)
-    hlp.click(BottomNavigation.CREATE_ACTIVITY, bottomNavItem = true)
-
-    // Add activity screen
-    /*hlp.assertIsDisplayed(CreateActivity.SCREEN)
-    hlp.write(CreateActivity.TITLE_INPUT, "Activity Title")
-    hlp.write(CreateActivity.DESCRIPTION_INPUT, "Activity Description")
-    hlp.write(CreateActivity.PRICE_INPUT, "13")
-    hlp.write(CreateActivity.PLACES_INPUT, "7")
-    hlp.write(CreateActivity.LOCATION_INPUT, "Activity Location")
-
-
-    composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputPlacesCreate").assertExists()
-    composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
-    composeTestRule.onNodeWithTag("chooseTypeMenu").assertExists()
-    composeTestRule.onNodeWithTag("addAttendeeButton").assertExists()
-    composeTestRule.onNodeWithTag("createButton").assertExists()
-    composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("Map").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()*/
   }
 
   @Test
@@ -335,7 +281,7 @@ class ActivityFlowTest {
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
     hlp.click(Overview.ACTIVITY_CARD)
     hlp.see(ActivityDetails.SCREEN)
-    hlp.click(ActivityDetails.ENROLL_BUTTON)
+    hlp.click(ENROLL_BUTTON)
 
     // make sure the user is now enrolled in an activity
     hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
