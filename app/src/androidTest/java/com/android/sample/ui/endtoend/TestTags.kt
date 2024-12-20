@@ -112,7 +112,7 @@ object ActivityDetails {
   const val NOT_LOGGED_IN_TEXT = "notLoggedInText"
   const val ENROLL_BUTTON = "enrollButton"
   const val LIKE_BUTTON = "likeButton"
-  const val COMMENTS_TITLE = "commentsTitle"
+  const val COMMENTS = "comments"
   const val COMMENT_INPUT = "CommentInputField"
   const val COMMENT_POST_BUTTON = "PostCommentButton"
   const val COMMENT_ITEM = "commentItem"
