@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -39,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,7 +68,9 @@ import com.android.sample.resources.C.Tag.AUTH_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
-import com.android.sample.resources.C.Tag.LARGE_PADDING
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -114,6 +118,11 @@ fun EditProfileScreen(
       topBar = {
         TopAppBar(
             title = { Text("Edit Profile", modifier = Modifier.testTag("editProfileTitle")) },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(MAIN_COLOR_DARK),
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White),
             navigationIcon = {
               IconButton(
                   modifier = Modifier.testTag("goBackButton"),
@@ -168,18 +177,20 @@ fun EditProfileScreen(
                   Modifier.fillMaxSize()
                       .padding(paddingValues)
                       .padding(MEDIUM_PADDING.dp)
+                      .background(Color(MAIN_BACKGROUND))
                       .testTag("editProfileContent")
                       .verticalScroll(scrollState),
               verticalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
               horizontalAlignment = Alignment.CenterHorizontally, // Ensures horizontal centering
           ) {
+            Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
             ProfileImage(
                 userId = profile.id,
                 modifier = Modifier.size(IMAGE_SIZE.dp).clip(CircleShape).testTag("profilePicture"),
                 imageViewModel,
                 editing = true,
                 bitmap = selectedImage)
-            Spacer(modifier = Modifier.padding(LARGE_PADDING.dp))
+            Spacer(modifier = Modifier.padding(SMALL_PADDING.dp))
             if (isDefaultImageSelected) {
               DefaultImageCarousel(
                   onImageSelected = { bitmap ->
@@ -290,7 +301,9 @@ fun EditProfileScreen(
                           Modifier.fillMaxWidth()
                               .height(AUTH_BUTTON_HEIGHT.dp)
                               .testTag("profileSaveButton"),
-                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+                      shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+                      colors =
+                          ButtonDefaults.buttonColors(containerColor = Color(MAIN_COLOR_DARK))) {
                         Text("Save", fontSize = SUBTITLE_FONTSIZE.sp)
                       }
                 }
@@ -331,7 +344,8 @@ fun ManageInterests(initialInterests: List<Interest>, onUpdateInterests: (List<I
             },
             enabled = newInterest != null,
             modifier = Modifier.testTag("addInterestButton"),
-            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
+            shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(MAIN_COLOR_DARK))) {
               Text("Add Interest")
             }
         // Interests List
@@ -371,7 +385,7 @@ fun InterestInputRow(onInterestChange: (Interest?) -> Unit) {
         // Category Dropdown
         Card(
             modifier = Modifier.weight(1f).testTag("TextFieldWithErrorStateCard"),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            colors = CardDefaults.cardColors(containerColor = Color(MAIN_BACKGROUND_BUTTON)),
             elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
               ExposedDropdownMenuBox(
@@ -395,7 +409,8 @@ fun InterestInputRow(onInterestChange: (Interest?) -> Unit) {
 
                     ExposedDropdownMenu(
                         expanded = expandedCategory,
-                        onDismissRequest = { expandedCategory = false }) {
+                        onDismissRequest = { expandedCategory = false },
+                        containerColor = Color(MAIN_BACKGROUND_BUTTON)) {
                           categories.forEach { category ->
                             DropdownMenuItem(
                                 text = { Text(category.name) },
@@ -413,7 +428,7 @@ fun InterestInputRow(onInterestChange: (Interest?) -> Unit) {
         // New Interest Input
         Card(
             modifier = Modifier.weight(1f).testTag("TextFieldWithErrorStateCard"),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            colors = CardDefaults.cardColors(containerColor = Color(MAIN_BACKGROUND_BUTTON)),
             elevation = CardDefaults.cardElevation(defaultElevation = CARD_ELEVATION_DEFAULT.dp),
             shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp)) {
               ExposedDropdownMenuBox(
@@ -436,7 +451,8 @@ fun InterestInputRow(onInterestChange: (Interest?) -> Unit) {
 
                     ExposedDropdownMenu(
                         expanded = expandedInterest,
-                        onDismissRequest = { expandedInterest = false }) {
+                        onDismissRequest = { expandedInterest = false },
+                        containerColor = Color(MAIN_BACKGROUND_BUTTON)) {
                           interestStringValues[selectedCategory]?.forEach { interest ->
                             DropdownMenuItem(
                                 text = { Text(interest) },

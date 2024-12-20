@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +36,9 @@ import com.android.sample.resources.C.Tag.IMAGE_IN_BUTTON_DEFAULT
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_PADDING
 import com.android.sample.resources.C.Tag.LINE_STROKE
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
@@ -55,16 +59,16 @@ import kotlinx.coroutines.launch
 fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewModel) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
+  // Mutable states for user inputs, errors, and UI visibility
   val emailState = remember { mutableStateOf("") }
   val passwordState = remember { mutableStateOf("") }
   val passwordErrorState = remember { mutableStateOf<String?>(null) }
+  val emailErrorState = remember { mutableStateOf<String?>(null) }
+
   val token = stringResource(R.string.default_web_client_id)
   val isPasswordVisible = remember { mutableStateOf(false) }
-  val emailErrorState = remember { mutableStateOf<String?>(null) }
   val onProfileExists = { navigationActions.navigateTo(Screen.OVERVIEW) }
-
   val onProfileMissing = { navigationActions.navigateTo(Screen.CREATE_PROFILE) }
-
   val onSignInFailure = { errorMessage: String ->
     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
   }
@@ -77,7 +81,11 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
       modifier = Modifier.fillMaxSize().testTag("SignInScreen"),
       content = { padding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("SignInScreenColumn"),
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(padding)
+                    .background(Color(MAIN_BACKGROUND))
+                    .testTag("SignInScreenColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -86,7 +94,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
             Image(
                 painter = painterResource(id = R.drawable.aptivity_logo_with_text),
                 contentDescription = "App Logo",
-                modifier = Modifier.size((3 * IMAGE_SIZE).dp).testTag("AppLogo"))
+                modifier = Modifier.size((2 * IMAGE_SIZE).dp).testTag("AppLogo"))
             Spacer(modifier = Modifier.height(LARGE_PADDING.dp))
           }
 
@@ -105,6 +113,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           }
 
           item {
+            // Password input
             PasswordTextField(
                 password = passwordState.value,
                 onPasswordChange = {
@@ -118,6 +127,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
           }
 
           item {
+            // Sign-in Button
             Card(
                 modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM).testTag("SignInCard"),
                 colors =
@@ -160,7 +170,7 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                       shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
                       colors =
                           ButtonDefaults.buttonColors(
-                              containerColor = MaterialTheme.colorScheme.primary,
+                              containerColor = Color(MAIN_COLOR_DARK),
                               contentColor = Color.White)) {
                         Text("SIGN IN", fontSize = SUBTITLE_FONTSIZE.sp)
                       }
@@ -198,7 +208,10 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                       onPerform = { navigationActions.navigateTo(Screen.OVERVIEW) })
                 },
                 modifier = Modifier.testTag("ContinueAsGuestButton")) {
-                  Text("Continue as a guest", fontSize = SUBTITLE_FONTSIZE.sp)
+                  Text(
+                      "Continue as a guest",
+                      fontSize = SUBTITLE_FONTSIZE.sp,
+                      color = Color(MAIN_COLOR_DARK))
                 }
             Spacer(modifier = Modifier.height(EXTRA_LARGE_PADDING.dp))
           }
@@ -217,14 +230,27 @@ fun SignInScreen(navigationActions: NavigationActions, viewModel: SignInViewMode
                         onPerform = { navigationActions.navigateTo(Screen.SIGN_UP) })
                   },
                   modifier = Modifier.testTag("GoToSignUpButton")) {
-                    Text("Sign Up", fontSize = SUBTITLE_FONTSIZE.sp)
+                    Text("Sign Up", fontSize = SUBTITLE_FONTSIZE.sp, color = Color(MAIN_COLOR_DARK))
                   }
             }
           }
         }
       })
 }
-
+/**
+ * Creates a `ManagedActivityResultLauncher` to handle Google Sign-In intents.
+ *
+ * This composable function returns a `ManagedActivityResultLauncher` that allows launching a Google
+ * Sign-In activity and processes its result. The function integrates with a `SignInViewModel` to
+ * manage authentication results and navigate users based on their profile status.
+ *
+ * @param viewModel The `SignInViewModel` responsible for handling the Google Sign-In result.
+ * @param onProfileExists Callback invoked when the user's profile already exists in the system.
+ * @param onProfileMissing Callback invoked when the user's profile is missing and needs creation.
+ * @param onFailure Callback invoked when the Google Sign-In process fails with an error message.
+ * @return A `ManagedActivityResultLauncher` instance to be used for launching the Google Sign-In
+ *   intent.
+ */
 @Composable
 fun rememberGoogleSignInLauncher(
     viewModel: SignInViewModel,
@@ -251,7 +277,15 @@ fun rememberGoogleSignInLauncher(
     }
   }
 }
-
+/**
+ * Creates an `Intent` for initiating Google Sign-In.
+ *
+ * It configures the Google Sign-In options to request the ID token and email address.
+ *
+ * @param context The `Context` used to create the Google Sign-In client.
+ * @param token The client ID token required for authentication.
+ * @return An `Intent` to launch the Google Sign-In activity.
+ */
 fun rememberGoogleSignInIntent(context: Context, token: String): Intent {
   val gso =
       GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -260,7 +294,7 @@ fun rememberGoogleSignInIntent(context: Context, token: String): Intent {
           .build()
   return GoogleSignIn.getClient(context, gso).signInIntent
 }
-
+// UI part of the Google button
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   val context = LocalContext.current
@@ -280,14 +314,22 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
           shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp),
           modifier =
               Modifier.height(BUTTON_HEIGHT_SM.dp).fillMaxWidth().testTag("GoogleSignInButton"),
-          border = BorderStroke(LINE_STROKE.dp, Color.Transparent) // Transparent indicator
-          ) {
+          border = BorderStroke(LINE_STROKE.dp, Color.Transparent), // Transparent indicator
+          colors =
+              ButtonColors(
+                  containerColor = Color(MAIN_BACKGROUND_BUTTON),
+                  contentColor = Color.White,
+                  disabledContentColor = Color.Gray,
+                  disabledContainerColor = Color.Gray)) {
             Image(
                 painter = painterResource(id = R.drawable.google_logo),
                 contentDescription = "Google Sign-In",
                 modifier = Modifier.size(IMAGE_IN_BUTTON_DEFAULT.dp))
             Spacer(Modifier.width(STANDARD_PADDING.dp))
-            Text("Login with Google", fontSize = SUBTITLE_FONTSIZE.sp, color = Color.Black)
+            Text(
+                "Login with Google",
+                fontSize = SUBTITLE_FONTSIZE.sp,
+                color = Color(MAIN_COLOR_DARK))
           }
     }
   }

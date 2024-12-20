@@ -23,7 +23,8 @@ object C {
     // App colors
     const val MAIN_COLOR_DARK = 0xFF00499E
     const val MAIN_COLOR_LIGHT = 0xFF5CE1E6
-    const val MAIN_BACKGROUND = 0xFFF1FDFD
+    const val MAIN_BACKGROUND = 0xFFFCFFFF
+    const val MAIN_BACKGROUND_BUTTON = 0xFFE7F2FD
 
     const val CREATED_ACTIVITIES = 0
     const val ENROLLED_ACTIVITIES = 1
@@ -41,8 +42,11 @@ object C {
     const val ROW_WIDTH = 408
 
     const val HALF_SCREEN_TEXT_FIELD_PADDING = 120
+    const val START_Y = 0f
+    const val END_Y = 500f
 
     const val DEFAULT_MAX_PRICE = 300f
+    const val GRADIENT_MAX = 0.6f
 
     const val BUTTON_WIDTH = 300
 
