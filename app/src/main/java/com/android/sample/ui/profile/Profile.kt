@@ -422,7 +422,10 @@ fun UserProfile(
               Row(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.Top,
-                  modifier = Modifier.fillMaxWidth().testTag("activityTypeRow")) {
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .testTag("activityTypeRow")
+                          .padding(vertical = NORMAL_PADDING.dp)) {
                     Text(
                         "Created",
                         modifier =
@@ -594,7 +597,7 @@ fun ProfileHeader(
             imageViewModel)
         Row(
             horizontalArrangement =
-                Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
+                Arrangement.spacedBy(NORMAL_PADDING.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.Top,
         ) {
           HeaderItem(
