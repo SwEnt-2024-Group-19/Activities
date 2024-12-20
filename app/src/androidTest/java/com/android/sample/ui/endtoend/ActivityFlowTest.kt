@@ -13,13 +13,16 @@ import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.defaultUserCredentials1
 import com.android.sample.resources.dummydata.defaultUserCredentials2
+import com.android.sample.ui.endtoend.Overview.ActivityDetails.ENROLL_BUTTON
+import com.android.sample.ui.endtoend.Profile.ACTIVITY_ROW
+import com.android.sample.ui.endtoend.Profile.ENROLLED_BUTTON
+import com.android.sample.ui.endtoend.Profile.PLUS_BUTTON_TO_CREATE
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.lang.Thread.sleep
 
 @HiltAndroidTest
 class ActivityFlowTest {
@@ -321,10 +324,26 @@ class ActivityFlowTest {
   */
 
   @Test
-  fun EditProfile() {
-    val email1 = defaultUserCredentials1["email"]!!
-    val password1 = defaultUserCredentials1["password"]!!
-    val name1 = defaultUserCredentials1["first name"]!! // @TODO: Should this change to full name?
+  fun EditProfileAndJoinActivity() {
+    //    val email = "anna1@gmail.com"
+    //    val password= "anna123"
+    //    val name = "anna" // @TODO: Should this change to full name?
+    //    val surname="ronnie"
+
+    // Auth screen > Sign up screen
+    //    hlp.click(Auth.SignIn.GO_TO_SIGN_UP_BUTTON)
+    //    hlp.notSee(Overview.SCREEN)
+    //    hlp.see(Auth.SignUp.SCREEN)
+    //    hlp.write(Auth.SignUp.EMAIL_TEXT_FIELDS, email)
+    //    hlp.write(Auth.SignUp.PASSWORD_TEXT_FIELDS, password)
+    //    hlp.write(Auth.SignUp.NAME_TEXT_FIELDS, name)
+    //    hlp.write(Auth.SignUp.SURNAME_TEXT_FIELDS, surname)
+    //    hlp.click(Auth.SignUp.SIGN_UP_BUTTON)
+    //
+    //
+    val email1 = defaultUserCredentials2["email"]!!
+    val password1 = defaultUserCredentials2["password"]!!
+    val name1 = defaultUserCredentials2["first name"]!! // @TODO: Should this change to full name?
 
     // Auth screen > Sign in screen
     hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
@@ -341,25 +360,44 @@ class ActivityFlowTest {
     hlp.see(BottomNavigation.OVERVIEW)
     hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
 
-    // Profile screen of user 1
+    // Profile screen of user
     hlp.see(Profile.SCREEN)
     hlp.see(name1, text = true)
 
-    // proceed to logout
+    // proceed to edit profile
     hlp.see(Profile.MORE_OPTIONS_BUTTON)
     hlp.click(Profile.MORE_OPTIONS_BUTTON)
     hlp.see(Profile.EDIT_PROFILE_BUTTON)
     hlp.click(Profile.EDIT_PROFILE_BUTTON)
 
+    // changing The profile name
     hlp.see(Profile.EditProfile.EDIT_PROFILE_SCREEN)
     hlp.click(Profile.EditProfile.INPUT_NAME)
-    hlp.write(Profile.EditProfile.INPUT_NAME, "Mary",true)
-
+    hlp.write(Profile.EditProfile.INPUT_NAME, "Mary", true)
     hlp.click(Profile.EditProfile.SAVE_BUTTON)
     hlp.see(Profile.SCREEN)
 
+    // make sure the name is really updated and displayed
     hlp.see("Mary", text = true)
 
+    // make sure the user is not enrolled in any activity
+    hlp.click(ENROLLED_BUTTON)
+    hlp.notSee(ACTIVITY_ROW)
+    hlp.see(PLUS_BUTTON_TO_CREATE)
 
+    // enroll in a new activity
+    hlp.click(BottomNavigation.OVERVIEW, bottomNavItem = true)
+    hlp.see(Overview.SCREEN)
+    hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
+    hlp.click(Overview.ACTIVITY_CARD)
+    hlp.see(ActivityDetails.SCREEN)
+    hlp.scroll("activityDetailsScreen", ENROLL_BUTTON)
+    hlp.click(ENROLL_BUTTON)
+
+    // make sure the user is now enrolled in an activity
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+    hlp.click(ENROLLED_BUTTON)
+    hlp.see(ACTIVITY_ROW)
+    hlp.notSee(PLUS_BUTTON_TO_CREATE)
   }
 }
