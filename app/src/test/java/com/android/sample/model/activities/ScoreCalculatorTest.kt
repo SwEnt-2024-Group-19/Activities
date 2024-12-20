@@ -5,6 +5,8 @@ import com.android.sample.model.map.Location
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.activity1
 import com.android.sample.resources.dummydata.activityBiking
+import com.android.sample.resources.dummydata.interest1
+import com.android.sample.resources.dummydata.interest2
 import com.android.sample.resources.dummydata.testUser
 import com.google.firebase.Timestamp
 import java.util.concurrent.TimeUnit
@@ -33,6 +35,7 @@ class ScoreCalculatorTest {
     val weights = listActivitiesViewModel.getWeights()
     val expectedWeights =
         mapOf(
+            "creator" to 0.2,
             "distance" to 0.2,
             "date" to 0.15,
             "interest" to 0.25,
@@ -96,8 +99,24 @@ class ScoreCalculatorTest {
   }
 
   @Test
-  fun `calculateInterestScore returns 0 as default`() {
-    assertEquals(0.0, listActivitiesViewModel.calculateInterestScore(), 0.0)
+  fun `calculateInterestScore returns 0 for different interests of different categories`() {
+    assertEquals(
+        0.0, listActivitiesViewModel.calculateInterestScore(listOf(interest1), interest2), 0.0)
+  }
+
+  @Test
+  fun `calculateInterestScore returns 0,5 for different interests of same categories`() {
+    assertEquals(
+        0.0,
+        listActivitiesViewModel.calculateInterestScore(
+            listOf(interest1), interest1.copy(name = "Other Sport")),
+        0.5)
+  }
+
+  @Test
+  fun `calculateInterestScore returns 1,0 for same interests`() {
+    assertEquals(
+        0.0, listActivitiesViewModel.calculateInterestScore(listOf(interest1), interest1), 1.0)
   }
 
   @Test
@@ -200,16 +219,7 @@ class ScoreCalculatorTest {
 
     val expectedWeights = listActivitiesViewModel.getWeights()
     val totalWeights = expectedWeights.values.sum()
-    val expectedScore =
-        (listActivitiesViewModel.calculateDistanceScore(10.0f) * expectedWeights["distance"]!! +
-            listActivitiesViewModel.calculateDateScore(activity.date) * expectedWeights["date"]!! +
-            listActivitiesViewModel.calculateInterestScore() * expectedWeights["interest"]!! +
-            listActivitiesViewModel.calculateParticipationScore(
-                testUser.activities, activity.creator) * expectedWeights["participation"]!! +
-            listActivitiesViewModel.calculateCompletionScore(
-                activity.participants.size, activity.maxPlaces) * expectedWeights["completion"]!! +
-            listActivitiesViewModel.calculatePriceScore(activity.price) *
-                expectedWeights["price"]!!) / totalWeights
+    val expectedScore = 0.346 // Calculated manually
 
     assertEquals(expectedScore, score, 0.1) // Allow small tolerance for floating-point calculations
   }

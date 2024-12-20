@@ -3,18 +3,21 @@ package com.android.sample.ui.camera
 import android.graphics.Bitmap
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +35,9 @@ import com.android.sample.model.activity.Category
 import com.android.sample.model.image.resize
 import com.android.sample.resources.C.Tag.IMAGE_SIZE
 import com.android.sample.resources.C.Tag.LARGE_BUTTON_HEIGHT
-import com.android.sample.resources.C.Tag.MEDIUM_IMAGE_SIZE
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND_BUTTON
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
+import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.WHITE_COLOR
@@ -72,33 +77,51 @@ fun Carousel(openDialog: () -> Unit, itemsList: List<Bitmap>, deleteImage: (Bitm
   Row(modifier = Modifier.padding(STANDARD_PADDING.dp).height(120.dp)) {
     FloatingActionButton(
         content = {
-          Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = "Add a new image")
+          Icon(
+              imageVector = Icons.Filled.AddAPhoto, // Using a more specific icon for adding photos
+              contentDescription = "Add a new image", // Providing an accessible description
+              modifier = Modifier.size(MEDIUM_FONTSIZE.dp) // Icon size can be adjusted as needed
+              )
         },
         onClick = openDialog,
         modifier =
             Modifier.size(LARGE_BUTTON_HEIGHT.dp)
                 .background(Color(WHITE_COLOR))
                 .testTag("addImageButton"),
-    )
+        contentColor = Color(MAIN_COLOR_DARK),
+        containerColor = Color(MAIN_BACKGROUND_BUTTON))
     LazyRow {
       items(itemsList.size) { bitmap ->
-        Card(modifier = Modifier.padding(SMALL_PADDING.dp)) {
-          Image(
-              bitmap = itemsList[bitmap].resize(IMAGE_SIZE).asImageBitmap(),
-              contentDescription = "Selected Image",
-              modifier = Modifier.size(IMAGE_SIZE.dp))
+        Box() {
+          Card(
+              modifier = Modifier.padding(SMALL_PADDING.dp),
+              colors =
+                  CardDefaults.cardColors(
+                      containerColor = Color(MAIN_BACKGROUND_BUTTON),
+                      contentColor = Color(MAIN_COLOR_DARK)),
+              border = BorderStroke(3.dp, Color(MAIN_BACKGROUND_BUTTON))) {
+                Image(
+                    bitmap = itemsList[bitmap].resize(IMAGE_SIZE).asImageBitmap(),
+                    contentDescription = "Selected Image",
+                    modifier = Modifier.size(IMAGE_SIZE.dp),
+                    contentScale = ContentScale.FillBounds)
+              }
           IconButton(
               onClick = { deleteImage(itemsList[bitmap]) },
               modifier =
-                  Modifier.width(MEDIUM_IMAGE_SIZE.dp)
-                      .height(MEDIUM_IMAGE_SIZE.dp)
-                      .align(Alignment.End)
-                      .testTag("removeImageButton")) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = "Remove Image",
-                    tint = Color.Black)
-              }
+                  Modifier.size(48.dp) // Appropriate size for touch target
+                      .align(Alignment.TopEnd) // Align to the top end of the Box, not the Card
+                      .background(
+                          color = Color.White.copy(alpha = 0.0F), // White background for contrast
+                          shape = CircleShape // Circular background for the delete button
+                          ), // Optional: Add a background for better visibility
+          ) {
+            Icon(
+                imageVector = Icons.Filled.DeleteForever, // Clear delete icon
+                contentDescription = "Remove Image",
+                tint = Color.Black, // White icon for contrast
+            )
+          }
         }
       }
     }

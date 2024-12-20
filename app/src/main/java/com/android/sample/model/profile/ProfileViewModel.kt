@@ -115,14 +115,24 @@ constructor(
     repository.updateProfile(user = user, onSuccess = { fetchUserData(user.id) }, onFailure = {})
   }
 
-  // I believe this function belongs to signInRepository (or maybe viewModel) instead of
-  // profileViewModel
-  // because it uses auth.currentUser
-  // I would move this function to SignInRepository if I wanted to test it in the e2e tests
-  // Written by: @mohamedtahaguelzim
   fun loadCachedProfile(): User? {
     return runBlocking { localDatabase.userDao().getUser(Firebase.auth.currentUser?.uid ?: "") }
   }
+
+  fun addReview(userId: String, activityId: String, review: Boolean?) {
+    getUserData(
+        userId,
+        onResult = {
+          val updatedUser =
+              it?.copy(
+                  likes =
+                      it.likes.toMutableMap().apply {
+                        if (review != null) put(activityId, review) else remove(activityId)
+                      }) ?: return@getUserData
+          repository.updateProfile(user = updatedUser, onSuccess = {}, onFailure = {})
+        })
+  }
+
   /** Navigate to the appropriate screen based on the category */
   fun navigateToActivity(navigationActions: NavigationActions, context: Context) {
     val networkManager = NetworkManager(context)

@@ -13,8 +13,19 @@ data class User(
     val interests: List<Interest>?,
     val activities: List<String>?,
     val photo: String?, // Optional, could be null if not provided
-    val likedActivities: List<String>? = emptyList()
-)
+    val likedActivities: List<String>? = emptyList(),
+    val likes: Map<String, Boolean> = emptyMap()
+) {
+  /** Calculates the user's rating based on their roles as a creator. */
+  fun getUserRatingAsACreator(creatorRatings: List<Double>): Double {
+    return creatorRatings.filter { it >= 0 }.average()
+  }
+
+  /** Calculates the user's rating based on their roles as a participant. */
+  fun getUserRatingAsAParticipant(): Double {
+    return if (likes.isNotEmpty()) likes.values.count { it }.toDouble() / likes.size else -1.0
+  }
+}
 
 data class Interest(val name: String, val category: Category)
 

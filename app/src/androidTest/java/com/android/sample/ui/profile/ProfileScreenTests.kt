@@ -343,7 +343,11 @@ class ProfileScreenTest {
     val activity2 = activity.copy(participants = listOf(testUser))
     val activity3 = activity.copy(creator = testUser.id)
     composeTestRule.setContent {
-      ProfileHeader(testUser, mockImageViewModel, listOf(activity1, activity2, activity3))
+      ProfileHeader(
+          testUser,
+          mockImageViewModel,
+          listOf(activity1, activity2, activity3),
+          HourDateViewModel())
     }
     composeTestRule.onNodeWithTag("profileHeader").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profilePicture").assertExists()
