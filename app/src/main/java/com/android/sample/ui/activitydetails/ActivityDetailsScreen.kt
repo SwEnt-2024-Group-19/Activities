@@ -167,9 +167,20 @@ fun ActivityDetailsScreen(
 
   val creatorID = activity?.creator ?: ""
   var creator by remember {
-    mutableStateOf(User(creatorID, "anonymous", "anonymous", listOf(), listOf(), "", listOf()))
+    mutableStateOf(User(creatorID, "null", "null", listOf(), listOf(), "", listOf()))
   }
+
   activity?.participants?.firstOrNull { it.id == creatorID }?.let { creator = it }
+  if (creator.name == "null") {
+    profileViewModel.getUserData(
+        creatorID,
+        onResult = {
+          if (it != null) {
+            creator = it
+          }
+        })
+  }
+  Log.d("ActivityDetailsScreen", "ActivityDetails Creator: $creator")
   val uiState by listActivityViewModel.uiState.collectAsState()
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
