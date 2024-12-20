@@ -341,9 +341,9 @@ class ProfileScreenTest {
     }
     composeTestRule.onNodeWithTag("profileHeader").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profilePicture").assertExists()
-    composeTestRule.onAllNodesWithTag("headerItem").assertCountEquals(4)
-    composeTestRule.onAllNodesWithTag("headerItemField").assertCountEquals(4)
-    composeTestRule.onAllNodesWithTag("headerItemTitle").assertCountEquals(4)
+    composeTestRule.onAllNodesWithTag("headerItem").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("headerItemField").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("headerItemTitle").assertCountEquals(3)
     composeTestRule.onNodeWithTag("ratingStar").assertIsDisplayed()
   }
 
