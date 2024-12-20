@@ -580,7 +580,7 @@ fun CommentSection(
   val newCommentText = remember { mutableStateOf("") }
   val context = LocalContext.current
   Column(modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
-    Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
+    Text(text = "Comments", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.testTag("commentsTitle"))
 
     // Display all comments
     comments.forEach { comment ->
@@ -643,7 +643,7 @@ fun CommentItem(
   Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
     Row(
         verticalAlignment = Alignment.CenterVertically, // Align items vertically
-        modifier = Modifier.padding(bottom = SMALL_PADDING.dp)) {
+        modifier = Modifier.padding(bottom = SMALL_PADDING.dp).testTag("commentItem")) {
           // If the user is the creator, display a badge
           if (comment.userId == creatorId) {
             Box(

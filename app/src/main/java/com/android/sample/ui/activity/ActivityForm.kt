@@ -327,7 +327,7 @@ fun ActivityForm(
                       )
                 },
                 onClick = { onLocationClick(location) },
-                modifier = Modifier.padding(STANDARD_PADDING.dp))
+                modifier = Modifier.padding(STANDARD_PADDING.dp).testTag("locationItem"))
           }
         }
   }
