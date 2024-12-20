@@ -37,6 +37,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -114,6 +115,12 @@ fun ListActivitiesScreen(
   val hourDateViewModel: HourDateViewModel = HourDateViewModel()
 
   HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
+
+  LaunchedEffect(Unit) {
+    viewModel.sortActivitiesByScore(profile) {
+      locationViewModel.getDistanceFromCurrentLocation(it)
+    }
+  }
 
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
