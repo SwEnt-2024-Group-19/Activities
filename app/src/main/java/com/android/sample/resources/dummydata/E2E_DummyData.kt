@@ -16,10 +16,13 @@ import java.util.Calendar
 private val e2e_interests =
     listOf(Interest("Football", Category.SPORT), Interest("Movies", Category.ENTERTAINMENT))
 
-private val e2e_locations =
+val e2e_locations =
     mapOf(
-        "EPFL" to Location(46.519962, 6.633597, "EPFL", "EPFL"),
-        "Lausanne" to Location(46.5, 6.6, "Lausanne", "EPFL"))
+        "EPFL" to Location(46.519962, 6.633597, "EPFL", "Ecole Polytechnique Fédérale de Lausanne"),
+        "Lausanne" to Location(46.5, 6.6, "Lausanne", "Lausanne/VD/CH"),
+        "Geneva" to Location(46.2, 6.1, "Geneva", "Geneva/GE/CH"),
+        "Zurich" to Location(47.4, 8.5, "Zurich", "Zurich/ZH/CH"),
+        "Bern" to Location(46.9, 7.4, "Bern", "Bern/BE/CH"))
 
 private val e2e_user1 =
     User(
@@ -94,8 +97,8 @@ private val e2e_activity1 =
 private val e2e_activity2 =
     Activity(
         uid = "activity2",
-        title = "Sample Title 1",
-        description = "Sample Description 1",
+        title = "Sample Title 2",
+        description = "Sample Description 2",
         date = Timestamp(TOMORROW),
         startTime = "10:00",
         duration = "03:00",
