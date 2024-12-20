@@ -118,6 +118,9 @@ object C {
     const val TEXT_FONTSIZE = 12
     const val SMALL_TEXT_FONTSIZE = 9
 
+    const val IMAGE_WIDTH_RATIO= 16f
+    const val IMAGE_HEIGHT_RATIO= 9f
+
     const val WIDTH_FRACTION_MD = 0.8f
 
     const val WIDTH_FRACTION_SM = 0.7f

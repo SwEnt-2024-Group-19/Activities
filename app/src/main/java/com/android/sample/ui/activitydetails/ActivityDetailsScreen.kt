@@ -88,6 +88,8 @@ import com.android.sample.resources.C.Tag.DARK_GRAY
 import com.android.sample.resources.C.Tag.DARK_YELLOW
 import com.android.sample.resources.C.Tag.EXTRA_LARGE_PADDING
 import com.android.sample.resources.C.Tag.ICON_BUTTON_SIZE
+import com.android.sample.resources.C.Tag.IMAGE_HEIGHT_RATIO
+import com.android.sample.resources.C.Tag.IMAGE_WIDTH_RATIO
 import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.LIGHT_BLUE
 import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
@@ -342,11 +344,10 @@ fun ActivityDetailsScreen(
               Box(
                   modifier =
                       Modifier.fillMaxWidth()
-                          .aspectRatio(16f / 9f)
+                          .aspectRatio(IMAGE_WIDTH_RATIO / IMAGE_HEIGHT_RATIO)
                           .padding(vertical = MEDIUM_PADDING.dp)
                           .testTag("image")) {
                     CarouselNoModif(itemsList = bitmaps, category = activity.category)
-                    LikeButton(profile, activity, profileViewModel)
                   }
 
               // Title
