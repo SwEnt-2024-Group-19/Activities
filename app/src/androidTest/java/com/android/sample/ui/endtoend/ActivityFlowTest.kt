@@ -95,10 +95,7 @@ class ActivityFlowTest {
     // TODO: Implement this feature
 
     // Check that the user is not logged in and can't enroll
-    hlp.scroll(
-        Overview.ActivityDetails.SCREEN,
-        Overview.ActivityDetails
-            .NOT_LOGGED_IN_TEXT) // @TODO: The need for a scroll here is debatable
+    // @TODO: The need for a scroll here is debatable
     hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
     hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
     hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)

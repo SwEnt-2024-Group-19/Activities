@@ -57,7 +57,8 @@ object C {
     const val AUTH_BUTTON_HEIGHT = 60
 
     const val LARGE_BUTTON_HEIGHT = 50
-    const val MEDIUM_FONT_WEIGHT = 250
+    const val SMALL_FONT_WEIGHT = 250
+    const val MEDIUM_FONT_WEIGHT = 350
     const val LARGE_FONT_WEIGHT = 500
     const val VERY_LARGE_FONT_WEIGHT = 600
     const val MAXIMUM_FONT_WEIGHT = 700
@@ -97,6 +98,7 @@ object C {
     const val IMAGE_SIZE = 100
     const val ICON_BUTTON_SIZE = 100
 
+    const val XL_IMAGE_SIZE = 350
     const val LARGE_IMAGE_SIZE = 200
 
     const val SMALL_IMAGE_SIZE = 30

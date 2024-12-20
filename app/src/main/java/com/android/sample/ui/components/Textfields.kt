@@ -26,7 +26,6 @@ import com.android.sample.resources.C.Tag.BORDER_STROKE_SM
 import com.android.sample.resources.C.Tag.CARD_ELEVATION_DEFAULT
 import com.android.sample.resources.C.Tag.ERROR_TEXTFIELD_FONT_SIZE
 import com.android.sample.resources.C.Tag.LIGHT_BLUE
-import com.android.sample.resources.C.Tag.MAIN_COLOR_LIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD

@@ -1,6 +1,7 @@
 package com.android.sample.ui.activitydetails
 
 import android.graphics.Bitmap
+import android.text.format.DateUtils
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -30,14 +31,11 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -47,11 +45,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -97,9 +93,10 @@ import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.MEDIUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.NORMAL_PADDING
-import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_L
+import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
 import com.android.sample.resources.C.Tag.SMALL_BUTTON_HEIGHT
 import com.android.sample.resources.C.Tag.SMALL_BUTTON_WIDTH
+import com.android.sample.resources.C.Tag.SMALL_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
@@ -124,7 +121,7 @@ fun ActivityDetailsScreen(
     locationViewModel: LocationViewModel,
     imageViewModel: ImageViewModel
 ) {
-  var detailsType = listActivityViewModel.selectedDetailsType.collectAsState().value
+  val detailsType = listActivityViewModel.selectedDetailsType.collectAsState().value
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
   // Check if the user is already enrolled in the activity
@@ -176,6 +173,7 @@ fun ActivityDetailsScreen(
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
   val hourDateViewModel = HourDateViewModel()
+  var participantsList by remember { mutableStateOf(activity?.participants ?: listOf()) }
 
   Scaffold(
       topBar = {
@@ -201,10 +199,11 @@ fun ActivityDetailsScreen(
                     .testTag("bottomBar")) {
               LikeButton(profile, activity, profileViewModel)
               Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-              Icon(
-                  Icons.Default.DateRange,
-                  contentDescription = "Schedule",
-                  tint = Color(LIGHT_BLUE))
+
+              if (activity != null) {
+                ExportActivityToCalendarButton(
+                    activity = activity, viewModel = listActivityViewModel, context = context)
+              }
 
               Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
               // Enroll button
@@ -337,8 +336,7 @@ fun ActivityDetailsScreen(
                   modifier =
                       Modifier.fillMaxWidth()
                           .aspectRatio(16f / 9f)
-                          .size(300.dp, 200.dp)
-                          .padding(vertical = 60.dp)
+                          .padding(vertical = MEDIUM_PADDING.dp)
                           .testTag("image")) {
                     imageViewModel.fetchActivityImagesAsBitmaps(
                         activity?.uid ?: "",
@@ -353,8 +351,10 @@ fun ActivityDetailsScreen(
 
               // Title
               Column(
-                  modifier = Modifier.padding(horizontal = EXTRA_LARGE_PADDING.dp).testTag("title"),
-                  horizontalAlignment = Alignment.CenterHorizontally) {
+                  modifier =
+                      Modifier.padding(horizontal = EXTRA_LARGE_PADDING.dp)
+                          .fillMaxWidth()
+                          .testTag("title")) {
                     Text(
                         text = activityTitle ?: "title not specified",
                         modifier =
@@ -367,7 +367,7 @@ fun ActivityDetailsScreen(
               Row(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.Top,
-                  modifier = Modifier.fillMaxWidth().testTag("")) {
+                  modifier = Modifier.fillMaxWidth().testTag("ACTIVITY_DETAILS button")) {
                     IconButton(
                         onClick = { listActivityViewModel.updateDetailsType(ACTIVITY_DETAILS) },
                         modifier =
@@ -380,7 +380,7 @@ fun ActivityDetailsScreen(
                                   }
                                 }
                                 .testTag("")) {
-                          Icon(Icons.Outlined.Search, contentDescription = "")
+                          Icon(Icons.Outlined.Search, contentDescription = "ACTIVITY_DETAILS icon")
                         }
 
                     IconButton(
@@ -392,9 +392,11 @@ fun ActivityDetailsScreen(
                                       it.background(Color.LightGray, shape = CircleShape)
                                   else it
                                 }
-                                .testTag("")) {
+                                .testTag("ATTENDANT_DETAILS button")) {
                           Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Outlined.Groups, contentDescription = "")
+                            Icon(
+                                imageVector = Icons.Outlined.Groups,
+                                contentDescription = "ATTENDANT_DETAILS")
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "${activity?.participants?.size}/${maxPlaces ?: 0}",
@@ -412,10 +414,12 @@ fun ActivityDetailsScreen(
                                     it
                                   }
                                 }
-                                .testTag("")) {
+                                .testTag("ACTIVITY_COMMENTS button")) {
                           Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Outlined.ModeComment, contentDescription = "")
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Outlined.ModeComment,
+                                contentDescription = "ACTIVITY_COMMENTS")
+                            Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
                             Text(
                                 text = "${activity?.comments?.size ?: 0}",
                                 style = MaterialTheme.typography.bodyMedium)
@@ -491,11 +495,11 @@ fun ActivityDetailsScreen(
                             tint = Color(LIGHT_BLUE))
                         Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                         Text(
-                            text = location?.name ?: "No location",
+                            text = location?.shortName ?: "No location",
                             modifier =
                                 Modifier.weight(
                                         TEXT_WEIGHT) // Dynamically takes remaining space while
-                                                     // respecting constraints
+                                    // respecting constraints
                                     .padding(
                                         end =
                                             SMALL_PADDING
@@ -526,7 +530,13 @@ fun ActivityDetailsScreen(
                       thickness = 3.dp, // Set thickness of the line
                       modifier = Modifier.fillMaxWidth(0.8f).align(Alignment.CenterHorizontally))
 
-                  CreatorRow(creator, nbActivitiesCreated, imageViewModel, navigationActions)
+                  CreatorRow(
+                      creator,
+                      profile,
+                      nbActivitiesCreated,
+                      imageViewModel,
+                      listActivityViewModel,
+                      navigationActions)
                 }
                 ATTENDANT_DETAILS -> {
                   // Participants section
@@ -543,8 +553,8 @@ fun ActivityDetailsScreen(
                           Modifier.padding(bottom = MEDIUM_PADDING.dp).testTag("participantsTitle"))
 
                   // List of participants
-                  Column(modifier = Modifier.testTag("participants")) {
-                    activity?.participants?.forEach { participant ->
+                  Column(modifier = Modifier.fillMaxWidth().testTag("participants")) {
+                    participantsList.forEach { participant ->
                       Row(
                           verticalAlignment = Alignment.CenterVertically,
                           modifier = Modifier.padding(vertical = SMALL_PADDING.dp)) {
@@ -590,9 +600,19 @@ fun ActivityDetailsScreen(
                                             style = MaterialTheme.typography.bodyMedium)
                                         Text(
                                             text =
-                                                participant.activities?.let { activities ->
-                                                  "joined ${activities.size} Activities"
-                                                } ?: "joined 0 Activities",
+                                                activitiesList.let { activities ->
+                                                  val participantActivities =
+                                                      activities.filter { activity ->
+                                                        activity.participants
+                                                            .map { it.id }
+                                                            .contains(
+                                                                participant
+                                                                    .id) // Check if the participant
+                                                        // is in the participants
+                                                        // list
+                                                      }
+                                                  "joined ${participantActivities.size} Activities"
+                                                },
                                             style =
                                                 TextStyle(
                                                     fontSize = MEDIUM_PADDING.sp,
@@ -606,45 +626,33 @@ fun ActivityDetailsScreen(
                             Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End,
                                 modifier =
                                     Modifier.fillMaxWidth()
                                         .padding(
                                             vertical = SMALL_PADDING.dp,
                                             horizontal = MEDIUM_PADDING.dp)
-                                        .testTag("participantsRating")) {
+                                        .testTag(
+                                            "participantsRating ${participant.name} ${participant.surname}")) {
+                                  Text(
+                                      text = "4.7",
+                                      style =
+                                          TextStyle(
+                                              fontSize = MEDIUM_PADDING.sp,
+                                              fontWeight = FontWeight(MEDIUM_FONT_WEIGHT),
+                                              color = Color(DARK_GRAY),
+                                              textAlign = TextAlign.Center,
+                                          ),
+                                      modifier = Modifier.testTag("ratingText"))
                                   Icon(
                                       imageVector = Icons.Filled.Star,
-                                      contentDescription = "Star1",
-                                      tint = Color(LIGHT_BLUE),
-                                      modifier =
-                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar1"))
-                                  Icon(
-                                      imageVector = Icons.Filled.Star,
-                                      contentDescription = "Star2",
-                                      tint = Color(LIGHT_BLUE),
-                                      modifier =
-                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar2"))
-                                  Icon(
-                                      imageVector = Icons.Filled.Star,
-                                      contentDescription = "Star3",
-                                      tint = Color(LIGHT_BLUE),
-                                      modifier =
-                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar3"))
-                                  Icon(
-                                      imageVector = Icons.Filled.Star,
-                                      contentDescription = "Star4",
-                                      tint = Color(LIGHT_BLUE),
-                                      modifier =
-                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar4"))
-                                  Icon(
-                                      imageVector = Icons.Filled.StarOutline,
-                                      contentDescription = "Star5",
+                                      contentDescription = "Star",
                                       tint = Color.Black,
-                                      modifier =
-                                          Modifier.size(MEDIUM_FONTSIZE.dp).testTag("ratingStar5"))
+                                      modifier = Modifier.size(MEDIUM_FONTSIZE.dp))
                                 }
                           }
                     }
+                    Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
                     if ((activity?.participants?.size ?: 0) < maxPlaces!!) {
                       Text(
                           text = "${maxPlaces!! - (activity?.participants?.size ?: 0)} places left",
@@ -662,44 +670,8 @@ fun ActivityDetailsScreen(
                 }
                 ACTIVITY_COMMENTS -> {
 
-              Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
+                  Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
-              // Export to calendar button
-              if (activity != null) {
-                ExportActivityToCalendarButton(
-                    activity = activity, viewModel = listActivityViewModel, context = context)
-              }
-
-              CommentSection(
-                  profileId = profile?.id ?: "anonymous",
-                  comments = comments,
-                  onAddComment = { content ->
-                    val newComment =
-                        Comment(
-                            uid = UUID.randomUUID().toString(),
-                            userId = profile?.id ?: "anonymous",
-                            userName = profile?.name ?: "anonymous",
-                            content = content,
-                            timestamp = Timestamp.now())
-                    // listActivityViewModel.addCommentToActivity(activity!!.uid, newComment)
-                    comments += newComment
-                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
-                  },
-                  onReplyComment = { replyContent, comment ->
-                    val reply =
-                        Comment(
-                            uid = UUID.randomUUID().toString(),
-                            userId = profile?.id ?: "anonymous",
-                            userName = profile?.name ?: "anonymous",
-                            content = replyContent,
-                            timestamp = Timestamp.now())
-                    // listActivityViewModel.addReplyToComment(activity!!.uid, comment.uid, reply)
-                    comment.replies += reply
-                    comments = comments.map { if (it.uid == comment.uid) comment else it }
-                    listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
-                  },
-                  onDeleteComment = deleteComment,
-                  creatorId = activity?.creator ?: "anonymous")
                   // Comment section
                   CommentSection(
                       profileId = profile?.id ?: "anonymous",
@@ -753,21 +725,6 @@ fun CommentSection(
   val context = LocalContext.current
   Column(modifier = Modifier.fillMaxWidth().padding(STANDARD_PADDING.dp)) {
     Text(text = "Comments", style = MaterialTheme.typography.headlineSmall)
-
-    // Display all comments
-    comments.forEach { comment ->
-      CommentItem(
-          profileId,
-          comment,
-          creatorId,
-          onReplyComment,
-          onDeleteComment,
-          allowReplies = true,
-          imageViewModel) // Set allowReplies to true for top-level comments
-    }
-
-    Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
-
     if (profileId == "anonymous") {
       // Message for users who are not logged in
       Text(
@@ -775,22 +732,22 @@ fun CommentSection(
           modifier = Modifier.padding(SMALL_PADDING.dp).testTag("notLoggedInMessage"))
     } else {
       // Input field for new comments if the user is logged in
-        TextFieldWithErrorState(
-            value = newCommentText.value,
-            onValueChange = { newCommentText.value = it },
-            label = "Add Comment",
-            modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
-            validation = { comment ->
-                when {
-                    comment.isEmpty() -> context.getString(R.string.comment_empty)
-                    else -> null
-                }
-            },
-            testTag = "inputComment",
-            errorTestTag = "commentErrorText")
-
+      TextFieldWithErrorState(
+          value = newCommentText.value,
+          onValueChange = { newCommentText.value = it },
+          label = "Add Comment",
+          modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
+          validation = { comment ->
+            when {
+              comment.isEmpty() -> context.getString(R.string.comment_empty)
+              else -> null
+            }
+          },
+          testTag = "inputComment",
+          errorTestTag = "commentErrorText")
 
       ElevatedButton(
+          enabled = newCommentText.value.isNotEmpty(),
           onClick = {
             performOfflineAwareAction(
                 context = context,
@@ -807,6 +764,18 @@ fun CommentSection(
           modifier = Modifier.padding(top = STANDARD_PADDING.dp).testTag("PostCommentButton")) {
             Text("Post Comment", color = Color.Black)
           }
+    }
+
+    // Display all comments
+    comments.forEach { comment ->
+      CommentItem(
+          profileId,
+          comment,
+          creatorId,
+          onReplyComment,
+          onDeleteComment,
+          allowReplies = true,
+          imageViewModel) // Set allowReplies to true for top-level comments
     }
   }
 }
@@ -827,105 +796,134 @@ fun CommentItem(
   val networkManager = NetworkManager(context)
 
   Column(modifier = Modifier.padding(STANDARD_PADDING.dp)) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically, // Align items vertically
-        modifier = Modifier.padding(bottom = SMALL_PADDING.dp)) {
-        // Profile Picture
-        ProfileImage(
-            userId = profileId,
-            modifier = Modifier.size(BUTTON_HEIGHT_MD.dp).clip(CircleShape),
-            imageViewModel = imageViewModel
-        )
-        // If the user is the creator, display a badge
-        if (comment.userId == creatorId) {
-            Box(
-                modifier =
-                Modifier.padding(end = SMALL_PADDING.dp)
-                    .background(color = Color.Gray, shape = RoundedCornerShape(4.dp))
-                    .padding(horizontal = STANDARD_PADDING.dp, vertical = SMALL_PADDING.dp)
-            ) {
-                Text(
-                    text = "Creator",
-                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Yellow),
-                    modifier = Modifier.testTag("creatorBadge_${comment.uid}")
-                )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      // Profile Picture
+      ProfileImage(
+          userId = profileId,
+          modifier = Modifier.size(BUTTON_HEIGHT_MD.dp).clip(CircleShape),
+          imageViewModel = imageViewModel)
+      // If the user is the creator, display a badge
+      Column {
+        // Display the user's name
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+            modifier = Modifier.padding(horizontal = STANDARD_PADDING.dp)) {
+              Text(
+                  text = comment.userName,
+                  style =
+                      TextStyle(
+                          fontSize = SUBTITLE_FONTSIZE.sp,
+                          fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                          color = Color(DARK_GRAY),
+                          textAlign = TextAlign.Center,
+                      ),
+                  modifier = Modifier.testTag("commentUserName_${comment.uid}"))
+              // Display the timestamp
+              CommentTimestamp(comment)
+              if (comment.userId == creatorId) {
+                Box(
+                    modifier =
+                        Modifier.padding(end = SMALL_PADDING.dp)
+                            .background(
+                                color = Color(DARK_YELLOW),
+                                shape = RoundedCornerShape(ROUNDED_CORNER_SHAPE_DEFAULT.dp))
+                            .padding(
+                                horizontal = STANDARD_PADDING.dp, vertical = SMALL_PADDING.dp)) {
+                      Text(
+                          text = "Creator",
+                          style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray),
+                          modifier = Modifier.testTag("creatorBadge_${comment.uid}"))
+                    }
+              }
             }
-        }
-        Column(modifier= Modifier.padding(SMALL_PADDING.dp)) {
-            // Display the user's name
-            Text(
-                text = "${comment.userName}",
-                style =
-                    TextStyle(
-                        fontSize = SUBTITLE_FONTSIZE.sp,
-                        fontWeight = FontWeight(LARGE_FONT_WEIGHT),
-                        color = Color(DARK_GRAY),
-                        textAlign = TextAlign.Center,
-                    ),
-                modifier = Modifier.testTag("commentUserName_${comment.uid}")
-            )
 
-
-            // Display the comment content
-            Text(
-                text = comment.content,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.testTag("commentContent_${comment.uid}")
-            )
-
-            // Display the timestamp
-            Text(
-                text = comment.timestamp.toDate().toString(),
-                style =
+        // Display the comment content
+        Text(
+            text = comment.content,
+            style =
                 TextStyle(
-                    fontSize = NORMAL_PADDING.sp,
+                    fontSize = SUBTITLE_FONTSIZE.sp,
                     fontWeight = FontWeight(MEDIUM_FONT_WEIGHT),
                     color = Color(DARK_GRAY),
-
+                    textAlign = TextAlign.Center,
                 ),
-                modifier = Modifier.testTag("commentTimestamp_${comment.uid}")
-            )
-        }
+            modifier =
+                Modifier.padding(horizontal = STANDARD_PADDING.dp)
+                    .testTag("commentContent_${comment.uid}"))
+      }
     }
 
-    if (profileId != "anonymous") {
-      Column {
-        if (comment.userId == profileId) {
-          TextButton(
-              onClick = {
-                performOfflineAwareAction(
-                    context = context,
-                    networkManager = networkManager,
-                    onPerform = { onDeleteComment(comment) })
-              },
-              modifier =
-                  Modifier.padding(top = SMALL_PADDING.dp, end = STANDARD_PADDING.dp)
-                      .testTag("DeleteButton_${comment.uid}")) {
-                Text("Delete", color= Color(DARK_GRAY))
+    Column {
+      if (comment.userId == profileId) {
+        if (profileId != "anonymous") {
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(STANDARD_PADDING.dp),
+              modifier = Modifier.padding(horizontal = STANDARD_PADDING.dp)) {
+                TextButton(
+                    onClick = {
+                      performOfflineAwareAction(
+                          context = context,
+                          networkManager = networkManager,
+                          onPerform = { onDeleteComment(comment) })
+                    },
+                    modifier =
+                        Modifier.padding(end = STANDARD_PADDING.dp)
+                            .testTag("DeleteButton_${comment.uid}")) {
+                      Text(
+                          "Delete",
+                          color = Color(DARK_GRAY),
+                          style =
+                              TextStyle(
+                                  fontSize = SUBTITLE_FONTSIZE.sp,
+                                  fontWeight = FontWeight(SMALL_FONT_WEIGHT),
+                                  color = Color(DARK_GRAY),
+                              ),
+                      )
+                    }
+                if (allowReplies) {
+                  // Toggle button to show/hide the reply input field
+                  TextButton(
+                      onClick = { showReplyField = !showReplyField },
+                      modifier =
+                          Modifier.testTag(
+                              "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
+                        Text(
+                            if (showReplyField) "Cancel" else "Reply",
+                            color = Color(DARK_GRAY),
+                            style =
+                                TextStyle(
+                                    fontSize = SUBTITLE_FONTSIZE.sp,
+                                    fontWeight = FontWeight(SMALL_FONT_WEIGHT),
+                                    color = Color(DARK_GRAY),
+                                ),
+                        )
+                      }
+                }
               }
         }
+      }
 
-        if (allowReplies) {
-          // Toggle button to show/hide the reply input field
-          TextButton(
-              onClick = { showReplyField = !showReplyField },
-              modifier =
-                  Modifier.padding(top = SMALL_PADDING.dp)
-                      .testTag(
-                          "${if (showReplyField) "Cancel" else "Reply"}Button_${comment.uid}")) {
-                Text(if (showReplyField) "Cancel" else "Reply", color= Color(DARK_GRAY))
-              }
-        }
-
-        // Conditionally show the reply input field if the user is logged in
+      // Conditionally show the reply input field if the user is logged in
+      if (profileId != "anonymous") {
         if (showReplyField) {
-          OutlinedTextField(
+          TextFieldWithErrorState(
               value = replyText,
               onValueChange = { replyText = it },
-              label = { Text("Reply") },
-              modifier = Modifier.fillMaxWidth().testTag("replyInputField_${comment.uid}"))
+              label = "Add Comment",
+              modifier = Modifier.padding(STANDARD_PADDING.dp).fillMaxWidth(),
+              validation = { comment ->
+                when {
+                  comment.isEmpty() -> context.getString(R.string.comment_empty)
+                  else -> null
+                }
+              },
+              testTag = "replyInputField_${comment.uid}",
+              errorTestTag = "replyErrorText")
 
-          Button(
+          ElevatedButton(
+              enabled = replyText.isNotEmpty(),
               onClick = {
                 performOfflineAwareAction(
                     context = context,
@@ -936,27 +934,31 @@ fun CommentItem(
                       showReplyField = false
                     })
               },
+              colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
+              elevation =
+                  ButtonDefaults.elevatedButtonElevation(
+                      defaultElevation = BUTTON_ELEVATION_DEFAULT.dp),
               modifier =
                   Modifier.padding(top = SMALL_PADDING.dp)
                       .testTag("postReplyButton_${comment.uid}")) {
-                Text("Post Reply")
+                Text("Post Reply", color = Color.Black)
               }
         }
       }
+    }
 
-      // Show replies for original comments, but do not allow replies on replies
-      comment.replies.forEach { reply ->
-        Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
-          // Pass `allowReplies = false` for replies to prevent nesting
-          CommentItem(
-              profileId,
-              reply,
-              creatorId,
-              onReplyComment,
-              onDeleteComment,
-              allowReplies = false,
-              imageViewModel)
-        }
+    // Show replies for original comments, but do not allow replies on replies
+    comment.replies.forEach { reply ->
+      Box(modifier = Modifier.padding(start = MEDIUM_PADDING.dp)) {
+        // Pass `allowReplies = false` for replies to prevent nesting
+        CommentItem(
+            profileId,
+            reply,
+            creatorId,
+            onReplyComment,
+            onDeleteComment,
+            allowReplies = false,
+            imageViewModel)
       }
     }
   }
@@ -970,7 +972,7 @@ fun PaymentInfoScreen(price: Double) {
   Row(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start,
-      modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("PriceAndInfo")) {
+      modifier = Modifier.padding(horizontal = MEDIUM_PADDING.dp).testTag("price")) {
         // Payment Text
 
         Icon(Icons.Filled.AttachMoney, contentDescription = "Price", tint = Color(LIGHT_BLUE))
@@ -983,7 +985,7 @@ fun PaymentInfoScreen(price: Double) {
         Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
         // Info Icon with Click
         ElevatedButton(
-            modifier = Modifier.testTag("PaymentInfoButton"),
+            modifier = Modifier.testTag("infoIconButton"),
             onClick = { showDialog = true },
             colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
             elevation =
@@ -1069,11 +1071,13 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
 @Composable
 fun CreatorRow(
     creator: User,
+    profile: User?,
     nbActivitiesCreated: Int,
     imageViewModel: ImageViewModel,
+    listActivityViewModel: ListActivitiesViewModel,
     navigationActions: NavigationActions
 ) {
-
+  val context = LocalContext.current
   Row(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.padding(SMALL_PADDING.dp).testTag("creatorRow")) {
@@ -1087,7 +1091,19 @@ fun CreatorRow(
             verticalArrangement = Arrangement.Center) {
               ElevatedButton(
                   modifier = Modifier.height(SMALL_BUTTON_HEIGHT.dp).width(SMALL_BUTTON_WIDTH.dp),
-                  onClick = { navigationActions.navigateTo(Screen.PROFILE) },
+                  onClick = {
+                    if (creator.id == "") {
+                      Toast.makeText(context, "This user is not registered", Toast.LENGTH_SHORT)
+                          .show()
+                    } else {
+                      if (creator.id == profile?.id) {
+                        navigationActions.navigateTo(Screen.PROFILE)
+                      } else {
+                        listActivityViewModel.selectUser(creator)
+                        navigationActions.navigateTo(Screen.PARTICIPANT_PROFILE)
+                      }
+                    }
+                  },
                   colors = buttonColors(containerColor = Color(DARK_YELLOW)),
                   elevation =
                       ButtonDefaults.elevatedButtonElevation(
@@ -1126,17 +1142,42 @@ fun CreatorRow(
             horizontalArrangement =
                 Arrangement.spacedBy(SMALL_PADDING.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Text(
-              modifier = Modifier.testTag("ratingText"),
-              text = "4.7",
-              style =
-                  TextStyle(
-                      fontSize = MEDIUM_PADDING.sp,
-                      fontWeight = FontWeight(LARGE_FONT_WEIGHT),
-                      color = Color(DARK_GRAY),
-                      textAlign = TextAlign.Center,
-                  ))
-        }
+            modifier = Modifier.testTag("creatorRating")) {
+              Text(
+                  modifier = Modifier.testTag("ratingText"),
+                  text = "4.7",
+                  style =
+                      TextStyle(
+                          fontSize = MEDIUM_PADDING.sp,
+                          fontWeight = FontWeight(LARGE_FONT_WEIGHT),
+                          color = Color(DARK_GRAY),
+                          textAlign = TextAlign.Center,
+                      ))
+              Icon(
+                  imageVector = Icons.Filled.Star,
+                  contentDescription = "Star",
+                  tint = Color.Black,
+                  modifier = Modifier.size(MEDIUM_FONTSIZE.dp))
+            }
       }
+}
+
+fun getRelativeTimeSpanString(timestamp: Timestamp): String {
+  val currentTime = System.currentTimeMillis()
+  val commentTime = timestamp.toDate().time
+  return DateUtils.getRelativeTimeSpanString(commentTime, currentTime, DateUtils.MINUTE_IN_MILLIS)
+      .toString()
+}
+
+@Composable
+fun CommentTimestamp(comment: Comment) {
+  Text(
+      text = getRelativeTimeSpanString(comment.timestamp),
+      style =
+          TextStyle(
+              fontSize = NORMAL_PADDING.sp,
+              fontWeight = FontWeight(SMALL_FONT_WEIGHT),
+              color = Color(DARK_GRAY),
+          ),
+      modifier = Modifier.testTag("commentTimestamp_${comment.uid}"))
 }
