@@ -385,7 +385,8 @@ constructor(
     val totalWeights = weights.values.sum()
 
     if (cachedScores_.containsKey("last_updated") &&
-        Timestamp.now().seconds.toDouble() - cachedScores_["last_updated"]!! < 30 &&
+        Timestamp.now().seconds.toDouble() - cachedScores_.getOrDefault("last_updated", 10000.0) <
+            30 &&
         cachedScores_.containsKey(activity.uid))
         return cachedScores_[activity.uid] ?: 2.5
 
