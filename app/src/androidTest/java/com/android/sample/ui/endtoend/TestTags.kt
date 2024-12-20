@@ -86,10 +86,17 @@ object Profile {
   const val SCREEN = "profileScreen"
   const val MORE_OPTIONS_BUTTON = "moreOptionsButton"
   const val LOGOUT_BUTTON = "logoutMenuItem"
+  const val EDIT_PROFILE_BUTTON = "editProfileMenuItem"
 
   object NotLoggedIn {
     const val PROMPT = "loadingText"
     const val SIGN_IN_BUTTON = "signInButton"
+  }
+
+  object EditProfile {
+    const val EDIT_PROFILE_SCREEN = "editProfileScreen"
+    const val INPUT_NAME = "inputProfileName"
+    const val SAVE_BUTTON = "profileSaveButton"
   }
 }
 

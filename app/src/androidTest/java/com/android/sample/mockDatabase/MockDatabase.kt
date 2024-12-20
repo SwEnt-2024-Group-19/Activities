@@ -1,5 +1,6 @@
 package com.android.sample.mockDatabase
 
+import android.util.Log
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.profile.User
 import com.android.sample.resources.dummydata.e2e_Activities
@@ -11,19 +12,42 @@ import com.android.sample.resources.dummydata.e2e_Users
  *
  * @param users: List of users
  */
-data class MockUsersDatabase(private val users: List<User> = e2e_Users) {
+data class MockUsersDatabase(private val users: MutableList<User> = e2e_Users.toMutableList()) {
+
+  /** Get a user by their ID */
   fun getUser(userId: String): User {
     return users.find { it.id == userId }
-        ?: throw IllegalArgumentException("User with id $userId does not exist")
+      ?: throw IllegalArgumentException("User with id $userId does not exist")
   }
 
+  /** Update a user */
   fun updateUser(user: User) {
     val index = users.indexOfFirst { it.id == user.id }
     if (index == -1) {
       throw IllegalArgumentException("User with id ${user.id} does not exist")
     }
+    users[index] = user
   }
-}
+
+  /** Add a new user */
+  fun addUser(user: User) {
+    if (users.any { it.id == user.id }) {
+      throw IllegalArgumentException("User with id ${user.id} already exists")
+    }
+    users.add(user)
+  }
+
+  /** Remove a user */
+  fun removeUser(userId: String) {
+    val index = users.indexOfFirst { it.id == userId }
+    if (index == -1) {
+      throw IllegalArgumentException("User with id $userId does not exist")
+    }
+    users.removeAt(index)
+  }}
+
+
+
 
 /**
  * Mock database for activities.

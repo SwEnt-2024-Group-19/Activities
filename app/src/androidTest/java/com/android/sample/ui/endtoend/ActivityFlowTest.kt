@@ -19,6 +19,7 @@ import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.lang.Thread.sleep
 
 @HiltAndroidTest
 class ActivityFlowTest {
@@ -319,4 +320,46 @@ class ActivityFlowTest {
 
   */
 
+  @Test
+  fun EditProfile() {
+    val email1 = defaultUserCredentials1["email"]!!
+    val password1 = defaultUserCredentials1["password"]!!
+    val name1 = defaultUserCredentials1["first name"]!! // @TODO: Should this change to full name?
+
+    // Auth screen > Sign in screen
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+    hlp.notSee(Overview.SCREEN)
+    hlp.see(Auth.SignIn.TEXT_INVALID_EMAIL, text = true)
+
+    //  Enters credentials then connects
+    hlp.write(Auth.SignIn.EMAIL_INPUT, email1)
+    hlp.write(Auth.SignIn.PASSWORD_INPUT, password1)
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+    hlp.see(BottomNavigation.OVERVIEW)
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+
+    // Profile screen of user 1
+    hlp.see(Profile.SCREEN)
+    hlp.see(name1, text = true)
+
+    // proceed to logout
+    hlp.see(Profile.MORE_OPTIONS_BUTTON)
+    hlp.click(Profile.MORE_OPTIONS_BUTTON)
+    hlp.see(Profile.EDIT_PROFILE_BUTTON)
+    hlp.click(Profile.EDIT_PROFILE_BUTTON)
+
+    hlp.see(Profile.EditProfile.EDIT_PROFILE_SCREEN)
+    hlp.click(Profile.EditProfile.INPUT_NAME)
+    hlp.write(Profile.EditProfile.INPUT_NAME, "Mary",true)
+
+    hlp.click(Profile.EditProfile.SAVE_BUTTON)
+    hlp.see(Profile.SCREEN)
+
+    hlp.see("Mary", text = true)
+
+
+  }
 }
