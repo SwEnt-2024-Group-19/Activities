@@ -3,6 +3,7 @@ package com.android.sample.ui.dialogs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,8 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.android.sample.model.profile.User
+import com.android.sample.resources.C.Tag.MAIN_BACKGROUND
+import com.android.sample.resources.C.Tag.MAIN_COLOR_DARK
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.ROUNDED_CORNER_SHAPE_DEFAULT
+import com.android.sample.resources.C.Tag.SMALL_PADDING
+import com.android.sample.resources.C.Tag.WIDTH_FRACTION_SM
+import com.android.sample.ui.components.TextFieldWithErrorState
 
 /**
  * Composable function to display the dialog to add a user.
@@ -48,7 +53,7 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
             modifier =
                 Modifier.fillMaxWidth()
                     .background(
-                        color = Color.White,
+                        color = Color(MAIN_BACKGROUND),
                         shape = RoundedCornerShape(size = ROUNDED_CORNER_SHAPE_DEFAULT.dp))
                     .testTag("addUserDialog"),
             verticalArrangement = Arrangement.Center,
@@ -61,21 +66,30 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
               style = MaterialTheme.typography.titleLarge,
               modifier = Modifier.testTag("addUserDialogTitle"),
           )
-          OutlinedTextField(
-              modifier = Modifier.testTag("nameTextFieldUser"),
+          TextFieldWithErrorState(
+              modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM),
               value = name,
               onValueChange = { name = it },
-              label = { Text("Name") },
-              singleLine = true,
-          )
+              label = "Name",
+              validation = { nameAttendee ->
+                if (nameAttendee.isEmpty()) {
+                  "Name cannot be empty"
+                } else {
+                  null
+                }
+              },
+              testTag = "nameTextFieldUser",
+              errorTestTag = "nameErrorUser")
 
-          OutlinedTextField(
-              modifier = Modifier.testTag("surnameTextFieldUser"),
+          Spacer(modifier = Modifier.padding(SMALL_PADDING.dp))
+          TextFieldWithErrorState(
+              modifier = Modifier.fillMaxWidth(WIDTH_FRACTION_SM),
               value = surname,
               onValueChange = { surname = it },
-              label = { Text("Surname") },
-              singleLine = true,
-          )
+              label = "Surname",
+              validation = { null },
+              testTag = "surnameTextFieldUser",
+              errorTestTag = "surnameErrorUser")
           TextButton(
               modifier =
                   Modifier.testTag("addUserButton").fillMaxWidth().padding(MEDIUM_PADDING.dp),
@@ -95,11 +109,11 @@ fun AddUserDialog(onDismiss: () -> Unit, onAddUser: (User) -> Unit) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add user",
-                    tint = Color.DarkGray,
+                    tint = Color(MAIN_COLOR_DARK),
                 )
                 Text(
                     "Add user",
-                    color = Color.DarkGray,
+                    color = Color(MAIN_COLOR_DARK),
                 )
               }
         }

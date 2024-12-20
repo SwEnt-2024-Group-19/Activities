@@ -146,7 +146,11 @@ fun NavGraph(
     ) {
       composable(Screen.OVERVIEW) {
         ListActivitiesScreen(
-            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+            listActivitiesViewModel,
+            navigationActions,
+            profileViewModel,
+            locationViewModel,
+            imageViewModel = imageViewModel)
       }
       composable(Screen.EDIT_ACTIVITY) {
         EditActivityScreen(
@@ -180,7 +184,11 @@ fun NavGraph(
       }
       composable(Screen.OVERVIEW) {
         ListActivitiesScreen(
-            listActivitiesViewModel, navigationActions, profileViewModel, locationViewModel)
+            listActivitiesViewModel,
+            navigationActions,
+            profileViewModel,
+            locationViewModel,
+            imageViewModel = imageViewModel)
       }
     }
 
@@ -211,7 +219,11 @@ fun NavGraph(
 
     navigation(startDestination = Screen.LIKED_ACTIVITIES, route = Route.LIKED_ACTIVITIES) {
       composable(Screen.LIKED_ACTIVITIES) {
-        LikedActivitiesScreen(listActivitiesViewModel, navigationActions, profileViewModel)
+        LikedActivitiesScreen(
+            listActivitiesViewModel,
+            navigationActions,
+            profileViewModel,
+            imageViewModel = imageViewModel)
       }
     }
   }

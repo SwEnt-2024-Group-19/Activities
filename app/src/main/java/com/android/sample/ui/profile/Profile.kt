@@ -207,8 +207,10 @@ fun ActivityRow(
       verticalAlignment = Alignment.Top) {
         var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
 
-        imageViewModel.fetchActivityImagesAsBitmaps(
-            activity.uid, onSuccess = { urls -> bitmaps = urls }, onFailure = {})
+        LaunchedEffect(user) {
+          imageViewModel.fetchActivityImagesAsBitmaps(
+              activity.uid, onSuccess = { urls -> bitmaps = urls }, onFailure = {})
+        }
 
         // Display image
         if (activity.images.isNotEmpty() && bitmaps.isNotEmpty()) {
@@ -643,9 +645,10 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel, userActivities: Li
           HeaderItem(
               "Activities\nJoined",
               userActivities
-                  .filter({
-                    it.creator != user.id || it.participants.map { it.id }.contains(user.id)
-                  })
+                  .filter { activity ->
+                    activity.creator != user.id &&
+                        activity.participants.map { it.id }.contains(user.id)
+                  }
                   .size
                   .toString(),
               false)
