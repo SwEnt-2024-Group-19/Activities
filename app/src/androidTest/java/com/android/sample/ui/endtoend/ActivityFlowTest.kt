@@ -66,9 +66,7 @@ class ActivityFlowTest {
   @Test
   fun guestCanSeeCorrectOverviewAndNavigateToActivityDetails() {
     // Auth screen > Sign in screen
-    hlp.scroll(
-        parentTag = Auth.SignIn.SIGN_IN_COLUMN,
-        nodeTag = Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
+
     hlp.click(Auth.SignIn.GUEST_BUTTON)
 
     // Overview screen

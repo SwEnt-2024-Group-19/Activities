@@ -117,6 +117,16 @@ import com.google.firebase.Timestamp
 import java.util.UUID
 import kotlin.math.min
 
+/**
+ * ActivityDetailsScreen Composable: Displays the activity details screen, including details,
+ * participants, comments, and interaction options.
+ *
+ * @param listActivityViewModel ViewModel for managing activity details and state.
+ * @param navigationActions Provides navigation between screens.
+ * @param profileViewModel ViewModel for user profile state and operations.
+ * @param locationViewModel ViewModel for handling location-based data.
+ * @param imageViewModel ViewModel for fetching and displaying images.
+ */
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,12 +137,14 @@ fun ActivityDetailsScreen(
     locationViewModel: LocationViewModel,
     imageViewModel: ImageViewModel
 ) {
+  // State variables for activity details
+
   val detailsType = listActivityViewModel.selectedDetailsType.collectAsState().value
   val activity = listActivityViewModel.selectedActivity.collectAsState().value
   val profile = profileViewModel.userState.collectAsState().value
-  // Check if the user is already enrolled in the activity
   val isUserEnrolled = profile?.activities?.contains(activity?.uid) ?: false
 
+  // Remember state for activity properties
   val activityTitle by remember { mutableStateOf(activity?.title) }
   val description by remember { mutableStateOf(activity?.description) }
   val location by remember { mutableStateOf(activity?.location) }
@@ -147,6 +159,10 @@ fun ActivityDetailsScreen(
   var comments by remember { mutableStateOf(activity?.comments ?: listOf()) }
 
   var bitmaps by remember { mutableStateOf(listOf<Bitmap>()) }
+  /**
+   * Function to delete a comment, along with replies if applicable. Updates the activity's comments
+   * list in the ViewModel.
+   */
   val deleteComment: (Comment) -> Unit = { commentToDelete ->
     // Filter out the main comment and any replies associated with it
     val newComments = comments.filter { it.uid != commentToDelete.uid }
@@ -168,7 +184,7 @@ fun ActivityDetailsScreen(
     // Update the activity with the modified comments list
     listActivityViewModel.updateActivity(activity!!.copy(comments = comments))
   }
-
+  // Creator information and participants
   val creatorID = activity?.creator ?: ""
   var creator by remember {
     mutableStateOf(User(creatorID, "null", "null", listOf(), listOf(), "", listOf()))
@@ -189,6 +205,8 @@ fun ActivityDetailsScreen(
   val activitiesList = (uiState as ListActivitiesViewModel.ActivitiesUiState.Success).activities
   val nbActivitiesCreated = activitiesList.filter { it.creator == creator.id }.size
   val hourDateViewModel = HourDateViewModel()
+
+  // Fetch participants and update list
   var participantsList by remember { mutableStateOf(listOf<User>()) }
   LaunchedEffect(activity?.uid) {
     activity?.participants?.forEach { participant ->
@@ -205,7 +223,7 @@ fun ActivityDetailsScreen(
       }
     }
   }
-
+  // Main UI Scaffold
   Scaffold(
       topBar = {
         CenterAlignedTopAppBar(
@@ -228,16 +246,18 @@ fun ActivityDetailsScreen(
                 Modifier.wrapContentHeight()
                     .padding(horizontal = MEDIUM_PADDING.dp)
                     .testTag("bottomBar")) {
+              // Like button to like/unlike the activity
               LikeButton(profile, activity, profileViewModel)
               Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
 
               if (activity != null) {
+                // Export activity to calendar
                 ExportActivityToCalendarButton(
                     activity = activity, viewModel = listActivityViewModel, context = context)
               }
 
               Spacer(modifier = Modifier.weight(WIDTH_FRACTION_MD))
-              // Enroll button
+              // Enroll or edit activity button
               if (activity?.status == ActivityStatus.ACTIVE && profile != null) {
 
                 if (hourDateViewModel.combineDateAndTime(activity.date, activity.startTime) <=
@@ -316,7 +336,6 @@ fun ActivityDetailsScreen(
                             )
                       }
                 } else {
-                  // Creator of the activity
                   ElevatedButton(
                       onClick = {
                         performOfflineAwareAction(
@@ -393,6 +412,7 @@ fun ActivityDetailsScreen(
 
               Spacer(modifier = Modifier.height(STANDARD_PADDING.dp))
 
+              // Tab bar
               Row(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.Top,
@@ -400,7 +420,7 @@ fun ActivityDetailsScreen(
                     IconButton(
                         onClick = { listActivityViewModel.updateDetailsType(ACTIVITY_DETAILS) },
                         modifier =
-                            Modifier.width(ICON_BUTTON_SIZE.dp) // Increase width horizontally
+                            Modifier.width(ICON_BUTTON_SIZE.dp)
                                 .let {
                                   if (detailsType == ACTIVITY_DETAILS) {
                                     it.background(Color.LightGray, shape = CircleShape)
@@ -818,7 +838,18 @@ fun CommentSection(
     }
   }
 }
-
+/**
+ * CommentSection Composable: Displays a comment section with the ability to add, reply to, and
+ * delete comments.
+ *
+ * @param profileId The ID of the current user's profile.
+ * @param comments A list of comments to display.
+ * @param onAddComment Callback function to handle adding a new comment.
+ * @param onReplyComment Callback function to handle replying to a comment.
+ * @param onDeleteComment Callback function to handle deleting a comment.
+ * @param creatorId The ID of the activity creator, to distinguish creator's comments.
+ * @param imageViewModel ViewModel for managing user profile images.
+ */
 @Composable
 fun CommentItem(
     profileId: String,
@@ -1002,7 +1033,12 @@ fun CommentItem(
     }
   }
 }
-
+/**
+ * PaymentInfoScreen Composable: Displays the payment details of an activity and provides additional
+ * information via a dialog.
+ *
+ * @param price The price of the activity, in CHF.
+ */
 @Composable
 fun PaymentInfoScreen(price: Double) {
   var showDialog by remember { mutableStateOf(false) }
@@ -1069,7 +1105,13 @@ fun PaymentInfoScreen(price: Double) {
         }
       }
 }
-
+/**
+ * LikeButton Composable: A button that allows users to like or unlike an activity.
+ *
+ * @param profile The current user's profile, which contains their liked activities.
+ * @param activity The activity to be liked or unliked.
+ * @param profileViewModel The ViewModel managing the user's profile state and actions.
+ */
 @Composable
 fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileViewModel) {
   var isLiked by remember {
@@ -1106,7 +1148,17 @@ fun LikeButton(profile: User?, activity: Activity?, profileViewModel: ProfileVie
     }
   }
 }
-
+/**
+ * CreatorRow Composable: Displays information about the activity creator, including their profile
+ * picture, name, number of activities created, and a navigation button to view their profile.
+ *
+ * @param creator The creator of the activity, represented as a User object.
+ * @param profile The current user's profile.
+ * @param nbActivitiesCreated The number of activities created by the creator.
+ * @param imageViewModel The ViewModel managing user profile images.
+ * @param listActivityViewModel The ViewModel managing activity-related state and logic.
+ * @param navigationActions The navigation actions for transitioning between screens.
+ */
 @Composable
 fun CreatorRow(
     creator: User,
@@ -1200,14 +1252,31 @@ fun CreatorRow(
             }
       }
 }
-
+/**
+ * getRelativeTimeSpanString: Converts a `Timestamp` object into a human-readable relative time
+ * string.
+ *
+ * This function calculates the difference between the current time and the provided timestamp and
+ * formats it as a relative time span, such as "5 minutes ago" or "2 days ago".
+ *
+ * @param timestamp The `Timestamp` object representing the time to be converted.
+ * @return A `String` representing the relative time span from the current time.
+ */
 fun getRelativeTimeSpanString(timestamp: Timestamp): String {
   val currentTime = System.currentTimeMillis()
   val commentTime = timestamp.toDate().time
   return DateUtils.getRelativeTimeSpanString(commentTime, currentTime, DateUtils.MINUTE_IN_MILLIS)
       .toString()
 }
-
+/**
+ * CommentTimestamp: A composable function that displays the relative timestamp of a comment.
+ *
+ * This function uses the provided `Comment` object to extract its timestamp and converts it into a
+ * human-readable relative time string (e.g., "5 minutes ago"). It then renders the timestamp using
+ * a `Text` composable with specific styling.
+ *
+ * @param comment The `Comment` object whose timestamp will be displayed.
+ */
 @Composable
 fun CommentTimestamp(comment: Comment) {
   Text(
