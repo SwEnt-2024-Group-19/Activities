@@ -128,9 +128,9 @@ class ActivityFlowTest {
 
     // Check that the user is not logged in and can't enroll
     // @TODO: The need for a scroll here is debatable
-    hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
-    hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
-    hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
+    hlp.see(ActivityDetails.NOT_LOGGED_IN_TEXT)
+    hlp.notSee(ActivityDetails.ENROLL_BUTTON)
+    hlp.click(ActivityDetails.GO_BACK_BUTTON)
     hlp.see(Overview.SCREEN)
 
     // Check that the user do not have a profile
@@ -335,7 +335,7 @@ class ActivityFlowTest {
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
     hlp.click(Overview.ACTIVITY_CARD)
     hlp.see(ActivityDetails.SCREEN)
-    hlp.click(ENROLL_BUTTON)
+    hlp.click(ActivityDetails.ENROLL_BUTTON)
 
     // make sure the user is now enrolled in an activity
     hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
