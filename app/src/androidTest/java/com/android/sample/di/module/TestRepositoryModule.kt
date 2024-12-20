@@ -12,6 +12,7 @@ import com.android.sample.model.map.MockLocationPermissionChecker
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.MockProfilesRepository
 import com.android.sample.model.profile.ProfilesRepository
+import com.android.sample.ui.map.MockLocationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
@@ -51,7 +52,7 @@ object TestRepositoryModule {
   @Provides
   @Singleton
   fun provideLocationRepository(): LocationRepository {
-    return mock(LocationRepository::class.java)
+    return MockLocationRepository()
   }
 
   @Provides

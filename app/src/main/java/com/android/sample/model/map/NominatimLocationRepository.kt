@@ -36,8 +36,6 @@ constructor(
         override fun onLocationResult(locationResult: LocationResult) {
           val location = locationResult.lastLocation
           if (location != null) {
-            // Update the ViewModel or any listener with the new location
-            // You could notify the ViewModel here, for example:
             onLocationUpdate?.invoke(
                 Location(location.latitude, location.longitude, "Current", "Current Location"))
           }
@@ -70,8 +68,6 @@ constructor(
         Location(lat, lon, name, fullName)
       }
     } catch (e: JSONException) {
-      // Log the error and return an empty list if the JSON format is incorrect
-      Log.e("NominatimLocationRepository", "Failed to parse JSON body", e)
       emptyList()
     }
   }
@@ -94,15 +90,14 @@ constructor(
     val request =
         Request.Builder()
             .url(url)
-            .header("User-Agent", "Aptivities/1.0 (elvan@epfl.ch)") // Set a proper User-Agent
-            .header("Referer", "https://aptivities-epfl.com") // Optionally add a Referer
+            .header("User-Agent", "Aptivities/1.0 (elvan@epfl.ch)")
+            .header("Referer", "https://aptivities-epfl.com")
             .build()
     client
         .newCall(request)
         .enqueue(
             object : Callback {
               override fun onFailure(call: Call, e: IOException) {
-                Log.e("NominatimLocationRepository", "Failed to execute request", e)
                 onFailure(e)
               }
 
@@ -110,7 +105,6 @@ constructor(
                 response.use {
                   if (!response.isSuccessful) {
                     onFailure(Exception("Unexpected code $response"))
-                    Log.d("NominatimLocationRepository", "Unexpected code $response")
                     return
                   }
 
@@ -129,11 +123,9 @@ constructor(
 
   @SuppressLint("MissingPermission")
   override fun getCurrentLocation(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
-
     fusedLocationClient.lastLocation
         .addOnSuccessListener { location ->
           location?.let {
-            Log.d("NominatimLocationRepository", "Location: $location")
             val fullName = "Current Location" // Replace with actual logic if needed
             val name = "Current" // Summarized name
             onSuccess(Location(it.latitude, it.longitude, name, fullName))
@@ -146,9 +138,8 @@ constructor(
   private fun requestLocationUpdate(onSuccess: (Location) -> Unit, onFailure: (Exception) -> Unit) {
     val cancellationTokenSource = CancellationTokenSource()
     fusedLocationClient
-        .getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
+        .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
         .addOnSuccessListener { location ->
-          Log.d("NominatimLocationRepository", "Location: $location")
           location?.let {
             onSuccess(Location(it.latitude, it.longitude, "Updated", "Updated Location"))
           } ?: onFailure(Exception("Location not available"))
