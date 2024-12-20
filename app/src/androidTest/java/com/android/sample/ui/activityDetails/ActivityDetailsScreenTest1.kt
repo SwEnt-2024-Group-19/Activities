@@ -535,7 +535,7 @@ class ActivityDetailsScreenAndroidTest {
     val detailsType = ATTENDANT_DETAILS
     `when`(mockViewModel.selectedDetailsType).thenReturn(MutableStateFlow(detailsType))
     mockProfileViewModel = mock(ProfileViewModel::class.java)
-    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id="")))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -545,7 +545,7 @@ class ActivityDetailsScreenAndroidTest {
           imageViewModel = mockImageViewModel)
     }
     // Check if each participant's name is displayed
-    activityWithParticipants.participants.forEach { participant ->
+    activityWithParticipants.copy(participants = listOf(testUser)).participants.forEach { participant ->
       composeTestRule
           .onNodeWithTag("${participant.name} ${participant.surname} row")
           .assertIsDisplayed()

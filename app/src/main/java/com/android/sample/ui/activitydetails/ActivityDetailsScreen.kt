@@ -194,12 +194,14 @@ fun ActivityDetailsScreen(
     activity?.participants?.forEach { participant ->
       if (participant.id.isEmpty()) participantsList = participantsList + participant
       else {
-        profileViewModel.getUserData(
-            participant.id,
-            onResult = {
-              if (it != null && !participantsList.contains(it))
-                  participantsList = participantsList.plus(it)
-            })
+          if (participant.id.length > 8) {
+              profileViewModel.getUserData(
+                  participant.id,
+                  onResult = {
+                      if (it != null && !participantsList.contains(it))
+                          participantsList = participantsList.plus(it)
+                  })
+          }
       }
     }
   }
