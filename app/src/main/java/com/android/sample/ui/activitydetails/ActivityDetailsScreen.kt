@@ -31,11 +31,9 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.buttonColors
@@ -93,7 +91,6 @@ import com.android.sample.resources.C.Tag.IMAGE_HEIGHT_RATIO
 import com.android.sample.resources.C.Tag.IMAGE_WIDTH_RATIO
 import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.LIGHT_BLUE
-import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.MEDIUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.NORMAL_PADDING
@@ -1226,7 +1223,7 @@ fun CreatorRow(
                       ),
                   modifier = Modifier.testTag("activityCount"))
             }
-  }
+      }
 }
 /**
  * getRelativeTimeSpanString: Converts a `Timestamp` object into a human-readable relative time
