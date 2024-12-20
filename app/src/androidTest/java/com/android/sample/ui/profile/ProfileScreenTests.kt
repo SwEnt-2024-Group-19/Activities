@@ -15,6 +15,7 @@ import androidx.compose.ui.test.performClick
 import com.android.sample.model.activity.ActivitiesRepository
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageRepositoryFirestore
 import com.android.sample.model.image.ImageViewModel
@@ -51,6 +52,7 @@ class ProfileScreenTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var mockHourDateViewModel: HourDateViewModel
+  private lateinit var signInViewModel: SignInViewModel
 
   private lateinit var sharedPreferences: SharedPreferences
   private lateinit var mockEditor: SharedPreferences.Editor
@@ -80,6 +82,7 @@ class ProfileScreenTest {
     }
 
     listActivitiesViewModel.getActivities()
+    signInViewModel = mock(SignInViewModel::class.java)
     val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)
@@ -102,7 +105,8 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel = mockImageViewModel)
+          imageViewModel = mockImageViewModel,
+          signInViewModel = signInViewModel)
     }
     composeTestRule
         .onNodeWithTag("loadingText")
@@ -118,7 +122,8 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel = mockImageViewModel)
+          imageViewModel = mockImageViewModel,
+          signInViewModel = signInViewModel)
     }
     composeTestRule.onNodeWithTag("profileTopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("userName").assertIsDisplayed()
@@ -142,7 +147,8 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel = mockImageViewModel)
+          imageViewModel = mockImageViewModel,
+          signInViewModel = signInViewModel)
     }
     composeTestRule.onNodeWithTag("settingsIcon", useUnmergedTree = true).performClick()
     composeTestRule.onNodeWithTag("editProfileMenuItem").performClick()
@@ -156,7 +162,8 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel = mockImageViewModel)
+          imageViewModel = mockImageViewModel,
+          signInViewModel = signInViewModel)
     }
 
     // Wait until the UI is idle and ready
@@ -184,7 +191,8 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel = mockImageViewModel)
+          imageViewModel = mockImageViewModel,
+          signInViewModel = signInViewModel)
     }
     composeTestRule.onNodeWithTag("passedActivities").performClick()
     composeTestRule.onNodeWithText("Watch World Cup 2022", useUnmergedTree = true).assertExists()
@@ -202,7 +210,8 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel = mockImageViewModel)
+          imageViewModel = mockImageViewModel,
+          signInViewModel = signInViewModel)
     }
 
     composeTestRule.waitForIdle()
@@ -295,7 +304,8 @@ class ProfileScreenTest {
           userProfileViewModel = userProfileViewModel,
           navigationActions = navigationActions,
           listActivitiesViewModel = listActivitiesViewModel,
-          imageViewModel = mockImageViewModel)
+          imageViewModel = mockImageViewModel,
+          signInViewModel = signInViewModel)
     }
 
     // Wait for the UI to settle
@@ -333,7 +343,11 @@ class ProfileScreenTest {
     val activity2 = activity.copy(participants = listOf(testUser))
     val activity3 = activity.copy(creator = testUser.id)
     composeTestRule.setContent {
-      ProfileHeader(testUser, mockImageViewModel, listOf(activity1, activity2, activity3))
+      ProfileHeader(
+          testUser,
+          mockImageViewModel,
+          listOf(activity1, activity2, activity3),
+          HourDateViewModel())
     }
     composeTestRule.onNodeWithTag("profileHeader").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profilePicture").assertExists()

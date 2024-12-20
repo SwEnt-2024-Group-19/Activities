@@ -30,8 +30,40 @@ data class Activity(
     val type: ActivityType,
     var participants: List<User>,
     var comments: List<Comment> = emptyList(),
-    var likes: Map<String, Boolean?> = emptyMap(),
-)
+    var likes: Map<String, Boolean> = emptyMap()
+) {
+  // Function to calculate the normalized rating for the activity
+  fun getActivityRating(): Double {
+    val totalVotes = likes.size
+    val likeCount = likes.values.count { it }
+
+    return if (totalVotes > 0) likeCount.toDouble() / totalVotes else -1.0
+  }
+
+  /**
+   * Normalized weighted rating of the activity based on the number of participants, percentage of
+   * completion, and percentage of participants who liked/disliked the activity.
+   */
+  fun getActivityWeightedRating(): Double {
+    val rating = getActivityRating()
+    val completionRatio = 1 - placesLeft.toDouble() / maxPlaces
+    val likesCompletionRatio =
+        if (participants.isNotEmpty()) likes.size.toDouble() / participants.size else -1.0
+
+    val ratingWeight =
+        if (rating >= 0) 0.5
+        else 0.0 // does not penalize if no likes because it's assumed to not be the creator's fault
+    val completionRatioWeight = 0.25
+    val likesCompletionRatioWeight =
+        if (likesCompletionRatio >= 0) 0.25
+        else 0.0 // does not penalize if no likes because it's assumed to not be the creator's fault
+    val totalWeight = ratingWeight + completionRatioWeight + likesCompletionRatioWeight
+
+    return (rating * ratingWeight +
+        completionRatio * completionRatioWeight +
+        likesCompletionRatio * likesCompletionRatioWeight) / totalWeight
+  }
+}
 
 data class Comment(
     val uid: String,

@@ -1,5 +1,6 @@
 package com.android.sample.ui.activitydetails
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.text.format.DateUtils
 import android.util.Log
@@ -111,10 +112,12 @@ import com.android.sample.ui.components.TextFieldWithErrorState
 import com.android.sample.ui.components.performOfflineAwareAction
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.utils.ReviewActivityButtons
 import com.google.firebase.Timestamp
 import java.util.UUID
 import kotlin.math.min
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityDetailsScreen(

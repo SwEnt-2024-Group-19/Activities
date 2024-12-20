@@ -15,8 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
 import com.android.sample.model.network.NetworkManager
@@ -65,7 +64,6 @@ import com.android.sample.resources.C.Tag.ROW_WIDTH
 import com.android.sample.resources.C.Tag.SMALL_PADDING
 import com.android.sample.resources.C.Tag.STANDARD_PADDING
 import com.android.sample.resources.C.Tag.SUBTITLE_FONTSIZE
-import com.android.sample.resources.C.Tag.SUCCESS_COLOR
 import com.android.sample.resources.C.Tag.TEXT_FONTSIZE
 import com.android.sample.resources.C.Tag.VERY_LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.WIDTH_FRACTION_MD
@@ -79,9 +77,8 @@ import com.android.sample.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
+import com.android.sample.ui.utils.ReviewActivityButtons
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import java.util.Calendar
 
 @Composable
@@ -90,7 +87,8 @@ fun ProfileScreen(
     userProfileViewModel: ProfileViewModel,
     navigationActions: NavigationActions,
     listActivitiesViewModel: ListActivitiesViewModel,
-    imageViewModel: ImageViewModel
+    imageViewModel: ImageViewModel,
+    signInViewModel: SignInViewModel
 ) {
   val context = LocalContext.current
   val networkManager = NetworkManager(context)
@@ -119,7 +117,8 @@ fun ProfileScreen(
             imageViewModel,
             userProfileViewModel,
             listActivitiesViewModel,
-            uid)
+            uid,
+            signInViewModel)
       }
     }
   } else {
@@ -139,7 +138,8 @@ fun ProfileScreen(
             imageViewModel,
             userProfileViewModel,
             listActivitiesViewModel,
-            uid)
+            uid,
+            signInViewModel)
       }
     }
   }
@@ -254,7 +254,7 @@ fun ActivityRow(
                   overflow = TextOverflow.Ellipsis,
                   modifier = Modifier.testTag("activityDescription"))
             }
-        if (!remainingTime && !isParticipant) {
+        if (!remainingTime && !isParticipant && user.id != activity.creator) {
           ReviewActivityButtons(activity.likes[user.id]) { review ->
             listActivitiesViewModel.reviewActivity(activity, user.id, review)
           }
@@ -309,48 +309,6 @@ fun RemainingTime(currentTimeMillis: Long, activity: Activity) {
       modifier = Modifier.testTag("remainingTime"))
 }
 
-@Composable
-fun ReviewActivityButtons(currentReview: Boolean?, review: (Boolean?) -> Unit) {
-  var isLiked: Boolean? by remember { mutableStateOf(currentReview) }
-  Row {
-    IconButton(
-        onClick = {
-          isLiked = if (isLiked == true) null else true
-          review(isLiked)
-        },
-        colors =
-            IconButtonDefaults.iconButtonColors(
-                containerColor = if (isLiked == true) Color(SUCCESS_COLOR) else Color.Transparent,
-                contentColor =
-                    if (isLiked == true) MaterialTheme.colorScheme.onError
-                    else MaterialTheme.colorScheme.onSurface),
-        modifier = Modifier.testTag("likeIconButton_${isLiked == true}")) {
-          Icon(imageVector = Icons.Default.ThumbUp, contentDescription = "Like")
-        }
-    Spacer(modifier = Modifier.width(MEDIUM_PADDING.dp))
-    IconButton(
-        onClick = {
-          isLiked = if (isLiked == false) null else false
-          review(isLiked)
-        },
-        colors =
-            IconButtonDefaults.iconButtonColors(
-                containerColor =
-                    if (isLiked == false) MaterialTheme.colorScheme.error else Color.Transparent,
-                contentColor =
-                    if (isLiked == false) MaterialTheme.colorScheme.onError
-                    else MaterialTheme.colorScheme.onSurface),
-        modifier = Modifier.testTag("dislikeIconButton_${isLiked == false}")) {
-          Icon(
-              imageVector = Icons.Default.ThumbDown,
-              contentDescription = "Dislike",
-              tint =
-                  if (isLiked == false) MaterialTheme.colorScheme.onError
-                  else MaterialTheme.colorScheme.onSurface)
-        }
-  }
-}
-
 /** Display a single interest in a box */
 @Composable
 fun InterestBox(interest: Interest) {
@@ -366,7 +324,7 @@ fun InterestBox(interest: Interest) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun UserProfile(
     user: User,
@@ -374,7 +332,8 @@ fun UserProfile(
     imageViewModel: ImageViewModel,
     profileViewModel: ProfileViewModel,
     listActivitiesViewModel: ListActivitiesViewModel,
-    uid: String
+    uid: String,
+    signInViewModel: SignInViewModel
 ) {
   var activityType by remember { mutableIntStateOf(CREATED_ACTIVITIES) }
   val uiState by listActivitiesViewModel.uiState.collectAsState()
@@ -442,11 +401,11 @@ fun UserProfile(
                             onPerform = {
                               showMenu = false
                               profileViewModel.clearUserData()
-                              Firebase.auth.signOut()
+                              signInViewModel.signOut() // sign out
                               navigationActions.navigateTo(Screen.AUTH)
                             })
                       },
-                      enabled = Firebase.auth.currentUser?.isAnonymous == false)
+                      enabled = profileViewModel.userState.value != null)
                   DropdownMenuItem(
                       modifier = Modifier.testTag("editProfileMenuItem"),
                       text = { Text(LocalContext.current.getString(R.string.edit_profile)) },
@@ -459,14 +418,17 @@ fun UserProfile(
             modifier = Modifier.padding(innerPadding).testTag("profileContentColumn"),
             verticalArrangement = Arrangement.spacedBy(NORMAL_PADDING.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              ProfileHeader(user, imageViewModel, userActivities)
+              ProfileHeader(user, imageViewModel, userActivities, hourDateViewModel)
 
               ShowInterests(user)
 
               Row(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.Top,
-                  modifier = Modifier.fillMaxWidth().testTag("activityTypeRow")) {
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .testTag("activityTypeRow")
+                          .padding(vertical = NORMAL_PADDING.dp)) {
                     Text(
                         "Created",
                         modifier =
@@ -620,8 +582,14 @@ fun DisplayActivitiesList(
   }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
-fun ProfileHeader(user: User, imageViewModel: ImageViewModel, userActivities: List<Activity>) {
+fun ProfileHeader(
+    user: User,
+    imageViewModel: ImageViewModel,
+    userActivities: List<Activity>,
+    hourDateViewModel: HourDateViewModel
+) {
   Row(
       horizontalArrangement = Arrangement.SpaceEvenly,
       verticalAlignment = Alignment.CenterVertically,
@@ -632,7 +600,7 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel, userActivities: Li
             imageViewModel)
         Row(
             horizontalArrangement =
-                Arrangement.spacedBy(BIG_PADDING.dp, Alignment.CenterHorizontally),
+                Arrangement.spacedBy(NORMAL_PADDING.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.Top,
         ) {
           HeaderItem(
@@ -649,7 +617,35 @@ fun ProfileHeader(user: User, imageViewModel: ImageViewModel, userActivities: Li
                   .size
                   .toString(),
               false)
-          HeaderItem("Rating", "4.7", true)
+
+          val creatorRatingInt =
+              (user.getUserRatingAsACreator(
+                      userActivities
+                          .filter {
+                            hourDateViewModel.combineDateAndTime(it.date, it.startTime) <=
+                                Timestamp.now()
+                          }
+                          .map { it.getActivityWeightedRating() }
+                          .filter { it >= 0 }) * 5)
+                  .toInt()
+          val creatorRatingString =
+              String.format(
+                  "%.1f",
+                  user.getUserRatingAsACreator(
+                      userActivities
+                          .filter {
+                            hourDateViewModel.combineDateAndTime(it.date, it.startTime) <=
+                                Timestamp.now()
+                          }
+                          .map { it.getActivityWeightedRating() }
+                          .filter { it >= 0 }) * 5)
+          if (creatorRatingInt >= 0) HeaderItem("Creator Rating", creatorRatingString, true)
+
+          val participantRatingInt = (user.getUserRatingAsAParticipant() * 5).toInt()
+          val participantRatingString =
+              String.format("%.1f", user.getUserRatingAsAParticipant() * 5)
+          if (participantRatingInt >= 0)
+              HeaderItem("Participant Rating", participantRatingString, true)
         }
       }
 }
