@@ -125,6 +125,10 @@ class ActivityFlowTest {
     hlp.see(ActivityDetails.DescriptionText)
     hlp.see(ActivityDetails.Price)
     hlp.see(ActivityDetails.PriceText)
+    hlp.see(ActivityDetails.Location)
+    hlp.see(ActivityDetails.LocationText)
+    hlp.see(ActivityDetails.Schedule)
+    hlp.see(ActivityDetails.ScheduleText)
 
     // Check that the user is not logged in and can't enroll
     // @TODO: The need for a scroll here is debatable
