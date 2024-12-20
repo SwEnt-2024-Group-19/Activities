@@ -66,9 +66,7 @@ class ActivityFlowTest {
   @Test
   fun guestCanSeeCorrectOverviewAndNavigateToActivityDetails() {
     // Auth screen > Sign in screen
-    hlp.scroll(
-        parentTag = Auth.SignIn.SIGN_IN_COLUMN,
-        nodeTag = Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
+
     hlp.click(Auth.SignIn.GUEST_BUTTON)
 
     // Overview screen
@@ -116,23 +114,24 @@ class ActivityFlowTest {
 
     // Activity details screen
     hlp.see(ActivityDetails.SCREEN)
-    listOf(
-            ActivityDetails.TopAppBar,
-            ActivityDetails.GoBackButton,
-            ActivityDetails.Image,
-            ActivityDetails.Title,
-            ActivityDetails.TitleText,
-            ActivityDetails.DescriptionText,
-            ActivityDetails.Price,
-            ActivityDetails.PriceText,
-            ActivityDetails.Location,
-            ActivityDetails.LocationText,
-            ActivityDetails.Schedule,
-            ActivityDetails.ScheduleText)
-        .forEach { hlp.see(it) }
+
+    hlp.see(ActivityDetails.TopAppBar)
+    hlp.see(ActivityDetails.GoBackButton)
+    hlp.see(ActivityDetails.Image)
+    hlp.see(ActivityDetails.Title)
+    hlp.see(ActivityDetails.TitleText)
+    hlp.click(ActivityDetails.detailsIcon)
+
+    hlp.see(ActivityDetails.DescriptionText)
+    hlp.see(ActivityDetails.Price)
+    hlp.see(ActivityDetails.PriceText)
+    hlp.see(ActivityDetails.Location)
+    hlp.see(ActivityDetails.LocationText)
+    hlp.see(ActivityDetails.Schedule)
+    hlp.see(ActivityDetails.ScheduleText)
 
     // Check that the user is not logged in and can't enroll
-    hlp.scroll(Overview.ActivityDetails.SCREEN, Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
+    // @TODO: The need for a scroll here is debatable
     hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
     hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
     hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
@@ -282,7 +281,6 @@ class ActivityFlowTest {
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
     hlp.click(Overview.ACTIVITY_CARD)
     hlp.see(ActivityDetails.SCREEN)
-    hlp.scroll("activityDetailsScreen", ENROLL_BUTTON)
     hlp.click(ENROLL_BUTTON)
 
     // make sure the user is now enrolled in an activity

@@ -49,6 +49,9 @@ constructor(
   private val _uiState = MutableStateFlow<ActivitiesUiState>(ActivitiesUiState.Success(emptyList()))
   open val uiState: StateFlow<ActivitiesUiState> = _uiState
 
+  private val _selectedDetailsType = MutableStateFlow<Int>(1)
+  open val selectedDetailsType: StateFlow<Int?> = _selectedDetailsType.asStateFlow()
+
   // Filter state variables
   var maxPrice by mutableStateOf(Double.MAX_VALUE)
   var availablePlaces by mutableStateOf<Int?>(null)
@@ -496,6 +499,10 @@ constructor(
       }
       else -> true
     }
+  }
+
+  open fun updateDetailsType(detailsType: Int) {
+    _selectedDetailsType.value = detailsType
   }
 
   open fun createActivity(

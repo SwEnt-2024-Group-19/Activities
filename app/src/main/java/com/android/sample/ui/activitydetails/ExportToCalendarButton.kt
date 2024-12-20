@@ -5,14 +5,18 @@ import android.content.Intent
 import android.provider.CalendarContract
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
+import com.android.sample.resources.C.Tag.LIGHT_BLUE
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import java.util.*
 
@@ -22,7 +26,7 @@ fun ExportActivityToCalendarButton(
     activity: Activity,
     context: Context = LocalContext.current
 ) {
-  Button(
+  IconButton(
       onClick = {
         val calendarEvent = viewModel.prepareCalendarEvent(activity)
 
@@ -30,8 +34,8 @@ fun ExportActivityToCalendarButton(
           exportToCalendar(context = context, calendarEvent = calendarEvent)
         }
       },
-      modifier = Modifier.fillMaxWidth().padding(MEDIUM_PADDING.dp)) {
-        Text(context.getString(R.string.export_to_calendar))
+      modifier = Modifier.padding(MEDIUM_PADDING.dp)) {
+        Icon(Icons.Default.DateRange, contentDescription = "Schedule", tint = Color(LIGHT_BLUE))
       }
 }
 

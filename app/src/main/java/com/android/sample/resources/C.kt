@@ -30,7 +30,11 @@ object C {
     const val ENROLLED_ACTIVITIES = 1
     const val PAST_ACTIVITIES = 2
 
-    const val CARD_IAMGES_SIZE = 100
+    const val CARD_IAMGES_SIZE = 120
+    const val ACTIVITY_DETAILS = 0
+    const val ATTENDANT_DETAILS = 1
+    const val ACTIVITY_COMMENTS = 2
+
     const val STANDARD_PADDING = 8
 
     const val MEDIUM_FONTSIZE = 18
@@ -50,11 +54,15 @@ object C {
 
     const val BUTTON_HEIGHT_MD = 50
 
+    const val BUTTON_HEIGHT_LG = 80
+
     const val ATTENDANT_PREVIEW_HEIGHT = 85
 
     const val AUTH_BUTTON_HEIGHT = 60
 
     const val LARGE_BUTTON_HEIGHT = 50
+    const val SMALL_FONT_WEIGHT = 250
+    const val MEDIUM_FONT_WEIGHT = 350
     const val LARGE_FONT_WEIGHT = 500
     const val VERY_LARGE_FONT_WEIGHT = 600
     const val MAXIMUM_FONT_WEIGHT = 700
@@ -65,6 +73,8 @@ object C {
     const val LARGE_PADDING = 24
 
     const val SMALL_PADDING = 4
+    const val SMALL_BUTTON_HEIGHT = 34
+    const val SMALL_BUTTON_WIDTH = 120
 
     const val EXTRA_LARGE_PADDING = 32
 
@@ -80,6 +90,7 @@ object C {
     const val WHITE_COLOR = 0xFFFFFFFF
     const val LIGHT_PURPLE_COLOR = 0xFF8B6EA2
     const val DARK_BLUE_COLOR = 0xFF4A148C
+    const val DARK_YELLOW = 0xFFCEB107
     const val PRIMARY_COLOR = 0xFF005697
 
     const val BLACK_COLOR = 0xFF000000
@@ -89,7 +100,9 @@ object C {
     const val SUCCESS_COLOR = 0xFF048531
 
     const val IMAGE_SIZE = 100
+    const val ICON_BUTTON_SIZE = 100
 
+    const val XL_IMAGE_SIZE = 350
     const val LARGE_IMAGE_SIZE = 200
 
     const val SMALL_IMAGE_SIZE = 30
@@ -105,19 +118,25 @@ object C {
     const val TEXT_FONTSIZE = 12
     const val SMALL_TEXT_FONTSIZE = 9
 
+    const val IMAGE_WIDTH_RATIO = 16f
+    const val IMAGE_HEIGHT_RATIO = 9f
+
     const val WIDTH_FRACTION_MD = 0.8f
 
     const val WIDTH_FRACTION_SM = 0.7f
 
     const val CARD_ELEVATION_DEFAULT = 4
+    const val BUTTON_ELEVATION_DEFAULT = 4
 
     const val ROUNDED_CORNER_SHAPE_DEFAULT = 12
+    const val ROUNDED_CORNER_SHAPE_L = 40
 
     const val LINE_STROKE = 1
 
     // ANIMATIONS
     const val SPINNING_DURATION = 1500
     const val FADING_DURATION = 1000
+    const val LIGHT_BLUE = 0xFF6697CA
 
     fun colorOfCategory(category: Category): Color {
       val colorCode =
@@ -130,6 +149,7 @@ object C {
       return Color(colorCode)
     }
 
+    const val TEXT_WEIGHT = 2f
     const val MIN_PASSWORD_LENGTH = 6
 
     const val BORDER_STROKE_SM = 1
