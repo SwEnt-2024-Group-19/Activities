@@ -333,13 +333,17 @@ class ProfileScreenTest {
     val activity2 = activity.copy(participants = listOf(testUser))
     val activity3 = activity.copy(creator = testUser.id)
     composeTestRule.setContent {
-      ProfileHeader(testUser, mockImageViewModel, listOf(activity1, activity2, activity3))
+      ProfileHeader(
+          testUser,
+          mockImageViewModel,
+          listOf(activity1, activity2, activity3),
+          HourDateViewModel())
     }
     composeTestRule.onNodeWithTag("profileHeader").assertIsDisplayed()
     composeTestRule.onNodeWithTag("profilePicture").assertExists()
-    composeTestRule.onAllNodesWithTag("headerItem").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("headerItemField").assertCountEquals(3)
-    composeTestRule.onAllNodesWithTag("headerItemTitle").assertCountEquals(3)
+    composeTestRule.onAllNodesWithTag("headerItem").assertCountEquals(4)
+    composeTestRule.onAllNodesWithTag("headerItemField").assertCountEquals(4)
+    composeTestRule.onAllNodesWithTag("headerItemTitle").assertCountEquals(4)
     composeTestRule.onNodeWithTag("ratingStar").assertIsDisplayed()
   }
 
