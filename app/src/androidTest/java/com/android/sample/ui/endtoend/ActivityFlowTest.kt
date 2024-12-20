@@ -112,20 +112,20 @@ class ActivityFlowTest {
 
     // Activity details screen
     hlp.see(ActivityDetails.SCREEN)
-    listOf(
-            ActivityDetails.TopAppBar,
-            ActivityDetails.GoBackButton,
-            ActivityDetails.Image,
-            ActivityDetails.Title,
-            ActivityDetails.TitleText,
-            ActivityDetails.DescriptionText,
-            ActivityDetails.Price,
-            ActivityDetails.PriceText,
-            ActivityDetails.Location,
-            ActivityDetails.LocationText,
-            ActivityDetails.Schedule,
-            ActivityDetails.ScheduleText)
-        .forEach { hlp.see(it) }
+
+    hlp.see(ActivityDetails.TopAppBar)
+      hlp.see(ActivityDetails.GoBackButton)
+        hlp.see(ActivityDetails.Image)
+          hlp.see(ActivityDetails.Title)
+            hlp.see(ActivityDetails.TitleText)
+            hlp.see(ActivityDetails.DescriptionText)
+            hlp.see(ActivityDetails.Price)
+            hlp.see(ActivityDetails.PriceText)
+            hlp.see(ActivityDetails.Location)
+            hlp.see(ActivityDetails.LocationText)
+            hlp.see(ActivityDetails.Schedule)
+            hlp.see(ActivityDetails.ScheduleText)
+
 
     // Check that the user is not logged in and can't enroll
     // @TODO: The need for a scroll here is debatable
