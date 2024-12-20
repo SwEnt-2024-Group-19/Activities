@@ -202,7 +202,7 @@ class ListActivitiesViewModelTest {
   @Test
   fun `should update activity with new likes when review is added`() {
     FirebaseApp.initializeApp(getApplicationContext())
-    val initialLikes = mapOf("user1" to true, "user2" to false, "user3" to null)
+    val initialLikes = mapOf("user1" to true, "user2" to false, "user3" to true)
     val activity = activityBiking.copy(likes = initialLikes)
     val userId = "user3"
     val review = true

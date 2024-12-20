@@ -2,6 +2,7 @@ package com.android.sample.ui.profile
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.android.sample.ui.utils.ReviewActivityButtons
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*

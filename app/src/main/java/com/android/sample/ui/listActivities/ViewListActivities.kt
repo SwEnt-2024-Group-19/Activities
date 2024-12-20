@@ -120,6 +120,12 @@ fun ListActivitiesScreen(
 
   HandleLocationPermissionsAndTracking(locationViewModel = locationViewModel)
 
+  LaunchedEffect(Unit) {
+    viewModel.sortActivitiesByScore(profile) {
+      locationViewModel.getDistanceFromCurrentLocation(it)
+    }
+  }
+
   Scaffold(
       modifier = modifier.testTag("listActivitiesScreen"),
       topBar = {
