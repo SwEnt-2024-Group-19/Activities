@@ -12,6 +12,7 @@ import com.android.sample.model.map.LocationRepository
 import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.defaultUserCredentials1
+import com.android.sample.resources.dummydata.defaultUserCredentials2
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
@@ -221,9 +222,9 @@ class ActivityFlowTest {
     val email1 = defaultUserCredentials1["email"]!!
     val password1 = defaultUserCredentials1["password"]!!
     val name1 = defaultUserCredentials1["first name"]!! // @TODO: Should this change to full name?
-    val email2 = defaultUserCredentials1["email"]!!
-    val password2 = defaultUserCredentials1["password"]!!
-    val name2 = defaultUserCredentials1["first name"]!!
+    val email2 = defaultUserCredentials2["email"]!!
+    val password2 = defaultUserCredentials2["password"]!!
+    val name2 = defaultUserCredentials2["first name"]!!
 
     // Auth screen > Sign in screen
     hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
@@ -317,4 +318,5 @@ class ActivityFlowTest {
    }
 
   */
+
 }
