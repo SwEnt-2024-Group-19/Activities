@@ -31,11 +31,9 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.buttonColors
@@ -93,7 +91,6 @@ import com.android.sample.resources.C.Tag.IMAGE_HEIGHT_RATIO
 import com.android.sample.resources.C.Tag.IMAGE_WIDTH_RATIO
 import com.android.sample.resources.C.Tag.LARGE_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.LIGHT_BLUE
-import com.android.sample.resources.C.Tag.MEDIUM_FONTSIZE
 import com.android.sample.resources.C.Tag.MEDIUM_FONT_WEIGHT
 import com.android.sample.resources.C.Tag.MEDIUM_PADDING
 import com.android.sample.resources.C.Tag.NORMAL_PADDING
@@ -1227,27 +1224,6 @@ fun CreatorRow(
                   modifier = Modifier.testTag("activityCount"))
             }
         Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-        Row(
-            horizontalArrangement =
-                Arrangement.spacedBy(SMALL_PADDING.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.testTag("creatorRating")) {
-              Text(
-                  modifier = Modifier.testTag("ratingText"),
-                  text = "4.7",
-                  style =
-                      TextStyle(
-                          fontSize = MEDIUM_PADDING.sp,
-                          fontWeight = FontWeight(LARGE_FONT_WEIGHT),
-                          color = Color(DARK_GRAY),
-                          textAlign = TextAlign.Center,
-                      ))
-              Icon(
-                  imageVector = Icons.Filled.Star,
-                  contentDescription = "Star",
-                  tint = Color.Black,
-                  modifier = Modifier.size(MEDIUM_FONTSIZE.dp))
-            }
       }
 }
 /**
