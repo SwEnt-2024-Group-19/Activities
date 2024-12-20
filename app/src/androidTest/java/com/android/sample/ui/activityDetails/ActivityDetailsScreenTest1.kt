@@ -535,9 +535,7 @@ class ActivityDetailsScreenAndroidTest {
     val detailsType = ATTENDANT_DETAILS
     `when`(mockViewModel.selectedDetailsType).thenReturn(MutableStateFlow(detailsType))
     mockProfileViewModel = mock(ProfileViewModel::class.java)
-      `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activityWithParticipants
-          .copy(participants = listOf(testUser.copy(id = "")))))
-      mockProfileViewModel = mock(ProfileViewModel::class.java)
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
 
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "")))
     composeTestRule.setContent {
