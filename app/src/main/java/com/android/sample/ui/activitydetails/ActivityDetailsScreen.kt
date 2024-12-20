@@ -357,7 +357,7 @@ fun ActivityDetailsScreen(
               } else if (activity?.status == ActivityStatus.FINISHED) {
                 Text(text = "Activity is not active", modifier = Modifier.testTag("notActiveText"))
               } else {
-                Text(text = "require log", modifier = Modifier.testTag("notLoggedInText"))
+                Text(text = "Require Log", modifier = Modifier.testTag("notLoggedInText"))
                 ElevatedButton(
                     onClick = { navigationActions.navigateTo(Screen.AUTH) },
                     colors = buttonColors(containerColor = Color(LIGHT_BLUE)),
@@ -785,7 +785,7 @@ fun CommentSection(
     if (profileId == "anonymous") {
       // Message for users who are not logged in
       Text(
-          text = "require log",
+          text = "Require Log",
           modifier = Modifier.padding(SMALL_PADDING.dp).testTag("notLoggedInMessage"))
     } else {
       // Input field for new comments if the user is logged in
