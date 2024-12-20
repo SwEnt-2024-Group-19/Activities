@@ -49,7 +49,6 @@ Our app supports multiple users through **Firebase Authentication**, allowing us
   - Regular users
   - Organizers
 
-These roles have different access levels to manage their respective tasks.
 
 ---
 
