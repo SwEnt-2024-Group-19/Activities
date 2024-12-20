@@ -29,12 +29,13 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
    *
    * @param tag The tag of the node to click.
    */
-  fun click(tag: String, bottomNavItem: Boolean = false) {
+  fun click(tag: String, bottomNavItem: Boolean = false, text: Boolean = false, any: Boolean = false) {
     if (bottomNavItem) {
+      if (text || any) throw IllegalArgumentException("Bottom navigation items should use tags.")
       clickBottomNavigationItem(tag)
       return
     }
-    val node = getNode(tag)
+    val node = getNode(tag, text, any)
     see(tag)
     node.assertHasClickAction()
     node.performClick()
@@ -45,7 +46,7 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
   private fun clickBottomNavigationItem(tag: String) {
     see(BottomNavigation.MENU)
     see(tag)
-    click(tag)
+    click(tag, text = false)
     // see(tag, selected = true) TODO: Uncomment this line when the bug is fixed
   }
 
