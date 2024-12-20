@@ -1226,29 +1226,7 @@ fun CreatorRow(
                       ),
                   modifier = Modifier.testTag("activityCount"))
             }
-        Spacer(modifier = Modifier.width(SMALL_PADDING.dp))
-        Row(
-            horizontalArrangement =
-                Arrangement.spacedBy(SMALL_PADDING.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.testTag("creatorRating")) {
-              Text(
-                  modifier = Modifier.testTag("ratingText"),
-                  text = "4.7",
-                  style =
-                      TextStyle(
-                          fontSize = MEDIUM_PADDING.sp,
-                          fontWeight = FontWeight(LARGE_FONT_WEIGHT),
-                          color = Color(DARK_GRAY),
-                          textAlign = TextAlign.Center,
-                      ))
-              Icon(
-                  imageVector = Icons.Filled.Star,
-                  contentDescription = "Star",
-                  tint = Color.Black,
-                  modifier = Modifier.size(MEDIUM_FONTSIZE.dp))
-            }
-      }
+  }
 }
 /**
  * getRelativeTimeSpanString: Converts a `Timestamp` object into a human-readable relative time
