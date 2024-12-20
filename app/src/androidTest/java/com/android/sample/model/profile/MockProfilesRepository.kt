@@ -37,6 +37,7 @@ class MockProfilesRepository(private val database: MockUsersDatabase = MockUsers
     try {
       val user = database.getUser(userId)
       database.updateUser(user.copy(likedActivities = user.likedActivities?.plus(activityId)))
+      onSuccess()
     } catch (e: Exception) {
       onFailure(e)
     }
@@ -51,6 +52,7 @@ class MockProfilesRepository(private val database: MockUsersDatabase = MockUsers
     try {
       val user = database.getUser(userId)
       database.updateUser(user.copy(likedActivities = user.likedActivities?.minus(activityId)))
+      onSuccess()
     } catch (e: Exception) {
       onFailure(e)
     }
