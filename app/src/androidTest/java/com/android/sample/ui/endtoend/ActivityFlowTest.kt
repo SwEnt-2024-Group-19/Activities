@@ -13,16 +13,17 @@ import com.android.sample.model.map.PermissionChecker
 import com.android.sample.model.profile.ProfilesRepository
 import com.android.sample.resources.dummydata.defaultUserCredentials1
 import com.android.sample.resources.dummydata.defaultUserCredentials2
-import com.android.sample.ui.endtoend.Overview.ActivityDetails.ENROLL_BUTTON
 import com.android.sample.ui.endtoend.Profile.ACTIVITY_ROW
 import com.android.sample.ui.endtoend.Profile.ENROLLED_BUTTON
 import com.android.sample.ui.endtoend.Profile.PLUS_BUTTON_TO_CREATE
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import java.lang.Thread.sleep
 import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 
 @HiltAndroidTest
 class ActivityFlowTest {
@@ -102,10 +103,7 @@ class ActivityFlowTest {
 
     // Search bar
     hlp.click(Overview.SearchBar.SEARCH_BAR)
-    hlp.write(
-        Overview.SearchBar.SEARCH_BAR,
-        "DANCE",
-    )
+    hlp.write(Overview.SearchBar.SEARCH_BAR, "DANCE")
     hlp.notSee(Overview.ACTIVITY_CARD)
     hlp.click(Overview.SearchBar.SEARCH_BAR)
     hlp.write(Overview.SearchBar.SEARCH_BAR, "Sample", replace = true)
@@ -132,10 +130,10 @@ class ActivityFlowTest {
         .forEach { hlp.see(it) }
 
     // Check that the user is not logged in and can't enroll
-    hlp.scroll(Overview.ActivityDetails.SCREEN, Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
-    hlp.see(Overview.ActivityDetails.NOT_LOGGED_IN_TEXT)
-    hlp.notSee(Overview.ActivityDetails.ENROLL_BUTTON)
-    hlp.click(Overview.ActivityDetails.GO_BACK_BUTTON)
+    hlp.scroll(ActivityDetails.SCREEN, ActivityDetails.NOT_LOGGED_IN_TEXT)
+    hlp.see(ActivityDetails.NOT_LOGGED_IN_TEXT)
+    hlp.notSee(ActivityDetails.ENROLL_BUTTON)
+    hlp.click(ActivityDetails.GO_BACK_BUTTON)
     hlp.see(Overview.SCREEN)
 
     // Check that the user do not have a profile
@@ -159,6 +157,64 @@ class ActivityFlowTest {
     hlp.see(Auth.SignIn.SCREEN)
     hlp.scroll(Auth.SignIn.SIGN_IN_COLUMN, Auth.SignIn.GUEST_BUTTON)
     hlp.click(Auth.SignIn.GUEST_BUTTON)
+  }
+
+  @Test
+  fun guestShouldSignUpForOtherFunctionalities() {
+    // Auth screen > Sign in screen
+    hlp.scroll(
+        Auth.SignIn.SIGN_IN_COLUMN,
+        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
+
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+    hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
+
+    // Profile screen
+    hlp.see(Profile.NotLoggedIn.PROMPT)
+    hlp.click(Profile.NotLoggedIn.SIGN_IN_BUTTON)
+
+    // Auth screen > Sign up screen
+    hlp.see(Auth.SignUp.SCREEN)
+    hlp.scroll(
+        Auth.SignUp.SIGN_UP_COLUMN,
+        Auth.SignUp.GO_TO_SIGN_IN_BUTTON) // @TODO: This should not need scrolling
+    hlp.click(Auth.SignUp.GO_TO_SIGN_IN_BUTTON)
+
+    // Auth screen > Sign in
+    hlp.see(Auth.SignIn.SCREEN)
+    hlp.scroll(
+        Auth.SignIn.SIGN_IN_COLUMN,
+        Auth.SignIn.GUEST_BUTTON) // @TODO: This should not need scrolling
+    hlp.click(Auth.SignIn.GUEST_BUTTON)
+
+    // Tries to create a new activity and is prompted to sign in
+    hlp.see(Overview.SCREEN)
+    hlp.click(BottomNavigation.CREATE_ACTIVITY, bottomNavItem = true)
+
+    // Add activity screen
+    /*hlp.assertIsDisplayed(CreateActivity.SCREEN)
+    hlp.write(CreateActivity.TITLE_INPUT, "Activity Title")
+    hlp.write(CreateActivity.DESCRIPTION_INPUT, "Activity Description")
+    hlp.write(CreateActivity.PRICE_INPUT, "13")
+    hlp.write(CreateActivity.PLACES_INPUT, "7")
+    hlp.write(CreateActivity.LOCATION_INPUT, "Activity Location")
+
+
+    composeTestRule.onNodeWithTag("inputDescriptionCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputDateCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputPriceCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputPlacesCreate").assertExists()
+    composeTestRule.onNodeWithTag("inputLocationCreate").assertExists()
+    composeTestRule.onNodeWithTag("chooseTypeMenu").assertExists()
+    composeTestRule.onNodeWithTag("addAttendeeButton").assertExists()
+    composeTestRule.onNodeWithTag("createButton").assertExists()
+    composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Map").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("mapScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("centerOnCurrentLocation").assertIsDisplayed()*/
   }
 
   @Test
@@ -282,13 +338,87 @@ class ActivityFlowTest {
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
     hlp.click(Overview.ACTIVITY_CARD)
     hlp.see(ActivityDetails.SCREEN)
-    hlp.scroll("activityDetailsScreen", ENROLL_BUTTON)
-    hlp.click(ENROLL_BUTTON)
+    hlp.scroll(ActivityDetails.SCREEN, ActivityDetails.ENROLL_BUTTON)
+    hlp.click(ActivityDetails.ENROLL_BUTTON)
 
     // make sure the user is now enrolled in an activity
     hlp.click(BottomNavigation.PROFILE, bottomNavItem = true)
     hlp.click(ENROLLED_BUTTON)
     hlp.see(ACTIVITY_ROW)
     hlp.notSee(PLUS_BUTTON_TO_CREATE)
+  }
+
+  @Test
+  fun aUserLikesAnActivity() {
+    // fun aUserLikesCommentsAndEditsAnActivity() {
+    val email = defaultUserCredentials2["email"]!!
+    val password = defaultUserCredentials2["password"]!!
+
+    // Signs in
+    hlp.write(Auth.SignIn.EMAIL_INPUT, email)
+    hlp.write(Auth.SignIn.PASSWORD_INPUT, password)
+    hlp.click(Auth.SignIn.SIGN_IN_BUTTON)
+
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+
+    // Likes screen
+    hlp.click(BottomNavigation.Liked, bottomNavItem = true)
+    hlp.notSee(Overview.ACTIVITY_CARD)
+    hlp.see(Liked.NO_LIKED_ACTIVITIES)
+
+    // Overview screen
+    hlp.click(BottomNavigation.OVERVIEW, bottomNavItem = true)
+    hlp.click(Overview.ACTIVITY_CARD, any = true, index = 1)
+
+    // Activity details screen
+    hlp.see(ActivityDetails.SCREEN)
+    hlp.click(ActivityDetails.LIKE_BUTTON + "false")
+    hlp.see(ActivityDetails.LIKE_BUTTON + "true")
+    hlp.click(ActivityDetails.GoBackButton)
+
+    // Overview screen
+    hlp.see(Overview.SCREEN)
+
+    // Likes screen
+    hlp.click(BottomNavigation.Liked, bottomNavItem = true)
+    composeTestRule.waitForIdle()
+    sleep(5000)
+    hlp.see(Overview.ACTIVITY_CARD)
+    hlp.notSee(Liked.NO_LIKED_ACTIVITIES)
+    hlp.click(Overview.ACTIVITY_CARD)
+
+    // Activity details screen
+    // Amine Dafer: for your PR, you will need to uncomment the following lines
+    /*hlp.click(ActivityDetails.COMMENT_SECTION) // COMMENT_SECTION is not defined in the TestTags.kt file, you will need to add it. It is the tag of the comment section in the ActivityDetails screen
+    hlp.notSee(ActivityDetails.COMMENT_ITEM)
+    hlp.write(ActivityDetails.COMMENT_INPUT, "This is a comment")
+    hlp.click(ActivityDetails.COMMENT_POST_BUTTON)
+    hlp.see("This is a comment", text = true)
+    hlp.see(ActivityDetails.COMMENT_ITEM)
+    hlp.click(ActivityDetails.EDIT_BUTTON)*/
+
+    // Edit activity screen
+    // Should just fix tags and scroll behavior
+    /*hlp.see(EditActivity.SCREEN)
+    hlp.write(EditActivity.TITLE_INPUT, "Edited Activity Title", replace = true)
+    hlp.write(EditActivity.DESCRIPTION_INPUT, "Edited Activity Description", replace = true)
+    hlp.write(EditActivity.PRICE_INPUT, "15", replace = true)
+
+    val location = e2e_locations["Geneva"]!!.shortName
+    hlp.scroll(EditActivity.SCREEN, EditActivity.LOCATION_INPUT)
+    hlp.write(EditActivity.LOCATION_INPUT, location, replace = true)
+    hlp.see(EditActivity.LOCATION_ITEM, any = true)
+    hlp.click(location)
+    hlp.scroll(EditActivity.SCREEN, EditActivity.EDIT_BUTTON)
+    hlp.click(EditActivity.EDIT_BUTTON)
+
+    // Activity details screen
+    hlp.see(Overview.SCREEN)
+    hlp.see("Edited Activity Title", text = true)
+    hlp.click("Edited Activity Title", text = true)
+    hlp.see("Edited Activity Description", text = true)
+    hlp.see("15.0 CHF", text = true)
+    hlp.see(location, text = true)*/
   }
 }
