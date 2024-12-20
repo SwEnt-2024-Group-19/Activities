@@ -25,6 +25,11 @@ object Auth {
     const val SCREEN = "SignUpColumn"
     const val SIGN_UP_COLUMN = "SignUpColumn"
     const val GO_TO_SIGN_IN_BUTTON = "GoToSignInButton"
+    const val EMAIL_TEXT_FIELDS = "EmailTextField"
+    const val PASSWORD_TEXT_FIELDS = "PasswordTextField"
+    const val NAME_TEXT_FIELDS = "nameTextField"
+    const val SURNAME_TEXT_FIELDS = "surnameTextField"
+    const val SIGN_UP_BUTTON = "SignUpButton"
   }
 
   object SignIn {
@@ -86,10 +91,20 @@ object Profile {
   const val SCREEN = "profileScreen"
   const val MORE_OPTIONS_BUTTON = "moreOptionsButton"
   const val LOGOUT_BUTTON = "logoutMenuItem"
+  const val EDIT_PROFILE_BUTTON = "editProfileMenuItem"
+  const val ENROLLED_BUTTON = "enrolledActivities"
+  const val ACTIVITY_ROW = "activityRow"
+  const val PLUS_BUTTON_TO_CREATE = "plusRowToCreate"
 
   object NotLoggedIn {
     const val PROMPT = "loadingText"
     const val SIGN_IN_BUTTON = "signInButton"
+  }
+
+  object EditProfile {
+    const val EDIT_PROFILE_SCREEN = "editProfileScreen"
+    const val INPUT_NAME = "inputProfileName"
+    const val SAVE_BUTTON = "profileSaveButton"
   }
 }
 
