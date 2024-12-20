@@ -44,10 +44,17 @@ Our app supports multiple users through **Firebase Authentication**, allowing us
 #### Key Features:
 - Each user has their own profile, storing preferences and past activity history.
 - Any user can be an organizer or a participant
-- Organizers have additional tools for creating and managing events. 
-- We implement **role-based permissions**, distinguishing between:
-  - Regular users
-  - Organizers
+- For each activity, only its creator has certain rights such as modifying it, deleting it, removing pictures...
+- Each participant receives notifications to alert him : 
+- - 24 hours ahead of the activity scheduled time,
+- - if the activity is deleted.
+- Each user has a participant rating, and if he creates at least an activity, he also has a creator rating.
+- Creator rating depends essentially on the likes and dislikes the creator's activities receive but also on the completion of his activities( number of people participating over the total number of places), the number of people that have joined its activities in global, and how susceptible the participants are to give a feedback (feedback ratio)
+- At the end of the activity, each participant can rate the activity, and the activity's creator can rate the participants.
+- Each user has a personalised overview of activities depending on the interests he puts in his profile, his location, the date proximity with the activity's scheduled date, whether the participant has already enrolled in a specific person's activity in the past, the rating of the creators, and the price.
+- Each user can filter the activities he wants to browse depending on various parameters, such as the date of the activity, its location, price...
+- Each user can see the activity location on the map, and go from its preview screen to its location on the map and vice-versa.
+-
 
 
 ---
