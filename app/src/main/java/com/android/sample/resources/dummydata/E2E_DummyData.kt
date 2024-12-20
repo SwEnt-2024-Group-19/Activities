@@ -125,7 +125,6 @@ val defaultUserCredentials2 =
         "first name" to e2e_user2.name,
         "full name" to "${e2e_user2.name} ${e2e_user2.surname}")
 
-
 val e2e_Users = listOf(e2e_user1, e2e_user2)
 val e2e_Activities = listOf(e2e_activity1, e2e_activity2)
 val e2e_Credentials =

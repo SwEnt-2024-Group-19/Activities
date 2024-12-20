@@ -3,7 +3,6 @@ package com.android.sample.ui.profile
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import com.android.sample.R
 import com.android.sample.model.activity.Activity
 import com.android.sample.model.activity.ListActivitiesViewModel
-import com.android.sample.model.auth.SignInRepository
 import com.android.sample.model.auth.SignInViewModel
 import com.android.sample.model.hour_date.HourDateViewModel
 import com.android.sample.model.image.ImageViewModel
@@ -83,8 +81,6 @@ import com.android.sample.ui.navigation.NavigationActions
 import com.android.sample.ui.navigation.Route
 import com.android.sample.ui.navigation.Screen
 import com.google.firebase.Timestamp
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import java.util.Calendar
 
 @Composable
@@ -123,7 +119,8 @@ fun ProfileScreen(
             imageViewModel,
             userProfileViewModel,
             listActivitiesViewModel,
-            uid, signInViewModel  )
+            uid,
+            signInViewModel)
       }
     }
   } else {
@@ -438,8 +435,7 @@ fun UserProfile(
                 DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                   DropdownMenuItem(
                       modifier = Modifier.testTag("logoutMenuItem"),
-                      text = {
-                          Text(LocalContext.current.getString(R.string.logout)) },
+                      text = { Text(LocalContext.current.getString(R.string.logout)) },
                       onClick = {
                         performOfflineAwareAction(
                             context = context,
@@ -447,17 +443,15 @@ fun UserProfile(
                             onPerform = {
                               showMenu = false
                               profileViewModel.clearUserData()
-                              signInViewModel.signOut() //sign out
+                              signInViewModel.signOut() // sign out
                               navigationActions.navigateTo(Screen.AUTH)
-
                             })
                       },
-                      enabled = profileViewModel.userState.value!=null)
+                      enabled = profileViewModel.userState.value != null)
                   DropdownMenuItem(
                       modifier = Modifier.testTag("editProfileMenuItem"),
                       text = { Text(LocalContext.current.getString(R.string.edit_profile)) },
-                      onClick = {
-                          navigationActions.navigateTo(Screen.EDIT_PROFILE) })
+                      onClick = { navigationActions.navigateTo(Screen.EDIT_PROFILE) })
                 }
               }
             })

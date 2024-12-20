@@ -40,7 +40,7 @@ fun ParticipantProfileScreen(
         navigationActions,
         listActivitiesViewModel,
         imageViewModel,
-         signInViewModel)
+        signInViewModel)
   }
 }
 

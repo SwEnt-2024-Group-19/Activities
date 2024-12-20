@@ -166,7 +166,11 @@ fun NavGraph(
       }
       composable(Screen.PARTICIPANT_PROFILE) {
         ParticipantProfileScreen(
-            listActivitiesViewModel, navigationActions, imageViewModel, profileViewModel, authViewModel)
+            listActivitiesViewModel,
+            navigationActions,
+            imageViewModel,
+            profileViewModel,
+            authViewModel)
       }
     }
 
@@ -198,7 +202,7 @@ fun NavGraph(
             navigationActions = navigationActions,
             listActivitiesViewModel = listActivitiesViewModel,
             imageViewModel = imageViewModel,
-             signInViewModel = authViewModel)
+            signInViewModel = authViewModel)
       }
       composable(Screen.EDIT_PROFILE) {
         EditProfileScreen(profileViewModel, navigationActions, imageViewModel)

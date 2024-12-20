@@ -52,8 +52,7 @@ class ProfileScreenTest {
   private lateinit var mockImageViewModel: ImageViewModel
   private lateinit var mockImageRepository: ImageRepositoryFirestore
   private lateinit var mockHourDateViewModel: HourDateViewModel
-    private lateinit var signInViewModel: SignInViewModel
-
+  private lateinit var signInViewModel: SignInViewModel
 
   private lateinit var sharedPreferences: SharedPreferences
   private lateinit var mockEditor: SharedPreferences.Editor
@@ -83,7 +82,7 @@ class ProfileScreenTest {
     }
 
     listActivitiesViewModel.getActivities()
-      signInViewModel = mock(SignInViewModel::class.java)
+    signInViewModel = mock(SignInViewModel::class.java)
     val userStateFlow = MutableStateFlow(testUser)
     navigationActions = mock(NavigationActions::class.java)
     `when`(navigationActions.currentRoute()).thenReturn(Screen.PROFILE)

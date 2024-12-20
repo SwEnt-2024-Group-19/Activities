@@ -100,11 +100,10 @@ class ComposeTestHelper(private val composeTestRule: ComposeTestRule) {
    * @param replace Whether to replace the text in the node. default is false.
    */
   fun write(tag: String, input: String, replace: Boolean = false) {
-    when(replace){
+    when (replace) {
       true -> composeTestRule.onNodeWithTag(tag).performTextReplacement(input)
       false -> composeTestRule.onNodeWithTag(tag).performTextInput(input)
     }
     composeTestRule.waitForIdle()
   }
-
 }
