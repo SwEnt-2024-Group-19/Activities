@@ -32,6 +32,7 @@ import com.android.sample.resources.C.Tag.ACTIVITY_DETAILS
 import com.android.sample.resources.C.Tag.ATTENDANT_DETAILS
 import com.android.sample.resources.dummydata.activityListWithPastActivity
 import com.android.sample.resources.dummydata.activityWithParticipants
+import com.android.sample.resources.dummydata.simpleUser
 import com.android.sample.resources.dummydata.testUser
 import com.android.sample.ui.activitydetails.ActivityDetailsScreen
 import com.android.sample.ui.activitydetails.CreatorRow
@@ -84,7 +85,7 @@ class ActivityDetailsScreenAndroidTest {
 
     mockViewModel = mock(ListActivitiesViewModel::class.java)
 
-    val activityStateFlow = MutableStateFlow(activityWithParticipants)
+    val activityStateFlow = MutableStateFlow(activityWithParticipants.copy(creator = "1"))
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
 
     mockDefaultUiState =
@@ -160,7 +161,8 @@ class ActivityDetailsScreenAndroidTest {
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     val activityFinished = activityWithParticipants.copy(status = ActivityStatus.FINISHED)
-    `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activityFinished))
+    `when`(mockViewModel.selectedActivity)
+        .thenReturn(MutableStateFlow(activityFinished.copy(creator = "1")))
     composeTestRule.setContent {
       ActivityDetailsScreen(
           listActivityViewModel = mockViewModel,
@@ -226,7 +228,7 @@ class ActivityDetailsScreenAndroidTest {
 
     val activity =
         activityWithParticipants.copy(
-            creator = "456", // Different from user ID
+            creator = "1", // Different from user ID
             status = ActivityStatus.ACTIVE)
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
 
@@ -248,7 +250,9 @@ class ActivityDetailsScreenAndroidTest {
     `when`(mockViewModel.selectedDetailsType).thenReturn(MutableStateFlow(detailsType))
     mockProfileViewModel = mock(ProfileViewModel::class.java)
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "123")))
-    val activity1 = activityWithParticipants.copy(creator = "123")
+    val activity1 =
+        activityWithParticipants.copy(
+            creator = "123", participants = listOf(testUser.copy(id = "123")))
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity1))
 
     composeTestRule.setContent {
@@ -297,7 +301,8 @@ class ActivityDetailsScreenAndroidTest {
     `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser))
     // Set placesLeft equal to maxPlaces to simulate full capacity
     val activityWithMaxParticipants =
-        activityWithParticipants.copy(placesLeft = activityWithParticipants.maxPlaces)
+        activityWithParticipants.copy(
+            placesLeft = activityWithParticipants.maxPlaces, creator = "1")
     val activityStateFlow = MutableStateFlow(activityWithMaxParticipants)
     `when`(mockViewModel.selectedActivity).thenReturn(activityStateFlow)
 
@@ -326,7 +331,7 @@ class ActivityDetailsScreenAndroidTest {
     val activity =
         activityWithParticipants.copy(
             uid = "act1",
-            creator = "456", // Different from user ID
+            creator = "1", // Different from user ID
             status = ActivityStatus.ACTIVE)
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
 
@@ -386,7 +391,9 @@ class ActivityDetailsScreenAndroidTest {
 
     val activity =
         activityWithParticipants.copy(
-            creator = "456", status = ActivityStatus.ACTIVE, participants = listOf(testUser))
+            creator = "JohnDoe",
+            status = ActivityStatus.ACTIVE,
+            participants = listOf(testUser, simpleUser.copy(id = "JohnDoe")))
     `when`(mockViewModel.selectedActivity).thenReturn(MutableStateFlow(activity))
 
     composeTestRule.setContent {
