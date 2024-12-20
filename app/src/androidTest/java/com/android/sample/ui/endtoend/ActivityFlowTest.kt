@@ -264,6 +264,7 @@ class ActivityFlowTest {
     hlp.see(Profile.EditProfile.EDIT_PROFILE_SCREEN)
     hlp.click(Profile.EditProfile.INPUT_NAME)
     hlp.write(Profile.EditProfile.INPUT_NAME, "Mary", true)
+    hlp.scroll("editProfileContent", "ProfileCreationButtonCard")
     hlp.click(Profile.EditProfile.SAVE_BUTTON)
     hlp.see(Profile.SCREEN)
 
