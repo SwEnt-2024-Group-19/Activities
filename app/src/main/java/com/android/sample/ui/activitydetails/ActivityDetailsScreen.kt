@@ -396,7 +396,7 @@ fun ActivityDetailsScreen(
               Row(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.Top,
-                  modifier = Modifier.fillMaxWidth().testTag("ACTIVITY_DETAILS button")) {
+                  modifier = Modifier.fillMaxWidth()) {
                     IconButton(
                         onClick = { listActivityViewModel.updateDetailsType(ACTIVITY_DETAILS) },
                         modifier =
@@ -408,7 +408,7 @@ fun ActivityDetailsScreen(
                                     it
                                   }
                                 }
-                                .testTag("")) {
+                                .testTag("ACTIVITY_DETAILS button")) {
                           Icon(Icons.Outlined.Search, contentDescription = "ACTIVITY_DETAILS icon")
                         }
 
@@ -426,7 +426,7 @@ fun ActivityDetailsScreen(
                             Icon(
                                 imageVector = Icons.Outlined.Groups,
                                 contentDescription = "ATTENDANT_DETAILS")
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(STANDARD_PADDING.dp))
                             Text(
                                 text = "${activity?.participants?.size}/${maxPlaces ?: 0}",
                                 style = MaterialTheme.typography.bodyMedium)

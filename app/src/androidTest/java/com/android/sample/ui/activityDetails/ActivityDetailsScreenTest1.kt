@@ -530,29 +530,35 @@ class ActivityDetailsScreenAndroidTest {
     assert(comments.first().replies.any { it.content == "This is a reply" })
   }
 
-    @Test
-    fun participantsList_isDisplayedCorrectly() {
-        val detailsType = ATTENDANT_DETAILS
-        `when`(mockViewModel.selectedDetailsType).thenReturn(MutableStateFlow(detailsType))
-        mockProfileViewModel = mock(ProfileViewModel::class.java)
-        `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "")))
-        `when`(mockViewModel.selectedActivity).thenReturn(
-            MutableStateFlow(activityWithParticipants.copy(creator = "", participants = listOf(testUser.copy(id="")))))
-        composeTestRule.setContent {
-            ActivityDetailsScreen(
-                listActivityViewModel = mockViewModel,
-                navigationActions = mockNavigationActions,
-                profileViewModel = mockProfileViewModel,
-                locationViewModel = mockLocationViewModel,
-                imageViewModel = mockImageViewModel)
-        }
-        // Check if each participant's name is displayed
-        activityWithParticipants.copy(creator = "", participants = listOf(testUser.copy(id = ""))).participants.forEach { participant ->
-            composeTestRule
-                .onNodeWithTag("${participant.name} ${participant.surname} row")
-                .assertIsDisplayed()
-        }
+  @Test
+  fun participantsList_isDisplayedCorrectly() {
+    val detailsType = ATTENDANT_DETAILS
+    `when`(mockViewModel.selectedDetailsType).thenReturn(MutableStateFlow(detailsType))
+    mockProfileViewModel = mock(ProfileViewModel::class.java)
+    `when`(mockProfileViewModel.userState).thenReturn(MutableStateFlow(testUser.copy(id = "")))
+    `when`(mockViewModel.selectedActivity)
+        .thenReturn(
+            MutableStateFlow(
+                activityWithParticipants.copy(
+                    creator = "", participants = listOf(testUser.copy(id = "")))))
+    composeTestRule.setContent {
+      ActivityDetailsScreen(
+          listActivityViewModel = mockViewModel,
+          navigationActions = mockNavigationActions,
+          profileViewModel = mockProfileViewModel,
+          locationViewModel = mockLocationViewModel,
+          imageViewModel = mockImageViewModel)
     }
+    // Check if each participant's name is displayed
+    activityWithParticipants
+        .copy(creator = "", participants = listOf(testUser.copy(id = "")))
+        .participants
+        .forEach { participant ->
+          composeTestRule
+              .onNodeWithTag("${participant.name} ${participant.surname} row")
+              .assertIsDisplayed()
+        }
+  }
 
   @Test
   fun changeIconWhenActivityIsLiked() {

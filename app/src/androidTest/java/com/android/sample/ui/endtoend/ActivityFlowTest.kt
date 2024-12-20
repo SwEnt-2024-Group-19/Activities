@@ -118,18 +118,15 @@ class ActivityFlowTest {
     hlp.see(ActivityDetails.SCREEN)
 
     hlp.see(ActivityDetails.TopAppBar)
-      hlp.see(ActivityDetails.GoBackButton)
-        hlp.see(ActivityDetails.Image)
-          hlp.see(ActivityDetails.Title)
-            hlp.see(ActivityDetails.TitleText)
-            hlp.see(ActivityDetails.DescriptionText)
-            hlp.see(ActivityDetails.Price)
-            hlp.see(ActivityDetails.PriceText)
-            hlp.see(ActivityDetails.Location)
-            hlp.see(ActivityDetails.LocationText)
-            hlp.see(ActivityDetails.Schedule)
-            hlp.see(ActivityDetails.ScheduleText)
+    hlp.see(ActivityDetails.GoBackButton)
+    hlp.see(ActivityDetails.Image)
+    hlp.see(ActivityDetails.Title)
+    hlp.see(ActivityDetails.TitleText)
+    hlp.click(ActivityDetails.detailsIcon)
 
+    hlp.see(ActivityDetails.DescriptionText)
+    hlp.see(ActivityDetails.Price)
+    hlp.see(ActivityDetails.PriceText)
 
     // Check that the user is not logged in and can't enroll
     // @TODO: The need for a scroll here is debatable
@@ -282,7 +279,6 @@ class ActivityFlowTest {
     hlp.click(Overview.SEGMENTED_BUTTON_(Category.SPORT))
     hlp.click(Overview.ACTIVITY_CARD)
     hlp.see(ActivityDetails.SCREEN)
-    hlp.scroll("activityDetailsScreen", ENROLL_BUTTON)
     hlp.click(ENROLL_BUTTON)
 
     // make sure the user is now enrolled in an activity
